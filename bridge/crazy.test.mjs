@@ -145,3 +145,162 @@ test('Boss guard prevents defeating the boss in the opening Bridge round', () =>
   assert.equal(s.bossHp, 850); assert.equal(s.score, score); assert.equal(s.attack, null);
   advanceCrazy(s); assert.equal(s.damageLeft, 50);
 });
+
+test('Cat event probabilities include healing, Boss and player scratches, blocks and mischief', async () => {
+  const { catAction } = await import('./crazy.mjs');
+  assert.deepEqual([.1, .3, .5, .7, .9].map(value => catAction(() => value)), ['heal', 'boss', 'player', 'blocks', 'mischief']);
+});
+
+test('A cat scratch damages the Boss once and obeys the encounter guard', () => {
+  const s = createCrazy({ random: () => .3 }); s.catDue = 0;
+  for (let i = 0; i < 25; i++) updateCrazy(s, 50);
+  assert.equal(s.cat.action, 'boss'); assert.equal(s.bossHp, 882);
+  for (let i = 0; i < 10; i++) updateCrazy(s, 50);
+  assert.equal(s.bossHp, 882);
+  const guarded = createCrazy({ random: () => .3 }); guarded.damageLeft = 0; guarded.catDue = 0;
+  for (let i = 0; i < 25; i++) updateCrazy(guarded, 50);
+  assert.equal(guarded.bossHp, 900);
+});
+
+test('Cat player scratches warn first, cost six HP, and can be dodged with left/right', () => {
+  const hit = createCrazy({ random: () => .5 }); hit.catDue = 0;
+  updateCrazy(hit, 50); assert.equal(hit.cat.action, 'player'); assert.equal(hit.hp, 100);
+  for (let i = 0; i < 24; i++) updateCrazy(hit, 50);
+  assert.equal(hit.hp, 94);
+  const dodge = createCrazy({ random: () => .5 }); dodge.catDue = 0;
+  updateCrazy(dodge, 50); tap(dodge, 'left');
+  for (let i = 0; i < 24; i++) updateCrazy(dodge, 50);
+  assert.equal(dodge.cat.dodged, true); assert.equal(dodge.hp, 100);
+});
+
+test('Cat block smashing removes a local area, preserves distant cells, and does not trigger penalties', () => {
+  const s = createCrazy({ random: () => .7 }); s.catDue = 0;
+  for (let y = 17; y < 20; y++) for (let x = 0; x < 3; x++) s.bridge.grid[y][x] = { type: 'G', g: 99, bomb: true, curse: 'garbage' };
+  s.bridge.grid[19][9] = { type: 'O', g: 100 };
+  for (let i = 0; i < 25; i++) updateCrazy(s, 50);
+  assert.equal(s.cat.action, 'blocks'); assert.ok(s.cat.cells.length > 0);
+  assert.ok(s.cat.cells.length <= 9); assert.equal(s.bridge.grid[19][9].g, 100);
+  assert.equal(s.bridge.pendingGarbage, 0); assert.equal(s.bridge.noHoldLeft, 0);
+  assert.ok(s.bossHp < 900);
+});
+
+test('Cat attacks a Boss instead when a card encounter has no blocks to smash', () => {
+  const s = createCrazy({ random: () => .7 }); enter(s, 'cards'); s.catDue = 0;
+  for (let i = 0; i < 25; i++) updateCrazy(s, 50);
+  assert.equal(s.cat.action, 'boss'); assert.equal(s.bossHp, 882);
+});
+
+test('Crazy Bridge and arcade playfields keep the original 1:2 aspect ratio', async () => {
+  const { crazyPlayfield, crazyCanvasHeight } = await import('./crazy-view.mjs');
+  for (const mode of ['bridge', 'sand', 'pinball', 'breakout', 'bbtan']) {
+    const area = crazyPlayfield(mode);
+    assert.equal(area.h, area.w * 2);
+    assert.equal(area.w / 280, area.h / 560);
+    assert.ok(area.y + area.h <= crazyCanvasHeight(mode) - 50);
+  }
+  assert.equal(crazyCanvasHeight('bridge'), 720);
+  assert.equal(crazyCanvasHeight('cards'), 560);
+});
+
+test('Crazy uses the Marathon Bridge engine and honors stage flips', () => {
+  const s = createCrazy({ random: () => .5 }); const g = s.bridge;
+  assert.equal(g.mode, 'marathon');
+  g.active = null; g.phase = 'resolving'; g.pendingFlips = 1;
+  g.grid[19][2] = { type: 'O', g: 21 };
+  updateCrazy(s, 50);
+  assert.equal(g.grid[0][7].g, 21); assert.equal(g.pendingFlips, 0);
+});
+
+test('Switching to a mini-game preserves the full Bridge board, active piece, hold and queue', () => {
+  const s = createCrazy({ random: () => .5 }); const g = s.bridge;
+  g.grid[19][2] = { type: 'O', g: 22, bomb: true };
+  g.active = { type: 'T', rot: 1, x: 4, y: 8, curse: null, sand: null };
+  g.hold = { type: 'I' }; g.holdLocked = true;
+  const before = structuredClone({ grid: g.grid, active: g.active, hold: g.hold, queue: g.queue });
+  advanceCrazy(s, 'cards');
+  for (let i = 0; i < 8; i++) updateCrazy(s, 50);
+  advanceCrazy(s, 'bridge');
+  assert.deepEqual({ grid: g.grid, active: g.active, hold: g.hold, queue: g.queue }, before);
+  assert.equal(g.holdLocked, true);
+});
+
+test('Sand conversion preserves a falling piece and its queue while settling grains quickly', () => {
+  const s = createCrazy({ random: () => .5 }); const g = s.bridge;
+  g.grid[18][2] = { type: 'O', g: 23 }; g.grid[19][2] = { type: 'O', g: 23 };
+  g.active = { type: 'T', rot: 1, x: 4, y: 8, curse: null, sand: null };
+  const queue = g.queue.map(p => ({ type: p.type, bombIndex: p.bombIndex, curse: p.curse, curseIndex: p.curseIndex }));
+  advanceCrazy(s, 'sand');
+  assert.equal(s.parkedPiece.type, 'T'); assert.equal(g.active, null);
+  for (let i = 0; i < 100 && !g.active; i++) updateCrazy(s, 16);
+  assert.equal(g.active.type, 'T'); assert.equal(g.active.rot, 1);
+  assert.deepEqual(g.queue.map(p => ({ type: p.type, bombIndex: p.bombIndex, curse: p.curse, curseIndex: p.curseIndex })), queue);
+  const { type, rot } = g.active;
+  advanceCrazy(s, 'cards');
+  assert.equal(g.sanding, false); assert.equal(g.active.type, type); assert.equal(g.active.rot, rot);
+  assert.equal(g.active.sand, null); assert.equal(g.phase, 'playing');
+});
+
+test('Leaving Sandtrix during conversion keeps the parked piece instead of dropping it', () => {
+  const s = createCrazy({ random: () => .5 }); const g = s.bridge;
+  g.active = { type: 'I', rot: 0, x: 3, y: 9, sand: null };
+  g.grid[9][2] = { type: 'O', g: 24 };
+  const queue = structuredClone(g.queue);
+  advanceCrazy(s, 'sand');
+  advanceCrazy(s, 'mahjong');
+  assert.equal(g.active.type, 'I'); assert.equal(g.sanding, false); assert.equal(s.parkedPiece, null);
+  assert.deepEqual(g.queue.map(p => p.type), queue.map(p => p.type));
+});
+
+test('Sandtrix exit relocates an overlapping active piece without overwriting settled blocks', async () => {
+  const { fits, SAND_SCALE } = await import('./logic.mjs');
+  const s = createCrazy({ random: () => .5 }); advanceCrazy(s, 'sand');
+  s.parkedPiece = null;
+  s.bridge.active = { type: 'O', rot: 0, x: 3, y: 18, sand: 1 };
+  for (let y = 16 * SAND_SCALE; y < 20 * SAND_SCALE; y++) for (let x = 0; x < 10 * SAND_SCALE; x++) s.bridge.sandGrid[y][x] = 1;
+  advanceCrazy(s, 'bridge');
+  const g = s.bridge;
+  assert.ok(fits(g.grid, g.active.type, g.active.rot, g.active.x, g.active.y, g));
+  assert.equal(g.grid.flat().filter(Boolean).length, 40);
+  assert.equal(g.active.type, 'O');
+});
+
+test('Crazy sand clearing keeps disconnected same-color grains', async () => {
+  const { SAND_SCALE } = await import('./logic.mjs');
+  const s = createCrazy({ random: () => .5 }); advanceCrazy(s, 'sand');
+  const g = s.bridge; s.parkedPiece = null; s.catDue = Infinity;
+  g.active = null; g.phase = 'resolving';
+  for (let x = 0; x < 10 * SAND_SCALE; x++) g.sandGrid[20 * SAND_SCALE - 1][x] = 1;
+  const x = 4 * SAND_SCALE, y = 20 * SAND_SCALE - 3;
+  g.sandGrid[y][x] = 1; for (let dx = -1; dx <= 1; dx++) g.sandGrid[y + 1][x + dx] = 2;
+  updateCrazy(s, 16);
+  assert.equal(g.sandGrid[y][x], 1);
+  assert.ok(g.sandGrid[20 * SAND_SCALE - 1].every(value => value === 0));
+});
+
+test('Original Bridge reward cells enter their bonus with no countdown', () => {
+  const s = createCrazy({ random: () => .5 }); const g = s.bridge;
+  g.active = null; g.phase = 'resolving';
+  g.grid[19] = Array.from({ length: 10 }, (_, x) => ({ type: 'O', g: 10 + x }));
+  g.grid[19][4].reward = 'pinball';
+  g.grid[12][2] = { type: 'O', g: 55 };
+  updateCrazy(s, 50);
+  for (let i = 0; i < 5; i++) updateCrazy(s, 50);
+  assert.equal(s.mode, 'pinball'); assert.equal(s.arcade.prep, 0);
+  assert.equal(g.grid[12][2].g, 55);
+});
+
+test('Crazy Sandtrix uses the same rotated paint colors as the grains it stamps', async () => {
+  const { cellsOf, sandPaintsFor, SAND_HEX, SAND_SCALE, ghostY, hardDrop } = await import('./logic.mjs');
+  const s = createCrazy({ random: () => .5 }); advanceCrazy(s, 'sand');
+  s.parkedPiece = null;
+  const g = s.bridge;
+  g.active = { type: 'T', rot: 1, x: 3, y: 0, sand: [0, 0, 2, 2] }; g.phase = 'playing';
+  const cells = cellsOf('T', 1, 3, ghostY(g));
+  const paints = sandPaintsFor('T', cells, g.active.sand, 1);
+  hardDrop(g);
+  cells.forEach(([x, y], index) => {
+    const grain = g.sandGrid[y * SAND_SCALE][x * SAND_SCALE];
+    assert.equal(grain, paints[index] + 1);
+    assert.equal(SAND_HEX[grain - 1], SAND_HEX[paints[index]]);
+  });
+});

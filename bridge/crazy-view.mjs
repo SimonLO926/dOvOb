@@ -1,6 +1,19 @@
-import { COLS, ROWS, SAND_SCALE, cellsOf, ghostY } from './logic.mjs?v=1.1.0';
-import { drawSession } from './arcade.mjs?v=1.1.0';
+import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.1.1';
+import { drawSession } from './arcade.mjs?v=1.1.1';
 export const CRAZY_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 356 });
+export const CRAZY_BLOCK_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 512 });
+export function crazyCanvasHeight(mode) { return mode === 'bridge' || mode === 'sand' ? 720 : 560; }
+export function crazyPlayfield(mode) {
+  const a = mode === 'bridge' || mode === 'sand' ? CRAZY_BLOCK_ARENA : CRAZY_ARENA;
+  const scale = Math.min(a.w / 280, a.h / 560);
+  return { x: a.x + (a.w - 280 * scale) / 2, y: a.y + (a.h - 560 * scale) / 2, w: 280 * scale, h: 560 * scale, scale };
+}
+const catPhoto = typeof Image === 'undefined' ? null : new Image();
+export const catImageReady = catPhoto ? new Promise(resolve => {
+  catPhoto.onload = () => resolve(true);
+  catPhoto.onerror = () => resolve(false);
+  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.1.1', import.meta.url).href;
+}) : Promise.resolve(false);
 const COLORS = { I: '#64d2ff', O: '#ffd60a', T: '#bf5af2', S: '#30d158', Z: '#ff453a', J: '#0a84ff', L: '#ff9f0a', B: '#9da4b9' };
 const SYMBOLS = ['★', '♥', '7', '♠'];
 const TILES = ['中', '發', '白', '東'];
@@ -13,66 +26,109 @@ function box(c, x, y, w, h, color, radius = 8) {
 function ellipse(c, x, y, rx, ry, color) {
   c.fillStyle = color; c.beginPath(); c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); c.fill();
 }
-// Original tabby-and-white character based on the reference: white bib, round eyes, striped tail, gold bell.
-export function drawMischiefCat(c, x, y, scale = 1, paw = false) {
-  c.save(); c.translate(x, y); c.scale(scale, scale);
-  c.lineCap = 'round'; c.lineWidth = 14; c.strokeStyle = '#666456';
-  c.beginPath(); c.moveTo(-34, 32); c.quadraticCurveTo(-75, 28, -60, -8); c.stroke();
-  c.lineWidth = 5; c.strokeStyle = '#272b2b';
-  for (let i = 0; i < 3; i++) { c.beginPath(); c.moveTo(-65, 3 + i * 9); c.lineTo(-55, 7 + i * 9); c.stroke(); }
-  ellipse(c, -10, 31, 36, 29, '#65675b'); ellipse(c, 4, 34, 25, 28, '#f2eee2');
-  for (let i = 0; i < 4; i++) { c.beginPath(); c.moveTo(-39 + i * 8, 11); c.lineTo(-43 + i * 8, 31); c.stroke(); }
-  c.fillStyle = '#646556'; c.beginPath(); c.moveTo(-26, -15); c.lineTo(-31, -49); c.lineTo(-4, -28); c.lineTo(21, -45); c.lineTo(26, -11); c.closePath(); c.fill();
-  c.fillStyle = '#cba59b'; c.beginPath(); c.moveTo(-24, -24); c.lineTo(-26, -40); c.lineTo(-11, -27); c.fill();
-  c.beginPath(); c.moveTo(10, -26); c.lineTo(20, -38); c.lineTo(20, -20); c.fill();
-  ellipse(c, 0, -9, 29, 27, '#747668');
-  c.fillStyle = '#fbf6ea'; c.beginPath(); c.moveTo(0, -30); c.lineTo(-7, -3); c.lineTo(-23, 5); c.quadraticCurveTo(0, 29, 25, 5); c.lineTo(9, -3); c.closePath(); c.fill();
-  c.strokeStyle = '#303333'; c.lineWidth = 3;
-  for (const dx of [-9, 0, 9]) { c.beginPath(); c.moveTo(dx, -30); c.lineTo(dx * .5, -19); c.stroke(); }
-  for (const dx of [-13, 13]) {
-    ellipse(c, dx, -10, 8, 8, '#252c29'); ellipse(c, dx, -10, 6, 6, '#b9bf87'); ellipse(c, dx, -10, 3, 5, '#171f1c'); ellipse(c, dx - 2, -12, 1.8, 1.8, '#fff');
-  }
-  c.fillStyle = '#c78584'; c.beginPath(); c.moveTo(-4, 0); c.lineTo(4, 0); c.lineTo(0, 5); c.fill();
-  c.strokeStyle = '#71645b'; c.lineWidth = 1;
-  for (const side of [-1, 1]) for (let i = 0; i < 3; i++) { c.beginPath(); c.moveTo(side * 8, 4 + i * 3); c.lineTo(side * 35, -1 + i * 6); c.stroke(); }
-  c.strokeStyle = '#795832'; c.lineWidth = 4; c.beginPath(); c.moveTo(-19, 18); c.quadraticCurveTo(0, 26, 20, 18); c.stroke();
-  ellipse(c, 1, 24, 5, 6, '#ecc34c'); c.strokeStyle = '#806014'; c.lineWidth = 1; c.beginPath(); c.moveTo(1, 24); c.lineTo(1, 29); c.stroke();
-  ellipse(c, -21, 56, 15, 6, '#f4efe4'); ellipse(c, 15, 57, 15, 6, '#f4efe4');
-  if (paw) { box(c, -15, 25, 28, 65, '#f4efe4', 12); ellipse(c, -1, 85, 17, 14, '#f4efe4'); for (const dx of [-8, 0, 8]) ellipse(c, dx, 83, 3, 4, '#dab2b0'); }
-  c.restore();
+// Photographic cutout: keep the image aspect ratio and smooth fur edges.
+export function drawMischiefCat(c, x, y, scale = 1, facingLeft = false) {
+  if (!catPhoto?.complete || !catPhoto.naturalWidth) return;
+  const w = 160 * scale, h = w * catPhoto.naturalHeight / catPhoto.naturalWidth;
+  c.save(); c.translate(x, y); if (facingLeft) c.scale(-1, 1);
+  c.imageSmoothingEnabled = true; c.drawImage(catPhoto, -w / 2, -h / 2, w, h); c.restore();
 }
+const DEALER_PIXELS = [
+  '................................',
+  '..C............C.............C..',
+  '..CCC.........CCC..........CCC..',
+  '...CCCC......CCCCC......CCCCC...',
+  '...CCCCCCCCCCCCCCCCCCCCCCCCC....',
+  '....CCCCCCCCCCCCCCCCCCCCCC......',
+  '.....OOOOOOOOOOOOOOOOOOOOO......',
+  '....OFFFFFFFFFFFFFFFFFFFFFO.....',
+  '...OFFSSFFFFFFFFFFFFFFSSFFFO....',
+  '...OFSSMMMMMMMMMMMMMMMMSSFFO....',
+  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
+  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
+  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
+  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
+  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
+  '...OFFSSFFFFFFFFFFFFFFSSFFO....',
+  '...OFFFFSSFFFFFFFFFFSSFFFFO.....',
+  '....OFFFFOOOOOOOOOOOOFFFFO......',
+  '....OFFFOFFOFFOFFOFFOFFFO.......',
+  '.....OFFFFFFFFFFFFFFFFFO........',
+  '......OOSSSSSSSSSSSSOO..........',
+  '........OOOOOOOOOOOO............',
+  '..........VVVVVVVV..............',
+  '........VVVVVVVVVVVV............',
+];
+const PIXEL_SYMBOLS = [
+  ['.X.X.', 'XXXXX', 'XXXXX', '.XXX.', '..X..'],
+  ['..X..', '.XXX.', 'XXXXX', '.X.X.', '..X..'],
+  ['XXXXX', '....X', '...X.', '..X..', '..X..'],
+];
 function drawDealer(c, s, reduced) {
-  const bob = reduced ? 0 : Math.sin(s.elapsed / 500) * 2;
-  c.save(); c.translate(140, 73 + bob);
-  c.fillStyle = '#ff486d'; c.beginPath(); c.moveTo(-42, -21); c.lineTo(-55, -46); c.lineTo(-13, -31); c.lineTo(0, -48); c.lineTo(13, -31); c.lineTo(55, -46); c.lineTo(42, -21); c.fill();
-  box(c, -48, -26, 96, 56, '#ded8e8', 12);
-  box(c, -40, -19, 80, 27, '#21152f', 5);
-  for (let i = 0; i < 3; i++) text(c, s.phase === 3 ? '7' : SYMBOLS[(i + s.phase) % 4], -25 + i * 25, -4, 20, s.attack ? '#ff486d' : '#ffe5a2');
-  c.strokeStyle = '#281b36'; c.lineWidth = 3; c.beginPath(); c.moveTo(-23, 17); c.quadraticCurveTo(0, 34, 23, 17); c.stroke();
+  const pixel = 3, left = 92, top = 30 + (reduced ? 0 : Math.round(Math.sin(s.elapsed / 500)) * pixel);
+  const palette = { C: s.phase === 3 ? '#ffc25d' : '#ff486d', O: '#100e20', F: '#f4e9f8', S: '#b9a6d2', M: '#281331', V: '#74528e' };
+  c.save(); c.imageSmoothingEnabled = false;
+  DEALER_PIXELS.forEach((row, y) => [...row].forEach((v, x) => {
+    if (v === '.') return;
+    c.fillStyle = palette[v]; c.fillRect(left + x * pixel, top + y * pixel, pixel, pixel);
+  }));
+  for (let i = 0; i < 3; i++) {
+    const glyph = PIXEL_SYMBOLS[s.phase === 3 ? 2 : (i + s.phase - 1) % 3];
+    c.fillStyle = s.attack ? '#ff4969' : '#ffe5a2';
+    glyph.forEach((row, y) => [...row].forEach((v, x) => { if (v === 'X') c.fillRect(left + 8 * pixel + i * 6 * pixel + x * pixel, top + 10 * pixel + y * pixel, pixel, pixel); }));
+  }
   c.restore();
 }
 function bar(c, x, y, w, value, color) { box(c, x, y, w, 6, '#302138', 3); box(c, x, y, Math.max(0.01, w * value), 6, color, 3); }
-function bridgeBoard(c, s) {
-  const g = s.bridge, a = CRAZY_ARENA;
-  c.save(); c.translate(a.x, a.y); c.scale(a.w / 280, a.h / 560);
-  for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
+function bridgeBoard(c, s, paint) {
+  const g = s.bridge, a = crazyPlayfield(s.mode);
+  c.save(); c.translate(a.x, a.y); c.scale(a.scale, a.scale);
+  if (paint.paintGrid && s.curses.blind <= 0) paint.paintGrid(c, g.grid);
+  else if (s.curses.blind <= 0) for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
     if (!g.grid[y][x]) continue;
     box(c, x * 28 + 1, y * 28 + 1, 26, 26, COLORS[g.grid[y][x].type] || '#e0b469', 3);
   }
-  if (g.sanding && g.sandGrid) {
-    const colors = ['#ffd84a', '#ff4b4b', '#3c8dff', '#3dce6e'];
+  if (g.sanding && g.sandGrid && s.curses.blind <= 0) {
+    const colors = SAND_HEX;
     const size = 28 / SAND_SCALE;
     for (let y = 0; y < g.sandGrid.length; y++) for (let x = 0; x < g.sandGrid[y].length; x++) if (g.sandGrid[y][x]) {
       c.fillStyle = colors[g.sandGrid[y][x] - 1]; c.fillRect(x * size, y * size, size, size);
     }
   }
   if (g.active && g.phase === 'playing') {
-    c.globalAlpha = .2;
-    for (const [x, y] of cellsOf(g.active.type, g.active.rot, g.active.x, ghostY(g))) box(c, x * 28 + 1, y * 28 + 1, 26, 26, '#fff', 3);
-    c.globalAlpha = 1;
-    for (const [x, y] of cellsOf(g.active.type, g.active.rot, g.active.x, g.active.y)) box(c, x * 28 + 1, y * 28 + 1, 26, 26, COLORS[g.active.type] || '#d6c6a3', 3);
+    if (paint.paintPiece) {
+      paint.paintPiece(c, { ...g.active, y: ghostY(g) }, true);
+      paint.paintPiece(c, g.active, false);
+    } else {
+      const draw = (y, alpha) => {
+        const cells = cellsOf(g.active.type, g.active.rot, g.active.x, y);
+        const colors = g.active.sand == null ? cells.map(() => COLORS[g.active.type] || '#d6c6a3')
+          : sandPaintsFor(g.active.type, cells, g.active.sand, g.active.rot).map(index => SAND_HEX[index]);
+        c.globalAlpha = alpha;
+        cells.forEach(([x, cy], index) => box(c, x * 28 + 1, cy * 28 + 1, 26, 26, colors[index], 3));
+      };
+      draw(ghostY(g), .2); draw(g.active.y, 1);
+    }
   }
   c.restore();
+}
+function drawBridgePreviews(c, s, t, paintPiece) {
+  if (!['bridge', 'sand'].includes(s.mode)) return;
+  const g = s.bridge;
+  text(c, t('keep'), 40, 37, 10, '#cbb8d9'); text(c, t('next'), 240, 37, 10, '#cbb8d9');
+  const preview = (piece, x, y) => {
+    if (!piece) return;
+    const cells = cellsOf(piece.type, 0, 0, 0), minX = Math.min(...cells.map(([x]) => x)), minY = Math.min(...cells.map(([, y]) => y));
+    if (paintPiece) {
+      c.save(); c.translate(x, y); c.scale(6 / 28, 6 / 28);
+      paintPiece(c, { ...piece, rot: 0, x: -minX, y: -minY }, false); c.restore();
+    } else {
+      const colors = piece.sand == null ? cells.map(() => COLORS[piece.type] || '#e0b469') : sandPaintsFor(piece.type, cells, piece.sand, 0).map(index => SAND_HEX[index]);
+      cells.forEach(([cx, cy], i) => box(c, x + (cx - minX) * 6, y + (cy - minY) * 6, 5, 5, colors[i], 1));
+    }
+  };
+  c.save(); c.globalAlpha = g.holdLocked || g.noHoldLeft > 0 ? .35 : 1; preview(g.hold, 26, 53); c.restore();
+  g.queue.slice(0, 3).forEach((piece, i) => preview(piece, 226, 49 + i * 21));
 }
 function miniBoard(c, s, t) {
   const m = s.mini;
@@ -113,27 +169,49 @@ function miniBoard(c, s, t) {
     for (let i = 0; i < 5; i++) { box(c, i * 56 + 3, 475, 50, 32, i === 2 ? '#8e2346' : i % 2 ? '#555097' : '#245948', 3); text(c, i === 2 ? '−6' : i % 2 ? '⚔' : '+8', i * 56 + 28, 491, 17); }
   }
 }
-export function drawCrazy(c, s, t, { reducedMotion = false } = {}) {
-  c.save(); c.clearRect(0, 0, 280, 560);
-  const bg = c.createLinearGradient(0, 0, 0, 560); bg.addColorStop(0, '#21112e'); bg.addColorStop(1, '#0b1020'); c.fillStyle = bg; c.fillRect(0, 0, 280, 560);
-  text(c, t(s.boss.name), 140, 15, 16, '#ffd69b'); drawDealer(c, s, reducedMotion);
+export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiece } = {}) {
+  const height = crazyCanvasHeight(s.mode);
+  c.save(); c.clearRect(0, 0, 280, height);
+  const bg = c.createLinearGradient(0, 0, 0, height); bg.addColorStop(0, '#21112e'); bg.addColorStop(1, '#0b1020'); c.fillStyle = bg; c.fillRect(0, 0, 280, height);
+  text(c, `${t('crazyGreed')} · ${t(s.boss.name)}`, 140, 15, 16, '#ffd69b'); drawDealer(c, s, reducedMotion); drawBridgePreviews(c, s, t, paintPiece);
   text(c, `${s.damageLeft === 0 ? '◇ ' : ''}BOSS ${s.bossHp}/${s.boss.hp}`, 140, 117, 12, '#ff829d'); bar(c, 24, 128, 232, s.bossHp / s.boss.hp, '#ff476f');
-  const a = CRAZY_ARENA;
+  const a = s.arcade || ['bridge', 'sand'].includes(s.mode) ? crazyPlayfield(s.mode) : CRAZY_ARENA;
   box(c, a.x - 2, a.y - 2, a.w + 4, a.h + 4, s.attack ? '#a63b5e' : '#674068', 5); box(c, a.x, a.y, a.w, a.h, '#100e1b', 3);
-  if (s.mode === 'bridge' || s.mode === 'sand') bridgeBoard(c, s);
+  if (s.mode === 'bridge' || s.mode === 'sand') bridgeBoard(c, s, { paintGrid, paintPiece });
   else if (s.arcade) {
-    c.save(); c.translate(a.x, a.y); c.scale(a.w / 280, a.h / 560); drawSession(c, s.arcade, '#f2deef', { speed: t('arcadeSpeed'), double: t('arcadeDouble'), triple: t('arcadeTriple'), wide: t('arcadeWide'), narrow: t('arcadeNarrow') }); c.restore();
+    c.save(); c.translate(a.x, a.y); c.scale(a.scale, a.scale);
+    if (paintGrid) paintGrid(c, s.arcade.grid);
+    else for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (s.arcade.grid[y][x]) box(c, x * 28 + 1, y * 28 + 1, 26, 26, COLORS[s.arcade.grid[y][x].type] || '#e0b469', 3);
+    drawSession(c, s.arcade, '#f2deef', { speed: t('arcadeSpeed'), double: t('arcadeDouble'), triple: t('arcadeTriple'), wide: t('arcadeWide'), narrow: t('arcadeNarrow') }); c.restore();
   } else miniBoard(c, s, t);
   text(c, `${t('crazyMode_' + s.mode)} · ${Math.ceil(Math.max(0, s.timeLeft) / 1000)}s`, 140, 141, 12, '#ffc7d6');
   if (s.cat) {
     const warning = s.cat.time < 1200;
-    drawMischiefCat(c, warning ? 273 : 241, warning ? 328 : 354, .75, !warning && !s.cat.gift);
-    if (warning) text(c, '!', 253, 295, 25, '#ffd46b');
+    const target = s.cat.action === 'boss' ? { x: 207, y: 74 }
+      : s.cat.action === 'heal' || s.cat.action === 'player' ? { x: 250, y: height - 100 }
+      : { x: 240, y: a.y + a.h * .6 };
+    const enter = reducedMotion ? 1 : Math.min(1, s.cat.time / 450);
+    drawMischiefCat(c, warning ? 316 - enter * 35 : target.x, warning ? target.y : target.y + 4, .8, true);
+    if (warning) text(c, '!', 255, target.y - 52, 25, '#ffd46b');
+    if (!warning && s.cat.action !== 'heal') {
+      c.save(); c.strokeStyle = s.cat.action === 'player' ? '#ff6889' : '#ffe9c9'; c.lineWidth = 3;
+      for (let i = 0; i < 3; i++) { c.beginPath(); c.moveTo(target.x - 50 + i * 9, target.y - 24); c.lineTo(target.x - 28 + i * 9, target.y + 11); c.stroke(); }
+      c.restore();
+    }
+    if (!warning && s.cat.cells?.length) {
+      const life = Math.max(0, 1 - (s.cat.time - 1200) / 1200);
+      c.save(); c.globalAlpha = life;
+      for (const cell of s.cat.cells) {
+        const x = a.x + cell.x * 28 * a.scale, y = a.y + cell.y * 28 * a.scale;
+        box(c, x, y, 26 * a.scale, 26 * a.scale, '#fff2bd', 2);
+      }
+      c.restore();
+    }
   }
-  text(c, `HP ${s.hp}/100 · ${t('crazyPhaseLabel')} ${s.phase}/3`, 140, 522, 14, '#f2deef');
-  bar(c, 24, 535, 232, s.hp / 100, s.hp <= 25 ? '#ff466c' : '#6bdfb2');
+  text(c, `HP ${s.hp}/100 · ${t('crazyPhaseLabel')} ${s.phase}/3`, 140, height - 38, 14, '#f2deef');
+  bar(c, 24, height - 25, 232, s.hp / 100, s.hp <= 25 ? '#ff466c' : '#6bdfb2');
   if (s.attack) text(c, `${t('crazyAttackWarning')} ${Math.ceil(s.attack.time / 1000)}`, 140, 94, 11, '#fff1a2');
-  else if (s.noticeTime > 0) text(c, `${t(s.notice)}${s.noticeAmount ? ` ${s.noticeAmount > 0 ? '+' : ''}${s.noticeAmount}` : ''}`, 140, 550, 11, '#ffe0ab');
-  if (s.hitFlash > 0) { c.fillStyle = `rgba(255,40,80,${s.hitFlash / 1500})`; c.fillRect(0, 0, 280, 560); }
+  else if (s.noticeTime > 0) text(c, `${t(s.notice)}${s.noticeAmount ? ` ${s.noticeAmount > 0 ? '+' : ''}${s.noticeAmount}` : ''}`, 140, height - 10, 11, '#ffe0ab');
+  if (s.hitFlash > 0) { c.fillStyle = `rgba(255,40,80,${s.hitFlash / 1500})`; c.fillRect(0, 0, 280, height); }
   c.restore();
 }

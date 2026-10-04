@@ -2,6 +2,17 @@ export const LANGS = ["zh-Hant", "zh-Hans", "en", "ja", "ko", "pt", "es"];
 
 const TEXT = {
   "zh-Hant": {
+    crazyGreed: "貪婪",
+    crazyCatPlayerWarning: "貓伸爪！左右躲避！",
+    crazyCatBossWarning: "貓盯上莊家……",
+    crazyCatGiftWarning: "貓帶了魚乾！",
+    crazyCatBlocksWarning: "貓盯上方塊……",
+    crazyCatSmash: "貓打碎方塊！",
+    crazyCatBossScratch: "貓抓傷 Boss",
+    crazyCatPlayerScratch: "被貓抓傷",
+    crazyCatDodge: "躲過貓爪！",
+    crazyCatGift: "魚乾回血",
+
     crazyBossBattle: "Boss 戰",
     crazyPreviewHint: "再按 Crazy 進場。100 HP · 三階段 · 無倒數等待。",
     crazyDealer: "狂宴莊家",
@@ -151,6 +162,17 @@ const TEXT = {
     keys: "方向鍵移動，上 / X 轉，Z 反轉，空白鍵直落，C 保留，P 暫停。",
   },
   "zh-Hans": {
+    crazyGreed: "贪婪",
+    crazyCatPlayerWarning: "猫伸爪！左右躲避！",
+    crazyCatBossWarning: "猫盯上庄家……",
+    crazyCatGiftWarning: "猫带了鱼干！",
+    crazyCatBlocksWarning: "猫盯上方块……",
+    crazyCatSmash: "猫打碎方块！",
+    crazyCatBossScratch: "猫抓伤 Boss",
+    crazyCatPlayerScratch: "被猫抓伤",
+    crazyCatDodge: "躲过猫爪！",
+    crazyCatGift: "鱼干回血",
+
     crazyBossBattle: "Boss 战",
     crazyPreviewHint: "再按 Crazy 進場。100 HP · 三阶段 · 无倒数等待。",
     crazyDealer: "狂宴莊家",
@@ -299,6 +321,17 @@ const TEXT = {
     keys: "方向键移动，上 / X 转，Z 反转，空格直落，C 保留，P 暂停。",
   },
   en: {
+    crazyGreed: "GREED",
+    crazyCatPlayerWarning: "Cat claw! Move left/right!",
+    crazyCatBossWarning: "Cat eyes the dealer…",
+    crazyCatGiftWarning: "Cat brought a treat!",
+    crazyCatBlocksWarning: "Cat eyes the blocks…",
+    crazyCatSmash: "Cat smashed blocks!",
+    crazyCatBossScratch: "Cat scratched the boss",
+    crazyCatPlayerScratch: "Cat scratched you",
+    crazyCatDodge: "Dodged the cat!",
+    crazyCatGift: "Cat treat · HP",
+
     crazyBossBattle: "Boss battle",
     crazyPreviewHint: "Tap Crazy again to enter. 100 HP \u00b7 three phases \u00b7 no countdowns.",
     crazyDealer: "THE MAD DEALER",

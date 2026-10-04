@@ -1,4 +1,4 @@
-import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.1.0";
+import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.1.1";
 
 export const CELL = 28;
 export const W = COLS * CELL;
@@ -165,7 +165,7 @@ function hit(session, x, y) {
   for (const cell of removed) {
     award(session);
     session.flashes.push({ x: cell.x, y: cell.y, life: 200 });
-    if (cell.curse && cell.cause !== "blast") session.curseHits.push(cell);
+    if (cell.curse && cell.curse !== "garbage" && cell.cause !== "blast") session.curseHits.push(cell);
     if (cell.type === "F") session.feverHits.push(cell);
   }
   return removed.length > 0;
