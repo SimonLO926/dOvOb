@@ -65,11 +65,26 @@ export const GARBAGE_CHANCE = 1 / 50;
 export const GARBAGE_ROW_CHANCE = [0.24, 0.24, 0.24, ...[16, 8, 4, 2, 1].map((weight) => 0.28 * weight / 31)];
 export const GARBAGE_GRACE_DROPS = 2;
 
-export function garbageRows(random = Math.random) {
+// Gentle relative growth, capped at stage 16; reward and Fever rolls remain separate.
+export function marathonRiskScale(stage = 1) {
+  return 1 + .04 * Math.max(0, Math.min(15, Math.floor(Number(stage) || 1) - 1));
+}
+export function marathonPenaltyRates(stage = 1) {
+  const scale = marathonRiskScale(stage);
+  return { nohold: NO_HOLD_CHANCE * scale, curse: CURSE_CHANCE * scale, garbage: GARBAGE_CHANCE * scale };
+}
+export function garbageRowChances(stage = 1) {
+  const growth = marathonRiskScale(stage) - 1;
+  const weights = GARBAGE_ROW_CHANCE.map((chance, i) => chance * (1 + growth * i));
+  const total = weights.reduce((sum, value) => sum + value, 0);
+  return weights.map(value => value / total);
+}
+export function garbageRows(random = Math.random, stage = 1) {
   const roll = random();
   let cumulative = 0;
-  for (let i = 0; i < GARBAGE_ROW_CHANCE.length; i += 1) {
-    cumulative += GARBAGE_ROW_CHANCE[i];
+  const chances = garbageRowChances(stage);
+  for (let i = 0; i < chances.length; i += 1) {
+    cumulative += chances[i];
     if (roll < cumulative) return i + 1;
   }
   return 8;
@@ -325,13 +340,14 @@ export function createGame(options = {}) {
       return describe(bag.pop());
     }
     if (mode === "marathon") {
+      const rates = marathonPenaltyRates(game.stage);
       const curseRoll = random();
-      if (curseRoll < NO_HOLD_CHANCE) return describe("C", "nohold");
-      if (curseRoll < NO_HOLD_CHANCE + CURSE_CHANCE) {
+      if (curseRoll < rates.nohold) return describe("C", "nohold");
+      if (curseRoll < rates.nohold + rates.curse) {
         return describe("C", CURSES[Math.floor(random() * CURSES.length)]);
       }
-      if (curseRoll < NO_HOLD_CHANCE + CURSE_CHANCE + FEVER_CHANCE) return describe("F");
-      if (curseRoll < NO_HOLD_CHANCE + CURSE_CHANCE + FEVER_CHANCE + GARBAGE_CHANCE) return describe("G", "garbage");
+      if (curseRoll < rates.nohold + rates.curse + FEVER_CHANCE) return describe("F");
+      if (curseRoll < rates.nohold + rates.curse + FEVER_CHANCE + rates.garbage) return describe("G", "garbage");
       const roll = random();
       const breakoutAt = REWARD_CHANCE.breakout;
       const bbtanAt = breakoutAt + REWARD_CHANCE.bbtan;
@@ -859,7 +875,7 @@ export function applyGarbageCurse(game, cells = []) {
   if (feverActive(game)) return 0;
   let rows = 0;
   for (const cell of penaltyCells(cells)) {
-    if (cell.curse === "garbage") rows += garbageRows(game.random);
+    if (cell.curse === "garbage") rows += garbageRows(game.random, game.mode === "marathon" ? game.stage : 1);
   }
   game.pendingGarbage += rows;
   return rows;
