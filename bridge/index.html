@@ -4,7 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.0.14" as="font" type="font/woff" crossorigin>
   <style>
+    /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
+    @font-face {
+      font-family: "Fever Brush";
+      src: url("./fonts/fever-brush.woff?v=1.0.14") format("woff");
+      font-weight: 400;
+      font-display: swap;
+    }
     :root {
       --ink: #1d1d1f;
       --muted: #6e6e73;
@@ -420,7 +428,7 @@
     .callout.fever::before {
       content: "特";
       display: block;
-      font: 900 80px "Noto Serif TC", "Songti TC", serif;
+      font: 400 80px "Fever Brush", "KaiTi", "STKaiti", serif;
       color: #ffe49b;
       transform: rotate(-10deg) skew(-6deg);
       text-shadow: -4px 4px 0 #7b2500, 0 0 22px #ff9f0a;
@@ -1305,16 +1313,16 @@
     </section>
   </div>
   <script type="module">
-    import { createSound } from "./audio.mjs?v=1.0.13";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.13";
-    import { translate } from "./i18n.mjs?v=1.0.13";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.13";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.13";
-    import { VERSION } from "./version.mjs?v=1.0.13";
+    import { createSound } from "./audio.mjs?v=1.0.14";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.14";
+    import { translate } from "./i18n.mjs?v=1.0.14";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.14";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.14";
+    import { VERSION } from "./version.mjs?v=1.0.14";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, activateFever, applyGarbageCurse, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
-      dangerLevel, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.0.13";
+      dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
+    } from "./logic.mjs?v=1.0.14";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -1568,6 +1576,8 @@
       game.feverResolving = false;
       game.feverGroups = new Set();
       game.pendingGarbage = 0;
+      game.garbageGraceLeft = 0;
+      game.garbageGraceResolving = false;
       game.grid = brickWall(Math.random);
       game.active = null;
       game.hold = null;
@@ -1599,6 +1609,8 @@
       game.feverResolving = false;
       game.feverGroups = new Set();
       game.pendingGarbage = 0;
+      game.garbageGraceLeft = 0;
+      game.garbageGraceResolving = false;
       game.phase = "playing";
       game.active = null;
       game.hold = null;
@@ -2104,7 +2116,7 @@
       const y = top + height / 2;
       context.translate(x, y);
       context.rotate(-0.12);
-      context.font = `900 ${Math.round(badge)}px "Noto Serif TC", "Songti TC", serif`;
+      context.font = `400 ${Math.round(badge)}px "Fever Brush", "KaiTi", "STKaiti", serif`;
       context.textAlign = "center";
       context.textBaseline = "middle";
       context.lineJoin = "round";
@@ -2558,6 +2570,7 @@
       const notes = [];
       if (curseStatus()) notes.push(curseStatus());
       if (feverActive(game)) notes.push(`${t("fever")} ×3 · ${game.feverLeft}`);
+      if (garbageGraceActive(game)) notes.push(`${t("garbageStable")} ${game.garbageGraceLeft}`);
       if (game.sanding) notes.push(Number.isFinite(game.sandLeft) ? `${t("sand")} ${Math.max(0, game.sandLeft)}` : t("gameSand"));
       document.querySelector("#curse-note").textContent = notes.join(" · ");
       paintPreview(holdCtx, holdCanvas, [game.hold]);

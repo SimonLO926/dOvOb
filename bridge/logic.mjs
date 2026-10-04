@@ -62,6 +62,22 @@ export const NO_HOLD_DROPS = 15;
 export const FEVER_CHANCE = 1 / 400;
 export const FEVER_DROPS = 15;
 export const GARBAGE_CHANCE = 1 / 50;
+export const GARBAGE_ROW_CHANCE = [0.24, 0.24, 0.24, ...[16, 8, 4, 2, 1].map((weight) => 0.28 * weight / 31)];
+export const GARBAGE_GRACE_DROPS = 2;
+
+export function garbageRows(random = Math.random) {
+  const roll = random();
+  let cumulative = 0;
+  for (let i = 0; i < GARBAGE_ROW_CHANCE.length; i += 1) {
+    cumulative += GARBAGE_ROW_CHANCE[i];
+    if (roll < cumulative) return i + 1;
+  }
+  return 8;
+}
+
+export function garbageGraceActive(game) {
+  return game.garbageGraceLeft > 0 || !!game.garbageGraceResolving;
+}
 export const REWARD_CHANCE = { breakout: 0.005, bbtan: 0.005, pinball: 0.01, sand: 0.005 };
 export const SAND_DROPS = 20;
 export const SAND_MATCH = 8;
@@ -345,6 +361,8 @@ export function createGame(options = {}) {
     feverGroups: new Set(),
     feverBlastX: 4,
     pendingGarbage: 0,
+    garbageGraceLeft: 0,
+    garbageGraceResolving: false,
     queue: [],
     mode,
     score: 0,
@@ -394,6 +412,8 @@ export function startGame(game, nextMode) {
   game.feverGroups = new Set();
   game.feverBlastX = 4;
   game.pendingGarbage = 0;
+  game.garbageGraceLeft = 0;
+  game.garbageGraceResolving = false;
   game.score = 0;
   game.lines = 0;
   game.stage = 1;
@@ -419,6 +439,7 @@ export function startGame(game, nextMode) {
 
 function spawn(game, preset) {
   game.feverResolving = false;
+  game.garbageGraceResolving = false;
   const next = preset ?? game.queue.shift();
   if (!preset) game.queue.push(game.pull());
   const piece = {
@@ -837,7 +858,7 @@ export function applyGarbageCurse(game, cells = []) {
   if (feverActive(game)) return 0;
   let rows = 0;
   for (const cell of penaltyCells(cells)) {
-    if (cell.curse === "garbage") rows += 1 + Math.min(2, Math.floor(game.random() * 3));
+    if (cell.curse === "garbage") rows += garbageRows(game.random);
   }
   game.pendingGarbage += rows;
   return rows;
@@ -865,7 +886,9 @@ function raiseGarbage(game, count) {
     game.phase = "over";
     return { type: "over", reason: "garbage", rows: count };
   }
-  return { type: "garbage", rows: count, hole, moves };
+  game.garbageGraceLeft = GARBAGE_GRACE_DROPS;
+  game.garbageGraceResolving = true;
+  return { type: "garbage", rows: count, hole, moves, grace: GARBAGE_GRACE_DROPS };
 }
 
 export function applyNoHoldCurse(game, cells = []) {
@@ -874,6 +897,8 @@ export function applyNoHoldCurse(game, cells = []) {
 
 export function lockActive(game) {
   if (!game.active) return;
+  game.garbageGraceResolving = game.garbageGraceLeft > 0;
+  if (game.garbageGraceLeft > 0) game.garbageGraceLeft -= 1;
   game.feverResolving = game.feverLeft > 0;
   if (game.feverLeft > 0) game.feverLeft -= 1;
   if (game.noHoldLeft > 0) game.noHoldLeft -= 1;
@@ -1126,7 +1151,7 @@ export function pump(game) {
     }
   }
 
-  if (game.mode !== "tetris") {
+  if (game.mode !== "tetris" && !garbageGraceActive(game)) {
     const comps = unsupportedComponents(game.grid);
     if (comps.length) {
       const moves = dropComponents(game.grid, comps, () => takeGid(game));
