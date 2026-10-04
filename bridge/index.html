@@ -687,6 +687,24 @@
     }
     .pad svg { width: min(42px, 42%); height: min(42px, 42%); display: block; }
     .hand-cross svg { width: 22px; height: 22px; }
+    #game .console.danger-warning {
+      --danger-shake: 1px;
+      animation: danger-shake 900ms linear infinite;
+    }
+    #game .console.danger-critical {
+      --danger-shake: 3px;
+      animation: danger-shake 240ms linear infinite;
+    }
+    @keyframes danger-shake {
+      0%, 100% { transform: translate(0, 0); }
+      20% { transform: translate(calc(-1 * var(--danger-shake)), var(--danger-shake)); }
+      40% { transform: translate(var(--danger-shake), 0); }
+      60% { transform: translate(calc(-1 * var(--danger-shake)), calc(-1 * var(--danger-shake))); }
+      80% { transform: translate(var(--danger-shake), 0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #game .console.danger-warning, #game .console.danger-critical { animation: none; }
+    }
     .pad-label {
       max-width: 100%;
       overflow: hidden;
@@ -1268,16 +1286,16 @@
     </section>
   </div>
   <script type="module">
-    import { createSound } from "./audio.mjs?v=1.0.8";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.8";
-    import { translate } from "./i18n.mjs?v=1.0.8";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.8";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.8";
-    import { VERSION } from "./version.mjs?v=1.0.8";
+    import { createSound } from "./audio.mjs?v=1.0.9";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.9";
+    import { translate } from "./i18n.mjs?v=1.0.9";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.9";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.9";
+    import { VERSION } from "./version.mjs?v=1.0.9";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.0.8";
+    } from "./logic.mjs?v=1.0.9";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -2180,7 +2198,7 @@
     function drawBoard() {
       prepareBoard();
       const shaking = fx.some((item) => (item.big && item.t < 200) || ((item.kind === "tspin" || item.kind === "combo") && item.t < 160));
-      if (shaking) ctx.translate((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8);
+      if (shaking && !paused && !reducedMotion.matches) ctx.translate((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8);
       ctx.fillStyle = wellColor();
       ctx.fillRect(0, 0, COLS * CELL, ROWS * CELL);
       drawSandField(ctx);
@@ -2344,6 +2362,10 @@
     }
 
     function draw() {
+      const danger = !paused && !session && !puzzle ? dangerLevel(game) : 0;
+      const consolePanel = document.querySelector("#game .console");
+      consolePanel.classList.toggle("danger-warning", danger === 1);
+      consolePanel.classList.toggle("danger-critical", danger === 2);
       document.querySelector("#btn-rot-left").hidden = !!(puzzle || session);
       if (document.querySelector("#game").hidden) return;
       if (puzzle) {
