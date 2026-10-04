@@ -281,7 +281,7 @@ test("arcade bomb hits do not forward blast-destroyed penalties, direct penalty 
   assert.equal(session.grid[5][6], null);
   assert.equal(session.curseHits.length, 0);
   const direct = breakoutTestSession(() => 0);
-  direct.grid[5][5] = { type: "G", g: 3, curse: "garbage" };
+  direct.grid[5][5] = { type: "C", g: 3, curse: "nohold" };
   direct.balls = [{ x: 154, y: 167, vx: 0, vy: -260, r: 6 }];
   updateSession(direct, 16);
   assert.equal(direct.curseHits.length, 1);
@@ -310,5 +310,21 @@ for (const kind of ["pinball", "breakout", "bbtan"]) {
     assert.equal(garbageGraceActive(game), true);
     assert.ok(game.grid[10][4]);
     assert.ok(game.grid.slice(0, 2).every(row => row.every(cell => cell === null)));
+  });
+}
+
+for (const kind of ["breakout", "bbtan", "pinball"]) {
+  test(`${kind} destroys garbage penalty bricks for points without forwarding garbage`, () => {
+    const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+    grid[2][0] = { type: "O", g: 1 };
+    grid[5][5] = { type: "G", g: 2, curse: "garbage" };
+    const session = createSession(kind, grid, 1, () => .5);
+    session.prep = 0; session.launched = true; session.aiming = false;
+    session.balls = [{ x: 154, y: 167, vx: 0, vy: -260, r: 6 }];
+    updateSession(session, 16);
+    assert.equal(grid[5][5], null);
+    assert.equal(session.curseHits.length, 0);
+    assert.ok(session.score > 0);
+    assert.equal(session.cleared, 1);
   });
 }

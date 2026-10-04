@@ -1,8 +1,13 @@
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand } from './logic.mjs?v=1.1.0';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.1.0';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.1.1';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.1.1';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, limit: 480000 });
 export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand']);
+export const CAT_ACTIONS = Object.freeze(['heal', 'boss', 'player', 'blocks', 'mischief']);
+export function catAction(random = Math.random) {
+  const roll = random();
+  return roll < .25 ? 'heal' : roll < .45 ? 'boss' : roll < .60 ? 'player' : roll < .85 ? 'blocks' : 'mischief';
+}
 const HARD = new Set(['pinball', 'breakout', 'bbtan', 'sand']);
 const RECOVERY = ['cards', 'mahjong', 'slots'];
 const shuffled = (items, random) => {
@@ -12,12 +17,12 @@ const shuffled = (items, random) => {
 };
 
 export function createCrazy({ random = Math.random, boss = FIRST_BOSS } = {}) {
-  const bridge = createGame({ mode: 'crazyBridge', random });
-  startGame(bridge, 'crazyBridge');
+  const bridge = createGame({ mode: 'marathon', random });
+  startGame(bridge, 'marathon');
   const state = {
     random, boss, hp: 100, maxHp: 100, bossHp: boss.hp, phase: 1, score: 0, elapsed: 0,
     over: false, won: false, damageLeft: 50, mode: 'bridge', encounter: 0, bag: [], hardStreak: 0,
-    bridge, arcade: null, mini: null, held: new Set(), actionReady: true,
+    bridge, parkedPiece: null, curses: { reverse: 0, blind: 0, rush: 0, norotate: 0 }, arcade: null, mini: null, held: new Set(), actionReady: true,
     timeLeft: 20000, duration: 20000, protection: 500, cooldown: 0, fallMs: 0, lockMs: 0, repeatMs: 0,
     resolveMs: 0, successes: 0, events: [], hitFlash: 0, cat: null, catDue: 9000, catBlock: 0,
     notice: 'crazyOpening', noticeTime: 3500, attack: null, attackDone: false,
@@ -66,11 +71,35 @@ function nextMode(s) {
   return s.bag.splice(index, 1)[0];
 }
 
-export function advanceCrazy(s) {
+function restoreParkedPiece(s) {
+  const g = s.bridge, piece = s.parkedPiece;
+  if (!piece) return;
+  s.parkedPiece = null;
+  const candidate = { ...piece, sand: g.sanding ? piece.sand : null };
+  if (!fits(g.grid, candidate.type, candidate.rot, candidate.x, candidate.y, g)) {
+    candidate.y = 0;
+    const origins = [candidate.x, 3, 2, 4, 1, 5, 0, 6, 7];
+    const x = origins.find(x => fits(g.grid, candidate.type, candidate.rot, x, 0, g));
+    if (x == null) {
+      // This is a genuine blocked spawn, not an overlapping conversion write.
+      g.active = candidate; g.phase = 'over'; return;
+    }
+    candidate.x = x;
+  }
+  g.active = candidate; g.phase = 'playing'; g.spinEligible = false;
+}
+function leaveSand(s) {
+  const g = s.bridge;
+  if (!g.sanding) return;
+  if (g.active) s.parkedPiece = { ...g.active };
+  finishSand(g);
+  if (s.parkedPiece) restoreParkedPiece(s);
+}
+export function advanceCrazy(s, preferredMode = null) {
   if (s.over) return;
-  if (s.mode === 'sand') finishSand(s.bridge);
+  if (s.mode === 'sand') leaveSand(s);
   s.encounter += 1;
-  s.mode = nextMode(s);
+  s.mode = preferredMode || nextMode(s);
   s.hardStreak = HARD.has(s.mode) ? s.hardStreak + 1 : 0;
   s.duration = 22000 - s.phase * 2000;
   s.damageLeft = 45 + s.phase * 5;
@@ -79,7 +108,12 @@ export function advanceCrazy(s) {
   s.successes = 0; s.arcade = null; s.mini = null; s.cat = null; s.catBlock = 0; s.attack = null; s.attackDone = false;
   s.catDue = Math.min(8000, s.duration / 2);
   if (s.mode === 'bridge' || s.mode === 'sand') {
-    if (s.mode === 'sand') beginSand(s.bridge, Infinity);
+    if (s.mode === 'sand') {
+      beginSand(s.bridge, Infinity);
+      // Settle converted grains before resuming the SAME falling piece.
+      if (s.bridge.active) { s.parkedPiece = { ...s.bridge.active }; s.bridge.active = null; }
+      s.bridge.phase = 'resolving';
+    }
     // Finish outstanding Bridge resolution before accepting a new active piece.
     if (!s.bridge.active) s.bridge.phase = 'resolving';
   } else if (['breakout', 'pinball', 'bbtan'].includes(s.mode)) {
@@ -164,6 +198,7 @@ export function inputCrazy(s, action, down = true) {
     if (s.arcade && ['left', 'right'].includes(action)) s.arcade[action] = false;
     return;
   }
+  if (s.cat?.action === 'player' && s.cat.time < 1200 && ['left', 'right'].includes(action)) s.cat.dodged = true;
   if (s.held.has(action)) return;
   s.held.add(action);
   if (action === 'action' && !s.actionReady) return;
@@ -173,9 +208,9 @@ export function inputCrazy(s, action, down = true) {
   } else if (s.mode === 'bridge' || s.mode === 'sand') {
     const g = s.bridge;
     if (g.phase !== 'playing') return;
-    if (action === 'left' || action === 'right') tryMove(g, action === 'left' ? -1 : 1, 0);
+    if (action === 'left' || action === 'right') tryMove(g, (action === 'left' ? -1 : 1) * (s.curses.reverse > 0 ? -1 : 1), 0);
     if (action === 'down') tryMove(g, 0, 1);
-    if (action === 'rotate' || action === 'rotateLeft') tryRotate(g, action === 'rotate' ? 1 : -1);
+    if ((action === 'rotate' || action === 'rotateLeft') && s.curses.norotate <= 0) tryRotate(g, action === 'rotate' ? 1 : -1);
     if (action === 'alt') hold(g);
     if (action === 'action') hardDrop(g);
   } else miniAction(s, action);
@@ -200,7 +235,11 @@ function recoverBridge(s) {
   const g = s.bridge;
   if (g.sanding) for (let y = 0; y < 8 * SAND_SCALE; y++) g.sandGrid[y].fill(0);
   for (let y = 0; y < 8; y++) g.grid[y].fill(null);
-  g.active = null; g.phase = 'resolving'; g.pendingFlips = 0; s.resolveMs = 150;
+  if (s.parkedPiece || g.active) {
+    const saved = s.parkedPiece || g.active;
+    s.parkedPiece = { ...saved, y: 0 }; restoreParkedPiece(s);
+  } else { g.active = null; g.phase = 'resolving'; }
+  g.pendingFlips = 0; s.resolveMs = 150;
 }
 function updateBridge(s, dt) {
   const g = s.bridge;
@@ -208,12 +247,24 @@ function updateBridge(s, dt) {
   if (g.phase === 'resolving') {
     s.resolveMs -= dt;
     if (s.resolveMs > 0) return;
+    // Sand resolution needs several grain steps per frame; one 35ms step per
+    // pixel used to stall each piece for several seconds in a 20s encounter.
+    if (g.sanding) for (let i = 0; i < 3; i++) if (!sandFallStep(g.sandGrid)) break;
+    const queueBefore = s.parkedPiece ? [...g.queue] : null;
     const step = pump(g);
-    s.resolveMs = step?.type === 'clear' ? 140 : 35;
-    if (step?.type === 'clear') {
-      hitCrazyBoss(s, (step.sand ? 12 : 16 * step.rows.length) + Math.min(12, step.combo * 2));
-      if (step.combo >= 2) healCrazy(s, 2);
+    s.resolveMs = step?.type === 'clear' ? 140 : g.sanding ? 0 : 35;
+    if (step?.type === 'spawn' && s.parkedPiece) {
+      g.queue = queueBefore;
+      restoreParkedPiece(s);
     }
+    if (step?.type === 'clear') {
+      hitCrazyBoss(s, ((step.sand ? 12 : 16 * step.rows.length) + Math.min(12, step.combo * 2)) * (feverActive(g) ? 3 : 1));
+      if (step.combo >= 2) healCrazy(s, 2);
+      if (feverActive(g)) for (const key of Object.keys(s.curses)) s.curses[key] = 0;
+      else for (const cell of penaltyCells(step.cells)) if (cell.curse in s.curses) s.curses[cell.curse] = cell.curse === 'blind' ? 5000 : 20000;
+    }
+    if (step?.type === 'flip') flipGrid(g);
+    if (step?.type === 'reward') { advanceCrazy(s, step.reward); return; }
     if (step?.type === 'over') recoverBridge(s);
     return;
   }
@@ -221,12 +272,12 @@ function updateBridge(s, dt) {
   s.repeatMs += dt;
   if (s.repeatMs >= 100) {
     s.repeatMs = 0;
-    if (s.held.has('left')) tryMove(g, -1, 0);
-    if (s.held.has('right')) tryMove(g, 1, 0);
+    if (s.held.has('left')) tryMove(g, s.curses.reverse > 0 ? 1 : -1, 0);
+    if (s.held.has('right')) tryMove(g, s.curses.reverse > 0 ? -1 : 1, 0);
     if (s.held.has('down')) tryMove(g, 0, 1);
   }
   s.fallMs += dt;
-  if (s.fallMs >= 640 - s.phase * 110) { s.fallMs = 0; tryMove(g, 0, 1); }
+  if (s.fallMs >= (640 - s.phase * 110) * (s.curses.rush > 0 ? .35 : 1)) { s.fallMs = 0; tryMove(g, 0, 1); }
   if (!fits(g.grid, g.active.type, g.active.rot, g.active.x, g.active.y + 1, g)) {
     s.lockMs += dt;
     if (s.lockMs >= 380) { lockActive(g); s.lockMs = 0; }
@@ -259,27 +310,58 @@ function updatePachinko(s, dt) {
   m.balls = m.balls.filter(b => b.y < 505);
 }
 
+function catSmashBlocks(s) {
+  const sand = s.mode === 'sand' && s.bridge.sandGrid;
+  const grid = s.arcade?.grid || sand || s.bridge.grid;
+  const occupied = [];
+  for (let y = 0; y < grid.length; y++) for (let x = 0; x < grid[y].length; x++) if (grid[y][x]) occupied.push({ x, y });
+  if (!occupied.length) return false;
+  const center = occupied[Math.floor(s.random() * occupied.length)];
+  const radius = sand ? SAND_SCALE : 1;
+  const cells = [];
+  for (let y = Math.max(0, center.y - radius); y <= Math.min(grid.length - 1, center.y + radius); y++) {
+    for (let x = Math.max(0, center.x - radius); x <= Math.min(grid[y].length - 1, center.x + radius); x++) {
+      if (!grid[y][x]) continue;
+      cells.push({ x: sand ? x / SAND_SCALE : x, y: sand ? y / SAND_SCALE : y });
+      grid[y][x] = sand ? 0 : null;
+    }
+  }
+  s.cat.cells = cells;
+  if (s.arcade) { s.arcade.cleared += cells.length; s.arcade.score += cells.length * 10; }
+  // Directly removing cells does not activate their bombs or penalties.
+  hitCrazyBoss(s, Math.min(12, sand ? Math.ceil(cells.length / (SAND_SCALE * SAND_SCALE)) * 2 : cells.length * 2));
+  notify(s, 'crazyCatSmash');
+  return true;
+}
+function catMischief(s) {
+  if (s.arcade) for (const ball of s.arcade.balls) ball.vx = -ball.vx + 35;
+  else if (s.mode === 'bridge' || s.mode === 'sand') {
+    if (s.bridge.active) tryMove(s.bridge, s.random() < .5 ? -1 : 1, 0);
+  } else s.catBlock = 700;
+  notify(s, 'crazyCatSwipe');
+}
 function updateCat(s, dt) {
   s.catDue -= dt;
   s.catBlock = Math.max(0, s.catBlock - dt);
   if (!s.cat && s.catDue <= 0) {
-    s.cat = { time: 0, applied: false, gift: s.random() < 0.25 };
-    notify(s, 'crazyCatWarning');
+    let action = catAction(s.random);
+    // There are no bricks to smash in the card/slot mini-games.
+    if (action === 'blocks' && !s.arcade && !['bridge', 'sand'].includes(s.mode)) action = 'boss';
+    s.cat = { time: 0, applied: false, action, gift: action === 'heal', dodged: false };
+    notify(s, action === 'player' ? 'crazyCatPlayerWarning' : action === 'boss' ? 'crazyCatBossWarning' : action === 'heal' ? 'crazyCatGiftWarning' : action === 'blocks' ? 'crazyCatBlocksWarning' : 'crazyCatWarning');
   }
   if (!s.cat) return;
   s.cat.time += dt;
   if (s.cat.time >= 1200 && !s.cat.applied) {
     s.cat.applied = true;
-    if (s.cat.gift) healCrazy(s, 8);
-    else if (s.arcade) {
-      for (const ball of s.arcade.balls) ball.vx = -ball.vx + 35;
-      notify(s, 'crazyCatSwipe');
-    } else if (s.mode === 'bridge' || s.mode === 'sand') {
-      if (s.bridge.active) tryMove(s.bridge, s.random() < 0.5 ? -1 : 1, 0);
-      notify(s, 'crazyCatSwipe');
-    } else {
-      s.catBlock = 700; notify(s, 'crazyCatSwipe');
-    }
+    if (s.cat.action === 'heal') { healCrazy(s, 8); notify(s, 'crazyCatGift', 8); }
+    else if (s.cat.action === 'boss') {
+      const before = s.bossHp; hitCrazyBoss(s, 18); notify(s, 'crazyCatBossScratch', before - s.bossHp);
+    } else if (s.cat.action === 'player') {
+      if (s.cat.dodged) notify(s, 'crazyCatDodge');
+      else hurtCrazy(s, 6, 'crazyCatPlayerScratch');
+    } else if (s.cat.action === 'blocks') { if (!catSmashBlocks(s)) catMischief(s); }
+    else catMischief(s);
   }
   if (s.cat.time >= 2400) { s.cat = null; s.catDue = 10000 - s.phase * 1000; }
 }
@@ -290,6 +372,7 @@ export function updateCrazy(s, elapsed) {
   s.elapsed += dt; s.timeLeft -= dt; s.protection = Math.max(0, s.protection - dt);
   s.hitFlash = Math.max(0, s.hitFlash - dt); s.noticeTime = Math.max(0, s.noticeTime - dt);
   if (!s.actionReady && !s.held.has('action') && s.duration - s.timeLeft >= 500) s.actionReady = true;
+  for (const key of Object.keys(s.curses)) s.curses[key] = Math.max(0, s.curses[key] - dt);
   const oldCooldown = s.cooldown; s.cooldown = Math.max(0, s.cooldown - dt);
   if (oldCooldown > 0 && s.cooldown === 0 && s.mini) {
     if (s.mode === 'slots') { s.mini.reels = [null, null, null]; s.mini.stop = 0; }
@@ -308,6 +391,15 @@ export function updateCrazy(s, elapsed) {
   else if (s.arcade) {
     const cleared = s.arcade.cleared;
     updateSession(s.arcade, dt);
+    if (s.arcade.feverHits.length) {
+      activateFever(s.bridge, s.arcade.feverHits); s.arcade.feverHits = [];
+      for (const key of Object.keys(s.curses)) s.curses[key] = 0;
+    }
+    if (s.arcade.curseHits.length) {
+      const cells = s.arcade.curseHits; s.arcade.curseHits = [];
+      applyNoHoldCurse(s.bridge, cells);
+      if (!feverActive(s.bridge)) for (const cell of penaltyCells(cells)) if (cell.curse in s.curses) s.curses[cell.curse] = cell.curse === 'blind' ? 5000 : 20000;
+    }
     const hits = s.arcade.cleared - cleared;
     if (hits) hitCrazyBoss(s, hits * 4);
     if (s.arcade.over) {

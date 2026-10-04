@@ -82,6 +82,7 @@ export const REWARD_CHANCE = { breakout: 0.005, bbtan: 0.005, pinball: 0.01, san
 export const SAND_DROPS = 20;
 export const SAND_MATCH = 8;
 export const SAND_COLORS = 4;
+export const SAND_HEX = Object.freeze(["#ffd84a", "#ff4b4b", "#3c8dff", "#3dce6e"]);
 export const SAND_SCALE = 8;
 export const SAND_OF_TYPE = {
   I: [0, 1], O: [1, 2], T: [2, 3], S: [3, 0],

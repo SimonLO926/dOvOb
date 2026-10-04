@@ -4,12 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
-  <link rel="preload" href="./fonts/fever-brush.woff?v=1.1.0" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="./assets/mischief-cat.png?v=1.1.1" as="image">
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.1.1" as="font" type="font/woff" crossorigin>
   <style>
     /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
     @font-face {
       font-family: "Fever Brush";
-      src: url("./fonts/fever-brush.woff?v=1.1.0") format("woff");
+      src: url("./fonts/fever-brush.woff?v=1.1.1") format("woff");
       font-weight: 400;
       font-display: swap;
     }
@@ -965,10 +966,13 @@
     body.crazy-active .console, body.touch.crazy-active .console { grid-template-columns: auto; width: 100%; justify-content: center; }
     body.crazy-active .rail { display: none; }
     #crazy-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-    html.touch body.crazy-active #game .stage { padding-bottom: calc(var(--pad-size) + 78px); }
-    @media (max-width: 760px) { body.crazy-active #game .stage { padding-bottom: calc(var(--pad-size) + 78px); } }
-    body.crazy-active #crazy-help { position: absolute; bottom: calc(var(--pad-size, 0px) + 18px); left: 50%; transform: translateX(-50%); width: min(480px, calc(100% - 120px)); pointer-events: none; }
-    #crazy-help { text-align: center; margin: 0; padding: 4px 12px; font-size: 12px; line-height: 1.3; color: #f4d7ca; min-height: 34px; }
+    body.crazy-active #game { height: 100svh; max-height: 100svh; min-height: 0; }
+    body.crazy-active #game .nav { flex: 0 0 58px; }
+    html.touch body.crazy-active #game .stage, body.crazy-active #game .stage { padding-bottom: 0; flex: 1; min-height: 0; overflow: hidden; }
+    body.crazy-active #crazy-help { position: static; transform: none; flex: 0 0 auto; width: 100%; max-width: 720px; align-self: center; margin: 6px 0; padding: 8px 12px; border: 1px solid #654155; border-radius: 8px; background: #120f23ee; font-size: 12px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
+    html.touch body.crazy-active #game .pad, body.touch.crazy-active #game .pad { position: relative; left: auto; right: auto; bottom: auto; flex: 0 0 var(--pad-size); margin-top: 64px; }
+    body.crazy-active #game .pad #btn-rot-left { bottom: calc(100% + 6px); height: 52px; }
+    @media (max-width: 760px) { body.crazy-active #game .pad { position: relative; left: auto; right: auto; bottom: auto; flex: 0 0 var(--pad-size); margin-top: 64px; } }
     @keyframes crazy-orbit { to { transform: rotate(360deg); } }
     @keyframes crazy-pressure { from { opacity: .4; } to { opacity: 1; } }
     @keyframes crazy-drift { from { translate: 0 -4px; } to { translate: 0 6px; } }
@@ -1418,24 +1422,23 @@
     <i style="--x:83%;--y:97%;--delay:-1.87s"></i>
   </div>
   <script type="module">
-    import { createCrazy, updateCrazy, inputCrazy, pointCrazy } from "./crazy.mjs?v=1.1.0";
-    import { drawCrazy, drawMischiefCat } from "./crazy-view.mjs?v=1.1.0";
-    import { createSound } from "./audio.mjs?v=1.1.0";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.1.0";
-    import { translate } from "./i18n.mjs?v=1.1.0";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.1.0";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.1.0";
-    import { VERSION } from "./version.mjs?v=1.1.0";
+    import { createCrazy, updateCrazy, inputCrazy, pointCrazy } from "./crazy.mjs?v=1.1.1";
+    import { drawCrazy, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.1.1";
+    import { createSound } from "./audio.mjs?v=1.1.1";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.1.1";
+    import { translate } from "./i18n.mjs?v=1.1.1";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.1.1";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.1.1";
+    import { VERSION } from "./version.mjs?v=1.1.1";
     import {
-      COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, activateFever, applyGarbageCurse, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
+      COLS, ROWS, SAND_DROPS, SAND_SCALE, SAND_HEX, SHAPES, activateFever, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.1.0";
+    } from "./logic.mjs?v=1.1.1";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
       J: "#0a84ff", L: "#ff9f0a", B: "#8e8e93", X: "#5e5ce6", D: "#ff9f0a", R: "#ff375f", A: "#e7d3a1", F: "#ffbd2e", G: "#313842", N: "#68727d",
     };
-    const SAND_HEX = ["#ffd84a", "#ff4b4b", "#3c8dff", "#3dce6e"];
     const CELL = 28;
     const board = document.querySelector("#board");
     const holdCanvas = document.querySelector("#hold-canvas");
@@ -1870,12 +1873,12 @@
       beginCrazy();
     });
     const previewCat = document.querySelector("#crazy-preview-cat").getContext("2d");
-    drawMischiefCat(previewCat, 130, 83, 1.3);
+    catImageReady.then(() => { previewCat.clearRect(0, 0, 220, 170); drawMischiefCat(previewCat, 110, 91, 1.3); });
     board.addEventListener("pointerdown", event => {
       if (!crazy || paused) return;
       event.preventDefault();
       const r = board.getBoundingClientRect();
-      pointCrazy(crazy, (event.clientX - r.left) * 280 / r.width, (event.clientY - r.top) * 560 / r.height);
+      pointCrazy(crazy, (event.clientX - r.left) * 280 / r.width, (event.clientY - r.top) * crazyCanvasHeight(crazy.mode) / r.height);
     });
     function releaseCrazyInputs() {
       if (!crazy) return;
@@ -2753,20 +2756,28 @@
       feverAura.classList.toggle("paused", paused);
       if (gameHidden) return;
       if (crazy) {
-        feverAura.hidden = true;
+        feverAura.hidden = !feverActive(crazy.bridge) || crazy.over;
         document.querySelector("#coach").hidden = true;
         document.querySelector("#callout").hidden = true;
         document.querySelector("#btn-rot-left").hidden = !["bridge", "sand"].includes(crazy.mode);
         document.body.dataset.crazyPhase = String(crazy.phase);
         prepareBoard();
-        drawCrazy(ctx, crazy, t, { reducedMotion: paused || reducedMotion.matches });
+        drawCrazy(ctx, crazy, t, {
+          reducedMotion: paused || reducedMotion.matches,
+          paintGrid: (context, grid) => drawGridCells(context, grid, new Set(), CELL),
+          paintPiece: (context, piece, ghost) => drawBlob(context, cellsOf(piece.type, piece.rot, piece.x, piece.y), piece.type, CELL, ghost, piece.bombIndex, piece.curse, piece.sand ?? null, piece.rot, piece.curseIndex),
+        });
         const blocks = ["bridge", "sand"].includes(crazy.mode);
         document.querySelector("#btn-soft").disabled = !blocks;
-        document.querySelector("#btn-hold").disabled = !blocks && !["tiger", "mahjong"].includes(crazy.mode);
+        document.querySelector("#btn-hold").disabled = blocks ? crazy.bridge.noHoldLeft > 0 : !["tiger", "mahjong"].includes(crazy.mode);
         document.querySelector("#btn-rot .pad-label").textContent = blocks ? t("rotateRight") : t("crazyAction");
         document.querySelector("#btn-hold .pad-label").textContent = blocks ? t("keep") : crazy.mode === "tiger" ? t("crazyBank") : t("crazyReset");
         document.querySelector("#btn-drop .pad-label").textContent = blocks ? t("drop") : t("crazyAction");
-        document.querySelector("#crazy-help").textContent = t("crazyHint_" + crazy.mode);
+        const battleNotes = [];
+        if (crazy.bridge.noHoldLeft > 0) battleNotes.push(`${t("curseNoHold")} ${crazy.bridge.noHoldLeft}`);
+        if (feverActive(crazy.bridge)) battleNotes.push(`FEVER ×3 · ${crazy.bridge.feverLeft}`);
+        if (garbageGraceActive(crazy.bridge)) battleNotes.push(`${t("garbageStable")} ${crazy.bridge.garbageGraceLeft}`);
+        document.querySelector("#crazy-help").textContent = [t("crazyHint_" + crazy.mode), ...battleNotes].join(" · ");
         document.querySelector("#crazy-status").textContent = `HP ${crazy.hp}/100 · BOSS ${crazy.bossHp}/${crazy.boss.hp} · ${t("crazyPhaseLabel")} ${crazy.phase}/3 · ${t("score")} ${crazy.score}`;
         if (paused && !crazy.over) showVeil(t("paused"), t("pauseHint"), t("resume"));
         else if (!crazy.over) veil.hidden = true;
@@ -2934,7 +2945,6 @@
           session.feverHits = [];
         }
         if (session.curseHits.length) {
-          applyGarbageCurse(game, session.curseHits);
           applyCurses(session.curseHits);
           session.curseHits = [];
         }
@@ -3057,13 +3067,14 @@
       const railW = railBoxes.reduce((sum, el) => sum + el.offsetWidth, 0) + 24;
       const stageStyle = getComputedStyle(stage);
       const stagePad = (parseFloat(stageStyle.paddingTop) || 0) + (parseFloat(stageStyle.paddingBottom) || 0);
-      const baseH = docked ? stage.clientHeight - stagePad : window.innerHeight - nav - 48;
-      const availH = Math.max(120, baseH - 4);
+      const baseH = docked || crazy ? stage.clientHeight - stagePad : window.innerHeight - nav - 48;
+      const availH = Math.max(crazy ? 32 : 120, baseH - 4);
       const availW = Math.max(96, stage.clientWidth - railW);
-      const fit = Math.min(availH / (ROWS * CELL), availW / (COLS * CELL));
+      const logicalHeight = crazy ? crazyCanvasHeight(crazy.mode) : ROWS * CELL;
+      const fit = Math.min(availH / logicalHeight, availW / (COLS * CELL));
       const scale = docked ? fit : Math.max(0.7, fit);
       const width = Math.round(COLS * CELL * scale);
-      const height = Math.round(ROWS * CELL * scale);
+      const height = Math.round(logicalHeight * scale);
       board.style.width = `${width}px`;
       board.style.height = `${height}px`;
       const radius = CORNER * scale;
