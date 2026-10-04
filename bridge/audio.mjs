@@ -151,6 +151,33 @@ export function createSound(getVolume) {
     noise.start(now);
   }
 
+  function playCasino(kind, amount = 0) {
+    if (!ensure()) return;
+    const start = ctx.currentTime;
+    const ping = (freq, offset, dur = .06, gain = .12, type = "triangle") => beep(freq, start + offset, dur, type, gain, sfxGain);
+    if (kind === "victory") {
+      [60, 64, 67, 72, 76, 79, 84].forEach((note, i) => ping(midi(note), i * .105, .32, .2));
+      // Metallic coin pairs, with diminishing scattered impacts and a bright final chord.
+      for (let i = 0; i < 42; i++) {
+        const offset = .35 + i * .047 + (i % 5) * .018, frequency = 1700 + (i * 317 % 2400);
+        ping(frequency, offset, .055, .08); ping(frequency * 1.47, offset + .006, .035, .045, "sine");
+      }
+      [72, 76, 79, 84].forEach(note => ping(midi(note), 2.55, .7, .1));
+    } else if (kind === "lever" || kind === "risk") {
+      ping(110, 0, .1, .18, "square");
+      for (let i = 0; i < 14; i++) ping(430 + i % 4 * 110, .06 + i * .057, .026, .075, "square");
+      [0, .25, .5].forEach((v, i) => ping(1000 + i * 180, .55 + v, .045, .1));
+    } else if (kind === "coin") { ping(2200, 0, .055, .12); ping(3300, .024, .065, .07, "sine"); }
+    else if (kind === "tile") { ping(280, 0, .024, .16, "square"); ping(1250, .02, .034, .06); }
+    else if (kind === "card") { for (let i = 0; i < 4; i++) ping(700 + i * 280, i * .009, .016, .05, "sawtooth"); }
+    else if (kind === "jump") { [260, 390, 520].forEach((f, i) => ping(f, i * .04, .045, .1, "square")); }
+    else if (kind === "dash" || kind === "laser") { for (let i = 0; i < 5; i++) ping((kind === "laser" ? 1250 : 450) + i * 160, i * .012, .045, .06, "sawtooth"); }
+    else if (kind === "transform") { [130, 155, 196, 260].forEach((f, i) => ping(f, i * .18, .3, .17, "sawtooth")); }
+    else if (kind === "reel") { ping(175, 0, .035, .14, "square"); ping(1200, .025, .08, .08); }
+    else if (kind === "launch") { ping(160, 0, .06, .14, "square"); ping(680, .055, .07, .08); }
+    else if (kind === "hit") { ping(240 + Math.min(8, amount) * 28, 0, .035, .12, "square"); ping(960, .015, .035, .06); }
+  }
+
   function mark() {
     if (typeof document !== "undefined") document.body.dataset.music = playing ? "on" : "off";
   }
@@ -189,5 +216,5 @@ export function createSound(getVolume) {
     }
   }
 
-  return { setVolume, blip, playClear, playBoom, playTspin, playCombo, playSand, start, restart, stop, tick, get playing() { return playing; } };
+  return { setVolume, playCasino, blip, playClear, playBoom, playTspin, playCombo, playSand, start, restart, stop, tick, get playing() { return playing; } };
 }

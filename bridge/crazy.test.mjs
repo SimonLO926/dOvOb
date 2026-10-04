@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createCrazy, FIRST_BOSS, CRAZY_MODES, advanceCrazy, updateCrazy, inputCrazy, pointCrazy, hitCrazyBoss, healCrazy, hurtCrazy } from './crazy.mjs';
+import { createCrazy, FIRST_BOSS, CRAZY_MODES, advanceCrazy, updateCrazy, inputCrazy, pointCrazy, hitCrazyBoss, healCrazy, hurtCrazy, skipCrazyCinematic } from './crazy.mjs';
 
 function enter(s, mode) {
   s.mode = 'bridge'; s.encounter = 0; s.bag = [mode]; advanceCrazy(s);
@@ -19,13 +19,21 @@ test('Crazy opens on Bridge with a separate dealer boss and bounded HP', () => {
   healCrazy(s, 80); assert.equal(s.hp, 100);
 });
 
-test('Boss damage advances three phases, gives recovery, and ends with victory once', () => {
+test('Boss phases lead to a protected transformation, then a separate higher-HP second form and victory', () => {
   const s = createCrazy(); s.hp = 50;
   s.damageLeft = 300; hitCrazyBoss(s, 300); assert.equal(s.phase, 2); assert.equal(s.hp, 62);
   s.damageLeft = 300; hitCrazyBoss(s, 300); assert.equal(s.phase, 3); assert.equal(s.hp, 74);
-  s.damageLeft = 300; hitCrazyBoss(s, 300); assert.equal(s.bossHp, 0); assert.equal(s.over, true); assert.equal(s.won, true);
-  const score = s.score; hitCrazyBoss(s, 30); healCrazy(s, 20); updateCrazy(s, 50);
-  assert.equal(s.score, score); assert.equal(s.hp, 74);
+  s.damageLeft = 300; hitCrazyBoss(s, 300);
+  assert.equal(s.bossHp, 0); assert.equal(s.over, false); assert.equal(s.form, 1); assert.equal(s.cutscene.kind, 'transform');
+  const elapsed = s.elapsed, hp = s.hp; s.protection = 0;
+  assert.equal(hurtCrazy(s, 30), false); hitCrazyBoss(s, 900); tap(s, 'action');
+  run(s, 4450); assert.equal(s.form, 1); assert.equal(s.hp, hp); assert.equal(s.elapsed, elapsed);
+  run(s, 50); assert.equal(s.form, 2); assert.equal(s.bossHp, 1200); assert.equal(s.bossMaxHp, 1200); assert.equal(s.mode, 'jump');
+  assert.equal(s.hp, 94); assert.equal(s.held.size, 0);
+  s.damageLeft = 1200; hitCrazyBoss(s, 1200);
+  assert.equal(s.bossHp, 0); assert.equal(s.over, true); assert.equal(s.won, true); assert.equal(s.cutscene.kind, 'victory');
+  const score = s.score; hitCrazyBoss(s, 30); healCrazy(s, 20); run(s, 6500);
+  assert.equal(s.score, score); assert.equal(s.hp, 100); assert.equal(s.cutscene, null);
 });
 
 test('Zero player HP and the eight-minute limit both end the fight', () => {
@@ -373,4 +381,52 @@ test('Ending a Tiger encounter settles the current risk before banking rewards',
   const s = createCrazy({ random: () => .9 }); enter(s, 'tiger'); s.catDue = Infinity;
   s.mini.pending = 18; tap(s, 'action'); s.timeLeft = 50; updateCrazy(s, 50);
   assert.equal(s.bossHp, 900); assert.equal(s.hp, 90); assert.notEqual(s.mode, 'tiger');
+});
+
+
+test('Transformation can be skipped after one second and preserves Bridge board and queue', () => {
+  const s = createCrazy(); s.bridge.grid[19][2] = { type: 'O', g: 42 };
+  const queue = structuredClone(s.bridge.queue); s.damageLeft = 900; hitCrazyBoss(s, 900);
+  assert.equal(skipCrazyCinematic(s), false); run(s, 1000); assert.equal(skipCrazyCinematic(s), true);
+  assert.equal(s.form, 2); assert.equal(s.bridge.grid[19][2].g, 42); assert.deepEqual(s.bridge.queue, queue);
+});
+
+test('Second-form deck includes every new attack and keeps Bridge in the rotation', () => {
+  const s = createCrazy({ random: () => .5 }); s.form = 2; const seen = new Set();
+  for (let i = 1; i <= 60; i++) { advanceCrazy(s); seen.add(s.mode); if (s.encounter % 3 === 0) assert.equal(s.mode, 'bridge'); }
+  for (const mode of ['jump', 'coins', 'motion', 'vortex', 'roulette']) assert.ok(seen.has(mode), mode);
+});
+
+test('Jump height responds to holding action, and cannot be retriggered in mid-air', () => {
+  const make = () => { const s = createCrazy(); advanceCrazy(s, 'jump'); run(s, 550); s.mini.spawn = Infinity; s.catDue = Infinity; return s; };
+  const short = make(), high = make(); tap(short, 'action'); inputCrazy(high, 'action');
+  run(short, 250); run(high, 250); assert.ok(high.mini.y < short.mini.y);
+  const vy = short.mini.vy; tap(short, 'action'); assert.equal(short.mini.vy, vy); assert.equal(short.mini.jumped, 1);
+  inputCrazy(high, 'action', false); run(short, 900); run(high, 900); assert.equal(short.mini.grounded, true); assert.equal(high.mini.grounded, true);
+});
+
+test('Blue sweeps hurt stationary cores, orange sweeps hurt moving cores, and warnings never hurt', () => {
+  const make = tone => { const s = createCrazy(); advanceCrazy(s, 'motion'); run(s, 550); s.catDue = Infinity; s.mini.spawn = Infinity; s.protection = 0;
+    s.mini.hazards = [{kind: 'motion', tone, y: s.mini.y, warn: 850, age: 0, speed: 200}]; return s; };
+  const warn = make('blue'); updateCrazy(warn, 50); assert.equal(warn.hp, 100);
+  const blueStill = make('blue'); blueStill.mini.hazards[0].age = 850; updateCrazy(blueStill, 50); assert.equal(blueStill.hp, 94);
+  const blueMove = make('blue'); blueMove.mini.hazards[0].age = 850; inputCrazy(blueMove, 'left'); updateCrazy(blueMove, 50); assert.equal(blueMove.hp, 100);
+  const orangeMove = make('orange'); orangeMove.mini.hazards[0].age = 850; inputCrazy(orangeMove, 'left'); updateCrazy(orangeMove, 50); assert.equal(orangeMove.hp, 94);
+  const orangeStill = make('orange'); orangeStill.mini.hazards[0].age = 850; updateCrazy(orangeStill, 50); assert.equal(orangeStill.hp, 100);
+});
+
+test('Earned pusher rewards preserve encounter cadence, prevent damage and bank actual dropped coins', () => {
+  const s = createCrazy(); s.form = 2; advanceCrazy(s, 'coins'); s.damageLeft = 100;
+  hitCrazyBoss(s, 40); assert.equal(s.pusherDue, true); const encounter = s.encounter;
+  advanceCrazy(s); assert.equal(s.mode, 'pusher'); assert.equal(s.encounter, encounter); assert.equal(s.duration, 12000);
+  s.protection = 0; assert.equal(hurtCrazy(s, 100), false); assert.equal(s.hp, 100);
+  s.mini.coins = [{x: 140, y: 466, vx: 0, vy: 0, green: false}]; updateCrazy(s, 50);
+  assert.equal(s.mini.pending, 3); assert.equal(s.stats.coins, 1);
+  inputCrazy(s, 'alt'); assert.notEqual(s.mode, 'pusher'); assert.equal(s.bossHp, 857); assert.equal(s.encounter, encounter + 1);
+});
+
+test('Pusher reward is settled once even when the time expires or a risk is banked early', () => {
+  const s = createCrazy(); advanceCrazy(s, 'pusher'); s.mini.pending = 20; s.mini.risk = {time: 4000, win: false}; s.timeLeft = 50;
+  updateCrazy(s, 50); assert.notEqual(s.mode, 'pusher'); assert.equal(s.bossHp, 890);
+  const hp = s.bossHp; updateCrazy(s, 50); assert.equal(s.bossHp, hp);
 });

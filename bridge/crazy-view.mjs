@@ -1,5 +1,8 @@
-import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.1.3';
-import { drawSession } from './arcade.mjs?v=1.1.3';
+import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.0';
+import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.0';
+import { greedImages } from './crazy-screen.mjs?v=1.2.0';
+import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.0';
+import { drawSession } from './arcade.mjs?v=1.2.0';
 export const CRAZY_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 356 });
 export const CRAZY_BLOCK_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 512 });
 export function crazyCanvasHeight(mode) { return mode === 'bridge' || mode === 'sand' ? 720 : 560; }
@@ -12,7 +15,7 @@ const catPhoto = typeof Image === 'undefined' ? null : new Image();
 export const catImageReady = catPhoto ? new Promise(resolve => {
   catPhoto.onload = () => resolve(true);
   catPhoto.onerror = () => resolve(false);
-  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.1.3', import.meta.url).href;
+  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.0', import.meta.url).href;
 }) : Promise.resolve(false);
 const COLORS = { I: '#64d2ff', O: '#ffd60a', T: '#bf5af2', S: '#30d158', Z: '#ff453a', J: '#0a84ff', L: '#ff9f0a', B: '#9da4b9' };
 const SYMBOLS = ['★', '♥', '7', '♠'];
@@ -65,6 +68,15 @@ const PIXEL_SYMBOLS = [
   ['XXXXX', '....X', '...X.', '..X..', '..X..'],
 ];
 function drawDealer(c, s, reduced) {
+  if (s.form === 1 && greedImages.firstSprite?.naturalWidth) {
+    c.save(); c.imageSmoothingEnabled = false;
+    const img = greedImages.firstSprite, height = 88, width = height * img.naturalWidth / img.naturalHeight;
+    c.drawImage(img, 140 - width / 2, 23, width, height); c.restore(); return;
+  }
+  if (s.form === 2 && greedImages.second?.naturalWidth) {
+    c.save(); c.imageSmoothingEnabled = false;
+    c.drawImage(greedImages.second, 69, 23, 142, 92); c.restore(); return;
+  }
   const pixel = 3, left = 92, top = 30 + (reduced ? 0 : Math.round(Math.sin(s.elapsed / 500)) * pixel);
   const palette = { C: s.phase === 3 ? '#ffc25d' : '#ff486d', O: '#100e20', F: '#f4e9f8', S: '#b9a6d2', M: '#281331', V: '#74528e' };
   c.save(); c.imageSmoothingEnabled = false;
@@ -236,8 +248,8 @@ export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiec
   const height = crazyCanvasHeight(s.mode);
   c.save(); c.clearRect(0, 0, 280, height);
   const bg = c.createLinearGradient(0, 0, 0, height); bg.addColorStop(0, '#21112e'); bg.addColorStop(1, '#0b1020'); c.fillStyle = bg; c.fillRect(0, 0, 280, height);
-  text(c, `${t('crazyGreed')} · ${t(s.boss.name)}`, 140, 15, 16, '#ffd69b'); drawDealer(c, s, reducedMotion); drawBridgePreviews(c, s, t, paintPiece);
-  text(c, `${s.damageLeft === 0 ? '◇ ' : ''}BOSS ${s.bossHp}/${s.boss.hp}`, 140, 117, 12, '#ff829d'); bar(c, 24, 128, 232, s.bossHp / s.boss.hp, '#ff476f');
+  text(c, `${t('crazyGreed')} · ${t(s.form === 2 ? 'crazyTrueName' : s.boss.name)}`, 140, 15, 16, '#ffd69b'); drawDealer(c, s, reducedMotion); drawBridgePreviews(c, s, t, paintPiece);
+  text(c, `${s.damageLeft === 0 ? '◇ ' : ''}BOSS · ${t('crazyForm')} ${s.form === 2 ? 'II' : 'I'}`, 140, 117, 12, '#ff829d'); bar(c, 24, 128, 232, s.bossHp / s.bossMaxHp, '#ff476f');
   const a = s.arcade || ['bridge', 'sand'].includes(s.mode) ? crazyPlayfield(s.mode) : CRAZY_ARENA;
   box(c, a.x - 2, a.y - 2, a.w + 4, a.h + 4, s.attack ? '#a63b5e' : '#674068', 5); box(c, a.x, a.y, a.w, a.h, '#100e1b', 3);
   if (s.mode === 'bridge' || s.mode === 'sand') bridgeBoard(c, s, { paintGrid, paintPiece });
@@ -246,7 +258,9 @@ export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiec
     if (paintGrid) paintGrid(c, s.arcade.grid);
     else for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (s.arcade.grid[y][x]) box(c, x * 28 + 1, y * 28 + 1, 26, 26, COLORS[s.arcade.grid[y][x].type] || '#e0b469', 3);
     drawSession(c, s.arcade, '#f2deef', { speed: t('arcadeSpeed'), double: t('arcadeDouble'), triple: t('arcadeTriple'), wide: t('arcadeWide'), narrow: t('arcadeNarrow') }); c.restore();
-  } else miniBoard(c, s, t, reducedMotion);
+  } else if (GREED_ATTACKS.includes(s.mode)) drawReaction(c, s, t, reducedMotion);
+  else if (s.mode === 'pusher') drawPusher(c, s, t);
+  else miniBoard(c, s, t, reducedMotion);
   text(c, `${t('crazyMode_' + s.mode)} · ${Math.ceil(Math.max(0, s.timeLeft) / 1000)}s`, 140, 141, 12, '#ffc7d6');
   if (s.cat) {
     const warning = s.cat.time < 1200;
@@ -254,11 +268,26 @@ export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiec
       : s.cat.action === 'heal' || s.cat.action === 'player' ? { x: 250, y: height - 100 }
       : { x: 240, y: a.y + a.h * .6 };
     const enter = reducedMotion ? 1 : Math.min(1, s.cat.time / 450);
-    drawMischiefCat(c, warning ? 316 - enter * 35 : target.x, warning ? target.y : target.y + 4, .8, true);
-    if (warning) text(c, '!', 255, target.y - 52, 25, '#ffd46b');
-    if (!warning && s.cat.action !== 'heal') {
-      c.save(); c.strokeStyle = s.cat.action === 'player' ? '#ff6889' : '#ffe9c9'; c.lineWidth = 3;
-      for (let i = 0; i < 3; i++) { c.beginPath(); c.moveTo(target.x - 50 + i * 9, target.y - 24); c.lineTo(target.x - 28 + i * 9, target.y + 11); c.stroke(); }
+    const scale = s.cat.action === 'boss' ? .48 : .64;
+    const catX = warning ? 312 - enter * 82 : target.x;
+    drawMischiefCat(c, catX, target.y, scale, true);
+    if (warning) text(c, s.cat.action === 'heal' ? '+' : '!', 243, target.y - 37, 20, '#ffd46b');
+    if (!warning) {
+      const age = s.cat.time - 1200, fade = Math.max(0, 1 - age / 500);
+      c.save(); c.globalAlpha = fade; c.lineCap = 'round';
+      if (s.cat.action === 'heal') {
+        for (let i = 0; i < 8; i++) {
+          const angle = i * Math.PI / 4, r = 18 + age / 15;
+          const x = target.x - 23 + Math.cos(angle) * r, y = target.y + Math.sin(angle) * r;
+          c.fillStyle = '#b4ffe1'; c.fillRect(x - 1, y - 4, 2, 8); c.fillRect(x - 4, y - 1, 8, 2);
+        }
+      } else {
+        c.strokeStyle = s.cat.action === 'player' ? '#ffc2cf' : '#fff0c3'; c.lineWidth = 2;
+        for (let i = 0; i < 3; i++) {
+          c.beginPath(); c.moveTo(target.x - 42 + i * 8, target.y - 16); c.quadraticCurveTo(target.x - 50 + i * 8, target.y + 2, target.x - 25 + i * 8, target.y + 18); c.stroke();
+        }
+        c.fillStyle = '#fff6d1'; c.fillRect(target.x - 34, target.y + 9, 3, 3);
+      }
       c.restore();
     }
     if (!warning && s.cat.cells?.length) {

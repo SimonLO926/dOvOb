@@ -1,4 +1,4 @@
-import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.1.3";
+import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.2.0";
 
 export const CELL = 28;
 export const W = COLS * CELL;
