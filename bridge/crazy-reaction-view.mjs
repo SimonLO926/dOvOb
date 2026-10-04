@@ -1,4 +1,4 @@
-import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.1';
+import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.2';
 const label = (c, value, x, y, size = 13, color = '#ffe7a3') => { c.fillStyle = color; c.font = `bold ${size}px "Pixel Latin", "Pixel Hant", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(value, x, y, 248); };
 export function pixelCore(c, x, y, color) {
   const pixels = ['.XX.XX.', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..', '...X...'];
@@ -42,7 +42,7 @@ export function drawReaction(c, s, t, reduced) {
   label(c, s.mode === 'jump' ? t('crazyJumpHint') : m.dashReady > 0 ? `${t('crazyDash')} ${(m.dashReady / 1000).toFixed(1)}s` : t('crazyDashReady'), 140, 498, 11, '#8fffdb');
 }
 export function drawPusher(c, s, t) {
-  const m = s.mini, front = 260 + (Math.sin(m.clock / 500) + 1) * 28;
+  const m = s.mini, front = 260 + (Math.sin(m.clock / 500) + 1) * 35;
   c.save(); c.beginPath(); c.rect(12, 152, 256, 356); c.clip();
   c.fillStyle = '#4a2d32'; c.fillRect(20, 185, 240, 290); c.fillStyle = '#bea07d'; c.fillRect(22, 220, 236, front - 220);
   c.fillStyle = '#fff0b6'; c.fillRect(22, front, 236, 5); c.fillStyle = '#130c19'; c.fillRect(22, 465, 236, 24);

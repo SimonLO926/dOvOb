@@ -430,3 +430,41 @@ test('Pusher reward is settled once even when the time expires or a risk is bank
   updateCrazy(s, 50); assert.notEqual(s.mode, 'pusher'); assert.equal(s.bossHp, 890);
   const hp = s.bossHp; updateCrazy(s, 50); assert.equal(s.bossHp, hp);
 });
+
+test('The packed pusher bed pays out through normal physics and dropped stock increases rewards', () => {
+  for (const aim of [35, 140, 245]) {
+    const play = (drop, step) => {
+      let seed = 9127; const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+      const s = createCrazy({ random }); advanceCrazy(s, 'pusher'); s.catDue = Infinity;
+      let nextDrop = 600;
+      for (let time = 0; time < 11500; time += step) {
+        s.mini.aim = aim;
+        if (drop && time >= nextDrop && s.mini.stock) { tap(s, 'action'); nextDrop += 500; }
+        updateCrazy(s, step);
+      }
+      assert.equal(s.hp, 100); assert.ok(s.mini.coins.every(c => Number.isFinite(c.x) && Number.isFinite(c.y)));
+      return s.mini.collected;
+    };
+    for (const step of [10, 50]) {
+      const idle = play(false, step), active = play(true, step);
+      assert.ok(active >= 8, `No meaningful payout at aim ${aim}, step ${step}: ${active}`);
+      assert.ok(active > idle, `Dropped coins must increase payout: ${active} vs ${idle}`);
+    }
+  }
+});
+
+test('Held jumps have a low ceiling but still clear the ground attack height', () => {
+  const s = createCrazy(); advanceCrazy(s, 'jump'); run(s, 550); s.catDue = Infinity; s.mini.spawn = Infinity;
+  inputCrazy(s, 'action'); let peak = 464;
+  for (let time = 0; time < 650; time += 10) { updateCrazy(s, 10); peak = Math.min(peak, s.mini.y); }
+  assert.ok(464 - peak > 32, 'Jump must clear ground hazards');
+  assert.ok(464 - peak < 60, 'Held jump must not bypass the arena');
+  assert.equal(s.mini.grounded, true);
+});
+
+test('Pachinko layouts vary while keeping every peg inside its playable lane', () => {
+  const low = createCrazy({ random: () => .1 }), high = createCrazy({ random: () => .9 });
+  advanceCrazy(low, 'pachinko'); advanceCrazy(high, 'pachinko');
+  assert.notDeepEqual(low.mini.pegs, high.mini.pegs);
+  for (const s of [low, high]) assert.ok(s.mini.pegs.every(p => p.x >= 10 && p.x <= 270 && p.y >= 160 && p.y <= 430));
+});

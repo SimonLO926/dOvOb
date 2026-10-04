@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
-  <link rel="preload" href="./assets/mischief-cat.png?v=1.2.1" as="image">
-  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.1" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="./assets/mischief-cat.png?v=1.2.2" as="image">
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.2" as="font" type="font/woff" crossorigin>
   <style>
     /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
     @font-face {
       font-family: "Fever Brush";
-      src: url("./fonts/fever-brush.woff?v=1.2.1") format("woff");
+      src: url("./fonts/fever-brush.woff?v=1.2.2") format("woff");
       font-weight: 400;
       font-display: swap;
     }
@@ -1182,8 +1182,8 @@
           <button type="button" disabled><span data-i18n="sinSloth">Sloth</span><small data-i18n="crazyLocked">Locked</small></button>
         </div>
         <div class="greed-preview">
-          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.png?v=1.2.1" alt="" aria-hidden="true">
-          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.png?v=1.2.1" alt="Greed, the casino dealer's first form">
+          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.png?v=1.2.2" alt="" aria-hidden="true">
+          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.png?v=1.2.2" alt="Greed, the casino dealer's first form">
           <div class="greed-caption"><h2 data-i18n="crazyDealer">The Mad Dealer</h2><p data-i18n="crazyGreedLore">The house wants everything. Defeat both forms.</p></div>
         </div>
       </div>
@@ -1487,7 +1487,7 @@
     <canvas id="cinematic-canvas" aria-hidden="true"></canvas><div class="cinematic-controls"><button id="cinematic-pause" type="button" data-i18n="paused">Pause</button><button id="cinematic-skip" type="button" data-i18n="crazySkip">Skip</button></div>
   </div>
   <div id="crazy-result" hidden role="dialog" aria-modal="true" aria-labelledby="result-title">
-    <img class="result-art" loading="lazy" src="./assets/greed-defeated.png?v=1.2.1" alt="Defeated Greed surrounded by spilled coins">
+    <img class="result-art" loading="lazy" src="./assets/greed-defeated.png?v=1.2.2" alt="Defeated Greed surrounded by spilled coins">
     <div class="result-content"><small>GREED · CLEARED</small><h1 id="result-title" data-i18n="crazyGreedBroken">Greed defeated</h1><div class="result-score" id="result-score"></div><div class="result-stats" id="result-stats"></div><p data-i18n="crazyClearUnlock">Second-form silhouette unlocked</p><div class="result-buttons"><button id="result-retry" type="button" data-i18n="again">Again</button><button id="result-bosses" type="button" data-i18n="crazySevenSins">Seven Deadly Sins</button></div></div>
   </div>
   <div id="fever-aura" hidden aria-hidden="true">
@@ -1505,21 +1505,21 @@
     <i style="--x:83%;--y:97%;--delay:-1.87s"></i>
   </div>
   <script type="module">
-    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.1";
-    import { drawCrazy, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.1";
-    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.1";
-    import { drawGreedCinematic, readGreedClear, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.1";
-    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.1";
-    import { createSound } from "./audio.mjs?v=1.2.1";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.1";
-    import { translate } from "./i18n.mjs?v=1.2.1";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.1";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.1";
-    import { VERSION } from "./version.mjs?v=1.2.1";
+    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.2";
+    import { drawCrazy, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.2";
+    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.2";
+    import { drawGreedCinematic, readGreedClear, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.2";
+    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.2";
+    import { createSound } from "./audio.mjs?v=1.2.2";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.2";
+    import { translate } from "./i18n.mjs?v=1.2.2";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.2";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.2";
+    import { VERSION } from "./version.mjs?v=1.2.2";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SAND_HEX, SHAPES, activateFever, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.2.1";
+    } from "./logic.mjs?v=1.2.2";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
