@@ -1046,8 +1046,10 @@ function awardCombo(game) {
 }
 
 function noteLines(game, count) {
+  const lineBonus = game.mode === "sprint" ? 0 : Math.min(5, Math.floor(game.combo / 2));
+  count += lineBonus;
   game.lines += count;
-  if (game.mode !== "marathon") return;
+  if (game.mode !== "marathon") return lineBonus;
   game.stageLines += count;
   while (game.stageLines >= game.stageGoal) {
     game.stageLines -= game.stageGoal;
@@ -1055,6 +1057,7 @@ function noteLines(game, count) {
     game.stage += 1;
     game.stageGoal = stageGoal(game.stage);
   }
+  return lineBonus;
 }
 
 export function pump(game) {
@@ -1073,8 +1076,8 @@ export function pump(game) {
       const bonus = awardCombo(game);
       const minos = Math.max(1, Math.round(cleared.count / (SAND_SCALE * SAND_SCALE)));
       game.score += minos * 25 * scoreMult(game) + bonus;
-      noteLines(game, Math.max(1, Math.floor(minos / 4)));
-      return { type: "clear", rows: [], cells: [], blasts: [], combo: game.combo, sand: true, bonus, colors: cleared.colors };
+      const lineBonus = noteLines(game, Math.max(1, Math.floor(minos / 4)));
+      return { type: "clear", rows: [], cells: [], blasts: [], combo: game.combo, sand: true, bonus, lineBonus, colors: cleared.colors };
     }
     if (game.sandExit) finishSand(game);
     else {
@@ -1117,13 +1120,13 @@ export function pump(game) {
     const bonus = awardCombo(game);
     const lineScore = kind ? tSpinScore(kind, rows.length) : (LINE_SCORE[rows.length] ?? LINE_SCORE[4] + (rows.length - 4) * 300);
     game.score += lineScore * mult + bonus;
-    noteLines(game, rows.length);
+    const lineBonus = noteLines(game, rows.length);
     if (game.mode === "tetris" || garbageGraceActive(game) || garbageQueued > 0) collapseRows(game.grid, rows);
     if (game.mode === "marathon") {
       const reward = pickReward(rewards);
       if (reward) game.pendingReward = reward;
     }
-    return { type: "clear", rows, cells, blasts, fever: feverActive(game), feverStarted, garbageQueued, combo: game.combo, tspin: kind === "tspin", spinName: kind ? tSpinName(kind, rows.length) : null, bonus };
+    return { type: "clear", rows, cells, blasts, fever: feverActive(game), feverStarted, garbageQueued, combo: game.combo, tspin: kind === "tspin", spinName: kind ? tSpinName(kind, rows.length) : null, bonus, lineBonus };
   }
 
   if (game.spin) {

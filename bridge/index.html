@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
-  <link rel="preload" href="./fonts/fever-brush.woff?v=1.0.15" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.0.16" as="font" type="font/woff" crossorigin>
   <style>
     /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
     @font-face {
       font-family: "Fever Brush";
-      src: url("./fonts/fever-brush.woff?v=1.0.15") format("woff");
+      src: url("./fonts/fever-brush.woff?v=1.0.16") format("woff");
       font-weight: 400;
       font-display: swap;
     }
@@ -1377,16 +1377,16 @@
     <i style="--x:83%;--y:97%;--delay:-1.87s"></i>
   </div>
   <script type="module">
-    import { createSound } from "./audio.mjs?v=1.0.15";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.15";
-    import { translate } from "./i18n.mjs?v=1.0.15";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.15";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.15";
-    import { VERSION } from "./version.mjs?v=1.0.15";
+    import { createSound } from "./audio.mjs?v=1.0.16";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.16";
+    import { translate } from "./i18n.mjs?v=1.0.16";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.16";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.16";
+    import { VERSION } from "./version.mjs?v=1.0.16";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, activateFever, applyGarbageCurse, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.0.15";
+    } from "./logic.mjs?v=1.0.16";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -2814,7 +2814,7 @@
               sound.playClear(step.sand ? 2 : step.rows.length);
               if (step.combo > 1) {
                 sound.playCombo(step.combo);
-                pushCallout("combo", `${t("combo")} ${step.combo}`);
+                pushCallout("combo", `${t("combo")} ${step.combo}${step.lineBonus ? ` · ${t("comboLines")} +${step.lineBonus}` : ""}`);
                 comboBurst(step.combo);
               }
               if (step.sand) sandBurst();

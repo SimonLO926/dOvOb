@@ -1048,3 +1048,44 @@ for (const triggeringAttack of [false, true]) {
     assert.equal(game.grid[triggeringAttack ? 5 : 6][2].g, 99);
   });
 }
+
+for (const mode of ["marathon", "tetris", "sprint"]) {
+  test(`${mode} combo line rewards scale up to five while sprint counts actual rows`, () => {
+    const game = createGame({ mode, random: () => 0.5 });
+    startGame(game, mode);
+    game.active = null;
+    let expected = 0;
+    for (let combo = 1; combo <= 12; combo += 1) {
+      game.grid = emptyGrid();
+      game.phase = "resolving";
+      fillRow(game.grid, 19);
+      const step = pump(game);
+      const extra = mode === "sprint" ? 0 : Math.min(5, Math.floor(combo / 2));
+      expected += 1 + extra;
+      assert.equal(step.combo, combo);
+      assert.equal(step.lineBonus, extra);
+      assert.equal(game.lines, expected);
+    }
+    if (mode === "marathon") {
+      assert.equal(game.stage, 3);
+      assert.equal(game.pendingFlips, 2);
+      assert.equal(game.stageLines, expected - 30);
+    }
+  });
+}
+
+test("a piece without a clear resets the next combo line reward", () => {
+  const game = createGame({ mode: "tetris" });
+  startGame(game, "tetris");
+  game.active = null;
+  game.combo = 8;
+  game.comboArmed = true;
+  game.phase = "resolving";
+  assert.equal(pump(game).type, "spawn");
+  assert.equal(game.combo, 0);
+  game.active = null;
+  game.phase = "resolving";
+  fillRow(game.grid, 19);
+  assert.equal(pump(game).lineBonus, 0);
+  assert.equal(game.lines, 1);
+});
