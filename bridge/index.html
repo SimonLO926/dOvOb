@@ -405,6 +405,7 @@
     .callout[hidden] { display: none !important; }
     .callout b { font-size: 28px; letter-spacing: .04em; }
     .callout.tspin b { color: #ffd60a; }
+    .callout.garbage b { color: #a9b4c3; }
     .callout.combo b { color: #7ee0ff; }
     .callout.fever { width: calc(100% - 12px); }
     .callout.fever b {
@@ -1304,20 +1305,20 @@
     </section>
   </div>
   <script type="module">
-    import { createSound } from "./audio.mjs?v=1.0.11";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.11";
-    import { translate } from "./i18n.mjs?v=1.0.11";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.11";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.11";
-    import { VERSION } from "./version.mjs?v=1.0.11";
+    import { createSound } from "./audio.mjs?v=1.0.12";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.12";
+    import { translate } from "./i18n.mjs?v=1.0.12";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.12";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.12";
+    import { VERSION } from "./version.mjs?v=1.0.12";
     import {
-      COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, activateFever, applyNoHoldCurse, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
+      COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, activateFever, applyGarbageCurse, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.0.11";
+    } from "./logic.mjs?v=1.0.12";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
-      J: "#0a84ff", L: "#ff9f0a", B: "#8e8e93", X: "#5e5ce6", D: "#ff9f0a", R: "#ff375f", A: "#e7d3a1", F: "#ffbd2e",
+      J: "#0a84ff", L: "#ff9f0a", B: "#8e8e93", X: "#5e5ce6", D: "#ff9f0a", R: "#ff375f", A: "#e7d3a1", F: "#ffbd2e", G: "#313842", N: "#68727d",
     };
     const SAND_HEX = ["#ffd84a", "#ff4b4b", "#3c8dff", "#3dce6e"];
     const CELL = 28;
@@ -1566,6 +1567,7 @@
       game.feverLeft = 0;
       game.feverResolving = false;
       game.feverGroups = new Set();
+      game.pendingGarbage = 0;
       game.grid = brickWall(Math.random);
       game.active = null;
       game.hold = null;
@@ -1596,6 +1598,7 @@
       game.feverLeft = 0;
       game.feverResolving = false;
       game.feverGroups = new Set();
+      game.pendingGarbage = 0;
       game.phase = "playing";
       game.active = null;
       game.hold = null;
@@ -1866,7 +1869,7 @@
 
     function ink() { return document.body.dataset.theme === "dark" ? "#f5f5f7" : "#1d1d1f"; }
     const CURSE_COLOR = {
-      seal: "#5e5ce6", reverse: "#ff9f0a", blind: "#1d1d1f", rush: "#ff375f", norotate: "#bf5af2", nohold: "#8e44ad",
+      seal: "#5e5ce6", reverse: "#ff9f0a", blind: "#1d1d1f", rush: "#ff375f", norotate: "#bf5af2", nohold: "#8e44ad", garbage: "#68727d",
     };
     function pieceColor(type, curse, sand) {
       if (sand != null) return SAND_HEX[sand] || SAND_HEX[0];
@@ -1903,6 +1906,14 @@
         context.lineTo(cx, cy + size * 0.22);
         context.lineTo(cx - size * 0.12, cy);
         context.fill();
+      } else if (curse === "garbage") {
+        context.strokeRect(cx - size * 0.16, cy - size * 0.12, size * 0.32, size * 0.32);
+        context.beginPath();
+        context.moveTo(cx - size * 0.22, cy - size * 0.18);
+        context.lineTo(cx + size * 0.22, cy - size * 0.18);
+        context.moveTo(cx - size * 0.07, cy - size * 0.24);
+        context.lineTo(cx + size * 0.07, cy - size * 0.24);
+        context.stroke();
       } else if (curse === "nohold") {
         context.strokeRect(cx - size * 0.2, cy - size * 0.2, size * 0.4, size * 0.4);
         context.beginPath();
@@ -1992,7 +2003,7 @@
       context.fill();
     }
 
-    function drawBlob(context, cells, type, size, ghost, markIndex = null, curse = null, sand = null, rot = 0) {
+    function drawBlob(context, cells, type, size, ghost, markIndex = null, curse = null, sand = null, rot = 0, curseIndex = null) {
       cells.forEach(([x, y], index) => {
         if (y < 0 || y >= ROWS || x < 0 || x >= COLS) return;
         if (sand != null) {
@@ -2008,7 +2019,7 @@
             context.fillRect(x * size + size / 2 + ox * size, y * size + size / 2 + oy * size, Math.max(2, size * 0.12), Math.max(2, size * 0.12));
           }
         }
-        if (!ghost && curse) curseMark(context, x, y, size, curse);
+        if (!ghost && curse && type !== "G") curseMark(context, x, y, size, curse);
         if (!ghost && index === markIndex && (type === "B" || type === "X")) {
           context.fillStyle = type === "B" ? "#1d1d1f" : "#ffffff";
           context.beginPath();
@@ -2016,7 +2027,51 @@
           context.fill();
         }
       });
-      if (!ghost && sand == null && ["B", "X", "D", "R", "A", "C", "F"].includes(type)) drawSpecialMark(context, cells, size, type);
+      if (!ghost && sand == null && type === "G") {
+        drawGarbageBag(context, cells, size);
+        if (curse) cells.forEach(([x, y], index) => {
+          if (index === curseIndex) curseMark(context, x, y, size, curse);
+        });
+      }
+      if (!ghost && sand == null && ["B", "X", "D", "R", "A", "C", "F", "G"].includes(type)) drawSpecialMark(context, cells, size, type);
+    }
+
+    function drawGarbageBag(context, cells, size) {
+      if (cells.length < 4) return;
+      const neighbors = ([x, y]) => cells.filter(([nx, ny]) => Math.abs(nx - x) + Math.abs(ny - y) === 1).length;
+      const neck = cells.reduce((best, cell) => neighbors(cell) < neighbors(best) ? cell : best);
+      const cx = (Math.min(...cells.map(([x]) => x)) + Math.max(...cells.map(([x]) => x)) + 1) * size / 2;
+      const cy = (Math.min(...cells.map(([, y]) => y)) + Math.max(...cells.map(([, y]) => y)) + 1) * size / 2;
+      context.save();
+      context.beginPath();
+      cells.forEach(([x, y]) => context.rect(x * size + 1, y * size + 1, size - 2, size - 2));
+      context.clip();
+      context.translate(cx, cy);
+      context.rotate(Math.atan2((neck[1] + 0.5) * size - cy, (neck[0] + 0.5) * size - cx) + Math.PI / 2);
+      const gloss = context.createLinearGradient(-size, 0, size, size);
+      gloss.addColorStop(0, "#737d8a");
+      gloss.addColorStop(0.35, "#222a34");
+      gloss.addColorStop(1, "#080d14");
+      context.fillStyle = gloss;
+      context.beginPath();
+      context.moveTo(-size * 0.24, -size * 0.55);
+      context.bezierCurveTo(-size * 1.5, -size * 0.2, -size * 1.4, size * 1.35, -size * 0.75, size * 1.38);
+      context.lineTo(size * 0.75, size * 1.38);
+      context.bezierCurveTo(size * 1.4, size * 1.35, size * 1.5, -size * 0.2, size * 0.24, -size * 0.55);
+      context.closePath();
+      context.fill();
+      context.strokeStyle = "#a9b4c3";
+      context.lineWidth = Math.max(1, size * 0.04);
+      context.stroke();
+      context.beginPath();
+      context.moveTo(-size * 0.22, -size * 0.68);
+      context.lineTo(size * 0.22, -size * 0.68);
+      context.moveTo(0, -size * 0.66);
+      context.lineTo(-size * 0.3, -size * 1.12);
+      context.lineTo(size * 0.3, -size * 1.12);
+      context.closePath();
+      context.stroke();
+      context.restore();
     }
 
     function drawSpecialMark(context, cells, size, type) {
@@ -2046,8 +2101,8 @@
       context.save();
       const big = type === "F" && cells.length >= 6;
       const badge = big ? size * 1.25 : size * 0.4;
-      const x = big ? left + width / 2 : left + size * 0.77;
-      const y = big ? top + height / 2 : top + size * 0.22;
+      const x = big ? left + width / 2 : (cells[0][0] + 0.77) * size;
+      const y = big ? top + height / 2 : (cells[0][1] + 0.22) * size;
       context.translate(x, y);
       context.rotate(-0.12);
       context.font = `900 ${Math.round(badge)}px "Noto Serif TC", "Songti TC", serif`;
@@ -2077,7 +2132,7 @@
               if (grid[gy][gx]?.g === cell.g) group.push([gx, gy]);
             }
           }
-          drawBlob(context, group, cell.type, size, false, null, cell.curse, cell.sand ?? null);
+          drawBlob(context, group, cell.type, size, false, null, cell.type === "G" ? null : cell.curse, cell.sand ?? null);
         }
       }
       context.fillStyle = "#dfff45";
@@ -2085,6 +2140,7 @@
         for (let x = 0; x < COLS; x += 1) {
           const cell = grid[y][x];
           if (!cell || skip.has(cell.g)) continue;
+          if (cell.type === "G" && cell.curse) curseMark(context, x, y, size, cell.curse);
           if (!cell.bomb && cell.reward !== "bbtan") continue;
           context.fillStyle = cell.bomb ? "#1d1d1f" : "#ffffff";
           context.beginPath();
@@ -2108,7 +2164,7 @@
         const oy = index * slot + (slot - (Math.max(...ys) - Math.min(...ys) + 1) * size) / 2 - Math.min(...ys) * size;
         context.save();
         context.translate(ox, oy);
-        drawBlob(context, cells, piece.type, size, false, piece.bombIndex, piece.curse, piece.sand ?? null);
+        drawBlob(context, cells, piece.type, size, false, piece.bombIndex, piece.curse, piece.sand ?? null, 0, piece.curseIndex);
         context.restore();
       });
     }
@@ -2290,9 +2346,9 @@
         ctx.translate(-(COLS * CELL) / 2, -(ROWS * CELL) / 2);
       }
       const skip = new Set();
-      if (anim?.step.moves?.length && (anim.step.type === "drop" || anim.step.type === "sand")) for (const move of anim.step.moves) skip.add(move.g);
+      if (anim?.step.moves?.length && (anim.step.type === "drop" || anim.step.type === "sand" || anim.step.type === "garbage")) for (const move of anim.step.moves) skip.add(move.g);
       drawGridCells(ctx, game.grid, skip, CELL);
-      if (anim?.step.moves?.length && (anim.step.type === "drop" || anim.step.type === "sand")) {
+      if (anim?.step.moves?.length && (anim.step.type === "drop" || anim.step.type === "sand" || anim.step.type === "garbage")) {
         const turn = Math.min(1, anim.t / anim.dur);
         const eased = 1 - (1 - turn) ** 2;
         for (const move of anim.step.moves) {
@@ -2319,8 +2375,8 @@
       drawFx();
       if (game.active && game.phase === "playing") {
         const gy = ghostY(game);
-        drawBlob(ctx, cellsOf(game.active.type, game.active.rot, game.active.x, gy), game.active.type, CELL, true, null, game.active.curse, game.active.sand ?? null, game.active.rot);
-        drawBlob(ctx, cellsOf(game.active.type, game.active.rot, game.active.x, game.active.y), game.active.type, CELL, false, game.active.bombIndex, game.active.curse, game.active.sand ?? null, game.active.rot);
+        drawBlob(ctx, cellsOf(game.active.type, game.active.rot, game.active.x, gy), game.active.type, CELL, true, null, game.active.curse, game.active.sand ?? null, game.active.rot, game.active.curseIndex);
+        drawBlob(ctx, cellsOf(game.active.type, game.active.rot, game.active.x, game.active.y), game.active.type, CELL, false, game.active.bombIndex, game.active.curse, game.active.sand ?? null, game.active.rot, game.active.curseIndex);
       }
       if (session) drawSession(ctx, session, ink(), {
         speed: t("arcadeSpeed"), double: t("arcadeDouble"), triple: t("arcadeTriple"),
@@ -2396,7 +2452,7 @@
       if (feverActive(game)) return;
       applyNoHoldCurse(game, cells);
       const now = performance.now();
-      for (const cell of cells || []) {
+      for (const cell of penaltyCells(cells)) {
         if (cell.curse === "reverse") curseUntil.reverse = now + 20000;
         if (cell.curse === "blind") curseUntil.blind = now + 5000;
         if (cell.curse === "rush") curseUntil.rush = now + 15000;
@@ -2623,6 +2679,7 @@
           session.feverHits = [];
         }
         if (session.curseHits.length) {
+          applyGarbageCurse(game, session.curseHits);
           applyCurses(session.curseHits);
           session.curseHits = [];
         }
@@ -2656,14 +2713,14 @@
         }
         if (!anim && game.phase === "resolving") {
           const step = pump(game);
-          if (step?.type === "clear" || step?.type === "drop" || step?.type === "flip" || step?.type === "reward" || step?.type === "sand" || step?.type === "spin") {
-            const distance = step.moves?.length && (step.type === "drop" || step.type === "sand") ? Math.max(0, ...step.moves.map((move) => Math.abs(move.y1 - move.y0) + Math.abs((move.x1 ?? move.x) - (move.x0 ?? move.x)))) : 0;
+          if (step?.type === "clear" || step?.type === "drop" || step?.type === "flip" || step?.type === "reward" || step?.type === "sand" || step?.type === "spin" || step?.type === "garbage") {
+            const distance = step.moves?.length && (step.type === "drop" || step.type === "sand" || step.type === "garbage") ? Math.max(0, ...step.moves.map((move) => Math.abs(move.y1 - move.y0) + Math.abs((move.x1 ?? move.x) - (move.x0 ?? move.x)))) : 0;
             const now = performance.now();
             const cursed = game.noHoldLeft > 0 || Object.values(curseUntil).some((until) => now < until)
               || game.grid.some((row) => row.some((cell) => cell?.curse === "seal"));
             const fastDrop = game.mode === "marathon" && !game.sanding && !cursed;
             const dropDuration = fastDrop ? Math.min(140, 40 + distance * 5) : 120 + distance * 18;
-            const dur = step.type === "clear" ? (step.blasts?.length ? 520 : step.sand ? 180 : 240) : step.type === "sand" ? 16 : step.type === "drop" ? dropDuration : step.type === "spin" ? 560 : step.type === "reward" && step.reward === "sand" ? 480 : step.type === "reward" ? 720 : 460;
+            const dur = step.type === "garbage" ? 220 + step.rows * 60 : step.type === "clear" ? (step.blasts?.length ? 520 : step.sand ? 180 : 240) : step.type === "sand" ? 16 : step.type === "drop" ? dropDuration : step.type === "spin" ? 560 : step.type === "reward" && step.reward === "sand" ? 480 : step.type === "reward" ? 720 : 460;
             anim = { step, t: 0, dur };
             if (step.type === "clear") {
               if (step.tspin || step.spinName) {
@@ -2684,6 +2741,10 @@
               applyCurses(step.cells);
               applyCurses(step.blasts);
               if (step.feverStarted) announceFever();
+            }
+            if (step.type === "garbage") {
+              pushCallout("garbage", `${t("garbageAdded")} +${step.rows}`);
+              sound.playBoom();
             }
             if (step.type === "spin") {
               sound.playTspin();

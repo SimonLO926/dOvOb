@@ -1,4 +1,4 @@
-import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.0.11";
+import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.0.12";
 
 export const CELL = 28;
 export const W = COLS * CELL;
@@ -165,7 +165,7 @@ function hit(session, x, y) {
   for (const cell of removed) {
     award(session);
     session.flashes.push({ x: cell.x, y: cell.y, life: 200 });
-    if (cell.curse) session.curseHits.push(cell);
+    if (cell.curse && cell.cause !== "blast") session.curseHits.push(cell);
     if (cell.type === "F") session.feverHits.push(cell);
   }
   return removed.length > 0;
@@ -194,7 +194,7 @@ function collideBricks(session, ball) {
     if (x < 0 || y < 0 || x >= COLS || y >= ROWS) continue;
     if (!session.grid[y][x]) continue;
     const cell = session.grid[y][x];
-    const special = !!(cell.bomb || cell.reward || cell.curse || ["B", "X", "D", "R", "A", "C", "F"].includes(cell.type));
+    const special = !!(cell.bomb || cell.reward || cell.curse || ["B", "X", "D", "R", "A", "C", "F", "G"].includes(cell.type));
     hit(session, x, y);
     bounceOffCell(ball, x, y);
     if (session.kind === "breakout" && special) {

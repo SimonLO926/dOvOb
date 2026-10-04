@@ -270,3 +270,19 @@ test("pinball launch and a flipper strike can reach the top of the table", () =>
     assert.ok(top <= 20, `launch=${launch}, highest y=${top}`);
   }
 });
+
+
+test("arcade bomb hits do not forward blast-destroyed penalties, direct penalty hits do", () => {
+  const session = breakoutTestSession(() => 0);
+  session.grid[5][5] = { type: "B", g: 3, bomb: true };
+  session.grid[5][6] = { type: "C", g: 4, curse: "garbage" };
+  session.balls = [{ x: 154, y: 167, vx: 0, vy: -260, r: 6 }];
+  updateSession(session, 16);
+  assert.equal(session.grid[5][6], null);
+  assert.equal(session.curseHits.length, 0);
+  const direct = breakoutTestSession(() => 0);
+  direct.grid[5][5] = { type: "G", g: 3, curse: "garbage" };
+  direct.balls = [{ x: 154, y: 167, vx: 0, vy: -260, r: 6 }];
+  updateSession(direct, 16);
+  assert.equal(direct.curseHits.length, 1);
+});

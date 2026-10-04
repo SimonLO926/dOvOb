@@ -2,6 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   COLS,
+  GARBAGE_CHANCE,
+  applyGarbageCurse,
+  penaltyCells,
+  hitBrick,
   CURSE_CHANCE,
   FEVER_CHANCE,
   FEVER_DROPS,
@@ -844,4 +848,117 @@ test("Fever ignores no-hold and sealed-row penalties and resets on a new game", 
   startGame(game);
   assert.equal(feverActive(game), false);
   assert.equal(game.feverGroups.size, 0);
+});
+
+
+test("garbage bags occupy an exact one-in-fifty interval and contain one marked cell", () => {
+  assert.equal(GARBAGE_CHANCE, 1 / 50);
+  const start = NO_HOLD_CHANCE + CURSE_CHANCE + FEVER_CHANCE;
+  for (const roll of [start, start + GARBAGE_CHANCE - 1e-8]) {
+    const game = createGame({ random: () => roll });
+    const piece = game.pull();
+    assert.equal(piece.type, "G");
+    assert.equal(piece.curse, "garbage");
+    assert.ok(piece.curseIndex >= 0 && piece.curseIndex < 7);
+  }
+  assert.notEqual(createGame({ random: () => start + GARBAGE_CHANCE }).pull().type, "G");
+  const game = createGame({ sequence: ["G", "I", "O", "T", "L", "J"], random: () => 0.5 });
+  startGame(game);
+  const marker = game.active.curseIndex;
+  hold(game);
+  game.holdLocked = false;
+  hold(game);
+  assert.equal(game.active.curseIndex, marker);
+  tryRotate(game, 1);
+  hardDrop(game);
+  const bag = game.grid.flat().filter((cell) => cell?.type === "G");
+  assert.equal(bag.length, 7);
+  assert.equal(bag.filter((cell) => cell.curse === "garbage").length, 1);
+});
+
+test("garbage penalties add one to three rows with a hole and shift existing blocks upward", () => {
+  for (const [roll, count] of [[0, 1], [0.5, 2], [0.99, 3]]) {
+    const game = createGame({ random: () => roll });
+    game.phase = "resolving";
+    game.grid[10][2] = { type: "O", g: 2 };
+    assert.equal(applyGarbageCurse(game, [{ curse: "garbage" }]), count);
+    const step = pump(game);
+    assert.equal(step.type, "garbage");
+    assert.equal(step.rows, count);
+    assert.ok(game.grid[10 - count][2]);
+    assert.equal(game.pendingGarbage, 0);
+    for (const row of game.grid.slice(-count)) {
+      assert.equal(row.filter(Boolean).length, COLS - 1);
+      assert.equal(row[step.hole], null);
+      assert.ok(row.filter(Boolean).every((cell) => cell.type === "N" && !cell.curse));
+    }
+  }
+});
+
+test("garbage pushing occupied cells beyond the top ends the game", () => {
+  const game = createGame({ random: () => 0 });
+  game.grid[0][4] = { type: "O", g: 2 };
+  game.phase = "resolving";
+  applyGarbageCurse(game, [{ curse: "garbage" }]);
+  assert.equal(pump(game).type, "over");
+  assert.equal(game.phase, "over");
+});
+
+test("normal line clearing triggers garbage once, while unmarked bag cells do not", () => {
+  const game = createGame({ random: () => 0.5 });
+  startGame(game);
+  fillRow(game.grid, 19);
+  game.grid[19][4] = { type: "G", g: 20, curse: "garbage" };
+  game.phase = "resolving";
+  game.active = null;
+  assert.equal(pump(game).garbageQueued, 2);
+  assert.equal(pump(game).rows, 2);
+  game.pendingGarbage = 0;
+  applyGarbageCurse(game, [{ type: "G", curse: null }]);
+  assert.equal(game.pendingGarbage, 0);
+});
+
+test("bomb blasts suppress every penalty, including same-row penalties and chain explosions", () => {
+  for (const curse of ["seal", "reverse", "blind", "rush", "norotate", "nohold", "garbage"]) {
+    const game = createGame({ random: () => 0 });
+    game.phase = "resolving";
+    fillRow(game.grid, 19);
+    game.grid[19][4] = { type: "B", g: 3, bomb: true };
+    game.grid[19][5] = { type: "C", g: 4, curse };
+    game.grid[18][4] = { type: "C", g: 5, curse };
+    const step = pump(game);
+    assert.equal(step.type, "clear");
+    assert.equal(penaltyCells([...step.cells, ...step.blasts]).length, 0);
+    assert.equal(game.noHoldLeft, 0);
+    assert.equal(game.pendingGarbage, 0);
+    const grid = emptyGrid();
+    grid[10][4] = { type: "B", g: 3, bomb: true };
+    grid[10][5] = { type: "B", g: 4, bomb: true };
+    grid[10][6] = { type: "C", g: 5, curse };
+    const removed = hitBrick(grid, 4, 10, () => 0);
+    assert.ok(removed.some((cell) => cell.curse === curse));
+    assert.equal(penaltyCells(removed).length, 0);
+    applyNoHoldCurse(game, removed);
+    applyGarbageCurse(game, removed);
+    assert.equal(game.noHoldLeft, 0);
+    assert.equal(game.pendingGarbage, 0);
+  }
+});
+
+test("a penalty outside the bomb footprint still triggers when normally cleared", () => {
+  const game = createGame({ random: () => 0 });
+  game.phase = "resolving";
+  fillRow(game.grid, 19);
+  game.grid[19][1] = { type: "B", g: 3, bomb: true };
+  game.grid[19][8] = { type: "C", g: 4, curse: "nohold" };
+  const step = pump(game);
+  assert.equal(penaltyCells(step.cells).length, 1);
+  assert.equal(game.noHoldLeft, 15);
+});
+
+test("Fever immunity also prevents garbage penalties", () => {
+  const game = createGame();
+  activateFever(game, [{ type: "F", feverId: 1 }]);
+  assert.equal(applyGarbageCurse(game, [{ curse: "garbage" }]), 0);
+  assert.equal(game.pendingGarbage, 0);
 });
