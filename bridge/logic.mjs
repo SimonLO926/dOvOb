@@ -1118,7 +1118,7 @@ export function pump(game) {
     const lineScore = kind ? tSpinScore(kind, rows.length) : (LINE_SCORE[rows.length] ?? LINE_SCORE[4] + (rows.length - 4) * 300);
     game.score += lineScore * mult + bonus;
     noteLines(game, rows.length);
-    if (game.mode === "tetris") collapseRows(game.grid, rows);
+    if (game.mode === "tetris" || garbageGraceActive(game) || garbageQueued > 0) collapseRows(game.grid, rows);
     if (game.mode === "marathon") {
       const reward = pickReward(rewards);
       if (reward) game.pendingReward = reward;

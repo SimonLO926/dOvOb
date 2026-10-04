@@ -1026,3 +1026,25 @@ test("garbage grace allows line clearing, refreshes on another attack, and reset
   startGame(game);
   assert.equal(garbageGraceActive(game), false);
 });
+
+for (const triggeringAttack of [false, true]) {
+  test(`garbage ${triggeringAttack ? "trigger" : "grace"} uses Tetris row collapse without Bridge falls`, () => {
+    const game = createGame({ random: () => 0.1 });
+    startGame(game);
+    game.active = null;
+    game.phase = "resolving";
+    game.garbageGraceLeft = triggeringAttack ? 0 : 1;
+    game.grid[5][2] = { type: "O", g: 99 };
+    game.grid[18][2] = { type: "O", g: 100 };
+    fillRow(game.grid, 19);
+    if (triggeringAttack) game.grid[19][4].curse = "garbage";
+    assert.equal(pump(game).type, "clear");
+    assert.equal(game.grid[5][2], null);
+    assert.equal(game.grid[6][2].g, 99);
+    assert.equal(game.grid[19][2].g, 100);
+    assert.equal(game.grid[19][3], null);
+    if (triggeringAttack) assert.equal(pump(game).type, "garbage");
+    assert.equal(pump(game).type, "spawn");
+    assert.equal(game.grid[triggeringAttack ? 5 : 6][2].g, 99);
+  });
+}
