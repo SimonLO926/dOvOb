@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
-  <link rel="preload" href="./assets/mischief-cat.png?v=1.2.2" as="image">
-  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.2" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="./assets/mischief-cat.png?v=1.2.3" as="image">
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.3" as="font" type="font/woff" crossorigin>
   <style>
     /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
     @font-face {
       font-family: "Fever Brush";
-      src: url("./fonts/fever-brush.woff?v=1.2.2") format("woff");
+      src: url("./fonts/fever-brush.woff?v=1.2.3") format("woff");
       font-weight: 400;
       font-display: swap;
     }
@@ -965,6 +965,8 @@
     body.crazy-preview #go-crazy.crazy-choice { background: #70233f; box-shadow: 0 0 24px #ff456f55; }
     body.crazy-active .console, body.touch.crazy-active .console { grid-template-columns: auto; width: 100%; justify-content: center; }
     body.crazy-active .rail { display: none; }
+    #crazy-boss-frame { display: none; position: absolute; top: 0; left: -50%; width: 200%; height: 100%; pointer-events: none; image-rendering: pixelated; }
+    body.crazy-active #crazy-boss-frame { display: block; }
     #crazy-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     body.crazy-active #game { height: 100svh; max-height: 100svh; min-height: 0; }
     body.crazy-active #game .nav { flex: 0 0 58px; }
@@ -992,14 +994,17 @@
     .sins-head button { white-space: nowrap; flex: 0 0 auto; padding: 10px 14px; font-size: 14px; }
     .sins-head h1 { margin: 0; font-size: clamp(25px, 5vw, 44px); color: #ffd58c; }
     .sins-head p { color: #d2a6bc; margin: 8px 0 0; font-size: 13px; }
-    .sins-layout { max-width: 1100px; margin: auto; display: grid; grid-template-columns: minmax(180px, .7fr) minmax(0, 1.7fr); gap: 24px; align-items: center; }
-    .sins-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    .sins-list button { text-align: left; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; color: #e9b99d; border: 1px solid #765144; background: #241321; border-radius: 3px; min-height: 54px; }
+    .sins-layout { max-width: 1100px; margin: auto; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+    .sins-list { position: relative; display: grid; grid-template-columns: 1fr; gap: 24px; padding: 8px 0; }
+    .sins-route { position: absolute; inset: 8px 0; width: 100%; height: calc(100% - 16px); pointer-events: none; fill: none; stroke: #ac7754; opacity: .5; }
+    .sins-list button { position: relative; width: 78%; z-index: 1; }
+    .sins-list button:nth-of-type(even) { justify-self: end; }
+    .sins-list button { text-align: left; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; color: #e9b99d; border: 1px solid #765144; background: #241321; border-radius: 3px; min-height: 64px; }
     .sins-list button:disabled { opacity: .38; cursor: default; }
     .sins-list #select-greed { background: linear-gradient(90deg, #6c2b3b, #342038); border-color: #ffc982; box-shadow: 0 0 24px #f2a44a22; color: #ffe3a4; }
     .sins-list #select-greed:hover, .sins-list #select-greed:focus-visible { box-shadow: 0 0 30px #f2a44a55; outline: 2px solid #ffe7b7; outline-offset: 3px; }
     .sins-list small { font-size: 11px; }
-    .greed-preview { position: relative; height: min(65svh, 620px); min-height: 330px; overflow: hidden; border: 1px solid #8a5f4a; background: #110b19; box-shadow: 0 0 50px #0008; }
+    .greed-preview { position: sticky; top: 24px; height: min(65svh, 620px); min-height: 330px; overflow: hidden; border: 1px solid #8a5f4a; background: #110b19; box-shadow: 0 0 50px #0008; }
     .greed-first-art { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: 35% center; image-rendering: pixelated; opacity: .16; transition: opacity .22s; z-index: 1; }
     .greed-preview.previewing .greed-first-art, .greed-preview.cleared .greed-first-art { opacity: 1; }
     .greed-preview.cleared .greed-first-art { width: 77%; mask-image: linear-gradient(90deg, #000 65%, transparent); }
@@ -1026,9 +1031,9 @@
     @media (max-width: 700px) {
       #bosses { padding: 18px 16px; }
       .sins-layout { display: flex; flex-direction: column-reverse; gap: 15px; }
-      .greed-preview { width: 100%; height: 34svh; min-height: 220px; }
-      .sins-list { width: 100%; grid-template-columns: 1fr; gap: 8px; }
-      .sins-list button { min-height: 47px; padding: 10px 14px; font-size: 14px; }
+      .greed-preview { position: relative; top: auto; width: 100%; height: 34svh; min-height: 220px; }
+      .sins-list { width: 100%; grid-template-columns: 1fr; gap: 24px; }
+      .sins-list button { min-height: 64px; padding: 10px 14px; font-size: 14px; }
       .sins-head { margin-bottom: 16px; }
       .greed-caption { padding: 14px; } .greed-caption h2 { font-size: 19px; margin: 18px 0 4px; }
       .greed-caption p { font-size: 11px; }
@@ -1173,6 +1178,7 @@
       <section id="crazy-ranks" hidden aria-label="Crazy rankings"><div id="crazy-board-card"></div><button id="crazy-ranks-close" class="text-btn" type="button" data-i18n="close">Back</button></section>
       <div class="sins-layout">
         <div class="sins-list">
+          <svg class="sins-route" viewBox="0 0 100 592" preserveAspectRatio="none" aria-hidden="true"><path d="M35 32 L65 120 L35 208 L65 296 L35 384 L65 472 L35 560" vector-effect="non-scaling-stroke" stroke-width="2"/></svg>
           <button id="select-greed" type="button"><span data-i18n="crazyGreed">Greed</span><small id="greed-clear-state" data-i18n="crazyChallenge">Challenge</small></button>
           <button type="button" disabled><span data-i18n="sinPride">Pride</span><small data-i18n="crazyLocked">Locked</small></button>
           <button type="button" disabled><span data-i18n="sinEnvy">Envy</span><small data-i18n="crazyLocked">Locked</small></button>
@@ -1182,8 +1188,8 @@
           <button type="button" disabled><span data-i18n="sinSloth">Sloth</span><small data-i18n="crazyLocked">Locked</small></button>
         </div>
         <div class="greed-preview">
-          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.png?v=1.2.2" alt="" aria-hidden="true">
-          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.png?v=1.2.2" alt="Greed, the casino dealer's first form">
+          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.png?v=1.2.3" alt="" aria-hidden="true">
+          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.png?v=1.2.3" alt="Greed, the casino dealer's first form">
           <div class="greed-caption"><h2 data-i18n="crazyDealer">The Mad Dealer</h2><p data-i18n="crazyGreedLore">The house wants everything. Defeat both forms.</p></div>
         </div>
       </div>
@@ -1415,6 +1421,7 @@
             </section>
           </aside>
           <div class="board-wrap">
+            <canvas id="crazy-boss-frame" width="560" height="720" aria-hidden="true"></canvas>
             <canvas id="board" width="280" height="560"></canvas>
             <div class="veil" id="veil" hidden>
               <h2 id="veil-title"></h2>
@@ -1487,7 +1494,7 @@
     <canvas id="cinematic-canvas" aria-hidden="true"></canvas><div class="cinematic-controls"><button id="cinematic-pause" type="button" data-i18n="paused">Pause</button><button id="cinematic-skip" type="button" data-i18n="crazySkip">Skip</button></div>
   </div>
   <div id="crazy-result" hidden role="dialog" aria-modal="true" aria-labelledby="result-title">
-    <img class="result-art" loading="lazy" src="./assets/greed-defeated.png?v=1.2.2" alt="Defeated Greed surrounded by spilled coins">
+    <img class="result-art" loading="lazy" src="./assets/greed-defeated.png?v=1.2.3" alt="Defeated Greed surrounded by spilled coins">
     <div class="result-content"><small>GREED · CLEARED</small><h1 id="result-title" data-i18n="crazyGreedBroken">Greed defeated</h1><div class="result-score" id="result-score"></div><div class="result-stats" id="result-stats"></div><p data-i18n="crazyClearUnlock">Second-form silhouette unlocked</p><div class="result-buttons"><button id="result-retry" type="button" data-i18n="again">Again</button><button id="result-bosses" type="button" data-i18n="crazySevenSins">Seven Deadly Sins</button></div></div>
   </div>
   <div id="fever-aura" hidden aria-hidden="true">
@@ -1505,21 +1512,21 @@
     <i style="--x:83%;--y:97%;--delay:-1.87s"></i>
   </div>
   <script type="module">
-    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.2";
-    import { drawCrazy, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.2";
-    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.2";
-    import { drawGreedCinematic, readGreedClear, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.2";
-    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.2";
-    import { createSound } from "./audio.mjs?v=1.2.2";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.2";
-    import { translate } from "./i18n.mjs?v=1.2.2";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.2";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.2";
-    import { VERSION } from "./version.mjs?v=1.2.2";
+    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.3";
+    import { drawCrazy, drawCrazyFrame, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.3";
+    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.3";
+    import { drawGreedCinematic, readGreedClear, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.3";
+    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.3";
+    import { createSound } from "./audio.mjs?v=1.2.3";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.3";
+    import { translate } from "./i18n.mjs?v=1.2.3";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.3";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.3";
+    import { VERSION } from "./version.mjs?v=1.2.3";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SAND_HEX, SHAPES, activateFever, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.2.2";
+    } from "./logic.mjs?v=1.2.3";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -2939,6 +2946,10 @@
           paintGrid: (context, grid) => drawGridCells(context, grid, new Set(), CELL),
           paintPiece: (context, piece, ghost) => drawBlob(context, cellsOf(piece.type, piece.rot, piece.x, piece.y), piece.type, CELL, ghost, piece.bombIndex, piece.curse, piece.sand ?? null, piece.rot, piece.curseIndex),
         });
+        const bossFrame = document.querySelector("#crazy-boss-frame");
+        const frameHeight = crazyCanvasHeight(crazy.mode);
+        if (bossFrame.height !== frameHeight) bossFrame.height = frameHeight;
+        drawCrazyFrame(bossFrame.getContext("2d"), crazy, { reducedMotion: paused || reducedMotion.matches });
         const blocks = ["bridge", "sand"].includes(crazy.mode);
         const flying = crazy.mode === "dodge" || FLYING_ATTACKS.includes(crazy.mode);
         document.querySelector("#btn-soft").disabled = !blocks && !flying;
