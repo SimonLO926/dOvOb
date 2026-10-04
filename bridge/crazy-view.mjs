@@ -1,8 +1,7 @@
-import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.0';
-import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.0';
-import { greedImages } from './crazy-screen.mjs?v=1.2.0';
-import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.0';
-import { drawSession } from './arcade.mjs?v=1.2.0';
+import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.1';
+import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.1';
+import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.1';
+import { drawSession } from './arcade.mjs?v=1.2.1';
 export const CRAZY_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 356 });
 export const CRAZY_BLOCK_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 512 });
 export function crazyCanvasHeight(mode) { return mode === 'bridge' || mode === 'sand' ? 720 : 560; }
@@ -15,7 +14,7 @@ const catPhoto = typeof Image === 'undefined' ? null : new Image();
 export const catImageReady = catPhoto ? new Promise(resolve => {
   catPhoto.onload = () => resolve(true);
   catPhoto.onerror = () => resolve(false);
-  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.0', import.meta.url).href;
+  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.1', import.meta.url).href;
 }) : Promise.resolve(false);
 const COLORS = { I: '#64d2ff', O: '#ffd60a', T: '#bf5af2', S: '#30d158', Z: '#ff453a', J: '#0a84ff', L: '#ff9f0a', B: '#9da4b9' };
 const SYMBOLS = ['★', '♥', '7', '♠'];
@@ -68,17 +67,10 @@ const PIXEL_SYMBOLS = [
   ['XXXXX', '....X', '...X.', '..X..', '..X..'],
 ];
 function drawDealer(c, s, reduced) {
-  if (s.form === 1 && greedImages.firstSprite?.naturalWidth) {
-    c.save(); c.imageSmoothingEnabled = false;
-    const img = greedImages.firstSprite, height = 88, width = height * img.naturalWidth / img.naturalHeight;
-    c.drawImage(img, 140 - width / 2, 23, width, height); c.restore(); return;
-  }
-  if (s.form === 2 && greedImages.second?.naturalWidth) {
-    c.save(); c.imageSmoothingEnabled = false;
-    c.drawImage(greedImages.second, 69, 23, 142, 92); c.restore(); return;
-  }
   const pixel = 3, left = 92, top = 30 + (reduced ? 0 : Math.round(Math.sin(s.elapsed / 500)) * pixel);
-  const palette = { C: s.phase === 3 ? '#ffc25d' : '#ff486d', O: '#100e20', F: '#f4e9f8', S: '#b9a6d2', M: '#281331', V: '#74528e' };
+  const palette = s.form === 2
+    ? { C: '#ffd361', O: '#291324', F: '#bd792e', S: '#ffe5a0', M: '#170c22', V: '#b23970' }
+    : { C: s.phase === 3 ? '#ffc25d' : '#ff486d', O: '#100e20', F: '#f4e9f8', S: '#b9a6d2', M: '#281331', V: '#74528e' };
   c.save(); c.imageSmoothingEnabled = false;
   DEALER_PIXELS.forEach((row, y) => [...row].forEach((v, x) => {
     if (v === '.') return;
@@ -88,6 +80,18 @@ function drawDealer(c, s, reduced) {
     const glyph = PIXEL_SYMBOLS[s.phase === 3 ? 2 : (i + s.phase - 1) % 3];
     c.fillStyle = s.attack ? '#ff4969' : '#ffe5a2';
     glyph.forEach((row, y) => [...row].forEach((v, x) => { if (v === 'X') c.fillRect(left + 8 * pixel + i * 6 * pixel + x * pixel, top + 10 * pixel + y * pixel, pixel, pixel); }));
+  }
+  if (s.form === 2) {
+    // A compact vault-mask, with grasping coin claws instead of a full-body portrait.
+    const reach = s.attack ? 9 : (reduced ? 0 : Math.round(Math.sin(s.elapsed / 240)) * 3);
+    for (const side of [-1, 1]) {
+      const x = side < 0 ? left - 9 - reach : left + 96 + reach;
+      c.fillStyle = '#bd792e'; c.fillRect(x, top + 33, 9, 21);
+      c.fillStyle = '#ffe5a0';
+      for (let finger = 0; finger < 3; finger++) c.fillRect(x + side * finger * 3, top + 27 + finger * 9, 9, 3);
+    }
+    c.fillStyle = '#ffd361'; c.fillRect(left + 39, top + 60, 18, 12);
+    c.fillStyle = '#291324'; c.fillRect(left + 45, top + 63, 6, 6);
   }
   c.restore();
 }
