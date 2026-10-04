@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { H, W, brickWall, createSession, flipper, updateSession } from "./arcade.mjs";
+import { H, W, BREAKOUT_EFFECTS, BREAKOUT_DURATION, activateBreakoutEffect, breakoutEffectStatus, brickWall, createSession, flipper, updateSession } from "./arcade.mjs";
 import { COLS, ROWS } from "./logic.mjs";
 
 test("a standalone brick wall leaves room for the paddle", () => {
@@ -157,4 +157,94 @@ test("a held flipper supports the ball until released without repeated launch im
   session.left = false;
   for (let i = 0; i < 600 && !session.over; i += 1) updateSession(session, 16);
   assert.equal(session.balls.length, 0);
+});
+
+
+function breakoutTestSession(random = () => 0.5) {
+  const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  grid[1][1] = { type: "O", g: 1 };
+  const session = createSession("breakout", grid, 1, random);
+  session.prep = 0;
+  session.launched = true;
+  session.balls = [{ x: 140, y: 400, vx: 120, vy: -230, r: 6, gravity: false }];
+  return session;
+}
+
+test("directly hitting a special Breakout brick selects each of five effects, normal bricks do not", () => {
+  for (let i = 0; i < BREAKOUT_EFFECTS.length; i += 1) {
+    const session = breakoutTestSession(() => (i + 0.5) / BREAKOUT_EFFECTS.length);
+    session.grid[5][5] = { type: "R", g: 2, reward: "breakout" };
+    session.balls[0] = { x: 154, y: 167, vx: 0, vy: -session.speed, r: 6 };
+    updateSession(session, 16);
+    assert.equal(session.grid[5][5], null);
+    assert.deepEqual(session.effectEvents, [BREAKOUT_EFFECTS[i]]);
+    assert.ok(breakoutEffectStatus(session).some(({ kind }) => kind === BREAKOUT_EFFECTS[i]));
+  }
+  const normal = breakoutTestSession();
+  normal.grid[5][5] = { type: "O", g: 2 };
+  normal.balls[0] = { x: 154, y: 167, vx: 0, vy: -normal.speed, r: 6 };
+  updateSession(normal, 16);
+  assert.deepEqual(normal.effectEvents, []);
+});
+
+test("speed boost refreshes without stacking and expires to the current progression speed", () => {
+  const session = breakoutTestSession();
+  activateBreakoutEffect(session, "speed");
+  activateBreakoutEffect(session, "speed");
+  assert.equal(session.speed, session.baseSpeed * 2);
+  session.progressSpeed = session.baseSpeed * 1.12;
+  session.balls = [];
+  updateSession(session, BREAKOUT_DURATION.speed);
+  assert.equal(session.speed, session.progressSpeed);
+});
+
+test("paddle effects replace each other, clamp to the table, and expire", () => {
+  const session = breakoutTestSession();
+  session.paddleX = 44;
+  activateBreakoutEffect(session, "wide");
+  assert.equal(session.paddleW, 132);
+  assert.ok(session.paddleX >= 66);
+  activateBreakoutEffect(session, "narrow");
+  assert.equal(session.paddleW, 62);
+  assert.equal(session.effects.wide, 0);
+  session.balls = [];
+  updateSession(session, BREAKOUT_DURATION.narrow);
+  assert.equal(session.paddleW, 88);
+});
+
+test("multi-ball multiplies active balls with distinct directions and has a twelve-ball limit", () => {
+  for (const [kind, count] of [["double", 2], ["triple", 3]]) {
+    const session = breakoutTestSession();
+    activateBreakoutEffect(session, kind);
+    updateSession(session, 16);
+    assert.equal(session.balls.length, count);
+    assert.equal(new Set(session.balls.map((b) => Math.atan2(b.vy, b.vx))).size, count);
+    for (let i = 0; i < 5; i += 1) {
+      activateBreakoutEffect(session, "triple");
+      updateSession(session, 16);
+    }
+    assert.equal(session.balls.length, 12);
+  }
+});
+
+test("multi-ball expiry keeps a surviving ball if the original was lost", () => {
+  const session = breakoutTestSession();
+  activateBreakoutEffect(session, "triple");
+  updateSession(session, 16);
+  session.balls = session.balls.filter((ball) => ball.effectBall);
+  updateSession(session, BREAKOUT_DURATION.triple);
+  assert.equal(session.balls.length, 1);
+  assert.equal(session.balls[0].effectBall, false);
+  assert.equal(session.over, false);
+});
+
+test("Breakout speeds up every four bricks and high-speed balls cannot skip a brick row", () => {
+  const session = breakoutTestSession();
+  session.cleared = 3;
+  session.grid[5][5] = { type: "O", g: 2 };
+  session.balls[0] = { x: 154, y: 180, vx: 0, vy: -1800, r: 6 };
+  updateSession(session, 32);
+  assert.equal(session.grid[5][5], null);
+  assert.equal(session.progressSpeed, session.baseSpeed * 1.12);
+  assert.ok(session.balls[0].vy > 0);
 });

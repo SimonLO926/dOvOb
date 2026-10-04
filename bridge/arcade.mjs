@@ -1,8 +1,72 @@
-import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.0.6";
+import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.0.7";
 
 export const CELL = 28;
 export const W = COLS * CELL;
 export const H = ROWS * CELL;
+export const BREAKOUT_EFFECTS = ["speed", "double", "triple", "wide", "narrow"];
+export const BREAKOUT_DURATION = { speed: 8000, double: 12000, triple: 12000, wide: 10000, narrow: 8000 };
+const MAX_BREAKOUT_BALLS = 12;
+
+function syncBreakoutSpeed(session) {
+  session.speed = session.progressSpeed * (session.effects.speed > 0 ? 2 : 1);
+  for (const ball of [...session.balls, ...session.pendingBalls]) rescale(ball, session.speed);
+}
+
+export function breakoutEffectStatus(session) {
+  if (session.kind !== "breakout") return [];
+  return Object.entries(session.effects).filter(([, remaining]) => remaining > 0)
+    .map(([kind, remaining]) => ({ kind, seconds: Math.ceil(remaining / 1000) }));
+}
+
+export function activateBreakoutEffect(session, kind, source) {
+  if (session.kind !== "breakout" || !BREAKOUT_EFFECTS.includes(kind)) return;
+  if (kind === "speed") {
+    session.effects.speed = BREAKOUT_DURATION.speed;
+    syncBreakoutSpeed(session);
+  } else if (kind === "wide" || kind === "narrow") {
+    session.effects.wide = 0;
+    session.effects.narrow = 0;
+    session.effects[kind] = BREAKOUT_DURATION[kind];
+    session.paddleW = kind === "wide" ? 132 : 62;
+    session.paddleX = Math.max(session.paddleW / 2, Math.min(W - session.paddleW / 2, session.paddleX));
+  } else {
+    session.effects.double = 0;
+    session.effects.triple = 0;
+    session.effects[kind] = BREAKOUT_DURATION[kind];
+    const originals = session.balls.length ? [...session.balls, ...session.pendingBalls] : source ? [source] : [];
+    for (const ball of originals) {
+      const angle = Math.atan2(ball.vy, ball.vx);
+      const offsets = kind === "double" ? [0.3] : [-0.3, 0.3];
+      for (const offset of offsets) {
+        if (session.balls.length + session.pendingBalls.length >= MAX_BREAKOUT_BALLS) break;
+        const extra = makeBall(session, angle + offset, ball.x, ball.y);
+        extra.effectBall = true;
+        session.pendingBalls.push(extra);
+      }
+    }
+  }
+  session.effectEvents.push(kind);
+}
+
+function tickBreakoutEffects(session, dtMs) {
+  for (const kind of BREAKOUT_EFFECTS) {
+    const before = session.effects[kind];
+    session.effects[kind] = Math.max(0, before - dtMs);
+    if (!before || session.effects[kind]) continue;
+    if (kind === "speed") syncBreakoutSpeed(session);
+    else if (kind === "wide" || kind === "narrow") session.paddleW = 88;
+    else {
+      const survivors = session.balls.filter((ball) => !ball.effectBall);
+      if (!survivors.length && session.balls.length) {
+        const survivor = session.balls[0];
+        survivor.effectBall = false;
+        survivors.push(survivor);
+      }
+      session.balls = survivors;
+    }
+  }
+}
+
 
 export function brickWall(random = Math.random) {
   const grid = emptyGrid();
@@ -24,7 +88,9 @@ export function brickWall(random = Math.random) {
 }
 
 export function createSession(kind, grid, stage, random) {
-  const speed = Math.min(460, 220 + (Math.max(1, stage) - 1) * 16);
+  const speed = kind === "breakout"
+    ? Math.min(520, 260 + (Math.max(1, stage) - 1) * 18)
+    : Math.min(460, 220 + (Math.max(1, stage) - 1) * 16);
   if (kind === "pinball" && grid?.[0]?.length) {
     for (let y = ROWS - 6; y < ROWS; y += 1) {
       if (!grid[y]) continue;
@@ -38,6 +104,10 @@ export function createSession(kind, grid, stage, random) {
     random,
     prep: 4000,
     baseSpeed: speed,
+    progressSpeed: speed,
+    effects: Object.fromEntries(BREAKOUT_EFFECTS.map((kind) => [kind, 0])),
+    effectEvents: [],
+    pendingBalls: [],
     speed,
     cleared: 0,
     streak: 0,
@@ -83,9 +153,9 @@ function award(session) {
   const mult = Math.min(8, 1 + Math.floor((session.streak - 1) / 4));
   session.score += 40 * session.stage * mult;
   session.cleared += 1;
-  if (session.kind === "breakout" && session.cleared % 8 === 0) {
-    session.speed = Math.min(session.baseSpeed * 2, session.speed * 1.15);
-    for (const ball of session.balls) rescale(ball, session.speed);
+  if (session.kind === "breakout" && session.cleared % 4 === 0) {
+    session.progressSpeed = Math.min(session.baseSpeed * 3, session.progressSpeed * 1.12);
+    syncBreakoutSpeed(session);
   }
 }
 
@@ -121,8 +191,14 @@ function collideBricks(session, ball) {
     const y = Math.floor(py / CELL);
     if (x < 0 || y < 0 || x >= COLS || y >= ROWS) continue;
     if (!session.grid[y][x]) continue;
+    const cell = session.grid[y][x];
+    const special = !!(cell.bomb || cell.reward || cell.curse || ["B", "X", "D", "R", "A", "C"].includes(cell.type));
     hit(session, x, y);
     bounceOffCell(ball, x, y);
+    if (session.kind === "breakout" && special) {
+      const index = Math.min(BREAKOUT_EFFECTS.length - 1, Math.floor(session.random() * BREAKOUT_EFFECTS.length));
+      activateBreakoutEffect(session, BREAKOUT_EFFECTS[index], ball);
+    }
     return;
   }
 }
@@ -243,7 +319,8 @@ function collideSegment(ball, segment, kicking) {
 }
 
 function stepBall(session, ball, dt) {
-  const slices = session.kind === "pinball" ? 4 : 1;
+  const slices = session.kind === "pinball" ? 4 : session.kind === "breakout"
+    ? Math.max(1, Math.ceil(Math.hypot(ball.vx, ball.vy) * dt / (ball.r * 0.8))) : 1;
   const step = dt / slices;
   for (let i = 0; i < slices; i += 1) {
     const previous = { x: ball.x, y: ball.y };
@@ -302,6 +379,7 @@ export function updateSession(session, dtMs) {
     session.aim = Math.max(-Math.PI + 0.28, Math.min(-0.28, session.aim));
     return session;
   }
+  if (session.kind === "breakout") tickBreakoutEffects(session, dtMs);
   if (session.kind === "breakout" && !session.launched) {
     const tilt = (session.random() - 0.5) * 0.7;
     session.balls.push(makeBall(session, -Math.PI / 2 + tilt, session.paddleX, H - 46));
@@ -347,6 +425,8 @@ export function updateSession(session, dtMs) {
     if (session.right && !session.wasRight) session.rightKick = 120;
   }
   for (const ball of session.balls) stepBall(session, ball, dt);
+  session.balls.push(...session.pendingBalls);
+  session.pendingBalls = [];
   if (session.kind === "pinball") {
     session.leftKick = Math.max(0, (session.leftKick || 0) - dtMs);
     session.rightKick = Math.max(0, (session.rightKick || 0) - dtMs);
@@ -383,7 +463,7 @@ function paintBall(ctx, ball) {
   ctx.restore();
 }
 
-export function drawSession(ctx, session, ink) {
+export function drawSession(ctx, session, ink, labels = {}) {
   for (const flash of session.flashes) {
     const age = 1 - Math.max(0, flash.life / 200);
     const cx = flash.x * CELL + CELL / 2;
@@ -402,6 +482,20 @@ export function drawSession(ctx, session, ink) {
     ctx.restore();
   }
   if (session.kind === "breakout") {
+    ctx.save();
+    ctx.font = "bold 12px system-ui";
+    ctx.textAlign = "center";
+    const statuses = breakoutEffectStatus(session);
+    statuses.forEach(({ kind, seconds }, i) => {
+      const label = `${labels[kind] || kind} ${seconds}s`;
+      const width = ctx.measureText(label).width + 16;
+      const y = H - 64 - i * 22;
+      ctx.fillStyle = "rgba(0, 0, 0, .72)";
+      ctx.fillRect((W - width) / 2, y - 14, width, 20);
+      ctx.fillStyle = kind === "narrow" || kind === "speed" ? "#ffd60a" : "#7ee0ff";
+      ctx.fillText(label, W / 2, y);
+    });
+    ctx.restore();
     const x = session.paddleX - session.paddleW / 2;
     const y = H - 34;
     const gloss = ctx.createLinearGradient(x, y, x, y + 12);

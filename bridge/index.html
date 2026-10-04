@@ -1268,16 +1268,16 @@
     </section>
   </div>
   <script type="module">
-    import { createSound } from "./audio.mjs?v=1.0.6";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.6";
-    import { translate } from "./i18n.mjs?v=1.0.6";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.6";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.6";
-    import { VERSION } from "./version.mjs?v=1.0.6";
+    import { createSound } from "./audio.mjs?v=1.0.7";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.7";
+    import { translate } from "./i18n.mjs?v=1.0.7";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.7";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.7";
+    import { VERSION } from "./version.mjs?v=1.0.7";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.0.6";
+    } from "./logic.mjs?v=1.0.7";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -2226,7 +2226,10 @@
         drawBlob(ctx, cellsOf(game.active.type, game.active.rot, game.active.x, gy), game.active.type, CELL, true, null, game.active.curse, game.active.sand ?? null, game.active.rot);
         drawBlob(ctx, cellsOf(game.active.type, game.active.rot, game.active.x, game.active.y), game.active.type, CELL, false, game.active.bombIndex, game.active.curse, game.active.sand ?? null, game.active.rot);
       }
-      if (session) drawSession(ctx, session, ink());
+      if (session) drawSession(ctx, session, ink(), {
+        speed: t("arcadeSpeed"), double: t("arcadeDouble"), triple: t("arcadeTriple"),
+        wide: t("arcadeWide"), narrow: t("arcadeNarrow"),
+      });
       if (performance.now() < curseUntil.blind) {
         ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, COLS * CELL, ROWS * CELL);
@@ -2466,6 +2469,11 @@
       if (!paused && session) {
         const clearedBefore = session.cleared;
         updateSession(session, dt);
+        for (const kind of session.effectEvents.splice(0)) {
+          const key = { speed: "arcadeSpeed", double: "arcadeDouble", triple: "arcadeTriple", wide: "arcadeWide", narrow: "arcadeNarrow" }[kind];
+          pushCallout("combo", t(key));
+          sound.blip(880, 0.06);
+        }
         if (session.cleared > clearedBefore) sound.blip(760, 0.035);
         if (session.curseHits.length) {
           applyCurses(session.curseHits);
