@@ -7,6 +7,7 @@ function enter(s, mode) {
   for (let i = 0; i < 11; i++) updateCrazy(s, 50);
   assert.equal(s.mode, mode);
 }
+const run = (s, ms) => { for (let left = ms; left > 0; left -= 50) updateCrazy(s, Math.min(left, 50)); };
 const tap = (s, action) => { inputCrazy(s, action); inputCrazy(s, action, false); };
 
 test('Crazy opens on Bridge with a separate dealer boss and bounded HP', () => {
@@ -71,14 +72,14 @@ test('Slots stops reels independently and pays matched symbols', () => {
 
 test('Tiger lever banks or risks rewards independently of timed reel stops', () => {
   const s = createCrazy({ random: () => 0 }); enter(s, 'tiger'); s.hp = 80;
-  tap(s, 'action'); assert.equal(s.mini.pending, 32); assert.equal(s.bossHp, 900);
-  tap(s, 'action'); assert.equal(s.mini.pending, 64);
+  tap(s, 'action'); assert.ok(s.mini.spin); assert.equal(s.mini.pending, 0); run(s, 1050); assert.equal(s.mini.pending, 32); assert.equal(s.bossHp, 900);
+  tap(s, 'action'); assert.equal(s.mini.pending, 32); run(s, 1050); assert.equal(s.mini.pending, 64);
   tap(s, 'alt'); assert.equal(s.mini.pending, 0); assert.equal(s.bossHp, 850); assert.equal(s.hp, 84);
 });
 
 test('A lost Tiger gamble removes its reward and costs HP', () => {
   const s = createCrazy(); enter(s, 'tiger'); s.mini.pending = 18; s.random = () => .9;
-  tap(s, 'action'); assert.equal(s.mini.pending, 0); assert.equal(s.hp, 90); assert.equal(s.bossHp, 900);
+  tap(s, 'action'); assert.equal(s.mini.pending, 18); run(s, 1050); assert.equal(s.mini.pending, 0); assert.equal(s.hp, 90); assert.equal(s.bossHp, 900);
 });
 
 test('Cards only accept the requested pair and support pointer selection', () => {
@@ -89,7 +90,7 @@ test('Cards only accept the requested pair and support pointer selection', () =>
 });
 
 test('Mahjong clears pairs and finishes a board without selecting removed tiles twice', () => {
-  const s = createCrazy(); enter(s, 'mahjong'); s.mini.items = [0, 0, 1, 1, 2, 2];
+  const s = createCrazy(); enter(s, 'mahjong'); s.mini.items = [0, 0, 1, 1, 2, 2]; s.mini.target = 0; s.random = () => 0;
   for (const i of [0, 1, 2, 3, 4, 5]) { s.cooldown = 0; s.mini.focus = i; tap(s, 'action'); }
   assert.equal(s.bossHp, 850); assert.equal(s.mini.removed.length, 6);
   tap(s, 'action'); assert.equal(s.bossHp, 850);
@@ -303,4 +304,73 @@ test('Crazy Sandtrix uses the same rotated paint colors as the grains it stamps'
     assert.equal(grain, paints[index] + 1);
     assert.equal(SAND_HEX[grain - 1], SAND_HEX[paints[index]]);
   });
+});
+
+
+test('Tiger spin locks repeat pulls and banking until its result lands exactly once', () => {
+  const s = createCrazy({ random: () => 0 }); enter(s, 'tiger'); s.mini.pending = 18;
+  tap(s, 'action'); const spin = s.mini.spin;
+  tap(s, 'action'); tap(s, 'alt'); assert.equal(s.mini.spin, spin); assert.equal(s.mini.pending, 18);
+  run(s, 1000); assert.equal(s.mini.pending, 18);
+  run(s, 50); assert.equal(s.mini.pending, 36); assert.equal(s.mini.spin, null);
+  run(s, 100); assert.equal(s.mini.pending, 36);
+});
+
+test('Timed pairs lose HP and reset a streak on expiry, but pause during cat obstruction', () => {
+  for (const mode of ['cards', 'mahjong']) {
+    const s = createCrazy(); enter(s, mode); s.catDue = Infinity;
+    s.mini.streak = 3; s.mini.roundLeft = 50;
+    s.catBlock = 150; updateCrazy(s, 50); assert.equal(s.mini.roundLeft, 50);
+    s.catBlock = 0; updateCrazy(s, 50);
+    assert.equal(s.hp, 95); assert.equal(s.mini.streak, 0); assert.ok(s.mini.roundLeft > 0);
+  }
+});
+
+test('Mahjong requires the indicated target and streaks increase pair damage', () => {
+  const s = createCrazy({ random: () => 0 }); enter(s, 'mahjong');
+  s.mini.items = [0, 0, 1, 1, 2, 2]; s.mini.target = 2;
+  pointCrazy(s, 62, 220); pointCrazy(s, 140, 220);
+  assert.equal(s.hp, 95); assert.equal(s.bossHp, 900); assert.deepEqual(s.mini.removed, []);
+  s.cooldown = 0; s.mini.selected = []; s.mini.streak = 2;
+  pointCrazy(s, 140, 325); pointCrazy(s, 218, 325);
+  assert.equal(s.bossHp, 880); assert.equal(s.mini.streak, 3); assert.equal(s.mini.target, 0);
+});
+
+test('Dodge controls move in four directions, clamp touch targets and limit dash repeats', () => {
+  const s = createCrazy(); enter(s, 'dodge'); s.catDue = Infinity;
+  const y = s.mini.y; inputCrazy(s, 'up'); updateCrazy(s, 50); inputCrazy(s, 'up', false);
+  assert.ok(s.mini.y < y);
+  pointCrazy(s, 999, -100); assert.deepEqual(s.mini.target, { x: 258, y: 172 });
+  run(s, 200); assert.ok(s.mini.x > 140);
+  tap(s, 'action'); assert.equal(s.mini.dash, 180); assert.equal(s.mini.dashReady, 1400);
+  run(s, 200); tap(s, 'action'); assert.equal(s.mini.dash, 0); assert.ok(s.mini.dashReady > 0);
+  run(s, 1200); tap(s, 'action'); assert.equal(s.mini.dash, 180);
+  assert.ok(s.mini.x <= 258); assert.ok(s.mini.y >= 172);
+});
+
+test('Dodge lanes warn before moving; gaps and dash avoid damage, collisions cost HP', () => {
+  const make = () => {
+    const s = createCrazy(); enter(s, 'dodge'); s.catDue = Infinity; s.protection = 0;
+    s.mini.spawn = Infinity; s.mini.x = 140; s.mini.y = 400;
+    s.mini.hazards = [{ horizontal: false, gap: 40, gapSize: 76, age: 0, warn: 700, pos: 400, speed: 140 }]; return s;
+  };
+  const hit = make(); updateCrazy(hit, 50); assert.equal(hit.hp, 100); assert.equal(hit.mini.hazards[0].pos, 400);
+  hit.mini.hazards[0].age = 700; updateCrazy(hit, 50); assert.equal(hit.hp, 94);
+  const gap = make(); gap.mini.x = 40; gap.mini.hazards[0].age = 700; updateCrazy(gap, 50); assert.equal(gap.hp, 100);
+  const dash = make(); dash.mini.hazards[0].age = 700; tap(dash, 'action'); updateCrazy(dash, 10); assert.equal(dash.hp, 100);
+});
+
+test('Dodge survival counters the Boss and transitions stay brief without pausing combat', () => {
+  const s = createCrazy(); advanceCrazy(s, 'dodge'); s.catDue = Infinity;
+  assert.deepEqual(s.transition, { from: 'bridge', to: 'dodge', time: 0 });
+  s.mini.spawn = Infinity; run(s, 800); assert.equal(s.transition, null); assert.equal(s.timeLeft, s.duration - 800);
+  run(s, 1200); assert.equal(s.bossHp, 892);
+  s.held.add('up'); advanceCrazy(s, 'bridge'); assert.equal(s.held.size, 0); assert.equal(s.mini, null);
+});
+
+
+test('Ending a Tiger encounter settles the current risk before banking rewards', () => {
+  const s = createCrazy({ random: () => .9 }); enter(s, 'tiger'); s.catDue = Infinity;
+  s.mini.pending = 18; tap(s, 'action'); s.timeLeft = 50; updateCrazy(s, 50);
+  assert.equal(s.bossHp, 900); assert.equal(s.hp, 90); assert.notEqual(s.mode, 'tiger');
 });
