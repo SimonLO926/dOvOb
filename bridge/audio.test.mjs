@@ -30,3 +30,23 @@ test("a line clear rings more notes as more rows disappear", () => {
   assert.deepEqual(clearPitches(4), [72, 76, 79, 84]);
   assert.deepEqual(clearPitches(8), [72, 76, 79, 84]);
 });
+
+test('BGM and sound effect gains can be muted independently and restored live', async () => {
+  const original = globalThis.AudioContext, gains = [];
+  globalThis.AudioContext = class {
+    constructor() { this.destination = {}; this.currentTime = 0; this.state = 'running'; }
+    createGain() {
+      const node = {gain:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){}};
+      gains.push(node); return node;
+    }
+    createOscillator() { return {frequency:{setValueAtTime(){}},connect(){},start(){},stop(){}}; }
+  };
+  try {
+    const { createSound } = await import('./audio.mjs');
+    let music = .7, sfx = .5;
+    const sound = createSound(() => 1, { music: () => music, sfx: () => sfx });
+    sound.blip(400); assert.equal(gains[1].gain.value, MIX.music * .7); assert.equal(gains[2].gain.value, MIX.sfx * .5);
+    music = 0; sound.setVolume(); assert.equal(gains[1].gain.value, 0); assert.equal(gains[2].gain.value, MIX.sfx * .5);
+    music = 1; sfx = 0; sound.setVolume(); assert.equal(gains[1].gain.value, MIX.music); assert.equal(gains[2].gain.value, 0);
+  } finally { if (original === undefined) delete globalThis.AudioContext; else globalThis.AudioContext = original; }
+});

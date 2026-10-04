@@ -1,7 +1,8 @@
-import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.3';
-import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.3';
-import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.3';
-import { drawSession } from './arcade.mjs?v=1.2.3';
+import { drawFineDealer, drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.4';
+import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.4';
+import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.4';
+import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.4';
+import { drawSession } from './arcade.mjs?v=1.2.4';
 export const CRAZY_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 356 });
 export const CRAZY_BLOCK_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 512 });
 export function crazyCanvasHeight(mode) { return mode === 'bridge' || mode === 'sand' ? 720 : 560; }
@@ -14,7 +15,7 @@ const catPhoto = typeof Image === 'undefined' ? null : new Image();
 export const catImageReady = catPhoto ? new Promise(resolve => {
   catPhoto.onload = () => resolve(true);
   catPhoto.onerror = () => resolve(false);
-  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.3', import.meta.url).href;
+  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.4', import.meta.url).href;
 }) : Promise.resolve(false);
 const COLORS = { I: '#64d2ff', O: '#ffd60a', T: '#bf5af2', S: '#30d158', Z: '#ff453a', J: '#0a84ff', L: '#ff9f0a', B: '#9da4b9' };
 const SYMBOLS = ['★', '♥', '7', '♠'];
@@ -35,72 +36,11 @@ export function drawMischiefCat(c, x, y, scale = 1, facingLeft = false) {
   c.save(); c.translate(x, y); if (facingLeft) c.scale(-1, 1);
   c.imageSmoothingEnabled = true; c.drawImage(catPhoto, -w / 2, -h / 2, w, h); c.restore();
 }
-const DEALER_PIXELS = [
-  '................................',
-  '..C............C.............C..',
-  '..CCC.........CCC..........CCC..',
-  '...CCCC......CCCCC......CCCCC...',
-  '...CCCCCCCCCCCCCCCCCCCCCCCCC....',
-  '....CCCCCCCCCCCCCCCCCCCCCC......',
-  '.....OOOOOOOOOOOOOOOOOOOOO......',
-  '....OFFFFFFFFFFFFFFFFFFFFFO.....',
-  '...OFFSSFFFFFFFFFFFFFFSSFFFO....',
-  '...OFSSMMMMMMMMMMMMMMMMSSFFO....',
-  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
-  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
-  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
-  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
-  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
-  '...OFFSSFFFFFFFFFFFFFFSSFFO....',
-  '...OFFFFSSFFFFFFFFFFSSFFFFO.....',
-  '....OFFFFOOOOOOOOOOOOFFFFO......',
-  '....OFFFOFFOFFOFFOFFOFFFO.......',
-  '.....OFFFFFFFFFFFFFFFFFO........',
-  '......OOSSSSSSSSSSSSOO..........',
-  '........OOOOOOOOOOOO............',
-  '..........VVVVVVVV..............',
-  '........VVVVVVVVVVVV............',
-];
 const PIXEL_SYMBOLS = [
   ['.X.X.', 'XXXXX', 'XXXXX', '.XXX.', '..X..'],
   ['..X..', '.XXX.', 'XXXXX', '.X.X.', '..X..'],
   ['XXXXX', '....X', '...X.', '..X..', '..X..'],
 ];
-function drawDealer(c, s, reduced) {
-  const pixel = 3.5, left = 84, top = 24 + (reduced ? 0 : Math.round(Math.sin(s.elapsed / 500)) * pixel);
-  const palette = s.form === 2
-    ? { C: '#ffd361', O: '#291324', F: '#bd792e', S: '#ffe5a0', M: '#170c22', V: '#b23970' }
-    : { C: '#ffc25d', O: '#100e20', F: '#f4e9f8', S: '#b9a6d2', M: '#281331', V: '#74528e' };
-  c.save(); c.imageSmoothingEnabled = false;
-  c.translate(140, 0); c.scale(1.25, 1); c.translate(-140, 0);
-  DEALER_PIXELS.forEach((row, y) => [...row].forEach((v, x) => {
-    if (v === '.') return;
-    c.fillStyle = palette[v]; c.fillRect(left + x * pixel, top + y * pixel, pixel, pixel);
-  }));
-  for (let i = 0; i < 3; i++) {
-    const glyph = PIXEL_SYMBOLS[s.phase === 3 ? 2 : (i + s.phase - 1) % 3];
-    c.fillStyle = '#f5e8cc'; c.fillRect(left + (8 + i * 6) * pixel, top + 10 * pixel, 5 * pixel, 5 * pixel);
-    c.fillStyle = s.attack ? '#ff4969' : i === 0 ? '#d72f58' : '#291324';
-    glyph.forEach((row, y) => [...row].forEach((v, x) => { if (v === 'X') c.fillRect(left + 8 * pixel + i * 6 * pixel + x * pixel, top + 10 * pixel + y * pixel, pixel, pixel); }));
-  }
-  // Casino-chip crown and ruby match the selected concept without loading a portrait.
-  for (let tower = 0; tower < 3; tower++) {
-    for (let chip = 0; chip < 4; chip++) {
-      c.fillStyle = chip % 2 ? '#fff0d5' : tower === 1 ? '#b62c67' : '#7351a2';
-      c.fillRect(left + (9 + tower * 7) * pixel, top + (5 - chip) * pixel, 4 * pixel, pixel);
-    }
-  }
-  c.fillStyle = '#ef3d85'; c.fillRect(left + 15 * pixel, top + 5 * pixel, 2 * pixel, 2 * pixel);
-  if (s.form === 2) {
-    c.fillStyle = '#ff45ba'; c.fillRect(left + 26 * pixel, top + 8 * pixel, 2 * pixel, 2 * pixel);
-    c.fillStyle = '#ffe5a0';
-    for (let tooth = 0; tooth < 5; tooth++) c.fillRect(left + (10 + tooth * 3) * pixel, top + 18 * pixel, pixel, 2 * pixel);
-    // The large hands are drawn outside the board by drawCrazyFrame.
-    c.fillStyle = '#ffd361'; c.fillRect(left + 13 * pixel, top + 20 * pixel, 6 * pixel, 3 * pixel);
-    c.fillStyle = '#291324'; c.fillRect(left + 15 * pixel, top + 21 * pixel, 2 * pixel, pixel);
-  }
-  c.restore();
-}
 export function drawCrazyFrame(c, s, { reducedMotion = false } = {}) {
   const height = crazyCanvasHeight(s.mode);
   c.clearRect(0, 0, 560, height);
@@ -118,29 +58,25 @@ export function drawCrazyFrame(c, s, { reducedMotion = false } = {}) {
     c.lineTo(90, height - 75); c.lineTo(90, height - 45); c.lineTo(136, height - 45);
     c.lineTo(136, 120); c.lineTo(140, 120); c.closePath(); c.fill();
     // Bevelled pauldrons, suit insignia and ruby brooches echo the boss concept.
-    c.fillStyle = gold ? '#a96526' : '#6e3341'; c.fillRect(78, 82, 58, 72);
-    c.fillStyle = trim; c.fillRect(82, 86, 50, 6); c.fillRect(82, 86, 6, 62); c.fillRect(82, 142, 50, 6);
-    c.fillStyle = gold ? '#efb955' : '#311b30'; c.fillRect(91, 97, 37, 37);
-    const emblem = PIXEL_SYMBOLS[1]; c.fillStyle = '#291324';
-    emblem.forEach((row, y) => [...row].forEach((v, x) => { if (v === 'X') c.fillRect(99 + x * 4, 104 + y * 4, 4, 4); }));
-    c.fillStyle = '#ffe5a0'; c.fillRect(115, 159, 14, 14); c.fillStyle = '#e93591'; c.fillRect(119, 163, 6, 6);
-    c.fillStyle = trim;
-    for (let y = 180; y < height - 70; y += 28) {
-      c.fillRect(82 + (Math.floor(y / 28) % 2) * 8, y, 6, 14);
-      c.fillStyle = gold ? '#92602e' : '#714773'; c.fillRect(112, y + 8, 8, 20); c.fillStyle = trim;
+    c.fillStyle = gold ? '#7a451e' : '#4e2534';
+    c.beginPath(); c.moveTo(81,82); c.lineTo(126,82); c.lineTo(136,92); c.lineTo(136,142); c.lineTo(124,154); c.lineTo(80,148); c.lineTo(73,133); c.lineTo(73,96); c.closePath(); c.fill();
+    c.fillStyle = gold ? '#bd863c' : '#842d49'; c.fillRect(78,94,52,39);
+    c.fillStyle = '#e5b866'; c.fillRect(82,85,42,2); c.fillRect(77,95,2,36); c.fillRect(82,143,42,2);
+    c.fillStyle = '#fff0bc'; c.fillRect(85,85,15,1); c.fillRect(77,100,1,13);
+    c.fillStyle = gold ? '#edc779' : '#c79872'; c.fillRect(87,98,36,28);
+    const emblem = PIXEL_SYMBOLS[1]; c.fillStyle = '#3a1c2d';
+    emblem.forEach((row, y) => [...row].forEach((v, x) => { if (v === 'X') c.fillRect(97 + x * 3, 103 + y * 3, 3, 3); }));
+    for (const [x,y] of [[81,93],[126,93],[82,135],[125,136]]) { c.fillStyle='#71421e';c.fillRect(x,y,3,3);c.fillStyle='#fff0bc';c.fillRect(x,y,1,1); }
+    c.fillStyle = '#f3c374'; c.fillRect(116,159,11,11); c.fillStyle = '#9a226c'; c.fillRect(118,161,7,7); c.fillStyle='#ff94d7';c.fillRect(119,162,2,2);
+    // Fine chain links, embroidered hems and shaded fabric folds.
+    for (let y = 178; y < height - 70; y += 9) {
+      const x = 86 + Math.round(Math.sin(y / 110) * 7);
+      c.fillStyle='#98612e';c.fillRect(x,y,4,5);c.fillStyle='#e3b65e';c.fillRect(x,y,1,5);c.fillRect(x+1,y,2,1);
+      c.fillStyle=body;c.fillRect(x+1,y+1,2,3);
     }
-    // Hands float beside the arena. Attacking claws reach toward the outer rim only.
+    for (let y = 170; y < height - 70; y += 5) {c.fillStyle=gold?'#ac3853':'#7c304f';c.fillRect(108,y,2,4);c.fillStyle='#301526';c.fillRect(121,y,2,5);}
     const y = 220 + pulse, reach = attack ? 14 : 0, x = 103 + reach;
-    c.fillStyle = gold ? '#bd792e' : '#b9a6d2'; c.fillRect(x - 26, y, 26, 66);
-    c.fillStyle = gold ? '#ffe5a0' : '#f4e9f8';
-    for (let finger = 0; finger < 4; finger++) {
-      const fy = y - 8 + finger * 21;
-      c.fillStyle = gold ? '#a96526' : '#b9a6d2'; c.fillRect(x - 6, fy, 18, 10);
-      c.fillStyle = gold ? '#ffe5a0' : '#f4e9f8'; c.fillRect(x - 6, fy, 18, 4);
-      c.fillRect(x + 6, fy + 4, 7, 15); c.fillRect(x + 9, fy + 17, 4, gold ? 19 : 9);
-      c.fillStyle = gold ? '#ffd361' : '#f4e9f8'; c.fillRect(x + 6, fy + 30, 4, gold ? 11 : 0);
-    }
-    if (gold) { c.fillStyle = '#ffd361'; c.fillRect(x - 20, y + 24, 10, 10); }
+    drawFineGauntlet(c, x, y, gold);
     if (attack) {
       c.fillStyle = gold ? '#ff657d' : '#ffe5a0';
       for (let i = 0; i < 3; i++) c.fillRect(132, y + i * 28, 6, 14);
@@ -150,7 +86,7 @@ export function drawCrazyFrame(c, s, { reducedMotion = false } = {}) {
   if (gold) {
     c.fillStyle = '#a96526'; c.fillRect(136, 176, 4, height - 230); c.fillRect(420, 176, 4, height - 230);
     c.fillStyle = '#ffd361';
-    for (let y = 185; y < height - 70; y += 40) { c.fillRect(130, y, 8, 8); c.fillRect(422, y, 8, 8); }
+    for (let y = 185; y < height - 70; y += 40) { c.fillRect(132, y, 6, 6); c.fillRect(422, y, 6, 6); }
   }
   c.fillStyle = trim;
   for (let x = 140; x < 420; x += 28) c.fillRect(x, height - 4, 16, 4);
@@ -313,7 +249,7 @@ export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiec
   const height = crazyCanvasHeight(s.mode);
   c.save(); c.clearRect(0, 0, 280, height);
   const bg = c.createLinearGradient(0, 0, 0, height); bg.addColorStop(0, '#21112e'); bg.addColorStop(1, '#0b1020'); c.fillStyle = bg; c.fillRect(0, 0, 280, height);
-  text(c, `${t('crazyGreed')} · ${t(s.form === 2 ? 'crazyTrueName' : s.boss.name)}`, 140, 15, 16, '#ffd69b'); drawDealer(c, s, reducedMotion); drawBridgePreviews(c, s, t, paintPiece);
+  text(c, `${t('crazyGreed')} · ${t(s.form === 2 ? 'crazyTrueName' : s.boss.name)}`, 140, 15, 16, '#ffd69b'); drawFineDealer(c, s, reducedMotion); drawBridgePreviews(c, s, t, paintPiece);
   text(c, `${s.damageLeft === 0 ? '◇ ' : ''}BOSS · ${t('crazyForm')} ${s.form === 2 ? 'II' : 'I'}`, 140, 117, 12, '#ff829d'); bar(c, 24, 128, 232, s.bossHp / s.bossMaxHp, '#ff476f');
   const a = s.arcade || ['bridge', 'sand'].includes(s.mode) ? crazyPlayfield(s.mode) : CRAZY_ARENA;
   box(c, a.x - 2, a.y - 2, a.w + 4, a.h + 4, s.attack ? '#a63b5e' : '#674068', 5); box(c, a.x, a.y, a.w, a.h, '#100e1b', 3);
