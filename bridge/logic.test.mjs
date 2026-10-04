@@ -1089,3 +1089,35 @@ test("a piece without a clear resets the next combo line reward", () => {
   assert.equal(pump(game).lineBonus, 0);
   assert.equal(game.lines, 1);
 });
+
+test("stage flips wait for garbage grace to end without losing the queued flip", () => {
+  const game = createGame({ random: () => 0.5 });
+  startGame(game);
+  game.active = null;
+  game.phase = "resolving";
+  game.pendingGarbage = 1;
+  pump(game);
+  game.pendingFlips = 1;
+  assert.equal(pump(game).type, "spawn");
+  assert.equal(game.pendingFlips, 1);
+  for (let round = 0; round < 2; round += 1) {
+    game.active = { type: "R", rot: 0, x: round, y: 18 };
+    lockActive(game);
+    assert.equal(pump(game).type, "spawn");
+    assert.equal(game.pendingFlips, 1);
+  }
+  game.active = null;
+  game.phase = "resolving";
+  assert.equal(pump(game).type, "flip");
+  assert.equal(game.pendingFlips, 0);
+});
+
+test("arcade rewards still flip the board outside garbage grace", () => {
+  const game = createGame({ random: () => 0.5 });
+  startGame(game);
+  game.active = null;
+  game.phase = "resolving";
+  game.grid[12][4] = { type: "O", g: 99 };
+  game.pendingReward = "pinball";
+  assert.equal(pump(game).flip, true);
+});

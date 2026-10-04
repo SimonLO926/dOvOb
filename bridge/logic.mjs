@@ -1150,7 +1150,7 @@ export function pump(game) {
     } else if (!hasLaunchRoom(game.grid)) {
       game.score += 500 * scoreMult(game);
     } else {
-      return { type: "reward", reward };
+      return { type: "reward", reward, flip: reward !== "sand" && !garbageGraceActive(game) };
     }
   }
 
@@ -1162,7 +1162,7 @@ export function pump(game) {
     }
   }
 
-  if (game.mode === "marathon" && game.pendingFlips > 0) {
+  if (game.mode === "marathon" && game.pendingFlips > 0 && !garbageGraceActive(game)) {
     game.pendingFlips -= 1;
     return { type: "flip", stage: game.stage };
   }
