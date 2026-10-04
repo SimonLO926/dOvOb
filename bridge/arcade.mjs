@@ -1,4 +1,4 @@
-import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.0.3";
+import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.0.5";
 
 export const CELL = 28;
 export const W = COLS * CELL;
@@ -46,7 +46,7 @@ export function createSession(kind, grid, stage, random) {
     paddleW: 88,
     aim: -Math.PI / 2,
     chances: kind === "bbtan" ? 3 : 1,
-    balls: kind === "pinball" ? [restBall()] : [],
+    balls: kind === "pinball" ? [launcherBall()] : [],
     queueLeft: 0,
     queueTime: 0,
     aiming: kind === "bbtan",
@@ -170,27 +170,43 @@ export function flipper(side, raised) {
   };
 }
 
-function bounceFlipper(ball, segment, kicking) {
+function bounceFlipper(ball, segment, kicking, previous) {
   const dx = segment.x2 - segment.x1;
   const dy = segment.y2 - segment.y1;
-  if (!dx) return false;
+  const length = Math.hypot(dx, dy);
+  const nx = Math.sign(dx) * dy / length;
+  const ny = -Math.abs(dx) / length;
   const t = (ball.x - segment.x1) / dx;
   if (t < 0 || t > 1) return false;
   const yLine = segment.y1 + dy * t;
-  if (ball.vy < 0 && ball.y <= yLine - ball.r + 1) return false;
-  if (ball.y + ball.r < yLine - 2) return false;
-  ball.y = yLine - ball.r - 2;
-  const speed = kicking ? 760 : Math.max(320, Math.abs(ball.vy));
-  ball.vy = -speed;
-  ball.vx += Math.sign(dx) * (kicking ? 160 : 70);
+  const distance = (ball.y - yLine) * ny;
+  const radius = ball.r + 6;
+  const oldDistance = (previous.y - (segment.y1 + dy * (previous.x - segment.x1) / dx)) * ny;
+  const rest = flipper(dx > 0 ? "left" : "right", false);
+  const restY = rest.y1 + (rest.y2 - rest.y1) * t;
+  const swept = kicking && ball.y >= yLine - radius && previous.y <= restY - ball.r + 6;
+  const crossing = oldDistance >= radius && distance <= radius;
+  if (!swept && !crossing && (distance < 0 || distance > radius)) return false;
+  const incoming = ball.vx * nx + ball.vy * ny;
+  if (!swept && incoming >= 0) return false;
+  // Passive contacts lose energy and roll toward the drain; only a press adds energy.
+  if (incoming < 0) {
+    ball.vx -= 1.6 * incoming * nx;
+    ball.vy -= 1.6 * incoming * ny;
+  }
+  if (kicking) {
+    ball.vy = Math.min(ball.vy, -760);
+    ball.vx += Math.sign(dx) * 140;
+  }
+  ball.x += nx * Math.max(0, radius - distance + 0.5);
+  ball.y += ny * Math.max(0, radius - distance + 0.5);
   return true;
 }
 
-function restBall() {
-  const seat = flipper("left", false);
+function launcherBall() {
   return {
-    x: (seat.x1 + seat.x2) / 2,
-    y: (seat.y1 + seat.y2) / 2 - 12,
+    x: W - PIN_RAIL - 11,
+    y: H - 100,
     vx: 0,
     vy: 0,
     r: 7,
@@ -230,7 +246,8 @@ function stepBall(session, ball, dt) {
   const slices = session.kind === "pinball" ? 4 : 1;
   const step = dt / slices;
   for (let i = 0; i < slices; i += 1) {
-    if (ball.gravity) ball.vy += 520 * step;
+    const previous = { x: ball.x, y: ball.y };
+    if (ball.gravity) ball.vy += 900 * step;
     ball.x += ball.vx * step;
     ball.y += ball.vy * step;
     const inset = session.kind === "pinball" ? PIN_RAIL + ball.r : ball.r;
@@ -243,8 +260,8 @@ function stepBall(session, ball, dt) {
       ball.vx = -Math.abs(ball.vx);
     }
     if (session.kind === "pinball") {
-      bounceFlipper(ball, flipper("left", session.left), session.leftKick > 0);
-      bounceFlipper(ball, flipper("right", session.right), session.rightKick > 0);
+      bounceFlipper(ball, flipper("left", session.left), session.leftKick > 0, previous);
+      bounceFlipper(ball, flipper("right", session.right), session.rightKick > 0, previous);
     }
     if (ball.y < ball.r) {
       ball.y = ball.r;
@@ -268,10 +285,7 @@ function stepBall(session, ball, dt) {
 
 function keepBall(session, ball) {
   if (session.kind !== "pinball") return ball.y < H + 12;
-  const leftTip = flipper("left", false).x2;
-  const rightTip = flipper("right", false).x2;
-  const inMouth = ball.x > leftTip && ball.x < rightTip;
-  return !(inMouth && ball.y > H - 2);
+  return ball.y < H + 12;
 }
 
 export function updateSession(session, dtMs) {
@@ -294,18 +308,18 @@ export function updateSession(session, dtMs) {
     session.launched = true;
   }
   if (session.kind === "pinball" && !session.launched) {
-    if (!session.balls.length) session.balls.push(restBall());
+    if (!session.balls.length) session.balls.push(launcherBall());
     const ball = session.balls[0];
-    const seat = restBall();
+    const seat = launcherBall();
     ball.x = seat.x;
     ball.y = seat.y;
     ball.vx = 0;
     ball.vy = 0;
-    if (session.prep <= 0 && (session.left || session.right || session.fire)) {
-      session.launched = true;
-      ball.vx = session.right && !session.left ? -70 : 70;
-      ball.vy = -760;
-    }
+    session.launched = true;
+    ball.x = W - PIN_RAIL - ball.r - 4;
+    ball.y = H - 100;
+    ball.vx = -110;
+    ball.vy = -820;
     return session;
   }
   if (session.kind === "breakout") movePaddle(session, dt);

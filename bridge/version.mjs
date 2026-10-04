@@ -1,2 +1,2 @@
-// Raise the last number on each update: 1.0.1, 1.0.3, then 1.1.
-export const VERSION = "1.0.3";
+// Increment the patch version on each update.
+export const VERSION = "1.0.5";

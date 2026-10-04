@@ -640,24 +640,41 @@ export function beginSand(game, drops = SAND_DROPS) {
 
 export function finishSand(game) {
   const grid = game.sandGrid;
-  const scale = SAND_SCALE;
   if (grid) {
-    for (let cy = 0; cy < ROWS; cy += 1) {
-      for (let cx = 0; cx < COLS; cx += 1) {
-        const tally = Array(SAND_COLORS).fill(0);
-        let filled = 0;
-        for (let dy = 0; dy < scale; dy += 1) {
-          for (let dx = 0; dx < scale; dx += 1) {
-            const value = grid[cy * scale + dy][cx * scale + dx];
-            if (!value) continue;
-            filled += 1;
-            tally[value - 1] += 1;
-          }
-        }
-        if (filled * 2 >= scale * scale) {
-          const color = tally.indexOf(Math.max(...tally));
-          game.grid[cy][cx] = { type: ["I", "O", "T", "S"][color], g: takeGid(game), bomb: false, reward: null, curse: null, sand: null };
-        } else game.grid[cy][cx] = null;
+    const area = Array(COLS).fill(0);
+    const colors = Array.from({ length: COLS }, () => Array(SAND_COLORS).fill(0));
+    for (const row of grid) {
+      row.forEach((value, x) => {
+        if (!value) return;
+        const column = Math.floor(x / SAND_SCALE);
+        area[column] += 1;
+        colors[column][value - 1] += 1;
+      });
+    }
+    const total = area.reduce((sum, value) => sum + value, 0);
+    // Keep an interior channel open so conversion does not award instant line clears.
+    const gap = [3, 4, 5, 6].reduce((best, x) => area[x] < area[best] ? x : best, 4);
+    const count = Math.min(ROWS * (COLS - 1), Math.round(total / (SAND_SCALE * SAND_SCALE)));
+    const weights = [...area];
+    weights[gap - 1] += area[gap] / 2;
+    weights[gap + 1] += area[gap] / 2;
+    weights[gap] = 0;
+    const heights = Array(COLS).fill(0);
+    for (let i = 0; i < count; i += 1) {
+      let best = -1;
+      for (let x = 0; x < COLS; x += 1) {
+        if (x === gap || heights[x] >= ROWS) continue;
+        if (best < 0 || weights[x] / total * count - heights[x] > weights[best] / total * count - heights[best]) best = x;
+      }
+      heights[best] += 1;
+    }
+    const globalColors = colors.reduce((sum, tally) => sum.map((value, i) => value + tally[i]), Array(SAND_COLORS).fill(0));
+    game.grid = emptyGrid();
+    for (let x = 0; x < COLS; x += 1) {
+      const tally = area[x] ? colors[x] : globalColors;
+      const color = tally.indexOf(Math.max(...tally));
+      for (let y = ROWS - heights[x]; y < ROWS; y += 1) {
+        game.grid[y][x] = { type: ["I", "O", "T", "S"][color], g: takeGid(game), bomb: false, reward: null, curse: null, sand: null };
       }
     }
   }
