@@ -702,6 +702,15 @@
       overflow: hidden;
       clip: rect(0 0 0 0);
     }
+    .pad #btn-rot-left {
+      position: absolute;
+      left: 0;
+      bottom: calc(100% + 24px);
+      width: 58px;
+      height: 58px;
+      touch-action: none;
+    }
+    .pad { position: relative; }
     #btn-rot { grid-area: 1 / 2; }
     #btn-hold { grid-area: 2 / 1; }
     #btn-drop { grid-area: 2 / 3; background: var(--md-primary); color: white; }
@@ -1222,6 +1231,10 @@
         </div>
       </div>
       <div class="pad">
+        <button type="button" id="btn-rot-left" aria-keyshortcuts="Z">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="transform: scaleX(-1)"><path d="M19.4 12a7.4 7.4 0 1 1-2.1-5.2M19.4 4.2V8.8H14.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="pad-label" data-i18n="rotateLeft">Left turn</span>
+        </button>
         <div class="hand hand-move">
           <button type="button" id="btn-left">
             <span class="sr" data-i18n="left">Left</span>
@@ -1233,9 +1246,9 @@
           </button>
         </div>
         <div class="hand hand-cross">
-          <button type="button" id="btn-rot">
+          <button type="button" id="btn-rot" aria-keyshortcuts="ArrowUp X">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 12a7.4 7.4 0 1 1-2.1-5.2M19.4 4.2V8.8H14.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span class="pad-label" data-i18n="rotate">Turn</span>
+            <span class="pad-label" data-i18n="rotateRight">Right turn</span>
           </button>
           <button type="button" id="btn-hold">
             <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.2" y="4.2" width="15.6" height="15.6" rx="3" fill="none" stroke="currentColor" stroke-width="2.4"/><rect x="8.3" y="8.3" width="7.4" height="7.4" rx="1.4" fill="currentColor"/></svg>
@@ -1255,16 +1268,16 @@
     </section>
   </div>
   <script type="module">
-    import { createSound } from "./audio.mjs?v=1.0.5";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.5";
-    import { translate } from "./i18n.mjs?v=1.0.5";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.5";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.5";
-    import { VERSION } from "./version.mjs?v=1.0.5";
+    import { createSound } from "./audio.mjs?v=1.0.8";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.8";
+    import { translate } from "./i18n.mjs?v=1.0.8";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.8";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.8";
+    import { VERSION } from "./version.mjs?v=1.0.8";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
-      hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.0.5";
+      dangerLevel, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
+    } from "./logic.mjs?v=1.0.8";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -1793,6 +1806,10 @@
       if (playPuzzlePad("up")) return;
       doRotate(1);
     });
+    bindPress("#btn-rot-left", () => {
+      if (puzzle || session) return;
+      doRotate(-1);
+    });
     bindPress("#btn-hold", () => {
       if (playPuzzlePad("cycle")) return;
       doHold();
@@ -2209,12 +2226,41 @@
         drawBlob(ctx, cellsOf(game.active.type, game.active.rot, game.active.x, gy), game.active.type, CELL, true, null, game.active.curse, game.active.sand ?? null, game.active.rot);
         drawBlob(ctx, cellsOf(game.active.type, game.active.rot, game.active.x, game.active.y), game.active.type, CELL, false, game.active.bombIndex, game.active.curse, game.active.sand ?? null, game.active.rot);
       }
-      if (session) drawSession(ctx, session, ink());
+      if (session) drawSession(ctx, session, ink(), {
+        speed: t("arcadeSpeed"), double: t("arcadeDouble"), triple: t("arcadeTriple"),
+        wide: t("arcadeWide"), narrow: t("arcadeNarrow"),
+      });
       if (performance.now() < curseUntil.blind) {
         ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, COLS * CELL, ROWS * CELL);
       }
       if (flipping) ctx.restore();
+      drawDanger();
+    }
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    function drawDanger() {
+      const level = dangerLevel(game);
+      if (!level || session || puzzle) return;
+      const critical = level === 2;
+      const strength = critical ? 1 : 0.5;
+      const rgb = critical ? "255, 59, 48" : "255, 159, 10";
+      const pulse = paused || reducedMotion.matches ? 0.5
+        : (1 + Math.sin(performance.now() / (critical ? 220 : 440))) / 2;
+      ctx.save();
+      const glow = ctx.createLinearGradient(0, 0, 0, CELL * 6);
+      glow.addColorStop(0, `rgba(${rgb}, ${0.12 + strength * (0.1 + pulse * 0.08)})`);
+      glow.addColorStop(1, `rgba(${rgb}, 0)`);
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, COLS * CELL, CELL * 6);
+      ctx.strokeStyle = `rgba(${rgb}, ${0.4 + strength * pulse * 0.4})`;
+      ctx.lineWidth = critical ? 5 : 3;
+      ctx.strokeRect(2, 2, COLS * CELL - 4, ROWS * CELL - 4);
+      ctx.font = "bold 12px system-ui";
+      ctx.textAlign = "center";
+      ctx.fillStyle = critical ? "#ff3b30" : "#ff9f0a";
+      ctx.fillText(t(critical ? "danger" : "warning"), COLS * CELL / 2, 18);
+      ctx.restore();
     }
 
     function applyCurses(cells) {
@@ -2298,6 +2344,7 @@
     }
 
     function draw() {
+      document.querySelector("#btn-rot-left").hidden = !!(puzzle || session);
       if (document.querySelector("#game").hidden) return;
       if (puzzle) {
         prepareBoard();
@@ -2426,6 +2473,11 @@
       if (!paused && session) {
         const clearedBefore = session.cleared;
         updateSession(session, dt);
+        for (const kind of session.effectEvents.splice(0)) {
+          const key = { speed: "arcadeSpeed", double: "arcadeDouble", triple: "arcadeTriple", wide: "arcadeWide", narrow: "arcadeNarrow" }[kind];
+          pushCallout("combo", t(key));
+          sound.blip(880, 0.06);
+        }
         if (session.cleared > clearedBefore) sound.blip(760, 0.035);
         if (session.curseHits.length) {
           applyCurses(session.curseHits);

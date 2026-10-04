@@ -3,8 +3,8 @@ import test from "node:test";
 import { VERSION } from "./version.mjs";
 import { createTen, createTwenty, tenFits, tenPlace, twentyMove } from "./puzzle.mjs";
 
-test("the hub version is 1.0.5", () => {
-  assert.equal(VERSION, "1.0.5");
+test("the hub version is 1.0.8", () => {
+  assert.equal(VERSION, "1.0.8");
 });
 
 test("1010 places a piece and clears a full row", () => {
