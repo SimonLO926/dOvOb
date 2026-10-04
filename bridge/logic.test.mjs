@@ -6,6 +6,9 @@ import {
   GARBAGE_ROW_CHANCE,
   GARBAGE_GRACE_DROPS,
   garbageRows,
+  garbageRowChances,
+  marathonPenaltyRates,
+  marathonRiskScale,
   garbageGraceActive,
   applyGarbageCurse,
   penaltyCells,
@@ -1120,4 +1123,49 @@ test("arcade rewards still flip the board outside garbage grace", () => {
   game.grid[12][4] = { type: "O", g: 99 };
   game.pendingReward = "pinball";
   assert.equal(pump(game).flip, true);
+});
+
+
+test("Marathon penalty rates grow gently with stage and stop growing at stage sixteen", () => {
+  const base = marathonPenaltyRates(1);
+  assert.deepEqual(base, { nohold: NO_HOLD_CHANCE, curse: CURSE_CHANCE, garbage: GARBAGE_CHANCE });
+  for (const stage of [2, 5, 10, 16, 100]) {
+    const rates = marathonPenaltyRates(stage);
+    const factor = 1 + .04 * Math.min(15, stage - 1);
+    for (const key of Object.keys(base)) assert.ok(Math.abs(rates[key] / base[key] - factor) < 1e-12);
+  }
+  assert.equal(marathonRiskScale(-1), 1); assert.equal(marathonRiskScale(NaN), 1);
+  const game = createGame({ random: () => .02 });
+  assert.equal(game.pull().curse, 'seal');
+  game.stage = 16; assert.equal(game.pull().curse, 'nohold');
+  const fever = createGame({ random: () => .081 }); fever.stage = 16;
+  assert.equal(fever.pull().type, 'F');
+  const garbage = createGame({ random: () => .1 }); garbage.stage = 16;
+  assert.equal(garbage.pull().curse, 'garbage');
+});
+
+test("Higher stages tilt normalized garbage weights towards taller garbage without changing the base", () => {
+  let previousMean = 0;
+  let previousTail = 0;
+  for (const stage of [1, 2, 5, 10, 16]) {
+    const chances = garbageRowChances(stage);
+    assert.ok(Math.abs(chances.reduce((sum, p) => sum + p, 0) - 1) < 1e-12);
+    const mean = chances.reduce((sum, p, i) => sum + p * (i + 1), 0);
+    const tail = chances.slice(3).reduce((sum, p) => sum + p, 0);
+    assert.ok(mean > previousMean); assert.ok(tail > previousTail);
+    previousMean = mean; previousTail = tail;
+    let low = 0;
+    chances.forEach((p, index) => { assert.equal(garbageRows(() => low + p / 2, stage), index + 1); low += p; });
+  }
+  assert.deepEqual(garbageRowChances(100), garbageRowChances(16));
+});
+
+test("Garbage triggering uses the current Marathon stage and preserves blast and Fever exemptions", () => {
+  const game = createGame({ random: () => .2 }); game.stage = 16;
+  assert.equal(garbageRows(game.random), 1);
+  assert.equal(applyGarbageCurse(game, [{ curse: 'garbage' }]), 2);
+  assert.equal(applyGarbageCurse(game, [{ curse: 'garbage', cause: 'blast' }]), 0);
+  game.feverLeft = 1; assert.equal(applyGarbageCurse(game, [{ curse: 'garbage' }]), 0);
+  game.feverLeft = 0; game.setMode('tetris'); game.pendingGarbage = 0;
+  assert.equal(applyGarbageCurse(game, [{ curse: 'garbage' }]), 1);
 });

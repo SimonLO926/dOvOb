@@ -1,4 +1,4 @@
-import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.1.1";
+import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.1.3";
 
 export const CELL = 28;
 export const W = COLS * CELL;
@@ -119,6 +119,8 @@ export function createSession(kind, grid, stage, random) {
     balls: kind === "pinball" ? [launcherBall()] : [],
     queueLeft: 0,
     queueTime: 0,
+    shotElapsed: 0,
+    playbackRate: 1,
     aiming: kind === "bbtan",
     launched: false,
     over: false,
@@ -367,7 +369,34 @@ function keepBall(session, ball) {
   return ball.y < H + 12;
 }
 
+// Fast-forward the simulation, rather than altering ball velocities or scoring.
+// Small physics steps preserve contacts at 2x / 3x playback.
 export function updateSession(session, dtMs) {
+  if (session.kind !== "bbtan" || session.over || session.prep > 0) return updateSessionStep(session, dtMs);
+  if (session.aiming) {
+    session.shotElapsed = 0; session.playbackRate = 1;
+    if (!session.fire) return updateSessionStep(session, dtMs);
+    updateSessionStep(session, 0);
+  }
+  let remaining = Math.max(0, Math.min(100, Number(dtMs) || 0));
+  while (remaining > 0 && !session.over && !session.aiming) {
+    const elapsed = session.shotElapsed || 0;
+    const boundary = elapsed < 3000 ? 3000 : elapsed < 6000 ? 6000 : Infinity;
+    const realStep = Math.min(remaining, 16, boundary - elapsed);
+    session.playbackRate = elapsed >= 6000 ? 3 : elapsed >= 3000 ? 2 : 1;
+    session.shotElapsed = elapsed + realStep;
+    let simulated = realStep * session.playbackRate;
+    while (simulated > 0 && !session.over && !session.aiming) {
+      const step = Math.min(8, simulated);
+      updateSessionStep(session, step); simulated -= step;
+    }
+    remaining -= realStep;
+  }
+  if (session.aiming || session.over) session.playbackRate = 1;
+  return session;
+}
+
+function updateSessionStep(session, dtMs) {
   const dt = Math.min(0.032, dtMs / 1000);
   session.flashes = session.flashes.filter((flash) => {
     flash.life -= dtMs;
@@ -444,6 +473,7 @@ export function updateSession(session, dtMs) {
   if (session.kind === "breakout" && session.launched && session.balls.length === 0) session.over = true;
   if (session.kind === "pinball" && session.launched && session.balls.length === 0) session.over = true;
   if (session.kind === "bbtan" && !session.aiming && session.queueLeft === 0 && session.balls.length === 0) {
+    session.shotElapsed = 0; session.playbackRate = 1;
     if (session.chances > 0) session.aiming = true;
     else session.over = true;
   }
@@ -563,6 +593,11 @@ export function drawSession(ctx, session, ink, labels = {}) {
       ctx.arc(18 + i * 16, H - 18, 4, 0, Math.PI * 2);
       ctx.fill();
     }
+  }
+  if (session.kind === "bbtan" && !session.aiming && session.playbackRate > 1 && !session.over) {
+    ctx.save(); ctx.font = 'bold 14px sans-serif'; ctx.textAlign = "center";
+    ctx.fillStyle = "rgba(0,0,0,.75)"; ctx.fillRect(W / 2 - 34, H - 48, 68, 24);
+    ctx.fillStyle = "#ffd56a"; ctx.fillText(`▶▶ ×${session.playbackRate}`, W / 2, H - 31); ctx.restore();
   }
   for (const ball of session.balls) paintBall(ctx, ball);
 }

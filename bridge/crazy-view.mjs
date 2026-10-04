@@ -1,5 +1,5 @@
-import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.1.1';
-import { drawSession } from './arcade.mjs?v=1.1.1';
+import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.1.3';
+import { drawSession } from './arcade.mjs?v=1.1.3';
 export const CRAZY_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 356 });
 export const CRAZY_BLOCK_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 512 });
 export function crazyCanvasHeight(mode) { return mode === 'bridge' || mode === 'sand' ? 720 : 560; }
@@ -12,13 +12,13 @@ const catPhoto = typeof Image === 'undefined' ? null : new Image();
 export const catImageReady = catPhoto ? new Promise(resolve => {
   catPhoto.onload = () => resolve(true);
   catPhoto.onerror = () => resolve(false);
-  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.1.1', import.meta.url).href;
+  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.1.3', import.meta.url).href;
 }) : Promise.resolve(false);
 const COLORS = { I: '#64d2ff', O: '#ffd60a', T: '#bf5af2', S: '#30d158', Z: '#ff453a', J: '#0a84ff', L: '#ff9f0a', B: '#9da4b9' };
 const SYMBOLS = ['★', '♥', '7', '♠'];
 const TILES = ['中', '發', '白', '東'];
 function text(c, label, x, y, size = 14, color = '#f5f2ff') {
-  c.fillStyle = color; c.font = `bold ${size}px "Pixel Latin", "Pixel Hant", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(label, x, y);
+  c.fillStyle = color; c.font = `bold ${size}px "Pixel Latin", "Pixel Hant", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(label, x, y, 260);
 }
 function box(c, x, y, w, h, color, radius = 8) {
   c.fillStyle = color; c.beginPath(); c.roundRect(x, y, w, h, radius); c.fill();
@@ -130,19 +130,32 @@ function drawBridgePreviews(c, s, t, paintPiece) {
   c.save(); c.globalAlpha = g.holdLocked || g.noHoldLeft > 0 ? .35 : 1; preview(g.hold, 26, 53); c.restore();
   g.queue.slice(0, 3).forEach((piece, i) => preview(piece, 226, 49 + i * 21));
 }
-function miniBoard(c, s, t) {
+function miniBoard(c, s, t, reducedMotion) {
   const m = s.mini;
   if (s.mode === 'slots' || s.mode === 'tiger') {
     box(c, 20, 188, 240, 166, '#42253f'); box(c, 25, 193, 230, 156, '#22152b');
     for (let i = 0; i < 3; i++) {
-      const reel = m.reels[i];
-      const value = reel ?? Math.floor(m.clock / (250 - s.phase * 20) + i) % 4;
-      box(c, 34 + i * 73, 220, 65, 87, '#f6ebd5', 5);
-      text(c, SYMBOLS[value], 66 + i * 73, 262, 36, value === 1 ? '#cf3155' : '#39233d');
+      const reel = m.reels[i], spin = m.spin;
+      const moving = (s.mode === 'slots' && reel == null) || (spin && spin.time < 550 + i * 250);
+      const value = moving ? Math.floor(m.clock / 70 + i) % 4 : spin?.result?.[i] ?? reel;
+      const x = 34 + i * 73;
+      box(c, x, 220, 65, 87, '#f6ebd5', 5);
+      c.save(); c.beginPath(); c.rect(x, 220, 65, 87); c.clip();
+      const offset = moving && !reducedMotion ? (m.clock % 100) / 100 * 72 : 0;
+      text(c, SYMBOLS[value], x + 32, 262 + offset, 36, value === 1 ? '#cf3155' : '#39233d');
+      if (moving && !reducedMotion) text(c, SYMBOLS[(value + 1) % 4], x + 32, 190 + offset, 36, '#b32951');
+      c.restore();
       if (s.mode === 'slots' && i === m.stop) { c.strokeStyle = '#ffbf5e'; c.lineWidth = 3; c.strokeRect(34 + i * 73, 220, 65, 87); }
     }
     text(c, s.mode === 'slots' ? `${t('crazyStop')} ${Math.min(3, m.stop + 1)}/3` : m.pending ? `${t('crazyPending')} ${m.pending}` : t('crazyPull'), 140, 389, 18, '#ffc76a');
-    if (s.mode === 'tiger') { text(c, t('crazyBankHint'), 140, 423, 12); text(c, t('crazyRiskHint'), 140, 445, 12, '#ff8ca5'); }
+    if (s.mode === 'tiger') {
+      const lever = m.spin && !reducedMotion ? Math.sin(Math.min(1, m.spin.time / 350) * Math.PI) * 24 : 0;
+      c.strokeStyle = '#ffc76a'; c.lineWidth = 5; c.beginPath(); c.moveTo(250, 326); c.lineTo(250, 300 + lever); c.stroke();
+      ellipse(c, 250, 298 + lever, 8, 8, m.spin ? '#ff617f' : '#ffbc59');
+      text(c, m.spin ? t(m.spin.risk ? 'crazyRiskRolling' : 'crazyRolling') : m.pending ? `${t('crazyRisk')} ×2 → ${m.pending * 2}` : t('crazyLeverPrompt'), 140, 363, 12, '#ffdb9f');
+      text(c, t('crazyBankHint'), 140, 423, 12); text(c, t('crazyRiskHint'), 140, 445, 11, '#ff8ca5');
+      text(c, t('crazyOdds'), 140, 470, 11, '#e7b9d2');
+    }
   } else if (s.mode === 'cards') {
     text(c, `${t('crazyFindPair')} ${m.target}`, 140, 171, 15, '#ffcf73');
     m.items.forEach((v, i) => {
@@ -153,6 +166,7 @@ function miniBoard(c, s, t) {
     });
     text(c, t('crazyPairHint'), 140, 355, 13);
   } else if (s.mode === 'mahjong') {
+    text(c, `${t('crazyFindPair')} ${TILES[m.target]}`, 140, 171, 15, '#ffcf73');
     m.items.forEach((v, i) => {
       if (m.removed.includes(i)) return;
       const x = 28 + (i % 3) * 78, y = 185 + Math.floor(i / 3) * 105;
@@ -161,6 +175,32 @@ function miniBoard(c, s, t) {
       if (i === m.focus) { c.strokeStyle = '#ff718b'; c.lineWidth = 3; c.strokeRect(x, y, 68, 85); }
     });
     text(c, t('crazyPairHint'), 140, 435, 13);
+  } else if (s.mode === 'dodge') {
+    c.save(); c.beginPath(); c.rect(12, 152, 256, 356); c.clip();
+    for (const h of m.hazards) {
+      const warning = h.age < h.warn;
+      const sections = h.horizontal ? [[152, h.gap - h.gapSize / 2], [h.gap + h.gapSize / 2, 508]] : [[12, h.gap - h.gapSize / 2], [h.gap + h.gapSize / 2, 268]];
+      if (warning) {
+        c.globalAlpha = reducedMotion ? .35 : .2 + Math.sin(h.age / 70) * .08;
+        c.fillStyle = '#ff476f';
+        for (const [lo, hi] of sections) if (h.horizontal) c.fillRect(12, lo, 256, hi - lo); else c.fillRect(lo, 152, hi - lo, 356);
+        c.globalAlpha = 1;
+        text(c, '!', h.horizontal ? 26 : h.gap, h.horizontal ? h.gap : 170, 20, '#ffeebc');
+      } else {
+        for (const [lo, hi] of sections) {
+          c.strokeStyle = h.horizontal ? '#ffd572' : '#e6f5ff'; c.lineWidth = 5;
+          c.beginPath(); if (h.horizontal) { c.moveTo(h.pos, lo); c.lineTo(h.pos, hi); } else { c.moveTo(lo, h.pos); c.lineTo(hi, h.pos); } c.stroke();
+          for (let at = lo + 6; at < hi; at += 18) {
+            if (h.horizontal) { ellipse(c, h.pos - 3, at, 4, 4, '#ffd572'); ellipse(c, h.pos + 3, at, 4, 4, '#ffd572'); }
+            else { ellipse(c, at, h.pos - 3, 4, 4, '#e6f5ff'); ellipse(c, at, h.pos + 3, 4, 4, '#e6f5ff'); }
+          }
+        }
+      }
+    }
+    const color = m.dash > 0 ? '#7ffff0' : s.protection > 0 ? '#ffc875' : '#ff486d';
+    c.fillStyle = color; c.beginPath(); c.moveTo(m.x, m.y + 7); c.lineTo(m.x - 7, m.y); c.lineTo(m.x - 7, m.y - 5); c.lineTo(m.x - 3, m.y - 7); c.lineTo(m.x, m.y - 4); c.lineTo(m.x + 3, m.y - 7); c.lineTo(m.x + 7, m.y - 5); c.lineTo(m.x + 7, m.y); c.closePath(); c.fill();
+    c.restore();
+    text(c, m.dashReady > 0 ? `${t('crazyDash')} ${(m.dashReady / 1000).toFixed(1)}s` : t('crazyDashReady'), 140, 480, 12, '#91ffde');
   } else if (s.mode === 'pachinko') {
     c.strokeStyle = '#bd839a'; c.lineWidth = 1;
     c.beginPath(); c.moveTo(m.aim, 154); c.lineTo(m.aim, 180); c.stroke();
@@ -168,6 +208,29 @@ function miniBoard(c, s, t) {
     for (const b of m.balls) ellipse(c, b.x, b.y, 5, 5, '#a0efff');
     for (let i = 0; i < 5; i++) { box(c, i * 56 + 3, 475, 50, 32, i === 2 ? '#8e2346' : i % 2 ? '#555097' : '#245948', 3); text(c, i === 2 ? '−6' : i % 2 ? '⚔' : '+8', i * 56 + 28, 491, 17); }
   }
+  if (['cards', 'mahjong'].includes(s.mode)) {
+    const fraction = Math.max(0, m.roundLeft / m.roundTime);
+    bar(c, 28, s.mode === 'cards' ? 320 : 407, 224, fraction, fraction < .35 ? '#ff486d' : '#ffcf73');
+    text(c, `${(Math.max(0, m.roundLeft) / 1000).toFixed(1)}s · COMBO ${m.streak || 0}`, 140, s.mode === 'cards' ? 385 : 463, 16, fraction < .35 ? '#ff718b' : '#ffcf73');
+  }
+}
+function drawTransition(c, s, t, reducedMotion, height) {
+  if (!s.transition) return;
+  const elapsed = s.transition.time, fade = Math.min(1, (800 - elapsed) / 250);
+  c.save(); c.globalAlpha = Math.max(0, fade);
+  const y = Math.min(height / 2, 330);
+  if (!reducedMotion) {
+    c.strokeStyle = '#ffc96a'; c.lineWidth = 2;
+    for (let i = 0; i < 14; i++) {
+      const angle = i * Math.PI / 7, r = 65 + elapsed * .18;
+      c.beginPath(); c.moveTo(140 + Math.cos(angle) * r, y + Math.sin(angle) * r); c.lineTo(140 + Math.cos(angle) * (r + 65), y + Math.sin(angle) * (r + 65)); c.stroke();
+    }
+  }
+  box(c, 0, y - 45, 280, 90, '#301529', 0);
+  c.fillStyle = '#ffc96a'; c.fillRect(0, y - 45, 280, 3); c.fillRect(0, y + 42, 280, 3);
+  text(c, t('crazyIncoming'), 140, y - 21, 12, '#ffb0c5');
+  text(c, t('crazyMode_' + s.mode), 140, y + 9, 28, '#ffe5ac');
+  c.restore();
 }
 export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiece } = {}) {
   const height = crazyCanvasHeight(s.mode);
@@ -183,7 +246,7 @@ export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiec
     if (paintGrid) paintGrid(c, s.arcade.grid);
     else for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (s.arcade.grid[y][x]) box(c, x * 28 + 1, y * 28 + 1, 26, 26, COLORS[s.arcade.grid[y][x].type] || '#e0b469', 3);
     drawSession(c, s.arcade, '#f2deef', { speed: t('arcadeSpeed'), double: t('arcadeDouble'), triple: t('arcadeTriple'), wide: t('arcadeWide'), narrow: t('arcadeNarrow') }); c.restore();
-  } else miniBoard(c, s, t);
+  } else miniBoard(c, s, t, reducedMotion);
   text(c, `${t('crazyMode_' + s.mode)} · ${Math.ceil(Math.max(0, s.timeLeft) / 1000)}s`, 140, 141, 12, '#ffc7d6');
   if (s.cat) {
     const warning = s.cat.time < 1200;
@@ -210,8 +273,9 @@ export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiec
   }
   text(c, `HP ${s.hp}/100 · ${t('crazyPhaseLabel')} ${s.phase}/3`, 140, height - 38, 14, '#f2deef');
   bar(c, 24, height - 25, 232, s.hp / 100, s.hp <= 25 ? '#ff466c' : '#6bdfb2');
-  if (s.attack) text(c, `${t('crazyAttackWarning')} ${Math.ceil(s.attack.time / 1000)}`, 140, 94, 11, '#fff1a2');
+  if (s.attack) text(c, `${t('crazyAttackWarning')} ${Math.ceil(s.attack.time / 1000)}`, 140, height - 10, 11, '#fff1a2');
   else if (s.noticeTime > 0) text(c, `${t(s.notice)}${s.noticeAmount ? ` ${s.noticeAmount > 0 ? '+' : ''}${s.noticeAmount}` : ''}`, 140, height - 10, 11, '#ffe0ab');
   if (s.hitFlash > 0) { c.fillStyle = `rgba(255,40,80,${s.hitFlash / 1500})`; c.fillRect(0, 0, 280, height); }
+  drawTransition(c, s, t, reducedMotion, height);
   c.restore();
 }

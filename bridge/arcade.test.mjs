@@ -328,3 +328,43 @@ for (const kind of ["breakout", "bbtan", "pinball"]) {
     assert.equal(session.cleared, 1);
   });
 }
+
+test("BBTAN playback accelerates after three real seconds and caps at 3x after six", () => {
+  const session = createSession("bbtan", brickWall(() => .5), 1, () => .5);
+  session.prep = 0; session.aiming = false; session.queueLeft = 0;
+  session.balls = [{ x: 100, y: 400, vx: 10, vy: 0, r: 4, gravity: false }];
+  session.shotElapsed = 2990;
+  updateSession(session, 20);
+  assert.equal(session.shotElapsed, 3010); assert.equal(session.playbackRate, 2);
+  assert.ok(Math.abs(session.balls[0].x - 100.3) < 1e-8);
+  session.shotElapsed = 5990;
+  const x = session.balls[0].x; updateSession(session, 20);
+  assert.equal(session.shotElapsed, 6010); assert.equal(session.playbackRate, 3);
+  assert.ok(Math.abs(session.balls[0].x - x - .5) < 1e-8);
+  assert.equal(session.balls[0].vx, 10); assert.equal(session.score, 0);
+});
+
+test("BBTAN resets fast-forward between volleys and excludes preparation and aiming", () => {
+  const session = createSession("bbtan", brickWall(() => .5), 1, () => .5);
+  updateSession(session, 3000); assert.equal(session.shotElapsed, 0);
+  session.prep = 0; updateSession(session, 50); assert.equal(session.shotElapsed, 0);
+  session.fire = true; updateSession(session, 16);
+  assert.equal(session.shotElapsed, 16); assert.equal(session.playbackRate, 1); assert.equal(session.chances, 2);
+  session.queueLeft = 0; session.shotElapsed = 6500;
+  session.balls = [{ x: 140, y: H + 20, vx: 0, vy: 100, r: 4, gravity: false }];
+  updateSession(session, 16);
+  assert.equal(session.aiming, true); assert.equal(session.shotElapsed, 0); assert.equal(session.playbackRate, 1);
+  session.fire = true; updateSession(session, 16);
+  assert.equal(session.shotElapsed, 16); assert.equal(session.playbackRate, 1); assert.equal(session.chances, 1);
+});
+
+test("Fast-forwarded BBTAN still hits bricks and scores each contact once", () => {
+  const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  grid[0][0] = { type: "O", g: 1 }; grid[10][5] = { type: "O", g: 2 };
+  const session = createSession("bbtan", grid, 1, () => .5);
+  session.prep = 0; session.aiming = false; session.shotElapsed = 6500;
+  session.balls = [{ x: 126, y: 10 * 28 + 14, vx: 220, vy: 0, r: 4, gravity: false }];
+  updateSession(session, 32);
+  assert.equal(session.grid[10][5], null); assert.equal(session.cleared, 1); assert.equal(session.score, 40);
+  assert.ok(session.balls[0].vx < 0); assert.equal(session.over, false);
+});

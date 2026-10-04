@@ -1,14 +1,14 @@
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.1.1';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.1.1';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.1.3';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.1.3';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, limit: 480000 });
-export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand']);
+export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand', 'dodge']);
 export const CAT_ACTIONS = Object.freeze(['heal', 'boss', 'player', 'blocks', 'mischief']);
 export function catAction(random = Math.random) {
   const roll = random();
   return roll < .25 ? 'heal' : roll < .45 ? 'boss' : roll < .60 ? 'player' : roll < .85 ? 'blocks' : 'mischief';
 }
-const HARD = new Set(['pinball', 'breakout', 'bbtan', 'sand']);
+const HARD = new Set(['pinball', 'breakout', 'bbtan', 'sand', 'dodge']);
 const RECOVERY = ['cards', 'mahjong', 'slots'];
 const shuffled = (items, random) => {
   const out = [...items];
@@ -25,7 +25,7 @@ export function createCrazy({ random = Math.random, boss = FIRST_BOSS } = {}) {
     bridge, parkedPiece: null, curses: { reverse: 0, blind: 0, rush: 0, norotate: 0 }, arcade: null, mini: null, held: new Set(), actionReady: true,
     timeLeft: 20000, duration: 20000, protection: 500, cooldown: 0, fallMs: 0, lockMs: 0, repeatMs: 0,
     resolveMs: 0, successes: 0, events: [], hitFlash: 0, cat: null, catDue: 9000, catBlock: 0,
-    notice: 'crazyOpening', noticeTime: 3500, attack: null, attackDone: false,
+    transition: null, notice: 'crazyOpening', noticeTime: 3500, attack: null, attackDone: false,
   };
   return state;
 }
@@ -98,8 +98,10 @@ function leaveSand(s) {
 export function advanceCrazy(s, preferredMode = null) {
   if (s.over) return;
   if (s.mode === 'sand') leaveSand(s);
+  const from = s.mode;
   s.encounter += 1;
   s.mode = preferredMode || nextMode(s);
+  s.transition = { from, to: s.mode, time: 0 };
   s.hardStreak = HARD.has(s.mode) ? s.hardStreak + 1 : 0;
   s.duration = 22000 - s.phase * 2000;
   s.damageLeft = 45 + s.phase * 5;
@@ -122,20 +124,24 @@ export function advanceCrazy(s, preferredMode = null) {
   } else if (s.mode === 'slots') {
     s.mini = { reels: [null, null, null], stop: 0, clock: 0, round: 0 };
   } else if (s.mode === 'tiger') {
-    s.mini = { reels: [0, 1, 2], pending: 0, risks: 0, clock: 0 };
+    s.mini = { reels: [0, 1, 2], pending: 0, risks: 0, clock: 0, spin: null };
   } else if (s.mode === 'pachinko') {
     s.mini = { aim: 140, balls: [], pegs: Array.from({ length: 36 }, (_, i) => ({ x: 28 + (i % 6) * 42 + (Math.floor(i / 6) % 2) * 12, y: 160 + Math.floor(i / 6) * 48 })) };
+  } else if (s.mode === 'dodge') {
+    s.mini = { x: 140, y: 400, target: null, hazards: [], wave: 0, spawn: 850, survival: 0, dash: 0, dashReady: 0, lastX: 0, lastY: -1 };
   } else deal(s);
   notify(s, 'crazySwitch');
 }
 
 function deal(s) {
+  const streak = s.mini?.streak || 0;
+  const roundTime = 3400 - s.phase * 400;
   if (s.mode === 'cards') {
     const target = 1 + Math.floor(s.random() * 9);
-    s.mini = { items: shuffled([target, target, target % 9 + 1, (target + 2) % 9 + 1], s.random), selected: [], focus: 0, target };
+    s.mini = { items: shuffled([target, target, target % 9 + 1, (target + 2) % 9 + 1], s.random), selected: [], focus: 0, target, streak, roundTime, roundLeft: roundTime };
   } else {
     const a = Math.floor(s.random() * 4);
-    s.mini = { items: shuffled([a, a, (a + 1) % 4, (a + 1) % 4, (a + 2) % 4, (a + 2) % 4], s.random), selected: [], focus: 0, removed: [] };
+    s.mini = { items: shuffled([a, a, (a + 1) % 4, (a + 1) % 4, (a + 2) % 4, (a + 2) % 4], s.random), selected: [], focus: 0, removed: [], target: a, streak, roundTime, roundLeft: roundTime };
   }
 }
 
@@ -145,18 +151,22 @@ function choose(s, index) {
   m.focus = index; m.selected.push(index);
   if (m.selected.length < 2) return;
   const [a, b] = m.selected;
-  if (m.items[a] === m.items[b] && (s.mode !== 'cards' || m.items[a] === m.target)) {
-    hitCrazyBoss(s, s.mode === 'cards' ? 22 : 16); healCrazy(s, 2);
+  if (m.items[a] === m.items[b] && (m.target == null || m.items[a] === m.target)) {
+    m.streak = (m.streak || 0) + 1;
+    hitCrazyBoss(s, (s.mode === 'cards' ? 22 : 16) + Math.min(8, (m.streak - 1) * 2)); healCrazy(s, 2);
+    m.roundLeft = m.roundTime;
     if (s.mode === 'mahjong') {
-      m.removed.push(a, b); m.selected = []; s.cooldown = 650;
+      m.removed.push(a, b); m.selected = []; s.cooldown = 350;
+      const available = m.items.filter((_, i) => !m.removed.includes(i));
+      if (available.length) m.target = available[Math.floor(s.random() * available.length)];
       if (m.removed.length === 6) { hitCrazyBoss(s, 20); s.cooldown = 450; }
-    } else s.cooldown = 600;
-  } else { hurtCrazy(s, 5, 'crazyWrong'); s.cooldown = 500; }
+    } else s.cooldown = 350;
+  } else { m.streak = 0; hurtCrazy(s, 5, 'crazyWrong'); s.cooldown = 350; }
 }
 
 function miniAction(s, action) {
   const m = s.mini;
-  if (!m || s.cooldown > 0 || s.catBlock > 0) return;
+  if (!m || s.cooldown > 0 || s.catBlock > 0 || m.spin) return;
   if (s.mode === 'slots' && action === 'action') {
     m.reels[m.stop] = Math.floor(m.clock / (250 - s.phase * 20) + m.stop) % 4;
     m.stop += 1;
@@ -169,17 +179,14 @@ function miniAction(s, action) {
   } else if (s.mode === 'tiger') {
     if (action === 'alt' && m.pending) {
       hitCrazyBoss(s, m.pending); healCrazy(s, 4); m.pending = 0; s.cooldown = 650;
-    } else if (action === 'action') {
-      if (m.pending) {
-        if (s.random() < 0.55) { m.pending *= 2; m.risks++; if (m.risks === 3) miniAction(s, 'alt'); }
-        else { m.pending = 0; hurtCrazy(s, 10, 'crazyRiskLost'); s.cooldown = 650; }
-      } else {
-        m.reels = Array.from({ length: 3 }, () => Math.floor(s.random() * 4)); m.risks = 0;
-        const count = Math.max(...m.reels.map(v => m.reels.filter(x => x === v).length));
-        if (count >= 2) { m.pending = count === 3 ? 32 : 18; notify(s, 'crazyBankOrRisk'); }
-        else { hurtCrazy(s, 6, 'crazyMiss'); s.cooldown = 650; }
-      }
+    } else if (action === 'action' && !m.spin) {
+      const risk = m.pending > 0;
+      m.spin = { time: 0, duration: 1050, risk, won: risk ? s.random() < .55 : null,
+        result: risk ? null : Array.from({ length: 3 }, () => Math.floor(s.random() * 4)) };
+      notify(s, risk ? 'crazyRiskRolling' : 'crazyRolling');
     }
+  } else if (s.mode === 'dodge' && action === 'action' && m.dashReady <= 0) {
+    m.dash = 180; m.dashReady = 1400;
   } else if (s.mode === 'pachinko' && action === 'action' && m.balls.length < 3) {
     m.balls.push({ x: m.aim, y: 154, vx: (m.aim - 140) * 0.7, vy: 40 }); s.cooldown = 500;
   } else if (['cards', 'mahjong'].includes(s.mode)) {
@@ -219,6 +226,7 @@ export function inputCrazy(s, action, down = true) {
 // All mini-game hit regions use the same logical 280 x 560 coordinates as the renderer.
 export function pointCrazy(s, x, y) {
   if (s.over || !s.actionReady || s.catBlock > 0) return;
+  if (s.mode === 'dodge') { s.mini.target = { x: Math.max(22, Math.min(258, x)), y: Math.max(172, Math.min(494, y)) }; return; }
   if (s.mode === 'pachinko') { s.mini.aim = Math.max(20, Math.min(260, x)); return; }
   if (s.mode === 'cards' && y >= 190 && y <= 290) {
     const i = Math.floor((x - 12) / 65);
@@ -228,6 +236,67 @@ export function pointCrazy(s, x, y) {
     const col = Math.floor((x - 28) / 78), row = Math.floor((y - 185) / 105);
     if (col >= 0 && col < 3 && row >= 0 && row < 2) choose(s, row * 3 + col);
   }
+}
+
+function updateTiger(s, dt) {
+  const m = s.mini, spin = m.spin;
+  if (!spin) return;
+  spin.time += dt;
+  if (spin.time < spin.duration) return;
+  m.spin = null;
+  if (spin.risk) {
+    if (spin.won) { m.pending *= 2; m.risks++; notify(s, 'crazyBankOrRisk'); if (m.risks === 3) miniAction(s, 'alt'); }
+    else { m.pending = 0; hurtCrazy(s, 10, 'crazyRiskLost'); s.cooldown = 650; }
+  } else {
+    m.reels = spin.result; m.risks = 0;
+    const count = Math.max(...m.reels.map(v => m.reels.filter(x => x === v).length));
+    if (count >= 2) { m.pending = count === 3 ? 32 : 18; notify(s, 'crazyBankOrRisk'); }
+    else { hurtCrazy(s, 6, 'crazyMiss'); s.cooldown = 650; }
+  }
+}
+function updatePairs(s, dt) {
+  const m = s.mini;
+  if (s.cooldown > 0 || m.roundLeft == null || s.catBlock > 0) return;
+  m.roundLeft -= dt;
+  if (m.roundLeft <= 0) {
+    m.streak = 0; hurtCrazy(s, 5, 'crazyPairTimeout'); deal(s); s.cooldown = 250;
+  }
+}
+function updateDodge(s, dt) {
+  const m = s.mini, seconds = dt / 1000;
+  m.dash = Math.max(0, m.dash - dt); m.dashReady = Math.max(0, m.dashReady - dt);
+  let dx = Number(s.held.has('right')) - Number(s.held.has('left'));
+  let dy = Number(s.held.has('down')) - Number(s.held.has('up'));
+  if (dx || dy) m.target = null;
+  else if (m.target) { dx = m.target.x - m.x; dy = m.target.y - m.y; }
+  const length = Math.hypot(dx, dy), speed = m.dash > 0 ? 620 : 190;
+  if (length) {
+    const distance = m.target ? Math.min(length, speed * seconds) : speed * seconds;
+    m.lastX = dx / length; m.lastY = dy / length;
+    m.x += m.lastX * distance; m.y += m.lastY * distance;
+  } else if (m.dash > 0) { m.x += m.lastX * speed * seconds; m.y += m.lastY * speed * seconds; }
+  m.x = Math.max(22, Math.min(258, m.x)); m.y = Math.max(172, Math.min(494, m.y));
+  m.spawn -= dt;
+  if (m.spawn <= 0) {
+    const horizontal = m.wave % 2 === 1;
+    const low = horizontal ? 172 : 22, range = horizontal ? 322 : 236;
+    const gap = low + 36 + s.random() * (range - 72), gapSize = 84 - s.phase * 8;
+    // A visible lane warns before either attack enters the arena.
+    m.hazards.push({ horizontal, gap, gapSize, age: 0, warn: 700, pos: horizontal ? 12 : 152, speed: 115 + s.phase * 25 });
+    m.wave++; m.spawn += 1900 - s.phase * 200;
+  }
+  let hit = false;
+  for (const h of m.hazards) {
+    const oldPos = h.pos; h.age += dt;
+    if (h.age < h.warn) continue;
+    h.pos += h.speed * Math.min(dt, h.age - h.warn) / 1000;
+    const along = h.horizontal ? m.x : m.y, across = h.horizontal ? m.y : m.x;
+    if (along >= oldPos - 10 && along <= h.pos + 10 && Math.abs(across - h.gap) > h.gapSize / 2 - 6) hit = true;
+  }
+  m.hazards = m.hazards.filter(h => h.pos < (h.horizontal ? 280 : 520));
+  if (hit && m.dash <= 0) { if (hurtCrazy(s, 5 + s.phase, 'crazyDodgeHit')) m.survival = 0; }
+  m.survival += dt;
+  if (m.survival >= 2000) { m.survival -= 2000; hitCrazyBoss(s, 8); }
 }
 
 function recoverBridge(s) {
@@ -369,6 +438,7 @@ function updateCat(s, dt) {
 export function updateCrazy(s, elapsed) {
   if (s.over) return s;
   const dt = Math.max(0, Math.min(50, elapsed));
+  if (s.transition) { s.transition.time += dt; if (s.transition.time >= 800) s.transition = null; }
   s.elapsed += dt; s.timeLeft -= dt; s.protection = Math.max(0, s.protection - dt);
   s.hitFlash = Math.max(0, s.hitFlash - dt); s.noticeTime = Math.max(0, s.noticeTime - dt);
   if (!s.actionReady && !s.held.has('action') && s.duration - s.timeLeft >= 500) s.actionReady = true;
@@ -408,11 +478,18 @@ export function updateCrazy(s, elapsed) {
       advanceCrazy(s);
     }
   } else if (s.mode === 'pachinko') updatePachinko(s, dt);
+  else if (s.mode === 'tiger') updateTiger(s, dt);
+  else if (s.mode === 'cards' || s.mode === 'mahjong') updatePairs(s, dt);
+  else if (s.mode === 'dodge') updateDodge(s, dt);
   if (s.mini?.clock != null) s.mini.clock += dt;
   if (s.elapsed >= s.boss.limit && !s.over) {
     s.hp = 0; s.over = true; s.finishReason = 'crazyTimeout'; notify(s, 'crazyTimeout');
   } else if (s.timeLeft <= 0 && !s.over) {
-    if (s.mode === 'tiger' && s.mini.pending) miniAction(s, 'alt');
+    if (s.mode === 'tiger') {
+      // Finish an in-flight wager before auto-banking; a last-second loss cannot be escaped.
+      if (s.mini.spin) updateTiger(s, s.mini.spin.duration - s.mini.spin.time);
+      if (s.mini.pending) { s.cooldown = 0; miniAction(s, 'alt'); }
+    }
     if (!s.successes) hurtCrazy(s, 8, 'crazyTimeoutRound');
     advanceCrazy(s);
   }
