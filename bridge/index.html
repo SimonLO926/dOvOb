@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
-  <link rel="preload" href="./assets/mischief-cat.png?v=1.1.3" as="image">
-  <link rel="preload" href="./fonts/fever-brush.woff?v=1.1.3" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="./assets/mischief-cat.png?v=1.2.0" as="image">
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.0" as="font" type="font/woff" crossorigin>
   <style>
     /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
     @font-face {
       font-family: "Fever Brush";
-      src: url("./fonts/fever-brush.woff?v=1.1.3") format("woff");
+      src: url("./fonts/fever-brush.woff?v=1.2.0") format("woff");
       font-weight: 400;
       font-display: swap;
     }
@@ -971,6 +971,7 @@
     html.touch body.crazy-active #game .stage, body.crazy-active #game .stage { padding-bottom: 0; flex: 1; min-height: 0; overflow: hidden; }
     body.crazy-active #crazy-help { position: static; transform: none; flex: 0 0 auto; width: 100%; max-width: 720px; align-self: center; margin: 6px 0; padding: 8px 12px; border: 1px solid #654155; border-radius: 8px; background: #120f23ee; font-size: 12px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
     html.touch body.crazy-active #game .pad, body.touch.crazy-active #game .pad { position: relative; left: auto; right: auto; bottom: auto; flex: 0 0 var(--pad-size); margin-top: 64px; }
+    html.touch body.crazy-active[data-crazy-controls="mini"] #game .pad, body.crazy-active[data-crazy-controls="mini"] #game .pad { margin-top: 12px; }
     body.crazy-active #game .pad #btn-rot-left { bottom: calc(100% + 6px); height: 52px; }
     @media (max-width: 760px) { body.crazy-active #game .pad { position: relative; left: auto; right: auto; bottom: auto; flex: 0 0 var(--pad-size); margin-top: 64px; } }
     @keyframes crazy-orbit { to { transform: rotate(360deg); } }
@@ -979,6 +980,58 @@
     @media (prefers-reduced-motion: reduce) {
       #crazy-ambient::before, #crazy-ambient::after, #crazy-ambient b { animation: none; }
     }
+
+    #bosses { min-height: 100svh; padding: 24px max(18px, env(safe-area-inset-left)); background: radial-gradient(ellipse at 65% 40%, #442039, #110b1b 70%); color: #fff0d8; overflow: auto; touch-action: pan-y; }
+    .sins-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: 1100px; margin: 0 auto 20px; }
+    body.boss-select { background: #120b1d; }
+    body.boss-select .page { padding: 0; max-width: none; }
+    .sins-head button { white-space: nowrap; flex: 0 0 auto; padding: 10px 14px; font-size: 14px; }
+    .sins-head h1 { margin: 0; font-size: clamp(25px, 5vw, 44px); color: #ffd58c; }
+    .sins-head p { color: #d2a6bc; margin: 8px 0 0; font-size: 13px; }
+    .sins-layout { max-width: 1100px; margin: auto; display: grid; grid-template-columns: minmax(180px, .7fr) minmax(0, 1.7fr); gap: 24px; align-items: center; }
+    .sins-list { display: grid; gap: 10px; }
+    .sins-list button { text-align: left; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; color: #e9b99d; border: 1px solid #765144; background: #241321; border-radius: 3px; min-height: 54px; }
+    .sins-list button:disabled { opacity: .38; cursor: default; }
+    .sins-list #select-greed { background: linear-gradient(90deg, #6c2b3b, #342038); border-color: #ffc982; box-shadow: 0 0 24px #f2a44a22; color: #ffe3a4; }
+    .sins-list #select-greed:hover, .sins-list #select-greed:focus-visible { box-shadow: 0 0 30px #f2a44a55; outline: 2px solid #ffe7b7; outline-offset: 3px; }
+    .sins-list small { font-size: 11px; }
+    .greed-preview { position: relative; height: min(65svh, 620px); min-height: 330px; overflow: hidden; border: 1px solid #8a5f4a; background: #110b19; box-shadow: 0 0 50px #0008; }
+    .greed-first-art { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: 35% center; image-rendering: pixelated; opacity: .16; transition: opacity .22s; z-index: 1; }
+    .greed-preview.previewing .greed-first-art, .greed-preview.cleared .greed-first-art { opacity: 1; }
+    .greed-preview.cleared .greed-first-art { width: 77%; mask-image: linear-gradient(90deg, #000 65%, transparent); }
+    .greed-shadow { display: none; position: absolute; right: -14%; bottom: 13%; width: 106%; height: 86%; object-fit: contain; filter: brightness(0) drop-shadow(0 0 7px #c06b93); opacity: .92; image-rendering: pixelated; }
+    .greed-preview.cleared .greed-shadow { display: block; }
+    .greed-caption { position: absolute; z-index: 2; inset: auto 0 0; padding: 22px; background: linear-gradient(transparent, #100917 30%); }
+    .greed-caption h2 { color: #ffe1a6; margin: 16px 0 8px; font-size: 25px; }
+    .greed-caption p { color: #edc4cc; font-size: 13px; line-height: 1.7; margin: 0; }
+    #crazy-cinematic { position: fixed; inset: 0; z-index: 100; background: #120b1d; }
+    #crazy-cinematic canvas { width: 100%; height: 100%; image-rendering: pixelated; }
+    .cinematic-controls { position: absolute; right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 10px; }
+    .cinematic-controls button { background: #211224dd; color: #ffe1a6; border: 1px solid #ac7754; font-size: 12px; }
+    #crazy-result { position: fixed; inset: 0; z-index: 101; overflow: auto; touch-action: pan-y; color: #ffeed1; background: #130c1b; }
+    .result-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 70%; image-rendering: pixelated; opacity: .7; }
+    .result-content { position: relative; min-height: 100%; background: linear-gradient(#170b21d9 0%, #170b21b3 40%, #170b2140 80%); display: flex; flex-direction: column; align-items: center; padding: 40px 18px 24px; }
+    .result-content > small { letter-spacing: .45em; color: #eab371; margin-bottom: 10px; }
+    .result-content h1 { margin: 6px 0 14px; color: #ffe5a8; font-size: clamp(30px, 6vw, 56px); text-shadow: 3px 3px #7e3d49; }
+    .result-score { font-size: 38px; color: #ffd576; margin: 8px; }
+    .result-stats { display: grid; grid-template-columns: 1fr 1fr; width: min(420px, 100%); gap: 8px 22px; padding: 18px 24px; background: #1c1028c9; border: 1px solid #946345; }
+    .result-stats div { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; line-height: 2; }
+    .result-stats b { color: #ffe09a; }
+    .result-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: auto; padding-top: 32px; }
+    .result-buttons button { background: #3d223c; color: #ffe9ba; border: 1px solid #bd8451; }
+    @media (max-width: 700px) {
+      #bosses { padding: 18px 16px; }
+      .sins-layout { display: flex; flex-direction: column-reverse; gap: 15px; }
+      .greed-preview { width: 100%; height: 34svh; min-height: 220px; }
+      .sins-list { width: 100%; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .sins-list #select-greed { grid-column: 1 / -1; }
+      .sins-list button { min-height: 47px; padding: 10px 14px; font-size: 14px; }
+      .sins-head { margin-bottom: 16px; }
+      .greed-caption { padding: 14px; } .greed-caption h2 { font-size: 19px; margin: 18px 0 4px; }
+      .greed-caption p { font-size: 11px; }
+      .result-stats { gap: 6px 14px; padding: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .greed-first-art { transition: none; } }
   </style>
 </head>
 <body data-theme="light">
@@ -1112,6 +1165,25 @@
       </div>
     </section>
 
+    <section id="bosses" hidden aria-labelledby="sins-title">
+      <header class="sins-head"><div><h1 id="sins-title" data-i18n="crazySevenSins">Seven Deadly Sins</h1><p data-i18n="crazyChooseBoss">Choose your opponent</p></div><button id="bosses-back" type="button" data-i18n="menu">Menu</button></header>
+      <div class="sins-layout">
+        <div class="sins-list">
+          <button id="select-greed" type="button"><span data-i18n="crazyGreed">Greed</span><small id="greed-clear-state" data-i18n="crazyChallenge">Challenge</small></button>
+          <button type="button" disabled><span data-i18n="sinPride">Pride</span><small data-i18n="crazyLocked">Locked</small></button>
+          <button type="button" disabled><span data-i18n="sinEnvy">Envy</span><small data-i18n="crazyLocked">Locked</small></button>
+          <button type="button" disabled><span data-i18n="sinWrath">Wrath</span><small data-i18n="crazyLocked">Locked</small></button>
+          <button type="button" disabled><span data-i18n="sinLust">Lust</span><small data-i18n="crazyLocked">Locked</small></button>
+          <button type="button" disabled><span data-i18n="sinGluttony">Gluttony</span><small data-i18n="crazyLocked">Locked</small></button>
+          <button type="button" disabled><span data-i18n="sinSloth">Sloth</span><small data-i18n="crazyLocked">Locked</small></button>
+        </div>
+        <div class="greed-preview">
+          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.png?v=1.2.0" alt="" aria-hidden="true">
+          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.png?v=1.2.0" alt="Greed, the casino dealer's first form">
+          <div class="greed-caption"><h2 data-i18n="crazyDealer">The Mad Dealer</h2><p data-i18n="crazyGreedLore">The house wants everything. Defeat both forms.</p></div>
+        </div>
+      </div>
+    </section>
     <section id="settings" class="settings-wrap" hidden>
       <svg class="logo compact" viewBox="0 0 196 36" role="img" aria-label="Bridge">
         <rect class="logo-tile" x="0.6" y="0.6" width="34.8" height="34.8" rx="11"/>
@@ -1407,6 +1479,13 @@
       </div>
     </section>
   </div>
+  <div id="crazy-cinematic" hidden role="dialog" aria-modal="true" aria-label="Boss cinematic">
+    <canvas id="cinematic-canvas" aria-hidden="true"></canvas><div class="cinematic-controls"><button id="cinematic-pause" type="button" data-i18n="paused">Pause</button><button id="cinematic-skip" type="button" data-i18n="crazySkip">Skip</button></div>
+  </div>
+  <div id="crazy-result" hidden role="dialog" aria-modal="true" aria-labelledby="result-title">
+    <img class="result-art" loading="lazy" src="./assets/greed-defeated.png?v=1.2.0" alt="Defeated Greed surrounded by spilled coins">
+    <div class="result-content"><small>GREED · CLEARED</small><h1 id="result-title" data-i18n="crazyGreedBroken">Greed defeated</h1><div class="result-score" id="result-score"></div><div class="result-stats" id="result-stats"></div><p data-i18n="crazyClearUnlock">Second-form silhouette unlocked</p><div class="result-buttons"><button id="result-retry" type="button" data-i18n="again">Again</button><button id="result-bosses" type="button" data-i18n="crazySevenSins">Seven Deadly Sins</button></div></div>
+  </div>
   <div id="fever-aura" hidden aria-hidden="true">
     <i style="--x:2%;--y:12%;--delay:-0.00s"></i>
     <i style="--x:3%;--y:45%;--delay:-0.17s"></i>
@@ -1422,18 +1501,21 @@
     <i style="--x:83%;--y:97%;--delay:-1.87s"></i>
   </div>
   <script type="module">
-    import { createCrazy, updateCrazy, inputCrazy, pointCrazy } from "./crazy.mjs?v=1.1.3";
-    import { drawCrazy, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.1.3";
-    import { createSound } from "./audio.mjs?v=1.1.3";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.1.3";
-    import { translate } from "./i18n.mjs?v=1.1.3";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.1.3";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.1.3";
-    import { VERSION } from "./version.mjs?v=1.1.3";
+    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.0";
+    import { drawCrazy, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.0";
+    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.0";
+    import { drawGreedCinematic, readGreedClear, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.0";
+    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.0";
+    import { createSound } from "./audio.mjs?v=1.2.0";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.0";
+    import { translate } from "./i18n.mjs?v=1.2.0";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.0";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.0";
+    import { VERSION } from "./version.mjs?v=1.2.0";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SAND_HEX, SHAPES, activateFever, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.1.3";
+    } from "./logic.mjs?v=1.2.0";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -1476,6 +1558,7 @@
     let dasTime = 0;
     let dasOn = false;
     const sound = createSound(() => settings.volume);
+    const crazyMusic = createCrazyMusic(() => settings.volume);
     const fx = [];
     const callouts = [];
     const curseUntil = { reverse: 0, blind: 0, rush: 0, norotate: 0 };
@@ -1641,9 +1724,16 @@
     }
 
     function showScreen(id) {
-      if (id !== "game") document.body.classList.remove("crazy-active");
+      document.body.classList.toggle("boss-select", id === "bosses");
+      if (id !== "game") {
+        document.body.classList.remove("crazy-active");
+        crazyMusic.pause();
+      }
+      document.querySelector("#crazy-cinematic").hidden = true;
+      document.querySelector("#crazy-result").hidden = true;
+      document.querySelector("#game").inert = false;
       if (id !== "menu") previewCrazy(false);
-      for (const name of ["menu", "settings", "boards", "game"]) document.querySelector(`#${name}`).hidden = name !== id;
+      for (const name of ["menu", "settings", "boards", "game", "bosses"]) document.querySelector(`#${name}`).hidden = name !== id;
     }
 
     function resetTimers() { acc = 0; softAcc = 0; lockMs = 0; lockResets = 0; }
@@ -1769,6 +1859,7 @@
 
     function backToMenu() {
       crazy = null;
+      crazyMusic.pause();
       previewCrazy(false);
       document.querySelector("#crazy-help").hidden = true;
       document.querySelector("#crazy-status").hidden = true;
@@ -1846,19 +1937,69 @@
       document.querySelector("#go-crazy").setAttribute("aria-pressed", String(on));
       document.querySelector("#crazy-preview-hint").hidden = !on;
     }
+    function showBossSelection() {
+      loadGreedArt();
+      crazyMusic.pause(); sound.stop(); crazy = null; paused = false; game.phase = "ready";
+      showScreen("bosses");
+      const cleared = readGreedClear(localStorage);
+      const preview = document.querySelector(".greed-preview");
+      preview.classList.toggle("cleared", cleared);
+      preview.classList.toggle("previewing", coarseDevice());
+      document.querySelector("#greed-clear-state").textContent = t(cleared ? "crazyCleared" : "crazyChallenge");
+      document.querySelector("#select-greed").focus({ preventScroll: true });
+    }
+    document.querySelector("#select-greed").addEventListener("pointerenter", () => document.querySelector(".greed-preview").classList.add("previewing"));
+    document.querySelector("#select-greed").addEventListener("pointerleave", () => { if (!coarseDevice()) document.querySelector(".greed-preview").classList.remove("previewing"); });
+    document.querySelector("#select-greed").addEventListener("focus", () => document.querySelector(".greed-preview").classList.add("previewing"));
+    document.querySelector("#select-greed").addEventListener("blur", () => { if (!coarseDevice()) document.querySelector(".greed-preview").classList.remove("previewing"); });
+    document.querySelector("#select-greed").addEventListener("click", beginCrazy);
+    document.querySelector("#bosses-back").addEventListener("click", backToMenu);
+    document.querySelector("#result-retry").addEventListener("click", beginCrazy);
+    document.querySelector("#result-bosses").addEventListener("click", showBossSelection);
+    document.querySelector("#cinematic-skip").addEventListener("click", () => { if (crazy && !paused) skipCrazyCinematic(crazy); });
+    document.querySelector("#cinematic-pause").addEventListener("click", () => { paused = !paused; if (paused) crazyMusic.pause(); });
+    function renderCrazyPresentation() {
+      const overlay = document.querySelector("#crazy-cinematic"), result = document.querySelector("#crazy-result");
+      const cinematic = !!crazy?.cutscene, won = !!crazy?.won && !cinematic;
+      const newlyShown = overlay.hidden && cinematic;
+      overlay.hidden = !cinematic; result.hidden = !won;
+      document.querySelector("#game").inert = cinematic || won;
+      if (cinematic) {
+        veil.hidden = true;
+        const canvas = document.querySelector("#cinematic-canvas"), ratio = window.innerWidth / window.innerHeight;
+        const w = ratio > 1 ? 640 : 360, h = Math.round(w / ratio);
+        if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+        drawGreedCinematic(canvas.getContext("2d"), crazy, t, reducedMotion.matches);
+        document.querySelector("#cinematic-skip").disabled = crazy.cutscene.time < 1000 || paused;
+        document.querySelector("#cinematic-pause").textContent = t(paused ? "resume" : "paused");
+        if (newlyShown) document.querySelector("#cinematic-pause").focus({ preventScroll: true });
+      }
+      if (won && !crazy.resultShown) {
+        crazy.resultShown = true; recordGreedClear(localStorage, crazy);
+        document.querySelector("#result-score").textContent = `${t("score")} ${crazy.score}`;
+        const stats = [["time", formatTime(crazy.elapsed)], ["crazyHealth", `${crazy.hp}/100`], ["crazyFormOne", formatTime(crazy.stats.firstTime)], ["crazyFormTwo", formatTime(crazy.stats.secondTime)], ["crazyCounters", crazy.stats.counters], ["crazyCoins", crazy.stats.coins], ["crazyDamageTaken", crazy.stats.damageTaken], ["crazyHealed", crazy.stats.healed]];
+        const list = document.querySelector("#result-stats"); list.replaceChildren();
+        for (const [key, value] of stats) { const row = document.createElement("div"), name = document.createElement("span"), amount = document.createElement("b"); name.textContent = t(key); amount.textContent = String(value); row.append(name, amount); list.append(row); }
+        document.querySelector("#result-bosses").focus({ preventScroll: true });
+      }
+    }
     function beginCrazy() {
+      loadGreedArt();
       begin("crazy");
       crazy = createCrazy();
+      crazyMusic.reset(); crazyMusic.unlock(); sound.stop();
       document.body.dataset.game = "bridge";
       document.body.classList.add("crazy-active");
       document.querySelector("#crazy-help").hidden = false;
       document.querySelector("#crazy-status").hidden = false;
+      board.tabIndex = -1; board.focus({ preventScroll: true });
       fitBoard();
     }
     function crazyPress(action, down = true) {
       if (!crazy) return false;
+      if (down && crazyMusic.blocked) crazyMusic.unlock();
       if (!paused && !document.querySelector("#game").hidden) {
-        if (action === "rotate" && !["bridge", "sand"].includes(crazy.mode)) action = crazy.mode === "dodge" ? "up" : "action";
+        if (action === "rotate" && !["bridge", "sand"].includes(crazy.mode)) action = crazy.mode === "dodge" || FLYING_ATTACKS.includes(crazy.mode) ? "up" : "action";
         inputCrazy(crazy, action, down);
       }
       return true;
@@ -1871,19 +2012,20 @@
     crazyChoice.addEventListener("blur", () => { if (!coarseDevice()) previewCrazy(false); });
     crazyChoice.addEventListener("click", () => {
       if (coarseDevice() && !document.body.classList.contains("crazy-preview")) { previewCrazy(true); return; }
-      beginCrazy();
+      showBossSelection();
     });
     const previewCat = document.querySelector("#crazy-preview-cat").getContext("2d");
     catImageReady.then(() => { previewCat.clearRect(0, 0, 220, 170); drawMischiefCat(previewCat, 110, 91, 1.3); });
     board.addEventListener("pointerdown", event => {
       if (!crazy || paused) return;
+      if (crazyMusic.blocked) crazyMusic.unlock();
       event.preventDefault();
-      if (crazy.mode === "dodge") board.setPointerCapture(event.pointerId);
+      if (["dodge", "jump", ...FLYING_ATTACKS].includes(crazy.mode)) board.setPointerCapture(event.pointerId);
       const r = board.getBoundingClientRect();
       pointCrazy(crazy, (event.clientX - r.left) * 280 / r.width, (event.clientY - r.top) * crazyCanvasHeight(crazy.mode) / r.height);
     });
     board.addEventListener("pointermove", event => {
-      if (!crazy || paused || crazy.mode !== "dodge" || !board.hasPointerCapture(event.pointerId)) return;
+      if (!crazy || paused || !["dodge", "jump", ...FLYING_ATTACKS].includes(crazy.mode) || !board.hasPointerCapture(event.pointerId)) return;
       event.preventDefault();
       const r = board.getBoundingClientRect();
       pointCrazy(crazy, (event.clientX - r.left) * 280 / r.width, (event.clientY - r.top) * crazyCanvasHeight(crazy.mode) / r.height);
@@ -1892,8 +2034,8 @@
       if (!crazy) return;
       for (const action of [...crazy.held]) inputCrazy(crazy, action, false);
     }
-    window.addEventListener("blur", () => { if (crazy && !crazy.over) { releaseCrazyInputs(); paused = true; } });
-    document.addEventListener("visibilitychange", () => { if (document.hidden && crazy && !crazy.over) { releaseCrazyInputs(); paused = true; } });
+    window.addEventListener("blur", () => { if (crazy && (!crazy.over || crazy.cutscene)) { releaseCrazyInputs(); crazyMusic.pause(); paused = true; } });
+    document.addEventListener("visibilitychange", () => { if (document.hidden && crazy && (!crazy.over || crazy.cutscene)) { releaseCrazyInputs(); crazyMusic.pause(); paused = true; } });
 
     document.querySelector("#go-start").addEventListener("click", beginSelected);
     document.querySelector("#game-prev").addEventListener("click", () => shiftCatalog(-1));
@@ -1954,6 +2096,7 @@
 
     window.addEventListener("keydown", (event) => {
       const key = event.key;
+      if (!document.querySelector("#crazy-result").hidden || event.target.closest("#crazy-cinematic, #bosses") || ["Enter", " "].includes(key) && event.target.closest("button") && !event.target.closest(".pad")) return;
       if (["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", " "].includes(key)) event.preventDefault();
       if (key === "p" || key === "P" || key === "Escape") {
         if (crazy && !crazy.over) { paused = !paused; releaseCrazyInputs(); }
@@ -2769,6 +2912,7 @@
         document.querySelector("#callout").hidden = true;
         document.querySelector("#btn-rot-left").hidden = !["bridge", "sand"].includes(crazy.mode);
         document.body.dataset.crazyPhase = String(crazy.phase);
+        document.body.dataset.crazyControls = ["bridge", "sand"].includes(crazy.mode) ? "blocks" : "mini";
         prepareBoard();
         drawCrazy(ctx, crazy, t, {
           reducedMotion: paused || reducedMotion.matches,
@@ -2776,22 +2920,24 @@
           paintPiece: (context, piece, ghost) => drawBlob(context, cellsOf(piece.type, piece.rot, piece.x, piece.y), piece.type, CELL, ghost, piece.bombIndex, piece.curse, piece.sand ?? null, piece.rot, piece.curseIndex),
         });
         const blocks = ["bridge", "sand"].includes(crazy.mode);
-        document.querySelector("#btn-soft").disabled = !blocks && crazy.mode !== "dodge";
-        document.querySelector("#btn-hold").disabled = blocks ? crazy.bridge.noHoldLeft > 0 : crazy.mode === "tiger" ? !crazy.mini.pending || !!crazy.mini.spin : crazy.mode !== "mahjong";
-        const actionLabel = crazy.mode === "slots" ? "crazyStop" : crazy.mode === "tiger" ? crazy.mini.spin ? "crazyRolling" : crazy.mini.pending ? "crazyRisk" : "crazyPull" : ["cards", "mahjong"].includes(crazy.mode) ? "crazySelect" : crazy.mode === "dodge" ? "crazyDash" : "fire";
-        document.querySelector("#btn-rot .pad-label").textContent = blocks ? t("rotateRight") : t(crazy.mode === "dodge" ? "crazyUp" : actionLabel);
-        document.querySelector("#btn-hold .pad-label").textContent = blocks ? t("keep") : crazy.mode === "tiger" ? t("crazyBank") : t("crazyReset");
+        const flying = crazy.mode === "dodge" || FLYING_ATTACKS.includes(crazy.mode);
+        document.querySelector("#btn-soft").disabled = !blocks && !flying;
+        document.querySelector("#btn-hold").disabled = blocks ? crazy.bridge.noHoldLeft > 0 : crazy.mode === "tiger" ? !crazy.mini.pending || !!crazy.mini.spin : !["mahjong", "pusher"].includes(crazy.mode);
+        const actionLabel = crazy.mode === "jump" ? "crazyJump" : crazy.mode === "pusher" ? crazy.mini.stock > 0 ? "crazyInsertCoin" : "crazyPusherAgain" : crazy.mode === "slots" ? "crazyStop" : crazy.mode === "tiger" ? crazy.mini.spin ? "crazyRolling" : crazy.mini.pending ? "crazyRisk" : "crazyPull" : ["cards", "mahjong"].includes(crazy.mode) ? "crazySelect" : flying ? "crazyDash" : "fire";
+        document.querySelector("#btn-rot .pad-label").textContent = blocks ? t("rotateRight") : t(flying ? "crazyUp" : actionLabel);
+        document.querySelector("#btn-hold .pad-label").textContent = blocks ? t("keep") : ["tiger", "pusher"].includes(crazy.mode) ? t("crazyBank") : t("crazyReset");
         document.querySelector("#btn-drop .pad-label").textContent = blocks ? t("drop") : t(actionLabel);
-        document.querySelector("#btn-drop").disabled = crazy.mode === "tiger" && !!crazy.mini.spin || crazy.mode === "dodge" && crazy.mini.dashReady > 0;
+        document.querySelector("#btn-drop").disabled = crazy.mode === "tiger" && !!crazy.mini.spin || flying && crazy.mini.dashReady > 0 || crazy.mode === "pusher" && (crazy.timeLeft <= 2000 || crazy.mini.stock === 0 && (crazy.mini.riskUsed || crazy.mini.pending === 0));
         document.querySelector("#btn-rot").disabled = crazy.mode === "tiger" && !!crazy.mini.spin;
         const battleNotes = [];
         if (crazy.bridge.noHoldLeft > 0) battleNotes.push(`${t("curseNoHold")} ${crazy.bridge.noHoldLeft}`);
         if (feverActive(crazy.bridge)) battleNotes.push(`FEVER ×3 · ${crazy.bridge.feverLeft}`);
         if (garbageGraceActive(crazy.bridge)) battleNotes.push(`${t("garbageStable")} ${crazy.bridge.garbageGraceLeft}`);
         document.querySelector("#crazy-help").textContent = [t("crazyHint_" + crazy.mode), ...battleNotes].join(" · ");
-        document.querySelector("#crazy-status").textContent = `HP ${crazy.hp}/100 · BOSS ${crazy.bossHp}/${crazy.boss.hp} · ${t("crazyPhaseLabel")} ${crazy.phase}/3 · ${t("score")} ${crazy.score}`;
+        document.querySelector("#crazy-status").textContent = `HP ${crazy.hp}/100 · BOSS ${t("crazyForm")} ${crazy.form} · ${t("crazyPhaseLabel")} ${crazy.phase}/3 · ${t("score")} ${crazy.score}`;
         fitBoard();
-        if (paused && !crazy.over) showVeil(t("paused"), t("pauseHint"), t("resume"));
+        renderCrazyPresentation();
+        if (paused && !crazy.over && !crazy.cutscene) showVeil(t("paused"), t("pauseHint"), t("resume"));
         else if (!crazy.over) veil.hidden = true;
         return;
       }
@@ -2880,22 +3026,23 @@
         if (!paused && !document.querySelector("#game").hidden) {
           updateCrazy(crazy, dt);
           for (const event of crazy.events.splice(0)) {
-            if (event.key === "crazyHit") sound.blip(700, .03);
+            const effects = { crazyRolling: "lever", crazyRiskRolling: "risk", crazyReelStop: "reel", crazyCoinSound: "coin", crazyCardSound: "card", crazyTileSound: "tile", crazyLaunchSound: "launch", crazyPegSound: "reel", crazyFlipperSound: "tile", crazyJump: "jump", crazyDashSound: "dash", crazyLaserSound: "laser", crazyTransform: "transform", crazyVictorySound: "victory" };
+            if (effects[event.key]) sound.playCasino(effects[event.key]);
+            else if (event.key === "crazyHit") sound.playCasino("hit", event.amount);
             else if (event.amount < 0) sound.blip(120, .08);
-            else if (event.key === "crazyCatWarning") sound.blip(980, .04);
-            else if (event.key === "crazyPhase") sound.playCombo(crazy.phase + 2);
             else if (event.key === "crazySwitch") sound.playCombo(2);
-            else if (["crazyRolling", "crazyRiskRolling"].includes(event.key)) sound.blip(360, .06);
+            else if (event.key.startsWith("crazyCat")) sound.blip(880, .035);
           }
           if (crazy.over && game.phase !== "over" && game.phase !== "done") {
             game.phase = crazy.won ? "done" : "over";
             game.score = crazy.score;
             remember(crazy.score);
-            showVeil(t(crazy.won ? "crazyVictory" : "crazyDefeat"), `${crazy.finishReason ? t(crazy.finishReason) + " · " : ""}${t("score")} ${crazy.score} · ${formatTime(crazy.elapsed)}`, t("again"));
+            if (!crazy.won) showVeil(t("crazyDefeat"), `${crazy.finishReason ? t(crazy.finishReason) + " · " : ""}${t("score")} ${crazy.score} · ${formatTime(crazy.elapsed)}`, t("again"));
           }
         }
-        const live = !paused && !crazy.over && !document.querySelector("#game").hidden;
-        if (live) { sound.start(); sound.tick(); } else sound.stop();
+        sound.stop();
+        if (!paused && !document.querySelector("#game").hidden) { crazyMusic.select(crazyTrack(crazy)); crazyMusic.tick(dt); }
+        else crazyMusic.pause();
         fitBoard(); draw(); requestAnimationFrame(frame); return;
       }
       if (puzzle?.over && game.phase !== "over") {

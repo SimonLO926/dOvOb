@@ -1,7 +1,8 @@
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.1.3';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.1.3';
+import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.0';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.0';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.0';
 
-export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, limit: 480000 });
+export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, secondHp: 1200, limit: 720000 });
 export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand', 'dodge']);
 export const CAT_ACTIONS = Object.freeze(['heal', 'boss', 'player', 'blocks', 'mischief']);
 export function catAction(random = Math.random) {
@@ -20,7 +21,8 @@ export function createCrazy({ random = Math.random, boss = FIRST_BOSS } = {}) {
   const bridge = createGame({ mode: 'marathon', random });
   startGame(bridge, 'marathon');
   const state = {
-    random, boss, hp: 100, maxHp: 100, bossHp: boss.hp, phase: 1, score: 0, elapsed: 0,
+    random, boss, hp: 100, maxHp: 100, bossHp: boss.hp, bossMaxHp: boss.hp, form: 1, phase: 1, cutscene: null, rewardCharge: 0, pusherDue: false,
+    stats: { hits: 0, damage: 0, damageTaken: 0, healed: 0, counters: 0, coins: 0, firstTime: 0, secondTime: 0 }, score: 0, elapsed: 0,
     over: false, won: false, damageLeft: 50, mode: 'bridge', encounter: 0, bag: [], hardStreak: 0,
     bridge, parkedPiece: null, curses: { reverse: 0, blind: 0, rush: 0, norotate: 0 }, arcade: null, mini: null, held: new Set(), actionReady: true,
     timeLeft: 20000, duration: 20000, protection: 500, cooldown: 0, fallMs: 0, lockMs: 0, repeatMs: 0,
@@ -35,7 +37,8 @@ function notify(s, key, amount = 0) {
   s.events.push({ key, amount });
 }
 export function hurtCrazy(s, amount, reason = 'crazyHurt') {
-  if (s.over || s.protection > 0) return false;
+  if (s.over || s.cutscene || s.protection > 0 || s.mode === 'pusher') return false;
+  s.stats.damageTaken += Math.min(s.hp, amount);
   s.hp = Math.max(0, s.hp - amount); s.protection = 650; s.hitFlash = 300;
   notify(s, reason, -amount);
   if (s.hp === 0) { s.over = true; s.won = false; s.finishReason = reason; }
@@ -44,26 +47,51 @@ export function hurtCrazy(s, amount, reason = 'crazyHurt') {
 export function healCrazy(s, amount) {
   if (s.over) return;
   const gained = Math.min(amount, s.maxHp - s.hp);
-  s.hp += gained;
+  s.hp += gained; s.stats.healed += gained;
   if (gained) notify(s, 'crazyHeal', gained);
 }
 export function hitCrazyBoss(s, amount) {
-  if (s.over) return;
+  if (s.over || s.cutscene) return;
   const damage = Math.min(amount, s.damageLeft, s.bossHp);
   s.damageLeft -= damage;
   s.bossHp -= damage;
+  if (damage) { s.stats.hits++; s.stats.damage += damage; }
+  if (GREED_ATTACKS.includes(s.mode) && damage) { s.rewardCharge += damage; if (s.rewardCharge >= 40) { s.rewardCharge -= 40; s.pusherDue = true; } }
   if (s.attack) { s.attack = null; notify(s, 'crazyCounter'); }
   s.score += damage * 10; s.successes += 1;
-  const phase = s.bossHp <= s.boss.hp / 3 ? 3 : s.bossHp <= s.boss.hp * 2 / 3 ? 2 : 1;
+  const phase = s.bossHp <= s.bossMaxHp / 3 ? 3 : s.bossHp <= s.bossMaxHp * 2 / 3 ? 2 : 1;
   if (phase > s.phase) { s.phase = phase; healCrazy(s, 12); notify(s, 'crazyPhase', phase); }
   else notify(s, damage ? 'crazyHit' : 'crazyGuard', damage);
-  if (s.bossHp === 0) { s.over = true; s.won = true; s.score += 5000 + s.hp * 50; }
+  if (s.bossHp === 0) {
+    s.held.clear(); s.attack = null;
+    if (s.form === 1 && s.boss.secondHp) {
+      s.stats.firstTime = s.elapsed; s.cutscene = { kind: 'transform', time: 0, duration: 4500 }; notify(s, 'crazyTransform');
+    } else {
+      s.stats.secondTime = s.elapsed - s.stats.firstTime;
+      s.over = true; s.won = true; s.score += 5000 + s.hp * 50;
+      s.cutscene = { kind: 'victory', time: 0, duration: 6500 }; notify(s, 'crazyVictorySound');
+    }
+  }
 }
 
+export function skipCrazyCinematic(s) {
+  if (!s.cutscene || s.cutscene.time < 1000) return false;
+  finishCinematic(s); return true;
+}
+function finishCinematic(s) {
+  const kind = s.cutscene.kind; s.cutscene = null; s.held.clear();
+  if (kind === 'transform') {
+    leaveSand(s); s.form = 2; s.bossMaxHp = s.boss.secondHp; s.bossHp = s.bossMaxHp; s.phase = 1;
+    s.bag = []; s.pusherDue = false; s.rewardCharge = 0;
+    for (const key of Object.keys(s.curses)) s.curses[key] = 0;
+    healCrazy(s, 20); advanceCrazy(s, 'jump'); notify(s, 'crazyTrueForm');
+  }
+}
 function nextMode(s) {
   if (s.encounter % 3 === 0) return 'bridge';
-  if (!s.bag.length) s.bag = shuffled(CRAZY_MODES, s.random);
-  let index = s.bag.findIndex(m => m !== s.mode && (s.hardStreak < 2 || RECOVERY.includes(m)));
+  if (!s.bag.length) s.bag = shuffled(s.form === 2 ? [...CRAZY_MODES, ...GREED_ATTACKS] : CRAZY_MODES, s.random);
+  let index = s.form === 2 && s.encounter % 3 === 1 ? s.bag.findIndex(m => GREED_ATTACKS.includes(m) && m !== s.mode) : -1;
+  if (index < 0) index = s.bag.findIndex(m => m !== s.mode && (s.hardStreak < 2 || RECOVERY.includes(m)));
   if (index < 0) {
     // Insert a recovery encounter without discarding the rest of the shuffled deck.
     return RECOVERY.find(m => m !== s.mode) || 'cards';
@@ -96,15 +124,17 @@ function leaveSand(s) {
   if (s.parkedPiece) restoreParkedPiece(s);
 }
 export function advanceCrazy(s, preferredMode = null) {
-  if (s.over) return;
+  if (s.over || s.cutscene) return;
   if (s.mode === 'sand') leaveSand(s);
   const from = s.mode;
-  s.encounter += 1;
-  s.mode = preferredMode || nextMode(s);
+  const bonus = preferredMode === 'pusher' || (!preferredMode && s.pusherDue);
+  if (!bonus) s.encounter += 1;
+  s.mode = bonus ? 'pusher' : preferredMode || nextMode(s);
+  if (bonus) s.pusherDue = false;
   s.transition = { from, to: s.mode, time: 0 };
   s.hardStreak = HARD.has(s.mode) ? s.hardStreak + 1 : 0;
-  s.duration = 22000 - s.phase * 2000;
-  s.damageLeft = 45 + s.phase * 5;
+  s.duration = s.mode === 'pusher' ? 12000 : (s.form === 2 ? 18000 : 22000) - s.phase * 2000;
+  s.damageLeft = (s.form === 2 ? 80 : 45) + s.phase * 5;
   s.timeLeft = s.duration; s.protection = 500; s.held.clear(); s.actionReady = false;
   s.cooldown = 0; s.fallMs = 0; s.lockMs = 0; s.repeatMs = 0; s.resolveMs = 0;
   s.successes = 0; s.arcade = null; s.mini = null; s.cat = null; s.catBlock = 0; s.attack = null; s.attackDone = false;
@@ -129,7 +159,9 @@ export function advanceCrazy(s, preferredMode = null) {
     s.mini = { aim: 140, balls: [], pegs: Array.from({ length: 36 }, (_, i) => ({ x: 28 + (i % 6) * 42 + (Math.floor(i / 6) % 2) * 12, y: 160 + Math.floor(i / 6) * 48 })) };
   } else if (s.mode === 'dodge') {
     s.mini = { x: 140, y: 400, target: null, hazards: [], wave: 0, spawn: 850, survival: 0, dash: 0, dashReady: 0, lastX: 0, lastY: -1 };
-  } else deal(s);
+  } else if (GREED_ATTACKS.includes(s.mode)) { s.mini = createReaction(s.mode); }
+  else if (s.mode === 'pusher') { s.mini = createPusher(s.random); }
+  else deal(s);
   notify(s, 'crazySwitch');
 }
 
@@ -148,7 +180,7 @@ function deal(s) {
 function choose(s, index) {
   const m = s.mini;
   if (!m || s.cooldown > 0 || m.removed?.includes(index) || m.selected?.includes(index)) return;
-  m.focus = index; m.selected.push(index);
+  m.focus = index; m.selected.push(index); notify(s, s.mode === 'cards' ? 'crazyCardSound' : 'crazyTileSound');
   if (m.selected.length < 2) return;
   const [a, b] = m.selected;
   if (m.items[a] === m.items[b] && (m.target == null || m.items[a] === m.target)) {
@@ -169,7 +201,7 @@ function miniAction(s, action) {
   if (!m || s.cooldown > 0 || s.catBlock > 0 || m.spin) return;
   if (s.mode === 'slots' && action === 'action') {
     m.reels[m.stop] = Math.floor(m.clock / (250 - s.phase * 20) + m.stop) % 4;
-    m.stop += 1;
+    m.stop += 1; notify(s, 'crazyReelStop');
     if (m.stop === 3) {
       const count = Math.max(...m.reels.map(v => m.reels.filter(x => x === v).length));
       if (count >= 2) { hitCrazyBoss(s, count === 3 ? 48 : 24); healCrazy(s, count === 3 ? 8 : 3); }
@@ -185,10 +217,14 @@ function miniAction(s, action) {
         result: risk ? null : Array.from({ length: 3 }, () => Math.floor(s.random() * 4)) };
       notify(s, risk ? 'crazyRiskRolling' : 'crazyRolling');
     }
+  } else if (GREED_ATTACKS.includes(s.mode)) {
+    reactionInput(s, action, notify);
+  } else if (s.mode === 'pusher') {
+    pusherAction(s, action, reactionApi);
   } else if (s.mode === 'dodge' && action === 'action' && m.dashReady <= 0) {
-    m.dash = 180; m.dashReady = 1400;
+    m.dash = 180; m.dashReady = 1400; notify(s, 'crazyDashSound');
   } else if (s.mode === 'pachinko' && action === 'action' && m.balls.length < 3) {
-    m.balls.push({ x: m.aim, y: 154, vx: (m.aim - 140) * 0.7, vy: 40 }); s.cooldown = 500;
+    notify(s, 'crazyLaunchSound'); m.balls.push({ x: m.aim, y: 154, vx: (m.aim - 140) * 0.7, vy: 40 }); s.cooldown = 500;
   } else if (['cards', 'mahjong'].includes(s.mode)) {
     if (action === 'left') m.focus = (m.focus - 1 + m.items.length) % m.items.length;
     if (action === 'right') m.focus = (m.focus + 1) % m.items.length;
@@ -198,7 +234,7 @@ function miniAction(s, action) {
 }
 
 export function inputCrazy(s, action, down = true) {
-  if (s.over) return;
+  if (s.over || s.cutscene) return;
   if (!down) {
     s.held.delete(action);
     if (action === 'action') s.actionReady = true;
@@ -210,8 +246,8 @@ export function inputCrazy(s, action, down = true) {
   s.held.add(action);
   if (action === 'action' && !s.actionReady) return;
   if (s.arcade) {
-    if (action === 'left' || action === 'right') s.arcade[action] = true;
-    if (action === 'action') s.arcade.fire = true;
+    if (action === 'left' || action === 'right') { s.arcade[action] = true; if (s.mode === 'pinball') notify(s, 'crazyFlipperSound'); }
+    if (action === 'action') { s.arcade.fire = true; if (s.arcade.aiming || !s.arcade.launched) notify(s, 'crazyLaunchSound'); }
   } else if (s.mode === 'bridge' || s.mode === 'sand') {
     const g = s.bridge;
     if (g.phase !== 'playing') return;
@@ -225,7 +261,9 @@ export function inputCrazy(s, action, down = true) {
 
 // All mini-game hit regions use the same logical 280 x 560 coordinates as the renderer.
 export function pointCrazy(s, x, y) {
-  if (s.over || !s.actionReady || s.catBlock > 0) return;
+  if (s.over || s.cutscene || !s.actionReady || s.catBlock > 0) return;
+  if (GREED_ATTACKS.includes(s.mode)) { reactionPoint(s, x, y); return; }
+  if (s.mode === 'pusher') { s.mini.aim = Math.max(30, Math.min(250, x)); return; }
   if (s.mode === 'dodge') { s.mini.target = { x: Math.max(22, Math.min(258, x)), y: Math.max(172, Math.min(494, y)) }; return; }
   if (s.mode === 'pachinko') { s.mini.aim = Math.max(20, Math.min(260, x)); return; }
   if (s.mode === 'cards' && y >= 190 && y <= 290) {
@@ -353,7 +391,7 @@ function updateBridge(s, dt) {
   } else s.lockMs = 0;
 }
 function updatePachinko(s, dt) {
-  const m = s.mini, t = dt / 1000;
+  const m = s.mini, t = dt / 1000; m.pegSound = Math.max(0, (m.pegSound || 0) - dt);
   if (s.held.has('left')) m.aim = Math.max(20, m.aim - dt * 0.18);
   if (s.held.has('right')) m.aim = Math.min(260, m.aim + dt * 0.18);
   for (const b of m.balls) {
@@ -365,7 +403,7 @@ function updatePachinko(s, dt) {
         const nx = d ? dx / d : 1, ny = d ? dy / d : 0;
         const dot = b.vx * nx + b.vy * ny;
         b.x = p.x + nx * 10.1; b.y = p.y + ny * 10.1;
-        if (dot < 0) { b.vx -= 1.55 * dot * nx; b.vy -= 1.55 * dot * ny; }
+        if (dot < 0) { b.vx -= 1.55 * dot * nx; b.vy -= 1.55 * dot * ny; if (m.pegSound <= 0) { notify(s, 'crazyPegSound'); m.pegSound = 85; } }
         b.vx += dx >= 0 ? 6 : -6;
       }
     }
@@ -414,6 +452,7 @@ function updateCat(s, dt) {
   s.catBlock = Math.max(0, s.catBlock - dt);
   if (!s.cat && s.catDue <= 0) {
     let action = catAction(s.random);
+    if (s.mode === 'pusher' && action === 'player') action = 'heal';
     // There are no bricks to smash in the card/slot mini-games.
     if (action === 'blocks' && !s.arcade && !['bridge', 'sand'].includes(s.mode)) action = 'boss';
     s.cat = { time: 0, applied: false, action, gift: action === 'heal', dodged: false };
@@ -435,9 +474,15 @@ function updateCat(s, dt) {
   if (s.cat.time >= 2400) { s.cat = null; s.catDue = 10000 - s.phase * 1000; }
 }
 
+const reactionApi = { hurt: hurtCrazy, hit: hitCrazyBoss, heal: healCrazy, emit: notify, advance: advanceCrazy };
 export function updateCrazy(s, elapsed) {
-  if (s.over) return s;
   const dt = Math.max(0, Math.min(50, elapsed));
+  if (s.cutscene) {
+    s.cutscene.time += dt;
+    if (s.cutscene.time >= s.cutscene.duration) finishCinematic(s);
+    return s;
+  }
+  if (s.over) return s;
   if (s.transition) { s.transition.time += dt; if (s.transition.time >= 800) s.transition = null; }
   s.elapsed += dt; s.timeLeft -= dt; s.protection = Math.max(0, s.protection - dt);
   s.hitFlash = Math.max(0, s.hitFlash - dt); s.noticeTime = Math.max(0, s.noticeTime - dt);
@@ -449,7 +494,7 @@ export function updateCrazy(s, elapsed) {
     else if (s.mode === 'cards' || (s.mode === 'mahjong' && s.mini.removed.length === 6)) deal(s);
     else if (s.mode === 'mahjong') s.mini.selected = [];
   }
-  if (!s.attackDone && s.duration - s.timeLeft >= 4500 && !s.cat) {
+  if (s.mode !== 'pusher' && !s.attackDone && s.duration - s.timeLeft >= 4500 && !s.cat) {
     s.attackDone = true; s.attack = { time: 3500 }; notify(s, 'crazyAttackWarning');
   }
   if (s.attack) {
@@ -481,7 +526,10 @@ export function updateCrazy(s, elapsed) {
   else if (s.mode === 'tiger') updateTiger(s, dt);
   else if (s.mode === 'cards' || s.mode === 'mahjong') updatePairs(s, dt);
   else if (s.mode === 'dodge') updateDodge(s, dt);
+  else if (GREED_ATTACKS.includes(s.mode)) updateReaction(s, dt, reactionApi);
+  else if (s.mode === 'pusher') { updatePusher(s, dt, reactionApi); return s; }
   if (s.mini?.clock != null) s.mini.clock += dt;
+  if (s.cutscene) return s;
   if (s.elapsed >= s.boss.limit && !s.over) {
     s.hp = 0; s.over = true; s.finishReason = 'crazyTimeout'; notify(s, 'crazyTimeout');
   } else if (s.timeLeft <= 0 && !s.over) {
