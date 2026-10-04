@@ -559,18 +559,19 @@ test("all four sand colors convert to valid Bridge pieces", () => {
   }
 });
 
-test("returning from sand can clear more than four Bridge rows without NaN", () => {
+test("sand returns as an area-preserving supported pile with an interior gap", () => {
   const game = createGame();
+  startGame(game);
   beginSand(game);
-  for (let y = 15 * SAND_SCALE; y < 20 * SAND_SCALE; y += 1) {
-    game.sandGrid[y].fill(y % SAND_COLORS + 1);
-  }
+  for (let y = 15 * SAND_SCALE; y < 20 * SAND_SCALE; y += 1) game.sandGrid[y].fill(y % SAND_COLORS + 1);
   finishSand(game);
+  assert.equal(game.grid.flat().filter(Boolean).length, 50);
+  assert.equal(fullRows(game.grid).length, 0);
+  assert.equal(unsupportedComponents(game.grid).length, 0);
+  assert.ok([3, 4, 5, 6].some((x) => game.grid.every((row) => !row[x])));
   game.phase = "resolving";
-  const step = pump(game);
-  assert.equal(step.rows.length, 5);
-  assert.ok(Number.isFinite(game.score));
-  assert.ok(game.score > 0);
+  assert.notEqual(pump(game)?.type, "clear");
+  assert.equal(game.score, 0);
 });
 
 
@@ -591,4 +592,18 @@ test("sand resolution preserves a settled disconnected island of the cleared col
     assert.equal(game.sandGrid[bottom - 3][11], 1);
     assert.ok(game.sandGrid[bottom - 1].every((value) => value === 0));
   }
+});
+
+
+test("sparse sand conversion counts total area rather than discarding partially filled cells", () => {
+  const game = createGame();
+  beginSand(game);
+  // Every coarse cell is below the previous 50% threshold: total area is 15 minos.
+  for (let y = 15 * SAND_SCALE; y < 20 * SAND_SCALE; y += 1) {
+    for (let x = 0; x < game.sandGrid[y].length; x += 1) if (x % 10 < 3) game.sandGrid[y][x] = 4;
+  }
+  finishSand(game);
+  assert.equal(game.grid.flat().filter(Boolean).length, 15);
+  assert.equal(fullRows(game.grid).length, 0);
+  assert.ok(game.grid.flat().filter(Boolean).every((cell) => cell.type === "S"));
 });

@@ -13,20 +13,15 @@ test("a standalone brick wall leaves room for the paddle", () => {
   assert.ok(bricks >= 20);
 });
 
-test("the pinball ball rests on the flippers until one is flipped", () => {
-  const grid = Array.from({ length: ROWS }, () => Array(COLS).fill({ type: "O" }));
+test("pinball launches automatically after the countdown without waiting on a flipper", () => {
+  const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  grid[2][4] = { type: "O", g: 1 };
   const session = createSession("pinball", grid, 1, () => 0.5);
-  assert.equal(grid[ROWS - 1][0], null);
   session.prep = 0;
-  for (let i = 0; i < 90; i += 1) updateSession(session, 16);
-  assert.equal(session.over, false);
-  assert.equal(session.launched, false);
-  assert.equal(session.balls.length, 1);
-  assert.ok(session.balls[0].y < ROWS * 28 - 30);
-  session.left = true;
   updateSession(session, 16);
   assert.equal(session.launched, true);
   assert.ok(session.balls[0].vy < 0);
+  assert.ok(session.balls[0].x > W / 2);
 });
 
 test("pinball flippers rest on a shallow slope and the side rails stay sealed", () => {
@@ -67,7 +62,7 @@ test("pinball flippers rest on a shallow slope and the side rails stay sealed", 
   const left = flipper("left", false);
   onFlipper.balls = [{ x: (left.x1 + left.x2) / 2, y: left.y1 - 30, vx: 0, vy: 360, r: 7, gravity: true }];
   let bounced = false;
-  for (let i = 0; i < 40; i += 1) {
+  for (let i = 0; i < 12; i += 1) {
     updateSession(onFlipper, 16);
     const ball = onFlipper.balls[0];
     assert.ok(ball);
@@ -78,7 +73,8 @@ test("pinball flippers rest on a shallow slope and the side rails stay sealed", 
   assert.equal(onFlipper.over, false);
   onFlipper.wasLeft = false;
   onFlipper.left = true;
-  onFlipper.balls[0].y = left.y1 - 8;
+  onFlipper.balls[0].x = (left.x1 + left.x2) / 2;
+  onFlipper.balls[0].y = (left.y1 + left.y2) / 2 - 14;
   onFlipper.balls[0].vy = 200;
   updateSession(onFlipper, 16);
   assert.ok(onFlipper.balls[0].vy < -400);
@@ -97,4 +93,61 @@ test("a hidden mode waits four seconds before the ball starts", () => {
     assert.equal(session.prep, 4000);
     assert.equal(session.launched, false);
   }
+});
+
+
+test("a pinball below a flipper drains instead of being pulled back onto it", () => {
+  for (const pressed of [false, true]) {
+    const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+    grid[2][4] = { type: "O", g: 1 };
+    const session = createSession("pinball", grid, 1, () => 0.5);
+    session.prep = 0;
+    session.launched = true;
+    session.left = pressed;
+    session.balls = [{ x: 65, y: H - 8, vx: 0, vy: 100, r: 7, gravity: true }];
+    for (let i = 0; i < 60; i += 1) updateSession(session, 16);
+    assert.equal(session.balls.length, 0);
+    assert.equal(session.over, true);
+  }
+});
+
+test("an idle pinball on a passive flipper moves and eventually drains", () => {
+  const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  grid[2][4] = { type: "O", g: 1 };
+  const session = createSession("pinball", grid, 1, () => 0.5);
+  session.prep = 0;
+  session.launched = true;
+  const left = flipper("left", false);
+  session.balls = [{ x: 65, y: left.y1 + (left.y2 - left.y1) * (65 - left.x1) / (left.x2 - left.x1) - 14, vx: 0, vy: 0, r: 7, gravity: true }];
+  for (let i = 0; i < 600 && !session.over; i += 1) updateSession(session, 16);
+  assert.equal(session.balls.length, 0);
+});
+
+
+test("pinball gravity accelerates a free falling ball toward the drain", () => {
+  const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  grid[2][1] = { type: "O", g: 1 };
+  const session = createSession("pinball", grid, 1, () => 0.5);
+  session.prep = 0;
+  session.launched = true;
+  session.balls = [{ x: W / 2, y: 240, vx: 0, vy: 0, r: 7, gravity: true }];
+  for (let i = 0; i < 10; i += 1) updateSession(session, 16);
+  assert.ok(session.balls[0].vy > 140 && session.balls[0].vy < 150);
+  assert.ok(session.balls[0].y > 250);
+});
+
+
+test("holding a pinball flipper does not keep it raised or trap the ball", () => {
+  const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  grid[2][1] = { type: "O", g: 1 };
+  const session = createSession("pinball", grid, 1, () => 0.5);
+  session.prep = 0;
+  session.launched = true;
+  session.left = true;
+  session.wasLeft = true;
+  const left = flipper("left", false);
+  session.balls = [{ x: 65, y: left.y1, vx: 0, vy: 80, r: 7, gravity: true }];
+  for (let i = 0; i < 600 && !session.over; i += 1) updateSession(session, 16);
+  assert.equal(session.leftKick, 0);
+  assert.equal(session.balls.length, 0);
 });
