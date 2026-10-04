@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
-  <link rel="preload" href="./fonts/fever-brush.woff?v=1.0.16" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.0.17" as="font" type="font/woff" crossorigin>
   <style>
     /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
     @font-face {
       font-family: "Fever Brush";
-      src: url("./fonts/fever-brush.woff?v=1.0.16") format("woff");
+      src: url("./fonts/fever-brush.woff?v=1.0.17") format("woff");
       font-weight: 400;
       font-display: swap;
     }
@@ -1377,16 +1377,16 @@
     <i style="--x:83%;--y:97%;--delay:-1.87s"></i>
   </div>
   <script type="module">
-    import { createSound } from "./audio.mjs?v=1.0.16";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.16";
-    import { translate } from "./i18n.mjs?v=1.0.16";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.16";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.16";
-    import { VERSION } from "./version.mjs?v=1.0.16";
+    import { createSound } from "./audio.mjs?v=1.0.17";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.17";
+    import { translate } from "./i18n.mjs?v=1.0.17";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.17";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.17";
+    import { VERSION } from "./version.mjs?v=1.0.17";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, activateFever, applyGarbageCurse, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.0.16";
+    } from "./logic.mjs?v=1.0.17";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -2418,7 +2418,7 @@
       ctx.fillStyle = wellColor();
       ctx.fillRect(0, 0, COLS * CELL, ROWS * CELL);
       drawSandField(ctx);
-      const flipping = anim?.step.type === "flip" || (anim?.step.type === "reward" && anim.step.reward !== "sand");
+      const flipping = anim?.step.type === "flip" || (anim?.step.type === "reward" && anim.step.flip);
       if (flipping) {
         const turn = Math.min(1, anim.t / anim.dur);
         const angle = Math.PI * (1 - Math.cos(Math.PI * turn)) / 2;
@@ -2775,7 +2775,7 @@
           if (anim.t >= anim.dur) {
             const step = anim.step;
             anim = null;
-            if (step.type === "flip" || (step.type === "reward" && step.reward !== "sand")) flipGrid(game);
+            if (step.type === "flip" || (step.type === "reward" && step.flip)) flipGrid(game);
             if (step.type === "reward" && step.reward === "sand") {
               beginSand(game);
               const taughtKey = "bridge-taught-sand";
@@ -2834,7 +2834,7 @@
               pushCallout("tspin", spinLabel(step.spinName));
               spinBurst();
             }
-            if (step.type === "flip" || (step.type === "reward" && step.reward !== "sand")) sound.blip(180, 0.08);
+            if (step.type === "flip" || (step.type === "reward" && step.flip)) sound.blip(180, 0.08);
             if (step.type === "reward" && step.reward === "sand") sound.playSand();
           } else if (step?.type === "done") {
             frozenTime = performance.now();

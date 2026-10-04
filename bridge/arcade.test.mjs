@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { H, W, BREAKOUT_EFFECTS, BREAKOUT_DURATION, activateBreakoutEffect, breakoutEffectStatus, brickWall, createSession, flipper, updateSession } from "./arcade.mjs";
-import { COLS, ROWS } from "./logic.mjs";
+import { COLS, ROWS, createGame, startGame, pump, flipGrid, garbageGraceActive } from "./logic.mjs";
 
 test("a standalone brick wall leaves room for the paddle", () => {
   const grid = brickWall(() => 0.5);
@@ -286,3 +286,29 @@ test("arcade bomb hits do not forward blast-destroyed penalties, direct penalty 
   updateSession(direct, 16);
   assert.equal(direct.curseHits.length, 1);
 });
+
+for (const kind of ["pinball", "breakout", "bbtan"]) {
+  test(`garbage grace returns from ${kind} without flipping garbage into the spawn area`, () => {
+    const game = createGame({ random: () => 0.5 });
+    startGame(game);
+    game.active = null;
+    game.phase = "resolving";
+    game.grid[12][4] = { type: "O", g: 99 };
+    game.pendingGarbage = 2;
+    assert.equal(pump(game).type, "garbage");
+    game.pendingReward = kind;
+    const step = pump(game);
+    assert.equal(step.type, "reward");
+    assert.equal(step.flip, false);
+    if (step.flip) flipGrid(game);
+    const session = createSession(kind, game.grid, game.stage, game.random);
+    session.over = true;
+    game.phase = "resolving";
+    assert.equal(pump(game).type, "spawn");
+    assert.equal(game.phase, "playing");
+    assert.equal(game.garbageGraceLeft, 2);
+    assert.equal(garbageGraceActive(game), true);
+    assert.ok(game.grid[10][4]);
+    assert.ok(game.grid.slice(0, 2).every(row => row.every(cell => cell === null)));
+  });
+}
