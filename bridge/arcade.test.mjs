@@ -248,3 +248,41 @@ test("Breakout speeds up every four bricks and high-speed balls cannot skip a br
   assert.equal(session.progressSpeed, session.baseSpeed * 1.12);
   assert.ok(session.balls[0].vy > 0);
 });
+
+
+test("pinball launch and a flipper strike can reach the top of the table", () => {
+  for (const launch of [true, false]) {
+    const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+    grid[1][0] = { type: "O", g: 1 };
+    const session = createSession("pinball", grid, 1, () => 0.5);
+    session.prep = 0;
+    if (!launch) {
+      session.launched = true;
+      session.left = true;
+      const left = flipper("left", false);
+      session.balls = [{ x: 65, y: left.y1 + (left.y2 - left.y1) * (65 - left.x1) / (left.x2 - left.x1) - 14, vx: 0, vy: 100, r: 7, gravity: true }];
+    }
+    let top = H;
+    for (let i = 0; i < 150 && !session.over; i += 1) {
+      updateSession(session, 16);
+      if (session.balls[0]) top = Math.min(top, session.balls[0].y);
+    }
+    assert.ok(top <= 20, `launch=${launch}, highest y=${top}`);
+  }
+});
+
+
+test("arcade bomb hits do not forward blast-destroyed penalties, direct penalty hits do", () => {
+  const session = breakoutTestSession(() => 0);
+  session.grid[5][5] = { type: "B", g: 3, bomb: true };
+  session.grid[5][6] = { type: "C", g: 4, curse: "garbage" };
+  session.balls = [{ x: 154, y: 167, vx: 0, vy: -260, r: 6 }];
+  updateSession(session, 16);
+  assert.equal(session.grid[5][6], null);
+  assert.equal(session.curseHits.length, 0);
+  const direct = breakoutTestSession(() => 0);
+  direct.grid[5][5] = { type: "G", g: 3, curse: "garbage" };
+  direct.balls = [{ x: 154, y: 167, vx: 0, vy: -260, r: 6 }];
+  updateSession(direct, 16);
+  assert.equal(direct.curseHits.length, 1);
+});

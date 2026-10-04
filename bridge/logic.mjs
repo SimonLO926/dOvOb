@@ -51,10 +51,17 @@ export const SHAPES = {
   R: [[[0, 0]]],
   A: [[[0, 0]]],
   C: [[[0, 0]]],
+  G: bombShapesFrom([[1, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2]]),
+  F: [Array.from({ length: 9 }, (_, i) => [i % 3, Math.floor(i / 3)])],
 };
 
 export const CURSES = ["seal", "reverse", "blind", "rush", "norotate"];
 export const CURSE_CHANCE = 1 / 30;
+export const NO_HOLD_CHANCE = 1 / 60;
+export const NO_HOLD_DROPS = 15;
+export const FEVER_CHANCE = 1 / 400;
+export const FEVER_DROPS = 15;
+export const GARBAGE_CHANCE = 1 / 50;
 export const REWARD_CHANCE = { breakout: 0.005, bbtan: 0.005, pinball: 0.01, sand: 0.005 };
 export const SAND_DROPS = 20;
 export const SAND_MATCH = 8;
@@ -280,6 +287,7 @@ export function createGame(options = {}) {
       type,
       bombIndex: marked ? Math.floor(random() * SHAPES[type][0].length) : null,
       curse,
+      curseIndex: type === "G" ? Math.floor(random() * SHAPES.G[0].length) : null,
     };
     if (game.sanding) {
       const mark = sandMark(type, random, game.sandHue);
@@ -292,16 +300,21 @@ export function createGame(options = {}) {
   function pull() {
     if (sequence) {
       if (!sequence.length) throw new Error("piece sequence exhausted");
-      return describe(sequence.shift());
+      const type = sequence.shift();
+      return describe(type, type === "G" ? "garbage" : null);
     }
     if (mode === "tetris" || mode === "sand" || (mode === "marathon" && game.sanding)) {
       if (!bag.length) bag.push(...shuffle(TYPES, random));
       return describe(bag.pop());
     }
     if (mode === "marathon") {
-      if (random() < CURSE_CHANCE) {
+      const curseRoll = random();
+      if (curseRoll < NO_HOLD_CHANCE) return describe("C", "nohold");
+      if (curseRoll < NO_HOLD_CHANCE + CURSE_CHANCE) {
         return describe("C", CURSES[Math.floor(random() * CURSES.length)]);
       }
+      if (curseRoll < NO_HOLD_CHANCE + CURSE_CHANCE + FEVER_CHANCE) return describe("F");
+      if (curseRoll < NO_HOLD_CHANCE + CURSE_CHANCE + FEVER_CHANCE + GARBAGE_CHANCE) return describe("G", "garbage");
       const roll = random();
       const breakoutAt = REWARD_CHANCE.breakout;
       const bbtanAt = breakoutAt + REWARD_CHANCE.bbtan;
@@ -326,6 +339,12 @@ export function createGame(options = {}) {
     active: null,
     hold: null,
     holdLocked: false,
+    noHoldLeft: 0,
+    feverLeft: 0,
+    feverResolving: false,
+    feverGroups: new Set(),
+    feverBlastX: 4,
+    pendingGarbage: 0,
     queue: [],
     mode,
     score: 0,
@@ -369,6 +388,12 @@ export function startGame(game, nextMode) {
   game.grid = emptyGrid();
   game.hold = null;
   game.holdLocked = false;
+  game.noHoldLeft = 0;
+  game.feverLeft = 0;
+  game.feverResolving = false;
+  game.feverGroups = new Set();
+  game.feverBlastX = 4;
+  game.pendingGarbage = 0;
   game.score = 0;
   game.lines = 0;
   game.stage = 1;
@@ -393,6 +418,7 @@ export function startGame(game, nextMode) {
 }
 
 function spawn(game, preset) {
+  game.feverResolving = false;
   const next = preset ?? game.queue.shift();
   if (!preset) game.queue.push(game.pull());
   const piece = {
@@ -402,6 +428,7 @@ function spawn(game, preset) {
     y: 0,
     bombIndex: next.bombIndex ?? null,
     curse: next.curse ?? null,
+    curseIndex: next.curseIndex ?? null,
     sand: next.sand ?? null,
   };
   game.spinEligible = false;
@@ -445,8 +472,8 @@ export function tryRotate(game, dir) {
 }
 
 export function hold(game) {
-  if (game.phase !== "playing" || !game.active || game.holdLocked) return false;
-  const current = { type: game.active.type, bombIndex: game.active.bombIndex ?? null, curse: game.active.curse ?? null, sand: game.active.sand ?? null };
+  if (game.phase !== "playing" || !game.active || game.holdLocked || game.noHoldLeft > 0) return false;
+  const current = { type: game.active.type, bombIndex: game.active.bombIndex ?? null, curse: game.active.curse ?? null, curseIndex: game.active.curseIndex ?? null, sand: game.active.sand ?? null };
   if (game.hold == null) {
     game.hold = current;
     game.holdLocked = true;
@@ -473,7 +500,7 @@ export function hardDrop(game) {
   const dist = y - start;
   game.active.y = y;
   if (dist > 0) game.spinEligible = false;
-  game.score += dist * 2 * paceOf(game);
+  game.score += dist * 2 * paceOf(game) * (feverActive(game) ? 3 : 1);
   lockActive(game);
   return dist;
 }
@@ -510,12 +537,51 @@ function rewardOn(piece, index) {
   return null;
 }
 
-function scoreMult(game) {
-  if (game.mode === "sprint" || game.mode === "tetris") return 1 + Math.floor(game.lines / 10);
-  return game.stage * paceOf(game);
+export function feverActive(game) {
+  return game.mode === "marathon" && (game.feverLeft > 0 || !!game.feverResolving);
 }
 
-function explodeFrom(grid, bombs, random) {
+export function activateFever(game, cells = []) {
+  if (game.mode !== "marathon") return false;
+  let started = false;
+  for (const cell of cells) {
+    if (cell.type !== "F") continue;
+    const id = cell.feverId ?? cell.g ?? `${cell.x},${cell.y}`;
+    if (game.feverGroups.has(id)) continue;
+    game.feverGroups.add(id);
+    started = true;
+  }
+  if (started) {
+    game.feverLeft = FEVER_DROPS;
+    game.feverResolving = true;
+    game.noHoldLeft = 0;
+  }
+  return started;
+}
+
+function scoreMult(game) {
+  const base = game.mode === "sprint" || game.mode === "tetris"
+    ? 1 + Math.floor(game.lines / 10) : game.stage * paceOf(game);
+  return base * (feverActive(game) ? 3 : 1);
+}
+
+function feverBlasts(game, rows) {
+  const blasted = [];
+  for (const y of rows) {
+    for (let cy = Math.max(0, y - 1); cy <= Math.min(ROWS - 1, y + 1); cy += 1) {
+      for (let x = Math.max(0, game.feverBlastX - 1); x <= Math.min(COLS - 1, game.feverBlastX + 1); x += 1) {
+        const cell = game.grid[cy][x];
+        if (!cell) continue;
+        blasted.push({ x, y: cy, ...paintCell(cell), cause: "blast" });
+        game.grid[cy][x] = null;
+      }
+    }
+  }
+  return blasted;
+}
+
+function explodeFrom(grid, bombs, random, cleared = []) {
+  const clearing = new Map(cleared.map((cell) => [`${cell.x},${cell.y}`, cell]));
   const blasted = [];
   const seen = new Set();
   for (const bomb of bombs) {
@@ -525,9 +591,10 @@ function explodeFrom(grid, bombs, random) {
       const key = `${cx},${cy}`;
       if (cx < 0 || cy < 0 || cx >= COLS || cy >= ROWS || seen.has(key)) continue;
       seen.add(key);
+      if (clearing.has(key)) clearing.get(key).cause = "blast";
       const target = grid[cy][cx];
       if (!target) continue;
-      blasted.push({ x: cx, y: cy, type: target.type, curse: target.curse ?? null });
+      blasted.push({ x: cx, y: cy, type: target.type, feverId: target.feverId ?? null, curse: target.curse ?? null, cause: "blast" });
       grid[cy][cx] = null;
     }
   }
@@ -584,6 +651,7 @@ function paintCell(cell, sand) {
   return {
     type: cell.type,
     g: cell.g,
+    feverId: cell.feverId ?? null,
     bomb: !!cell.bomb,
     reward: cell.reward ?? null,
     curse: cell.curse ?? null,
@@ -761,12 +829,59 @@ export function sandClearColors(grid) {
   return { colors: [...colors], count };
 }
 
+export function penaltyCells(cells = []) {
+  return cells.filter((cell) => cell?.curse && cell.cause !== "blast");
+}
+
+export function applyGarbageCurse(game, cells = []) {
+  if (feverActive(game)) return 0;
+  let rows = 0;
+  for (const cell of penaltyCells(cells)) {
+    if (cell.curse === "garbage") rows += 1 + Math.min(2, Math.floor(game.random() * 3));
+  }
+  game.pendingGarbage += rows;
+  return rows;
+}
+
+function raiseGarbage(game, count) {
+  const hole = Math.min(COLS - 1, Math.floor(game.random() * COLS));
+  const moves = [];
+  let topped = false;
+  for (let y = 0; y < ROWS; y += 1) {
+    for (let x = 0; x < COLS; x += 1) {
+      const cell = game.grid[y][x];
+      if (!cell) continue;
+      if (y < count) topped = true;
+      else moves.push({ x, y0: y, y1: y - count, ...paintCell(cell) });
+    }
+  }
+  for (let i = 0; i < count; i += 1) {
+    game.grid.shift();
+    const g = takeGid(game);
+    game.grid.push(Array.from({ length: COLS }, (_, x) => x === hole ? null
+      : { type: "N", g, bomb: false, curse: null, reward: null, sand: null }));
+  }
+  if (topped) {
+    game.phase = "over";
+    return { type: "over", reason: "garbage", rows: count };
+  }
+  return { type: "garbage", rows: count, hole, moves };
+}
+
+export function applyNoHoldCurse(game, cells = []) {
+  if (!feverActive(game) && penaltyCells(cells).some((cell) => cell.curse === "nohold")) game.noHoldLeft = NO_HOLD_DROPS;
+}
+
 export function lockActive(game) {
   if (!game.active) return;
+  game.feverResolving = game.feverLeft > 0;
+  if (game.feverLeft > 0) game.feverLeft -= 1;
+  if (game.noHoldLeft > 0) game.noHoldLeft -= 1;
   game.spin = tSpinKind(game);
   const gid = takeGid(game);
   const sanding = !!game.sanding && game.sandGrid;
   const cells = cellsOf(game.active.type, game.active.rot, game.active.x, game.active.y);
+  game.feverBlastX = Math.max(0, Math.min(COLS - 1, Math.round(cells.reduce((sum, [x]) => sum + x, 0) / cells.length)));
   if (sanding) {
     const paints = sandPaintsFor(game.active.type, cells, game.active.sand, game.active.rot);
     cells.forEach(([x, y], index) => stampSand(game.sandGrid, x, y, paints[index] + 1));
@@ -783,9 +898,10 @@ export function lockActive(game) {
     game.grid[y][x] = {
       type: game.active.type,
       g: gid,
+      feverId: game.active.type === "F" ? gid : null,
       bomb: game.active.type === "B" && index === game.active.bombIndex,
       reward: rewardOn(game.active, index),
-      curse: game.active.type === "C" ? game.active.curse : null,
+      curse: game.active.type === "C" || (game.active.type === "G" && index === game.active.curseIndex) ? game.active.curse : null,
       sand: null,
     };
   });
@@ -844,6 +960,7 @@ export function unsupportedComponents(grid) {
           y: cy,
           type: grid[cy][cx].type,
           g: origin.g,
+          feverId: grid[cy][cx].feverId ?? null,
           bomb: !!grid[cy][cx].bomb,
           reward: grid[cy][cx].reward ?? null,
           curse: grid[cy][cx].curse ?? null,
@@ -882,7 +999,7 @@ export function dropComponents(grid, comps, nextGid) {
       let y = cell.y;
       while (y + 1 < ROWS && !grid[y + 1][x]) y += 1;
       const g = nextGid();
-      grid[y][x] = { type: cell.type, g, bomb: !!cell.bomb, reward: cell.reward ?? null, curse: cell.curse ?? null, sand: cell.sand ?? null };
+      grid[y][x] = { type: cell.type, g, feverId: cell.feverId ?? null, bomb: !!cell.bomb, reward: cell.reward ?? null, curse: cell.curse ?? null, sand: cell.sand ?? null };
       moves.push({ x, y0: cell.y, y1: y, type: cell.type, g });
     }
   }
@@ -936,7 +1053,7 @@ export function pump(game) {
     }
     if (game.sandExit) finishSand(game);
     else {
-      if (game.comboArmed) game.combo = 0;
+      if (game.comboArmed && !feverActive(game)) game.combo = 0;
       game.comboArmed = false;
       game.phase = "playing";
       spawn(game);
@@ -944,7 +1061,7 @@ export function pump(game) {
     }
   }
 
-  const rows = clearingRows(game.grid);
+  const rows = feverActive(game) ? fullRows(game.grid) : clearingRows(game.grid);
   if (rows.length) {
     const cells = [];
     const bombs = [];
@@ -954,12 +1071,21 @@ export function pump(game) {
         const cell = game.grid[y][x];
         if (cell?.bomb) bombs.push({ x, y });
         if (cell?.reward) rewards.push(cell.reward);
-        if (cell) cells.push({ x, y, type: cell.type, reward: cell.reward ?? null, curse: cell.curse ?? null, sand: cell.sand ?? null });
+        if (cell) cells.push({ x, y, type: cell.type, feverId: cell.feverId ?? null, reward: cell.reward ?? null, curse: cell.curse ?? null, sand: cell.sand ?? null });
         game.grid[y][x] = null;
       }
     }
-    const blasts = explodeFrom(game.grid, bombs, game.random);
-    game.score += blasts.length * 15 * paceOf(game);
+    let feverStarted = activateFever(game, cells);
+    const blasts = explodeFrom(game.grid, bombs, game.random, cells);
+    feverStarted = activateFever(game, blasts) || feverStarted;
+    if (feverActive(game)) {
+      const extra = feverBlasts(game, rows);
+      feverStarted = activateFever(game, extra) || feverStarted;
+      blasts.push(...extra);
+    }
+    applyNoHoldCurse(game, cells);
+    const garbageQueued = applyGarbageCurse(game, cells);
+    game.score += blasts.length * 15 * paceOf(game) * (feverActive(game) ? 3 : 1);
     const kind = game.spin;
     game.spin = null;
     const mult = scoreMult(game);
@@ -972,7 +1098,7 @@ export function pump(game) {
       const reward = pickReward(rewards);
       if (reward) game.pendingReward = reward;
     }
-    return { type: "clear", rows, cells, blasts, combo: game.combo, tspin: kind === "tspin", spinName: kind ? tSpinName(kind, rows.length) : null, bonus };
+    return { type: "clear", rows, cells, blasts, fever: feverActive(game), feverStarted, garbageQueued, combo: game.combo, tspin: kind === "tspin", spinName: kind ? tSpinName(kind, rows.length) : null, bonus };
   }
 
   if (game.spin) {
@@ -980,6 +1106,12 @@ export function pump(game) {
     game.spin = null;
     game.score += tSpinScore(kind, 0) * scoreMult(game);
     return { type: "spin", kind, spinName: tSpinName(kind, 0), combo: game.combo };
+  }
+
+  if (game.pendingGarbage > 0) {
+    const count = game.pendingGarbage;
+    game.pendingGarbage = 0;
+    return raiseGarbage(game, count);
   }
 
   if (game.pendingReward) {
@@ -1012,7 +1144,7 @@ export function pump(game) {
     return { type: "done" };
   }
 
-  if (game.comboArmed) game.combo = 0;
+  if (game.comboArmed && !feverActive(game)) game.combo = 0;
   game.comboArmed = false;
   game.phase = "playing";
   spawn(game);
@@ -1043,7 +1175,7 @@ export function hitBrick(grid, x, y, random) {
   if (!cell) return [];
   if (cell.bomb) return chainBlast(grid, x, y, random);
   grid[y][x] = null;
-  return [{ x, y, type: cell.type, bomb: false, curse: cell.curse ?? null }];
+  return [{ x, y, type: cell.type, bomb: false, feverId: cell.feverId ?? null, curse: cell.curse ?? null, cause: "hit" }];
 }
 
 export function chainBlast(grid, x, y, random) {
@@ -1057,7 +1189,7 @@ export function chainBlast(grid, x, y, random) {
     exploded.add(key);
     const origin = grid[by]?.[bx];
     if (origin) {
-      removed.push({ x: bx, y: by, type: origin.type, bomb: !!origin.bomb, curse: origin.curse ?? null });
+      removed.push({ x: bx, y: by, type: origin.type, bomb: !!origin.bomb, feverId: origin.feverId ?? null, curse: origin.curse ?? null, cause: "blast" });
       grid[by][bx] = null;
     }
     for (const [dx, dy] of blastOffsets(random)) {
@@ -1067,7 +1199,7 @@ export function chainBlast(grid, x, y, random) {
       const target = grid[cy][cx];
       if (!target) continue;
       const wasBomb = !!target.bomb;
-      removed.push({ x: cx, y: cy, type: target.type, bomb: wasBomb, curse: target.curse ?? null });
+      removed.push({ x: cx, y: cy, type: target.type, bomb: wasBomb, feverId: target.feverId ?? null, curse: target.curse ?? null, cause: "blast" });
       grid[cy][cx] = null;
       if (wasBomb) queue.push([cx, cy]);
     }

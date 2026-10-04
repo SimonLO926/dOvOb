@@ -1,4 +1,4 @@
-import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.0.9";
+import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.0.12";
 
 export const CELL = 28;
 export const W = COLS * CELL;
@@ -128,6 +128,7 @@ export function createSession(kind, grid, stage, random) {
     fire: false,
     flashes: [],
     curseHits: [],
+    feverHits: [],
   };
 }
 
@@ -164,7 +165,8 @@ function hit(session, x, y) {
   for (const cell of removed) {
     award(session);
     session.flashes.push({ x: cell.x, y: cell.y, life: 200 });
-    if (cell.curse) session.curseHits.push(cell);
+    if (cell.curse && cell.cause !== "blast") session.curseHits.push(cell);
+    if (cell.type === "F") session.feverHits.push(cell);
   }
   return removed.length > 0;
 }
@@ -192,7 +194,7 @@ function collideBricks(session, ball) {
     if (x < 0 || y < 0 || x >= COLS || y >= ROWS) continue;
     if (!session.grid[y][x]) continue;
     const cell = session.grid[y][x];
-    const special = !!(cell.bomb || cell.reward || cell.curse || ["B", "X", "D", "R", "A", "C"].includes(cell.type));
+    const special = !!(cell.bomb || cell.reward || cell.curse || ["B", "X", "D", "R", "A", "C", "F", "G"].includes(cell.type));
     hit(session, x, y);
     bounceOffCell(ball, x, y);
     if (session.kind === "breakout" && special) {
@@ -271,7 +273,7 @@ function bounceFlipper(ball, segment, kicking, previous) {
     ball.vy -= 1.6 * incoming * ny;
   }
   if (kicking) {
-    ball.vy = Math.min(ball.vy, -760);
+    ball.vy = Math.min(ball.vy, -1080);
     ball.vx += Math.sign(dx) * 140;
   }
   ball.x += nx * Math.max(0, radius - distance + 0.5);
@@ -352,7 +354,7 @@ function stepBall(session, ball, dt) {
       }
     }
   }
-  const limit = session.kind === "pinball" ? 900 : session.speed * 1.4;
+  const limit = session.kind === "pinball" ? 1200 : session.speed * 1.4;
   const mag = Math.hypot(ball.vx, ball.vy);
   if (mag > limit) {
     ball.vx = (ball.vx / mag) * limit;
@@ -397,7 +399,7 @@ export function updateSession(session, dtMs) {
     ball.x = W - PIN_RAIL - ball.r - 4;
     ball.y = H - 100;
     ball.vx = -110;
-    ball.vy = -820;
+    ball.vy = -1080;
     return session;
   }
   if (session.kind === "breakout") movePaddle(session, dt);
