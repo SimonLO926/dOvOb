@@ -1305,16 +1305,16 @@
     </section>
   </div>
   <script type="module">
-    import { createSound } from "./audio.mjs?v=1.0.12";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.12";
-    import { translate } from "./i18n.mjs?v=1.0.12";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.12";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.12";
-    import { VERSION } from "./version.mjs?v=1.0.12";
+    import { createSound } from "./audio.mjs?v=1.0.13";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.13";
+    import { translate } from "./i18n.mjs?v=1.0.13";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.13";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.13";
+    import { VERSION } from "./version.mjs?v=1.0.13";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, activateFever, applyGarbageCurse, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.0.12";
+    } from "./logic.mjs?v=1.0.13";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -2003,7 +2003,7 @@
       context.fill();
     }
 
-    function drawBlob(context, cells, type, size, ghost, markIndex = null, curse = null, sand = null, rot = 0, curseIndex = null) {
+    function drawBlob(context, cells, type, size, ghost, markIndex = null, curse = null, sand = null, rot = 0, curseIndex = null, showFeverMark = true) {
       cells.forEach(([x, y], index) => {
         if (y < 0 || y >= ROWS || x < 0 || x >= COLS) return;
         if (sand != null) {
@@ -2033,7 +2033,7 @@
           if (index === curseIndex) curseMark(context, x, y, size, curse);
         });
       }
-      if (!ghost && sand == null && ["B", "X", "D", "R", "A", "C", "F", "G"].includes(type)) drawSpecialMark(context, cells, size, type);
+      if (!ghost && sand == null && type === "F" && showFeverMark) drawFeverMark(context, cells, size);
     }
 
     function drawGarbageBag(context, cells, size) {
@@ -2074,7 +2074,7 @@
       context.restore();
     }
 
-    function drawSpecialMark(context, cells, size, type) {
+    function drawFeverMark(context, cells, size) {
       if (!cells.length) return;
       const left = Math.min(...cells.map(([x]) => x)) * size;
       const top = Math.min(...cells.map(([, y]) => y)) * size;
@@ -2094,15 +2094,14 @@
       context.fillRect(left, top, width, height);
       context.strokeStyle = "#ffe19c";
       context.shadowColor = "#ff9f0a";
-      context.shadowBlur = type === "F" ? 12 : 6;
+      context.shadowBlur = 12;
       context.lineWidth = Math.max(1, size * 0.045);
       cells.forEach(([x, y]) => context.strokeRect(x * size + 2, y * size + 2, size - 4, size - 4));
       context.restore();
       context.save();
-      const big = type === "F" && cells.length >= 6;
-      const badge = big ? size * 1.25 : size * 0.4;
-      const x = big ? left + width / 2 : (cells[0][0] + 0.77) * size;
-      const y = big ? top + height / 2 : (cells[0][1] + 0.22) * size;
+      const badge = Math.min(width, height) * 0.75;
+      const x = left + width / 2;
+      const y = top + height / 2;
       context.translate(x, y);
       context.rotate(-0.12);
       context.font = `900 ${Math.round(badge)}px "Noto Serif TC", "Songti TC", serif`;
@@ -2110,17 +2109,18 @@
       context.textBaseline = "middle";
       context.lineJoin = "round";
       context.strokeStyle = "#5a2200";
-      context.lineWidth = big ? 4 : 2;
+      context.lineWidth = Math.max(2, badge * 0.07);
       context.strokeText("特", 0, 0);
       context.fillStyle = "#fff3b0";
       context.shadowColor = "#ff9f0a";
-      context.shadowBlur = big ? 10 : 3;
+      context.shadowBlur = 10;
       context.fillText("特", 0, 0);
       context.restore();
     }
 
     function drawGridCells(context, grid, skip, size) {
       const drawn = new Set();
+      const feverPieces = new Map();
       for (let y = 0; y < ROWS; y += 1) {
         for (let x = 0; x < COLS; x += 1) {
           const cell = grid[y][x];
@@ -2132,9 +2132,15 @@
               if (grid[gy][gx]?.g === cell.g) group.push([gx, gy]);
             }
           }
-          drawBlob(context, group, cell.type, size, false, null, cell.type === "G" ? null : cell.curse, cell.sand ?? null);
+          drawBlob(context, group, cell.type, size, false, null, cell.type === "G" ? null : cell.curse, cell.sand ?? null, 0, null, false);
+          if (cell.type === "F" && cell.sand == null) {
+            const id = cell.feverId ?? cell.g;
+            if (!feverPieces.has(id)) feverPieces.set(id, []);
+            feverPieces.get(id).push(...group);
+          }
         }
       }
+      for (const cells of feverPieces.values()) drawFeverMark(context, cells, size);
       context.fillStyle = "#dfff45";
       for (let y = 0; y < ROWS; y += 1) {
         for (let x = 0; x < COLS; x += 1) {
