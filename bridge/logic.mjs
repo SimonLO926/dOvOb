@@ -55,6 +55,8 @@ export const SHAPES = {
 
 export const CURSES = ["seal", "reverse", "blind", "rush", "norotate"];
 export const CURSE_CHANCE = 1 / 30;
+export const NO_HOLD_CHANCE = 1 / 60;
+export const NO_HOLD_DROPS = 15;
 export const REWARD_CHANCE = { breakout: 0.005, bbtan: 0.005, pinball: 0.01, sand: 0.005 };
 export const SAND_DROPS = 20;
 export const SAND_MATCH = 8;
@@ -299,7 +301,9 @@ export function createGame(options = {}) {
       return describe(bag.pop());
     }
     if (mode === "marathon") {
-      if (random() < CURSE_CHANCE) {
+      const curseRoll = random();
+      if (curseRoll < NO_HOLD_CHANCE) return describe("C", "nohold");
+      if (curseRoll < NO_HOLD_CHANCE + CURSE_CHANCE) {
         return describe("C", CURSES[Math.floor(random() * CURSES.length)]);
       }
       const roll = random();
@@ -326,6 +330,7 @@ export function createGame(options = {}) {
     active: null,
     hold: null,
     holdLocked: false,
+    noHoldLeft: 0,
     queue: [],
     mode,
     score: 0,
@@ -369,6 +374,7 @@ export function startGame(game, nextMode) {
   game.grid = emptyGrid();
   game.hold = null;
   game.holdLocked = false;
+  game.noHoldLeft = 0;
   game.score = 0;
   game.lines = 0;
   game.stage = 1;
@@ -445,7 +451,7 @@ export function tryRotate(game, dir) {
 }
 
 export function hold(game) {
-  if (game.phase !== "playing" || !game.active || game.holdLocked) return false;
+  if (game.phase !== "playing" || !game.active || game.holdLocked || game.noHoldLeft > 0) return false;
   const current = { type: game.active.type, bombIndex: game.active.bombIndex ?? null, curse: game.active.curse ?? null, sand: game.active.sand ?? null };
   if (game.hold == null) {
     game.hold = current;
@@ -761,8 +767,13 @@ export function sandClearColors(grid) {
   return { colors: [...colors], count };
 }
 
+export function applyNoHoldCurse(game, cells = []) {
+  if (cells.some((cell) => cell?.curse === "nohold")) game.noHoldLeft = NO_HOLD_DROPS;
+}
+
 export function lockActive(game) {
   if (!game.active) return;
+  if (game.noHoldLeft > 0) game.noHoldLeft -= 1;
   game.spin = tSpinKind(game);
   const gid = takeGid(game);
   const sanding = !!game.sanding && game.sandGrid;
@@ -959,6 +970,7 @@ export function pump(game) {
       }
     }
     const blasts = explodeFrom(game.grid, bombs, game.random);
+    applyNoHoldCurse(game, [...cells, ...blasts]);
     game.score += blasts.length * 15 * paceOf(game);
     const kind = game.spin;
     game.spin = null;

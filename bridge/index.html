@@ -1286,16 +1286,16 @@
     </section>
   </div>
   <script type="module">
-    import { createSound } from "./audio.mjs?v=1.0.9";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.9";
-    import { translate } from "./i18n.mjs?v=1.0.9";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.9";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.9";
-    import { VERSION } from "./version.mjs?v=1.0.9";
+    import { createSound } from "./audio.mjs?v=1.0.10";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.10";
+    import { translate } from "./i18n.mjs?v=1.0.10";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.10";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.10";
+    import { VERSION } from "./version.mjs?v=1.0.10";
     import {
-      COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
+      COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, applyNoHoldCurse, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.0.9";
+    } from "./logic.mjs?v=1.0.10";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -1840,7 +1840,7 @@
 
     function ink() { return document.body.dataset.theme === "dark" ? "#f5f5f7" : "#1d1d1f"; }
     const CURSE_COLOR = {
-      seal: "#5e5ce6", reverse: "#ff9f0a", blind: "#1d1d1f", rush: "#ff375f", norotate: "#bf5af2",
+      seal: "#5e5ce6", reverse: "#ff9f0a", blind: "#1d1d1f", rush: "#ff375f", norotate: "#bf5af2", nohold: "#8e44ad",
     };
     function pieceColor(type, curse, sand) {
       if (sand != null) return SAND_HEX[sand] || SAND_HEX[0];
@@ -1877,6 +1877,12 @@
         context.lineTo(cx, cy + size * 0.22);
         context.lineTo(cx - size * 0.12, cy);
         context.fill();
+      } else if (curse === "nohold") {
+        context.strokeRect(cx - size * 0.2, cy - size * 0.2, size * 0.4, size * 0.4);
+        context.beginPath();
+        context.moveTo(cx - size * 0.25, cy + size * 0.25);
+        context.lineTo(cx + size * 0.25, cy - size * 0.25);
+        context.stroke();
       } else if (curse === "norotate") {
         context.beginPath();
         context.moveTo(cx - size * 0.16, cy - size * 0.16);
@@ -2282,6 +2288,7 @@
     }
 
     function applyCurses(cells) {
+      applyNoHoldCurse(game, cells);
       const now = performance.now();
       for (const cell of cells || []) {
         if (cell.curse === "reverse") curseUntil.reverse = now + 20000;
@@ -2298,6 +2305,7 @@
       if (now < curseUntil.blind) labels.push(t("curseBlind"));
       if (now < curseUntil.rush) labels.push(t("curseRush"));
       if (now < curseUntil.norotate) labels.push(t("curseNorotate"));
+      if (game.noHoldLeft > 0) labels.push(`${t("curseNoHold")} ${game.noHoldLeft}`);
       return labels.join(" · ");
     }
 
@@ -2376,7 +2384,9 @@
         else drawTwentyBoard();
       } else drawBoard();
       holdCanvas.classList.toggle("used", game.holdLocked && game.phase === "playing");
-      document.querySelector("#hold-state").textContent = game.holdLocked && game.phase === "playing" ? t("holdUsed") : t("holdReady");
+      document.querySelector("#hold-state").textContent = game.noHoldLeft > 0
+        ? `${t("curseNoHold")} ${game.noHoldLeft}` : game.holdLocked && game.phase === "playing" ? t("holdUsed") : t("holdReady");
+      document.querySelector("#btn-hold").disabled = game.noHoldLeft > 0 && !puzzle && !session;
       const notes = [];
       if (curseStatus()) notes.push(curseStatus());
       if (game.sanding) notes.push(Number.isFinite(game.sandLeft) ? `${t("sand")} ${Math.max(0, game.sandLeft)}` : t("gameSand"));
@@ -2538,7 +2548,7 @@
           if (step?.type === "clear" || step?.type === "drop" || step?.type === "flip" || step?.type === "reward" || step?.type === "sand" || step?.type === "spin") {
             const distance = step.moves?.length && (step.type === "drop" || step.type === "sand") ? Math.max(0, ...step.moves.map((move) => Math.abs(move.y1 - move.y0) + Math.abs((move.x1 ?? move.x) - (move.x0 ?? move.x)))) : 0;
             const now = performance.now();
-            const cursed = Object.values(curseUntil).some((until) => now < until)
+            const cursed = game.noHoldLeft > 0 || Object.values(curseUntil).some((until) => now < until)
               || game.grid.some((row) => row.some((cell) => cell?.curse === "seal"));
             const fastDrop = game.mode === "marathon" && !game.sanding && !cursed;
             const dropDuration = fastDrop ? Math.min(140, 40 + distance * 5) : 120 + distance * 18;

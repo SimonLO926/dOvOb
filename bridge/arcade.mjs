@@ -1,4 +1,4 @@
-import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.0.9";
+import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.0.10";
 
 export const CELL = 28;
 export const W = COLS * CELL;
@@ -271,7 +271,7 @@ function bounceFlipper(ball, segment, kicking, previous) {
     ball.vy -= 1.6 * incoming * ny;
   }
   if (kicking) {
-    ball.vy = Math.min(ball.vy, -760);
+    ball.vy = Math.min(ball.vy, -1080);
     ball.vx += Math.sign(dx) * 140;
   }
   ball.x += nx * Math.max(0, radius - distance + 0.5);
@@ -352,7 +352,7 @@ function stepBall(session, ball, dt) {
       }
     }
   }
-  const limit = session.kind === "pinball" ? 900 : session.speed * 1.4;
+  const limit = session.kind === "pinball" ? 1200 : session.speed * 1.4;
   const mag = Math.hypot(ball.vx, ball.vy);
   if (mag > limit) {
     ball.vx = (ball.vx / mag) * limit;
@@ -397,7 +397,7 @@ export function updateSession(session, dtMs) {
     ball.x = W - PIN_RAIL - ball.r - 4;
     ball.y = H - 100;
     ball.vx = -110;
-    ball.vy = -820;
+    ball.vy = -1080;
     return session;
   }
   if (session.kind === "breakout") movePaddle(session, dt);

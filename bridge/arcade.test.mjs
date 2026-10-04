@@ -248,3 +248,25 @@ test("Breakout speeds up every four bricks and high-speed balls cannot skip a br
   assert.equal(session.progressSpeed, session.baseSpeed * 1.12);
   assert.ok(session.balls[0].vy > 0);
 });
+
+
+test("pinball launch and a flipper strike can reach the top of the table", () => {
+  for (const launch of [true, false]) {
+    const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+    grid[1][0] = { type: "O", g: 1 };
+    const session = createSession("pinball", grid, 1, () => 0.5);
+    session.prep = 0;
+    if (!launch) {
+      session.launched = true;
+      session.left = true;
+      const left = flipper("left", false);
+      session.balls = [{ x: 65, y: left.y1 + (left.y2 - left.y1) * (65 - left.x1) / (left.x2 - left.x1) - 14, vx: 0, vy: 100, r: 7, gravity: true }];
+    }
+    let top = H;
+    for (let i = 0; i < 150 && !session.over; i += 1) {
+      updateSession(session, 16);
+      if (session.balls[0]) top = Math.min(top, session.balls[0].y);
+    }
+    assert.ok(top <= 20, `launch=${launch}, highest y=${top}`);
+  }
+});

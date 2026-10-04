@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   COLS,
+  NO_HOLD_CHANCE,
+  NO_HOLD_DROPS,
+  applyNoHoldCurse,
   dangerLevel,
   tryMove,
   REWARD_CHANCE,
@@ -465,8 +468,9 @@ test("hard starts twice as fast and weights the score", () => {
   assert.equal(hard.score - scored, 100 * 2);
 });
 
-test("one marathon pull in thirty is a penalty cell", () => {
-  const game = createGame({ mode: "marathon", random: () => 0 });
+test("existing penalties retain their one-in-thirty probability interval", () => {
+  const rolls = [NO_HOLD_CHANCE, 0];
+  const game = createGame({ mode: "marathon", random: () => rolls.shift() ?? 0.5 });
   const piece = game.pull();
   assert.equal(piece.type, "C");
   assert.equal(piece.curse, "seal");
@@ -677,4 +681,54 @@ test("danger has two stages with exact row boundaries and recovers as the pile d
     game.grid[row][4] = { type: "O" };
     assert.equal(dangerLevel(game), expected);
   }
+});
+
+
+test("no-hold has its own exact one-in-sixty interval in Bridge only", () => {
+  assert.equal(NO_HOLD_CHANCE, 1 / 60);
+  for (const roll of [0, NO_HOLD_CHANCE - 1e-8]) {
+    const game = createGame({ random: () => roll });
+    assert.equal(game.pull().curse, "nohold");
+  }
+  const edge = createGame({ random: () => NO_HOLD_CHANCE });
+  assert.notEqual(edge.pull().curse, "nohold");
+  for (const mode of ["tetris", "sand", "sprint"]) {
+    assert.notEqual(createGame({ mode, random: () => 0 }).pull().curse, "nohold");
+  }
+});
+
+test("no-hold blocks swapping for fifteen locked pieces and then restores hold", () => {
+  const game = createGame({ random: () => 0.9 });
+  startGame(game);
+  applyNoHoldCurse(game, [{ curse: "nohold" }]);
+  assert.equal(game.noHoldLeft, NO_HOLD_DROPS);
+  for (let i = 0; i < NO_HOLD_DROPS; i += 1) {
+    game.phase = "playing";
+    game.grid = emptyGrid();
+    game.active = { type: "O", rot: 0, x: 3, y: 18 };
+    const saved = game.active;
+    assert.equal(hold(game), false);
+    assert.equal(game.active, saved);
+    lockActive(game);
+    assert.equal(game.noHoldLeft, NO_HOLD_DROPS - i - 1);
+  }
+  game.phase = "playing";
+  game.active = { type: "T", rot: 0, x: 3, y: 0 };
+  assert.equal(hold(game), true);
+  applyNoHoldCurse(game, [{ curse: "nohold" }]);
+  startGame(game);
+  assert.equal(game.noHoldLeft, 0);
+});
+
+test("clearing a no-hold cell starts fifteen pieces without consuming one on the trigger clear", () => {
+  const game = createGame({ random: () => 0.9 });
+  startGame(game);
+  fillRow(game.grid, 19);
+  game.grid[19][4] = { type: "C", curse: "nohold", g: 99 };
+  game.active = null;
+  game.phase = "resolving";
+  assert.equal(pump(game).type, "clear");
+  assert.equal(game.noHoldLeft, 15);
+  lockActive(game);
+  assert.equal(game.noHoldLeft, 15);
 });
