@@ -3,6 +3,10 @@ import test from "node:test";
 import {
   COLS,
   GARBAGE_CHANCE,
+  GARBAGE_ROW_CHANCE,
+  GARBAGE_GRACE_DROPS,
+  garbageRows,
+  garbageGraceActive,
   applyGarbageCurse,
   penaltyCells,
   hitBrick,
@@ -877,7 +881,7 @@ test("garbage bags occupy an exact one-in-fifty interval and contain one marked 
 });
 
 test("garbage penalties add one to three rows with a hole and shift existing blocks upward", () => {
-  for (const [roll, count] of [[0, 1], [0.5, 2], [0.99, 3]]) {
+  for (const [roll, count] of [[0, 1], [0.3, 2], [0.6, 3]]) {
     const game = createGame({ random: () => roll });
     game.phase = "resolving";
     game.grid[10][2] = { type: "O", g: 2 };
@@ -911,8 +915,8 @@ test("normal line clearing triggers garbage once, while unmarked bag cells do no
   game.grid[19][4] = { type: "G", g: 20, curse: "garbage" };
   game.phase = "resolving";
   game.active = null;
-  assert.equal(pump(game).garbageQueued, 2);
-  assert.equal(pump(game).rows, 2);
+  assert.equal(pump(game).garbageQueued, 3);
+  assert.equal(pump(game).rows, 3);
   game.pendingGarbage = 0;
   applyGarbageCurse(game, [{ type: "G", curse: null }]);
   assert.equal(game.pendingGarbage, 0);
@@ -961,4 +965,64 @@ test("Fever immunity also prevents garbage penalties", () => {
   activateFever(game, [{ type: "F", feverId: 1 }]);
   assert.equal(applyGarbageCurse(game, [{ curse: "garbage" }]), 0);
   assert.equal(game.pendingGarbage, 0);
+});
+
+
+test("garbage probabilities are 24% each for one to three, then halve across four to eight", () => {
+  assert.deepEqual(GARBAGE_ROW_CHANCE.slice(0, 3), [0.24, 0.24, 0.24]);
+  assert.ok(Math.abs(GARBAGE_ROW_CHANCE.reduce((sum, p) => sum + p, 0) - 1) < 1e-12);
+  let low = 0;
+  GARBAGE_ROW_CHANCE.forEach((probability, index) => {
+    assert.equal(garbageRows(() => low + probability / 2), index + 1);
+    if (index >= 4) assert.ok(Math.abs(probability / GARBAGE_ROW_CHANCE[index - 1] - 0.5) < 1e-12);
+    low += probability;
+  });
+  assert.equal(garbageRows(() => 0.24), 2);
+  assert.equal(garbageRows(() => 0.48), 3);
+  assert.equal(garbageRows(() => 0.72), 4);
+  assert.equal(garbageRows(() => 0.999999), 8);
+});
+
+test("garbage prevents Bridge falls immediately and through two subsequent piece resolutions", () => {
+  const game = createGame({ random: () => 0.9 });
+  startGame(game);
+  game.active = null;
+  game.grid[5][2] = { type: "O", g: 99 };
+  game.phase = "resolving";
+  game.pendingGarbage = 1;
+  assert.equal(pump(game).type, "garbage");
+  assert.equal(game.garbageGraceLeft, GARBAGE_GRACE_DROPS);
+  assert.equal(pump(game).type, "spawn");
+  assert.ok(game.grid[4][2]);
+  for (let round = 0; round < 2; round += 1) {
+    game.active = { type: "R", rot: 0, x: round, y: 18 };
+    lockActive(game);
+    assert.equal(game.garbageGraceLeft, 1 - round);
+    assert.equal(garbageGraceActive(game), true);
+    assert.equal(pump(game).type, "spawn");
+    assert.ok(game.grid[4][2]);
+  }
+  assert.equal(garbageGraceActive(game), false);
+  game.active = { type: "R", rot: 0, x: 2, y: 18 };
+  lockActive(game);
+  assert.equal(pump(game).type, "drop");
+  assert.equal(game.grid[4][2], null);
+});
+
+test("garbage grace allows line clearing, refreshes on another attack, and resets on restart", () => {
+  const game = createGame({ random: () => 0.9 });
+  startGame(game);
+  game.active = null;
+  game.phase = "resolving";
+  game.pendingGarbage = 1;
+  pump(game);
+  game.garbageGraceLeft = 1;
+  game.pendingGarbage = 1;
+  pump(game);
+  assert.equal(game.garbageGraceLeft, 2);
+  fillRow(game.grid, 19);
+  assert.equal(pump(game).type, "clear");
+  assert.equal(game.garbageGraceLeft, 2);
+  startGame(game);
+  assert.equal(garbageGraceActive(game), false);
 });
