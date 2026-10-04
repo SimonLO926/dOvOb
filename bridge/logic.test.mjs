@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   COLS,
+  dangerLevel,
+  tryMove,
   REWARD_CHANCE,
   SAND_COLORS,
   SAND_DROPS,
@@ -606,4 +608,62 @@ test("sparse sand conversion counts total area rather than discarding partially 
   assert.equal(game.grid.flat().filter(Boolean).length, 15);
   assert.equal(fullRows(game.grid).length, 0);
   assert.ok(game.grid.flat().filter(Boolean).every((cell) => cell.type === "S"));
+});
+
+
+test("both rotation directions can enter a T-spin single cavity", () => {
+  for (const [rot, x, dir] of [[1, 2, -1], [3, 4, 1]]) {
+    const game = createGame();
+    startGame(game);
+    tSpinCavity(game, 16, 4);
+    game.active = { type: "T", rot, x, y: 17 };
+    assert.equal(tryRotate(game, dir), true);
+    assert.equal(tSpinKind(game), "tspin");
+    assert.equal(hardDrop(game), 0);
+    assert.equal(pump(game).spinName, "single");
+  }
+});
+
+test("rotating above a cavity then dropping into it is not a T-spin", () => {
+  const game = createGame();
+  startGame(game);
+  tSpinCavity(game, 16, 4);
+  game.active = { type: "T", rot: 0, x: 3, y: 2 };
+  assert.equal(tryRotate(game, 1), true);
+  assert.ok(hardDrop(game) > 0);
+  assert.equal(game.spin, null);
+  assert.equal(pump(game).spinName, null);
+});
+
+test("successful translation clears rotation eligibility but blocked input does not", () => {
+  const game = createGame();
+  startGame(game);
+  game.active = { type: "T", rot: 0, x: 3, y: 2 };
+  tryRotate(game, 1);
+  assert.equal(tryMove(game, 0, 1), true);
+  assert.equal(game.spinEligible, false);
+  tSpinCavity(game, 16, 4);
+  game.active = { type: "T", rot: 1, x: 2, y: 17 };
+  assert.equal(tryRotate(game, -1), true);
+  assert.equal(tryMove(game, 0, 1), false);
+  assert.equal(tSpinKind(game), "tspin");
+});
+
+test("danger increases as settled blocks reach the top and clears when the pile falls", () => {
+  for (const mode of ["marathon", "tetris"]) {
+    const game = createGame({ mode });
+    startGame(game);
+    assert.equal(dangerLevel(game), 0);
+    game.grid[5][4] = { type: "O" };
+    const low = dangerLevel(game);
+    assert.ok(low > 0);
+    game.grid[1][4] = { type: "O" };
+    assert.ok(dangerLevel(game) > low);
+    game.grid = emptyGrid();
+    game.grid[6][4] = { type: "O" };
+    assert.equal(dangerLevel(game), 0);
+    game.sanding = true;
+    game.grid[0][4] = { type: "O" };
+    assert.equal(dangerLevel(game), 0);
+  }
 });

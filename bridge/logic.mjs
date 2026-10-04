@@ -420,7 +420,7 @@ export function tryMove(game, dx, dy) {
   if (!fits(game.grid, type, rot, x + dx, y + dy, game)) return false;
   game.active.x += dx;
   game.active.y += dy;
-  if (dx) game.spinEligible = false;
+  if (dx || dy) game.spinEligible = false;
   return true;
 }
 
@@ -472,6 +472,7 @@ export function hardDrop(game) {
   const y = ghostY(game);
   const dist = y - start;
   game.active.y = y;
+  if (dist > 0) game.spinEligible = false;
   game.score += dist * 2 * paceOf(game);
   lockActive(game);
   return dist;
@@ -555,6 +556,13 @@ export function tSpinKind(game) {
   const front = T_FRONT[piece.rot].filter(([dx, dy]) => blocked(dx, dy)).length;
   if (front === 2 || game.lastKick === 4) return "tspin";
   return "mini";
+}
+
+export function dangerLevel(game) {
+  if (!game || game.sanding || !["marathon", "tetris", "sprint"].includes(game.mode)
+      || !["playing", "resolving"].includes(game.phase)) return 0;
+  const top = game.grid.findIndex((row) => row.some(Boolean));
+  return top >= 0 && top < 6 ? (6 - top) / 6 : 0;
 }
 
 export function tSpinReady(game) {
