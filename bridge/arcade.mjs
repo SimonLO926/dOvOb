@@ -1,4 +1,4 @@
-import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.0.4";
+import { COLS, ROWS, brickCount, emptyGrid, hitBrick } from "./logic.mjs?v=1.0.5";
 
 export const CELL = 28;
 export const W = COLS * CELL;
@@ -260,8 +260,8 @@ function stepBall(session, ball, dt) {
       ball.vx = -Math.abs(ball.vx);
     }
     if (session.kind === "pinball") {
-      bounceFlipper(ball, flipper("left", session.leftKick > 0), session.leftKick > 0, previous);
-      bounceFlipper(ball, flipper("right", session.rightKick > 0), session.rightKick > 0, previous);
+      bounceFlipper(ball, flipper("left", session.left), session.leftKick > 0, previous);
+      bounceFlipper(ball, flipper("right", session.right), session.rightKick > 0, previous);
     }
     if (ball.y < ball.r) {
       ball.y = ball.r;
@@ -427,7 +427,7 @@ export function drawSession(ctx, session, ink) {
     ctx.lineCap = "round";
     ctx.lineWidth = 18;
     for (const side of ["left", "right"]) {
-      const segment = flipper(side, side === "left" ? session.leftKick > 0 : session.rightKick > 0);
+      const segment = flipper(side, side === "left" ? session.left : session.right);
       const gloss = ctx.createLinearGradient(segment.x1, segment.y1, segment.x2, segment.y2);
       gloss.addColorStop(0, "#9bdcff");
       gloss.addColorStop(1, "#0a66c2");

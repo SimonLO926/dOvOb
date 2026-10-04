@@ -137,7 +137,7 @@ test("pinball gravity accelerates a free falling ball toward the drain", () => {
 });
 
 
-test("holding a pinball flipper does not keep it raised or trap the ball", () => {
+test("a held flipper supports the ball until released without repeated launch impulses", () => {
   const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
   grid[2][1] = { type: "O", g: 1 };
   const session = createSession("pinball", grid, 1, () => 0.5);
@@ -145,9 +145,16 @@ test("holding a pinball flipper does not keep it raised or trap the ball", () =>
   session.launched = true;
   session.left = true;
   session.wasLeft = true;
-  const left = flipper("left", false);
-  session.balls = [{ x: 65, y: left.y1, vx: 0, vy: 80, r: 7, gravity: true }];
-  for (let i = 0; i < 600 && !session.over; i += 1) updateSession(session, 16);
+  const raised = flipper("left", true);
+  const x = 40;
+  const y = raised.y1 + (raised.y2 - raised.y1) * (x - raised.x1) / (raised.x2 - raised.x1) - 15;
+  session.balls = [{ x, y, vx: 0, vy: 0, r: 7, gravity: true }];
+  for (let i = 0; i < 180; i += 1) updateSession(session, 16);
   assert.equal(session.leftKick, 0);
+  assert.equal(session.balls.length, 1);
+  assert.ok(session.balls[0].y < raised.y1);
+  assert.ok(Math.abs(session.balls[0].vy) < 100);
+  session.left = false;
+  for (let i = 0; i < 600 && !session.over; i += 1) updateSession(session, 16);
   assert.equal(session.balls.length, 0);
 });
