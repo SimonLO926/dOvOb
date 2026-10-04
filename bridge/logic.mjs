@@ -562,7 +562,7 @@ export function dangerLevel(game) {
   if (!game || game.sanding || !["marathon", "tetris", "sprint"].includes(game.mode)
       || !["playing", "resolving"].includes(game.phase)) return 0;
   const top = game.grid.findIndex((row) => row.some(Boolean));
-  return top >= 0 && top < 6 ? (6 - top) / 6 : 0;
+  return top < 0 || top >= 6 ? 0 : top < 3 ? 2 : 1;
 }
 
 export function tSpinReady(game) {

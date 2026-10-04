@@ -1268,16 +1268,16 @@
     </section>
   </div>
   <script type="module">
-    import { createSound } from "./audio.mjs?v=1.0.7";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.7";
-    import { translate } from "./i18n.mjs?v=1.0.7";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.7";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.7";
-    import { VERSION } from "./version.mjs?v=1.0.7";
+    import { createSound } from "./audio.mjs?v=1.0.8";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.8";
+    import { translate } from "./i18n.mjs?v=1.0.8";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.8";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.8";
+    import { VERSION } from "./version.mjs?v=1.0.8";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.0.7";
+    } from "./logic.mjs?v=1.0.8";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -2242,20 +2242,24 @@
     function drawDanger() {
       const level = dangerLevel(game);
       if (!level || session || puzzle) return;
-      const pulse = paused || reducedMotion.matches ? 0.5 : (1 + Math.sin(performance.now() / 220)) / 2;
+      const critical = level === 2;
+      const strength = critical ? 1 : 0.5;
+      const rgb = critical ? "255, 59, 48" : "255, 159, 10";
+      const pulse = paused || reducedMotion.matches ? 0.5
+        : (1 + Math.sin(performance.now() / (critical ? 220 : 440))) / 2;
       ctx.save();
       const glow = ctx.createLinearGradient(0, 0, 0, CELL * 6);
-      glow.addColorStop(0, `rgba(255, 59, 48, ${0.12 + level * (0.1 + pulse * 0.08)})`);
-      glow.addColorStop(1, "rgba(255, 59, 48, 0)");
+      glow.addColorStop(0, `rgba(${rgb}, ${0.12 + strength * (0.1 + pulse * 0.08)})`);
+      glow.addColorStop(1, `rgba(${rgb}, 0)`);
       ctx.fillStyle = glow;
       ctx.fillRect(0, 0, COLS * CELL, CELL * 6);
-      ctx.strokeStyle = `rgba(255, 59, 48, ${0.45 + pulse * 0.35})`;
-      ctx.lineWidth = 3 + level * 2;
+      ctx.strokeStyle = `rgba(${rgb}, ${0.4 + strength * pulse * 0.4})`;
+      ctx.lineWidth = critical ? 5 : 3;
       ctx.strokeRect(2, 2, COLS * CELL - 4, ROWS * CELL - 4);
       ctx.font = "bold 12px system-ui";
       ctx.textAlign = "center";
-      ctx.fillStyle = "#ff3b30";
-      ctx.fillText(t("danger"), COLS * CELL / 2, 18);
+      ctx.fillStyle = critical ? "#ff3b30" : "#ff9f0a";
+      ctx.fillText(t(critical ? "danger" : "warning"), COLS * CELL / 2, 18);
       ctx.restore();
     }
 

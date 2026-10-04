@@ -667,3 +667,14 @@ test("danger increases as settled blocks reach the top and clears when the pile 
     assert.equal(dangerLevel(game), 0);
   }
 });
+
+
+test("danger has two stages with exact row boundaries and recovers as the pile drops", () => {
+  const game = createGame();
+  startGame(game);
+  for (const [row, expected] of [[6, 0], [5, 1], [3, 1], [2, 2], [0, 2], [3, 1], [6, 0]]) {
+    game.grid = emptyGrid();
+    game.grid[row][4] = { type: "O" };
+    assert.equal(dangerLevel(game), expected);
+  }
+});
