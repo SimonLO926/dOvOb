@@ -406,6 +406,24 @@
     .callout b { font-size: 28px; letter-spacing: .04em; }
     .callout.tspin b { color: #ffd60a; }
     .callout.combo b { color: #7ee0ff; }
+    .callout.fever { width: calc(100% - 12px); }
+    .callout.fever b {
+      display: block;
+      color: #ffe49b;
+      font-size: clamp(14px, 3.8vw, 24px);
+      font-style: italic;
+      white-space: normal;
+      line-height: 1.15;
+      text-shadow: -2px 2px 0 #5a2200, 0 0 18px #ff9f0a;
+    }
+    .callout.fever::before {
+      content: "特";
+      display: block;
+      font: 900 80px "Noto Serif TC", "Songti TC", serif;
+      color: #ffe49b;
+      transform: rotate(-10deg) skew(-6deg);
+      text-shadow: -4px 4px 0 #7b2500, 0 0 22px #ff9f0a;
+    }
     .callout.sand b { color: #ffd60a; }
 
     .settings-card {
@@ -1286,20 +1304,20 @@
     </section>
   </div>
   <script type="module">
-    import { createSound } from "./audio.mjs?v=1.0.10";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.10";
-    import { translate } from "./i18n.mjs?v=1.0.10";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.10";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.10";
-    import { VERSION } from "./version.mjs?v=1.0.10";
+    import { createSound } from "./audio.mjs?v=1.0.11";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.11";
+    import { translate } from "./i18n.mjs?v=1.0.11";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.11";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.11";
+    import { VERSION } from "./version.mjs?v=1.0.11";
     import {
-      COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, applyNoHoldCurse, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
+      COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, activateFever, applyNoHoldCurse, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.0.10";
+    } from "./logic.mjs?v=1.0.11";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
-      J: "#0a84ff", L: "#ff9f0a", B: "#8e8e93", X: "#5e5ce6", D: "#ff9f0a", R: "#ff375f", A: "#e7d3a1",
+      J: "#0a84ff", L: "#ff9f0a", B: "#8e8e93", X: "#5e5ce6", D: "#ff9f0a", R: "#ff375f", A: "#e7d3a1", F: "#ffbd2e",
     };
     const SAND_HEX = ["#ffd84a", "#ff4b4b", "#3c8dff", "#3dce6e"];
     const CELL = 28;
@@ -1544,6 +1562,10 @@
       resetTimers();
       heldKeys.clear();
       game.setMode(kind);
+      game.noHoldLeft = 0;
+      game.feverLeft = 0;
+      game.feverResolving = false;
+      game.feverGroups = new Set();
       game.grid = brickWall(Math.random);
       game.active = null;
       game.hold = null;
@@ -1570,6 +1592,10 @@
       heldKeys.clear();
       puzzle = kind === "ten" ? createTen(Math.random) : createTwenty(Math.random);
       game.setMode(kind);
+      game.noHoldLeft = 0;
+      game.feverLeft = 0;
+      game.feverResolving = false;
+      game.feverGroups = new Set();
       game.phase = "playing";
       game.active = null;
       game.hold = null;
@@ -1990,6 +2016,52 @@
           context.fill();
         }
       });
+      if (!ghost && sand == null && ["B", "X", "D", "R", "A", "C", "F"].includes(type)) drawSpecialMark(context, cells, size, type);
+    }
+
+    function drawSpecialMark(context, cells, size, type) {
+      if (!cells.length) return;
+      const left = Math.min(...cells.map(([x]) => x)) * size;
+      const top = Math.min(...cells.map(([, y]) => y)) * size;
+      const width = (Math.max(...cells.map(([x]) => x)) + 1) * size - left;
+      const height = (Math.max(...cells.map(([, y]) => y)) + 1) * size - top;
+      const time = paused || reducedMotion.matches ? 0 : performance.now();
+      context.save();
+      context.beginPath();
+      cells.forEach(([x, y]) => context.rect(x * size + 1, y * size + 1, size - 2, size - 2));
+      context.clip();
+      const shineX = left - width + (time % 1500) / 1500 * width * 3;
+      const shine = context.createLinearGradient(shineX - size, top, shineX + size, top + height);
+      shine.addColorStop(0, "rgba(255, 235, 160, 0)");
+      shine.addColorStop(0.5, "rgba(255, 250, 210, .55)");
+      shine.addColorStop(1, "rgba(255, 235, 160, 0)");
+      context.fillStyle = shine;
+      context.fillRect(left, top, width, height);
+      context.strokeStyle = "#ffe19c";
+      context.shadowColor = "#ff9f0a";
+      context.shadowBlur = type === "F" ? 12 : 6;
+      context.lineWidth = Math.max(1, size * 0.045);
+      cells.forEach(([x, y]) => context.strokeRect(x * size + 2, y * size + 2, size - 4, size - 4));
+      context.restore();
+      context.save();
+      const big = type === "F" && cells.length >= 6;
+      const badge = big ? size * 1.25 : size * 0.4;
+      const x = big ? left + width / 2 : left + size * 0.77;
+      const y = big ? top + height / 2 : top + size * 0.22;
+      context.translate(x, y);
+      context.rotate(-0.12);
+      context.font = `900 ${Math.round(badge)}px "Noto Serif TC", "Songti TC", serif`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.lineJoin = "round";
+      context.strokeStyle = "#5a2200";
+      context.lineWidth = big ? 4 : 2;
+      context.strokeText("特", 0, 0);
+      context.fillStyle = "#fff3b0";
+      context.shadowColor = "#ff9f0a";
+      context.shadowBlur = big ? 10 : 3;
+      context.fillText("特", 0, 0);
+      context.restore();
     }
 
     function drawGridCells(context, grid, skip, size) {
@@ -2139,12 +2211,12 @@
       for (const item of fx) {
         const p = Math.max(0, item.t) / item.life;
         if (item.t < 0) continue;
-        if (item.kind === "tspin" || item.kind === "combo" || item.kind === "sand") {
+        if (item.kind === "tspin" || item.kind === "combo" || item.kind === "sand" || item.kind === "fever") {
           ctx.save();
           ctx.translate(item.x, item.y);
           ctx.globalAlpha = Math.max(0, 1 - p);
           ctx.lineWidth = item.kind === "combo" ? 3 + Math.min(item.combo || 2, 6) : 4;
-          ctx.strokeStyle = item.kind === "sand" ? item.color : item.kind === "combo" ? "#7ee0ff" : "#ffd60a";
+          ctx.strokeStyle = item.kind === "fever" ? "#ffbd2e" : item.kind === "sand" ? item.color : item.kind === "combo" ? "#7ee0ff" : "#ffd60a";
           ctx.rotate(item.t / 140);
           ctx.beginPath();
           ctx.arc(0, 0, 28 + p * (item.kind === "combo" ? 70 : 56), item.kind === "sand" ? 0 : 0.2, Math.PI * (item.kind === "sand" ? 2 : 1.35));
@@ -2260,6 +2332,7 @@
       }
       if (flipping) ctx.restore();
       drawDanger();
+      drawFever();
     }
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -2287,7 +2360,40 @@
       ctx.restore();
     }
 
+    function drawFever() {
+      if (!feverActive(game) || session || puzzle) return;
+      ctx.save();
+      const pulse = paused || reducedMotion.matches ? 0.5 : (1 + Math.sin(performance.now() / 180)) / 2;
+      ctx.strokeStyle = `rgba(255, 189, 46, ${0.45 + pulse * 0.3})`;
+      ctx.lineWidth = 3;
+      ctx.strokeRect(7, 7, COLS * CELL - 14, ROWS * CELL - 14);
+      ctx.font = "bold 13px system-ui";
+      ctx.textAlign = "center";
+      const label = `FEVER ×3 · ${game.feverLeft}`;
+      const width = ctx.measureText(label).width + 16;
+      ctx.fillStyle = "rgba(48, 25, 0, .85)";
+      ctx.fillRect((COLS * CELL - width) / 2, 28, width, 22);
+      ctx.fillStyle = "#ffd60a";
+      ctx.fillText(label, COLS * CELL / 2, 44);
+      ctx.restore();
+    }
+
+    function announceFever() {
+      for (const curse of Object.keys(curseUntil)) curseUntil[curse] = 0;
+      pushCallout("fever", t("feverStart"), 1800);
+      fx.push({
+        kind: "fever", x: COLS * CELL / 2, y: ROWS * CELL * 0.3,
+        t: 0, life: 900, sparks: Array.from({ length: 24 }, (_, i) => ({
+          a: Math.PI * 2 * i / 24, sp: 120 + (i % 4) * 30,
+          color: i % 2 ? "#ff9f0a" : "#ffe49b",
+        })),
+      });
+      sound.playCombo(5);
+      sound.playBoom();
+    }
+
     function applyCurses(cells) {
+      if (feverActive(game)) return;
       applyNoHoldCurse(game, cells);
       const now = performance.now();
       for (const cell of cells || []) {
@@ -2389,6 +2495,7 @@
       document.querySelector("#btn-hold").disabled = game.noHoldLeft > 0 && !puzzle && !session;
       const notes = [];
       if (curseStatus()) notes.push(curseStatus());
+      if (feverActive(game)) notes.push(`${t("fever")} ×3 · ${game.feverLeft}`);
       if (game.sanding) notes.push(Number.isFinite(game.sandLeft) ? `${t("sand")} ${Math.max(0, game.sandLeft)}` : t("gameSand"));
       document.querySelector("#curse-note").textContent = notes.join(" · ");
       paintPreview(holdCtx, holdCanvas, [game.hold]);
@@ -2446,8 +2553,8 @@
         showVeil(t("topped"), String(total), t("again"));
         return;
       }
-      game.score += Math.round(session.score * paceOf(game));
-      if (session.full) game.score += Math.round(2000 * game.stage * paceOf(game));
+      game.score += Math.round(session.score * paceOf(game)) * (feverActive(game) ? 3 : 1);
+      if (session.full) game.score += Math.round(2000 * game.stage * paceOf(game)) * (feverActive(game) ? 3 : 1);
       session = null;
       game.phase = "resolving";
     }
@@ -2474,7 +2581,7 @@
           softAcc += dt;
           while (softAcc >= 45) {
             softAcc -= 45;
-            if (tryMove(game, 0, 1)) game.score += Math.round(paceOf(game));
+            if (tryMove(game, 0, 1)) game.score += Math.round(paceOf(game)) * (feverActive(game) ? 3 : 1);
           }
         }
         acc += dt;
@@ -2511,6 +2618,10 @@
           sound.blip(880, 0.06);
         }
         if (session.cleared > clearedBefore) sound.blip(760, 0.035);
+        if (session.feverHits.length) {
+          if (activateFever(game, session.feverHits)) announceFever();
+          session.feverHits = [];
+        }
         if (session.curseHits.length) {
           applyCurses(session.curseHits);
           session.curseHits = [];
@@ -2572,6 +2683,7 @@
               if (step.blasts?.length) sound.playBoom();
               applyCurses(step.cells);
               applyCurses(step.blasts);
+              if (step.feverStarted) announceFever();
             }
             if (step.type === "spin") {
               sound.playTspin();
