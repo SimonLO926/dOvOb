@@ -1,0 +1,328 @@
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand } from './logic.mjs?v=1.1.0';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.1.0';
+
+export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, limit: 480000 });
+export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand']);
+const HARD = new Set(['pinball', 'breakout', 'bbtan', 'sand']);
+const RECOVERY = ['cards', 'mahjong', 'slots'];
+const shuffled = (items, random) => {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [out[i], out[j]] = [out[j], out[i]]; }
+  return out;
+};
+
+export function createCrazy({ random = Math.random, boss = FIRST_BOSS } = {}) {
+  const bridge = createGame({ mode: 'crazyBridge', random });
+  startGame(bridge, 'crazyBridge');
+  const state = {
+    random, boss, hp: 100, maxHp: 100, bossHp: boss.hp, phase: 1, score: 0, elapsed: 0,
+    over: false, won: false, damageLeft: 50, mode: 'bridge', encounter: 0, bag: [], hardStreak: 0,
+    bridge, arcade: null, mini: null, held: new Set(), actionReady: true,
+    timeLeft: 20000, duration: 20000, protection: 500, cooldown: 0, fallMs: 0, lockMs: 0, repeatMs: 0,
+    resolveMs: 0, successes: 0, events: [], hitFlash: 0, cat: null, catDue: 9000, catBlock: 0,
+    notice: 'crazyOpening', noticeTime: 3500, attack: null, attackDone: false,
+  };
+  return state;
+}
+
+function notify(s, key, amount = 0) {
+  s.notice = key; s.noticeAmount = amount; s.noticeTime = 1800;
+  s.events.push({ key, amount });
+}
+export function hurtCrazy(s, amount, reason = 'crazyHurt') {
+  if (s.over || s.protection > 0) return false;
+  s.hp = Math.max(0, s.hp - amount); s.protection = 650; s.hitFlash = 300;
+  notify(s, reason, -amount);
+  if (s.hp === 0) { s.over = true; s.won = false; s.finishReason = reason; }
+  return true;
+}
+export function healCrazy(s, amount) {
+  if (s.over) return;
+  const gained = Math.min(amount, s.maxHp - s.hp);
+  s.hp += gained;
+  if (gained) notify(s, 'crazyHeal', gained);
+}
+export function hitCrazyBoss(s, amount) {
+  if (s.over) return;
+  const damage = Math.min(amount, s.damageLeft, s.bossHp);
+  s.damageLeft -= damage;
+  s.bossHp -= damage;
+  if (s.attack) { s.attack = null; notify(s, 'crazyCounter'); }
+  s.score += damage * 10; s.successes += 1;
+  const phase = s.bossHp <= s.boss.hp / 3 ? 3 : s.bossHp <= s.boss.hp * 2 / 3 ? 2 : 1;
+  if (phase > s.phase) { s.phase = phase; healCrazy(s, 12); notify(s, 'crazyPhase', phase); }
+  else notify(s, damage ? 'crazyHit' : 'crazyGuard', damage);
+  if (s.bossHp === 0) { s.over = true; s.won = true; s.score += 5000 + s.hp * 50; }
+}
+
+function nextMode(s) {
+  if (s.encounter % 3 === 0) return 'bridge';
+  if (!s.bag.length) s.bag = shuffled(CRAZY_MODES, s.random);
+  let index = s.bag.findIndex(m => m !== s.mode && (s.hardStreak < 2 || RECOVERY.includes(m)));
+  if (index < 0) {
+    // Insert a recovery encounter without discarding the rest of the shuffled deck.
+    return RECOVERY.find(m => m !== s.mode) || 'cards';
+  }
+  return s.bag.splice(index, 1)[0];
+}
+
+export function advanceCrazy(s) {
+  if (s.over) return;
+  if (s.mode === 'sand') finishSand(s.bridge);
+  s.encounter += 1;
+  s.mode = nextMode(s);
+  s.hardStreak = HARD.has(s.mode) ? s.hardStreak + 1 : 0;
+  s.duration = 22000 - s.phase * 2000;
+  s.damageLeft = 45 + s.phase * 5;
+  s.timeLeft = s.duration; s.protection = 500; s.held.clear(); s.actionReady = false;
+  s.cooldown = 0; s.fallMs = 0; s.lockMs = 0; s.repeatMs = 0; s.resolveMs = 0;
+  s.successes = 0; s.arcade = null; s.mini = null; s.cat = null; s.catBlock = 0; s.attack = null; s.attackDone = false;
+  s.catDue = Math.min(8000, s.duration / 2);
+  if (s.mode === 'bridge' || s.mode === 'sand') {
+    if (s.mode === 'sand') beginSand(s.bridge, Infinity);
+    // Finish outstanding Bridge resolution before accepting a new active piece.
+    if (!s.bridge.active) s.bridge.phase = 'resolving';
+  } else if (['breakout', 'pinball', 'bbtan'].includes(s.mode)) {
+    s.arcade = createSession(s.mode, brickWall(s.random), s.phase, s.random);
+    s.arcade.prep = 0; s.arcade.teach = false;
+  } else if (s.mode === 'slots') {
+    s.mini = { reels: [null, null, null], stop: 0, clock: 0, round: 0 };
+  } else if (s.mode === 'tiger') {
+    s.mini = { reels: [0, 1, 2], pending: 0, risks: 0, clock: 0 };
+  } else if (s.mode === 'pachinko') {
+    s.mini = { aim: 140, balls: [], pegs: Array.from({ length: 36 }, (_, i) => ({ x: 28 + (i % 6) * 42 + (Math.floor(i / 6) % 2) * 12, y: 160 + Math.floor(i / 6) * 48 })) };
+  } else deal(s);
+  notify(s, 'crazySwitch');
+}
+
+function deal(s) {
+  if (s.mode === 'cards') {
+    const target = 1 + Math.floor(s.random() * 9);
+    s.mini = { items: shuffled([target, target, target % 9 + 1, (target + 2) % 9 + 1], s.random), selected: [], focus: 0, target };
+  } else {
+    const a = Math.floor(s.random() * 4);
+    s.mini = { items: shuffled([a, a, (a + 1) % 4, (a + 1) % 4, (a + 2) % 4, (a + 2) % 4], s.random), selected: [], focus: 0, removed: [] };
+  }
+}
+
+function choose(s, index) {
+  const m = s.mini;
+  if (!m || s.cooldown > 0 || m.removed?.includes(index) || m.selected?.includes(index)) return;
+  m.focus = index; m.selected.push(index);
+  if (m.selected.length < 2) return;
+  const [a, b] = m.selected;
+  if (m.items[a] === m.items[b] && (s.mode !== 'cards' || m.items[a] === m.target)) {
+    hitCrazyBoss(s, s.mode === 'cards' ? 22 : 16); healCrazy(s, 2);
+    if (s.mode === 'mahjong') {
+      m.removed.push(a, b); m.selected = []; s.cooldown = 650;
+      if (m.removed.length === 6) { hitCrazyBoss(s, 20); s.cooldown = 450; }
+    } else s.cooldown = 600;
+  } else { hurtCrazy(s, 5, 'crazyWrong'); s.cooldown = 500; }
+}
+
+function miniAction(s, action) {
+  const m = s.mini;
+  if (!m || s.cooldown > 0 || s.catBlock > 0) return;
+  if (s.mode === 'slots' && action === 'action') {
+    m.reels[m.stop] = Math.floor(m.clock / (250 - s.phase * 20) + m.stop) % 4;
+    m.stop += 1;
+    if (m.stop === 3) {
+      const count = Math.max(...m.reels.map(v => m.reels.filter(x => x === v).length));
+      if (count >= 2) { hitCrazyBoss(s, count === 3 ? 48 : 24); healCrazy(s, count === 3 ? 8 : 3); }
+      else hurtCrazy(s, 6, 'crazyMiss');
+      s.cooldown = 650;
+    }
+  } else if (s.mode === 'tiger') {
+    if (action === 'alt' && m.pending) {
+      hitCrazyBoss(s, m.pending); healCrazy(s, 4); m.pending = 0; s.cooldown = 650;
+    } else if (action === 'action') {
+      if (m.pending) {
+        if (s.random() < 0.55) { m.pending *= 2; m.risks++; if (m.risks === 3) miniAction(s, 'alt'); }
+        else { m.pending = 0; hurtCrazy(s, 10, 'crazyRiskLost'); s.cooldown = 650; }
+      } else {
+        m.reels = Array.from({ length: 3 }, () => Math.floor(s.random() * 4)); m.risks = 0;
+        const count = Math.max(...m.reels.map(v => m.reels.filter(x => x === v).length));
+        if (count >= 2) { m.pending = count === 3 ? 32 : 18; notify(s, 'crazyBankOrRisk'); }
+        else { hurtCrazy(s, 6, 'crazyMiss'); s.cooldown = 650; }
+      }
+    }
+  } else if (s.mode === 'pachinko' && action === 'action' && m.balls.length < 3) {
+    m.balls.push({ x: m.aim, y: 154, vx: (m.aim - 140) * 0.7, vy: 40 }); s.cooldown = 500;
+  } else if (['cards', 'mahjong'].includes(s.mode)) {
+    if (action === 'left') m.focus = (m.focus - 1 + m.items.length) % m.items.length;
+    if (action === 'right') m.focus = (m.focus + 1) % m.items.length;
+    if (action === 'action') choose(s, m.focus);
+    if (action === 'alt' && s.mode === 'mahjong') m.selected = [];
+  }
+}
+
+export function inputCrazy(s, action, down = true) {
+  if (s.over) return;
+  if (!down) {
+    s.held.delete(action);
+    if (action === 'action') s.actionReady = true;
+    if (s.arcade && ['left', 'right'].includes(action)) s.arcade[action] = false;
+    return;
+  }
+  if (s.held.has(action)) return;
+  s.held.add(action);
+  if (action === 'action' && !s.actionReady) return;
+  if (s.arcade) {
+    if (action === 'left' || action === 'right') s.arcade[action] = true;
+    if (action === 'action') s.arcade.fire = true;
+  } else if (s.mode === 'bridge' || s.mode === 'sand') {
+    const g = s.bridge;
+    if (g.phase !== 'playing') return;
+    if (action === 'left' || action === 'right') tryMove(g, action === 'left' ? -1 : 1, 0);
+    if (action === 'down') tryMove(g, 0, 1);
+    if (action === 'rotate' || action === 'rotateLeft') tryRotate(g, action === 'rotate' ? 1 : -1);
+    if (action === 'alt') hold(g);
+    if (action === 'action') hardDrop(g);
+  } else miniAction(s, action);
+}
+
+// All mini-game hit regions use the same logical 280 x 560 coordinates as the renderer.
+export function pointCrazy(s, x, y) {
+  if (s.over || !s.actionReady || s.catBlock > 0) return;
+  if (s.mode === 'pachinko') { s.mini.aim = Math.max(20, Math.min(260, x)); return; }
+  if (s.mode === 'cards' && y >= 190 && y <= 290) {
+    const i = Math.floor((x - 12) / 65);
+    if (i >= 0 && i < 4) choose(s, i);
+  }
+  if (s.mode === 'mahjong' && y >= 185 && y <= 385) {
+    const col = Math.floor((x - 28) / 78), row = Math.floor((y - 185) / 105);
+    if (col >= 0 && col < 3 && row >= 0 && row < 2) choose(s, row * 3 + col);
+  }
+}
+
+function recoverBridge(s) {
+  hurtCrazy(s, 20, 'crazyTopout');
+  const g = s.bridge;
+  if (g.sanding) for (let y = 0; y < 8 * SAND_SCALE; y++) g.sandGrid[y].fill(0);
+  for (let y = 0; y < 8; y++) g.grid[y].fill(null);
+  g.active = null; g.phase = 'resolving'; g.pendingFlips = 0; s.resolveMs = 150;
+}
+function updateBridge(s, dt) {
+  const g = s.bridge;
+  if (g.phase === 'over') { recoverBridge(s); return; }
+  if (g.phase === 'resolving') {
+    s.resolveMs -= dt;
+    if (s.resolveMs > 0) return;
+    const step = pump(g);
+    s.resolveMs = step?.type === 'clear' ? 140 : 35;
+    if (step?.type === 'clear') {
+      hitCrazyBoss(s, (step.sand ? 12 : 16 * step.rows.length) + Math.min(12, step.combo * 2));
+      if (step.combo >= 2) healCrazy(s, 2);
+    }
+    if (step?.type === 'over') recoverBridge(s);
+    return;
+  }
+  if (!g.active) return;
+  s.repeatMs += dt;
+  if (s.repeatMs >= 100) {
+    s.repeatMs = 0;
+    if (s.held.has('left')) tryMove(g, -1, 0);
+    if (s.held.has('right')) tryMove(g, 1, 0);
+    if (s.held.has('down')) tryMove(g, 0, 1);
+  }
+  s.fallMs += dt;
+  if (s.fallMs >= 640 - s.phase * 110) { s.fallMs = 0; tryMove(g, 0, 1); }
+  if (!fits(g.grid, g.active.type, g.active.rot, g.active.x, g.active.y + 1, g)) {
+    s.lockMs += dt;
+    if (s.lockMs >= 380) { lockActive(g); s.lockMs = 0; }
+  } else s.lockMs = 0;
+}
+function updatePachinko(s, dt) {
+  const m = s.mini, t = dt / 1000;
+  if (s.held.has('left')) m.aim = Math.max(20, m.aim - dt * 0.18);
+  if (s.held.has('right')) m.aim = Math.min(260, m.aim + dt * 0.18);
+  for (const b of m.balls) {
+    b.vy = Math.min(370, b.vy + 370 * t); b.x += b.vx * t; b.y += b.vy * t;
+    if (b.x < 10 || b.x > 270) { b.x = Math.max(10, Math.min(270, b.x)); b.vx *= -0.8; }
+    for (const p of m.pegs) {
+      const dx = b.x - p.x, dy = b.y - p.y, d = Math.hypot(dx, dy);
+      if (d < 10) {
+        const nx = d ? dx / d : 1, ny = d ? dy / d : 0;
+        const dot = b.vx * nx + b.vy * ny;
+        b.x = p.x + nx * 10.1; b.y = p.y + ny * 10.1;
+        if (dot < 0) { b.vx -= 1.55 * dot * nx; b.vy -= 1.55 * dot * ny; }
+        b.vx += dx >= 0 ? 6 : -6;
+      }
+    }
+    if (b.y >= 505) {
+      const bin = Math.min(4, Math.max(0, Math.floor(b.x / 56)));
+      if (bin === 0 || bin === 4) healCrazy(s, 8);
+      else if (bin === 2) hurtCrazy(s, 6, 'crazyMiss');
+      else hitCrazyBoss(s, 22);
+    }
+  }
+  m.balls = m.balls.filter(b => b.y < 505);
+}
+
+function updateCat(s, dt) {
+  s.catDue -= dt;
+  s.catBlock = Math.max(0, s.catBlock - dt);
+  if (!s.cat && s.catDue <= 0) {
+    s.cat = { time: 0, applied: false, gift: s.random() < 0.25 };
+    notify(s, 'crazyCatWarning');
+  }
+  if (!s.cat) return;
+  s.cat.time += dt;
+  if (s.cat.time >= 1200 && !s.cat.applied) {
+    s.cat.applied = true;
+    if (s.cat.gift) healCrazy(s, 8);
+    else if (s.arcade) {
+      for (const ball of s.arcade.balls) ball.vx = -ball.vx + 35;
+      notify(s, 'crazyCatSwipe');
+    } else if (s.mode === 'bridge' || s.mode === 'sand') {
+      if (s.bridge.active) tryMove(s.bridge, s.random() < 0.5 ? -1 : 1, 0);
+      notify(s, 'crazyCatSwipe');
+    } else {
+      s.catBlock = 700; notify(s, 'crazyCatSwipe');
+    }
+  }
+  if (s.cat.time >= 2400) { s.cat = null; s.catDue = 10000 - s.phase * 1000; }
+}
+
+export function updateCrazy(s, elapsed) {
+  if (s.over) return s;
+  const dt = Math.max(0, Math.min(50, elapsed));
+  s.elapsed += dt; s.timeLeft -= dt; s.protection = Math.max(0, s.protection - dt);
+  s.hitFlash = Math.max(0, s.hitFlash - dt); s.noticeTime = Math.max(0, s.noticeTime - dt);
+  if (!s.actionReady && !s.held.has('action') && s.duration - s.timeLeft >= 500) s.actionReady = true;
+  const oldCooldown = s.cooldown; s.cooldown = Math.max(0, s.cooldown - dt);
+  if (oldCooldown > 0 && s.cooldown === 0 && s.mini) {
+    if (s.mode === 'slots') { s.mini.reels = [null, null, null]; s.mini.stop = 0; }
+    else if (s.mode === 'cards' || (s.mode === 'mahjong' && s.mini.removed.length === 6)) deal(s);
+    else if (s.mode === 'mahjong') s.mini.selected = [];
+  }
+  if (!s.attackDone && s.duration - s.timeLeft >= 4500 && !s.cat) {
+    s.attackDone = true; s.attack = { time: 3500 }; notify(s, 'crazyAttackWarning');
+  }
+  if (s.attack) {
+    s.attack.time -= dt;
+    if (s.attack.time <= 0) { s.attack = null; hurtCrazy(s, 4 + s.phase * 2, 'crazyBossAttack'); }
+  }
+  updateCat(s, dt);
+  if (s.mode === 'bridge' || s.mode === 'sand') updateBridge(s, dt);
+  else if (s.arcade) {
+    const cleared = s.arcade.cleared;
+    updateSession(s.arcade, dt);
+    const hits = s.arcade.cleared - cleared;
+    if (hits) hitCrazyBoss(s, hits * 4);
+    if (s.arcade.over) {
+      if (s.arcade.full) { hitCrazyBoss(s, 30); healCrazy(s, 6); }
+      else hurtCrazy(s, 12, 'crazyBallLost');
+      advanceCrazy(s);
+    }
+  } else if (s.mode === 'pachinko') updatePachinko(s, dt);
+  if (s.mini?.clock != null) s.mini.clock += dt;
+  if (s.elapsed >= s.boss.limit && !s.over) {
+    s.hp = 0; s.over = true; s.finishReason = 'crazyTimeout'; notify(s, 'crazyTimeout');
+  } else if (s.timeLeft <= 0 && !s.over) {
+    if (s.mode === 'tiger' && s.mini.pending) miniAction(s, 'alt');
+    if (!s.successes) hurtCrazy(s, 8, 'crazyTimeoutRound');
+    advanceCrazy(s);
+  }
+  return s;
+}

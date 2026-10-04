@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
-  <link rel="preload" href="./fonts/fever-brush.woff?v=1.0.17" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.1.0" as="font" type="font/woff" crossorigin>
   <style>
     /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
     @font-face {
       font-family: "Fever Brush";
-      src: url("./fonts/fever-brush.woff?v=1.0.17") format("woff");
+      src: url("./fonts/fever-brush.woff?v=1.1.0") format("woff");
       font-weight: 400;
       font-display: swap;
     }
@@ -946,10 +946,45 @@
       .stat b { font-size: 18px; }
       .rail { padding: 6px; gap: 8px; }
     }
+    #go-crazy.crazy-choice { border: 1px solid #ce486f; margin-top: 8px; }
+    .crazy-choice span { display: block; font-size: 12px; opacity: .8; margin-top: 3px; }
+    #crazy-preview-hint { max-width: 330px; font-size: 13px; margin: 8px 0; color: #ffd6a0; }
+    #crazy-ambient { display: none; position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: radial-gradient(ellipse at 50% 35%, #56243d, #130f25 60%, #070910); }
+    #crazy-ambient::before { content: ""; position: absolute; inset: -30%; background: repeating-conic-gradient(from 0deg, transparent 0deg 20deg, #ff426619 20deg 22deg); animation: crazy-orbit 30s linear infinite; }
+    #crazy-ambient::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 90px #df285777; animation: crazy-pressure 2s ease-in-out infinite alternate; }
+    #crazy-ambient b { position: absolute; left: var(--x); top: var(--y); transform: rotate(var(--r)); font-size: clamp(26px, 5vw, 70px); color: #eac0ad; opacity: .32; animation: crazy-drift 4s ease-in-out infinite alternate; }
+    #crazy-preview-cat { position: absolute; left: 1%; bottom: 1%; width: min(220px, 36vw); opacity: .8; transform: rotate(-8deg); }
+    body.crazy-preview, body.crazy-active { --ink: #fff0e7; --muted: #d3a7ba; --md-on-surface: #fff0e7; --md-container: #322335; --md-outline: #77556b; --md-primary: #ffbe83; --blue: #ff9aaf; }
+    body.crazy-preview #crazy-ambient, body.crazy-active #crazy-ambient { display: block; }
+    body.crazy-active[data-crazy-phase="2"] #crazy-ambient::after { box-shadow: inset 0 0 110px #ff284a88; }
+    body.crazy-active[data-crazy-phase="3"] #crazy-ambient::after { box-shadow: inset 0 0 120px #ff793caa; }
+    body.crazy-preview .hero { background: none; }
+    body.crazy-preview #hero3d { opacity: .12; }
+    body.crazy-preview .hero-copy { background: #110b1cc9; border-radius: 24px; }
+    body.crazy-preview #go-crazy.crazy-choice { background: #70233f; box-shadow: 0 0 24px #ff456f55; }
+    body.crazy-active .console, body.touch.crazy-active .console { grid-template-columns: auto; width: 100%; justify-content: center; }
+    body.crazy-active .rail { display: none; }
+    #crazy-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    html.touch body.crazy-active #game .stage { padding-bottom: calc(var(--pad-size) + 78px); }
+    @media (max-width: 760px) { body.crazy-active #game .stage { padding-bottom: calc(var(--pad-size) + 78px); } }
+    body.crazy-active #crazy-help { position: absolute; bottom: calc(var(--pad-size, 0px) + 18px); left: 50%; transform: translateX(-50%); width: min(480px, calc(100% - 120px)); pointer-events: none; }
+    #crazy-help { text-align: center; margin: 0; padding: 4px 12px; font-size: 12px; line-height: 1.3; color: #f4d7ca; min-height: 34px; }
+    @keyframes crazy-orbit { to { transform: rotate(360deg); } }
+    @keyframes crazy-pressure { from { opacity: .4; } to { opacity: 1; } }
+    @keyframes crazy-drift { from { translate: 0 -4px; } to { translate: 0 6px; } }
+    @media (prefers-reduced-motion: reduce) {
+      #crazy-ambient::before, #crazy-ambient::after, #crazy-ambient b { animation: none; }
+    }
   </style>
 </head>
 <body data-theme="light">
   <div id="vv-probe" aria-hidden="true"></div>
+  <div id="crazy-ambient" aria-hidden="true">
+    <b style="--x:7%;--y:16%;--r:-15deg">♠ ♥</b><b style="--x:76%;--y:12%;--r:14deg">7 7 7</b>
+    <b style="--x:10%;--y:64%;--r:12deg">中 發</b><b style="--x:77%;--y:67%;--r:-12deg">◉ · ◉</b>
+    <b style="--x:34%;--y:4%;--r:-8deg">★ ▦ ★</b><b style="--x:55%;--y:88%;--r:8deg">⚔ ♦ ▣</b>
+    <canvas id="crazy-preview-cat" width="220" height="170"></canvas>
+  </div>
   <div class="page">
     <section id="menu" class="hero">
       <canvas id="hero3d" aria-hidden="true"></canvas>
@@ -1051,6 +1086,10 @@
         <div class="hero-actions">
           <button id="go-sprint" class="secondary" type="button" data-i18n="sprint">40-line sprint</button>
         </div>
+        <div class="hero-actions">
+          <button id="go-crazy" class="secondary crazy-choice" type="button" aria-pressed="false">Crazy <span data-i18n="crazyBossBattle">Boss battle</span></button>
+        </div>
+        <p id="crazy-preview-hint" data-i18n="crazyPreviewHint" hidden>Select again to enter the battle.</p>
         <div class="pace-row" id="pace-row">
           <button id="pace-normal" type="button" data-i18n="normal">Normal</button>
           <button id="pace-hard" type="button"><span data-i18n="hard">Hard</span> ×2</button>
@@ -1325,6 +1364,8 @@
           </aside>
         </div>
       </div>
+      <p id="crazy-help" hidden></p>
+      <p id="crazy-status" class="sr" hidden></p>
       <div class="pad">
         <button type="button" id="btn-rot-left" aria-keyshortcuts="Z">
           <svg viewBox="0 0 24 24" aria-hidden="true" style="transform: scaleX(-1)"><path d="M19.4 12a7.4 7.4 0 1 1-2.1-5.2M19.4 4.2V8.8H14.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1377,16 +1418,18 @@
     <i style="--x:83%;--y:97%;--delay:-1.87s"></i>
   </div>
   <script type="module">
-    import { createSound } from "./audio.mjs?v=1.0.17";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.0.17";
-    import { translate } from "./i18n.mjs?v=1.0.17";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.0.17";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.0.17";
-    import { VERSION } from "./version.mjs?v=1.0.17";
+    import { createCrazy, updateCrazy, inputCrazy, pointCrazy } from "./crazy.mjs?v=1.1.0";
+    import { drawCrazy, drawMischiefCat } from "./crazy-view.mjs?v=1.1.0";
+    import { createSound } from "./audio.mjs?v=1.1.0";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.1.0";
+    import { translate } from "./i18n.mjs?v=1.1.0";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.1.0";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.1.0";
+    import { VERSION } from "./version.mjs?v=1.1.0";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SHAPES, activateFever, applyGarbageCurse, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.0.17";
+    } from "./logic.mjs?v=1.1.0";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -1413,6 +1456,7 @@
     ];
     const game = createGame();
     const settings = loadSettings();
+    let crazy = null;
     let puzzle = null;
     let paused = false;
     let acc = 0;
@@ -1482,6 +1526,7 @@
       settings.game = id;
       const key = GAMES.find(([name]) => name === id)[1];
       document.querySelector("#game-name").textContent = t(key);
+      if (id !== "bridge") previewCrazy(false);
       document.querySelector("#tetris-tools").hidden = id !== "bridge";
       document.body.dataset.game = id;
       document.querySelector("#version-label").textContent = VERSION;
@@ -1562,6 +1607,7 @@
           [t("normal"), readBoard("bridge-best-marathon-normal", { legacy: ["bridge-best-marathon"] }), (value) => String(value)],
           [`${t("hard")} ×2`, readBoard("bridge-best-marathon-hard"), (value) => String(value)],
           [t("sprint"), readBoard("bridge-best-sprint", { lower: true }), formatTime],
+          ["Crazy", readBoard("bridge-best-crazy"), (value) => String(value)],
           ...(settings.pace === "custom" ? [[`${t("custom")} ×${paceOf({ pace: settings.paceSpeed })}`, readBoard(`bridge-best-marathon-custom-${paceOf({ pace: settings.paceSpeed })}`), (value) => String(value)]] : []),
         ]
         : [[t(GAMES.find(([name]) => name === id)[1]), readBoard(`bridge-best-${id}`), (value) => String(value)]];
@@ -1592,12 +1638,18 @@
     }
 
     function showScreen(id) {
+      if (id !== "game") document.body.classList.remove("crazy-active");
+      if (id !== "menu") previewCrazy(false);
       for (const name of ["menu", "settings", "boards", "game"]) document.querySelector(`#${name}`).hidden = name !== id;
     }
 
     function resetTimers() { acc = 0; softAcc = 0; lockMs = 0; lockResets = 0; }
 
     function begin(mode) {
+      crazy = null;
+      document.querySelector("#crazy-help").hidden = true;
+      document.querySelector("#crazy-status").hidden = true;
+      document.body.classList.remove("crazy-active");
       puzzle = null;
       document.body.dataset.game = mode === "marathon" || mode === "sprint" ? "bridge" : mode;
       startGame(game, mode);
@@ -1628,6 +1680,10 @@
     }
 
     function beginArcade(kind) {
+      crazy = null;
+      document.body.classList.remove("crazy-active");
+      document.querySelector("#crazy-help").hidden = true;
+      document.querySelector("#crazy-status").hidden = true;
       document.body.dataset.game = kind;
       puzzle = null;
       anim = null;
@@ -1660,6 +1716,10 @@
     }
 
     function beginPuzzle(kind) {
+      crazy = null;
+      document.body.classList.remove("crazy-active");
+      document.querySelector("#crazy-help").hidden = true;
+      document.querySelector("#crazy-status").hidden = true;
       document.body.dataset.game = kind;
       session = null;
       anim = null;
@@ -1705,6 +1765,15 @@
     }
 
     function backToMenu() {
+      crazy = null;
+      previewCrazy(false);
+      document.querySelector("#crazy-help").hidden = true;
+      document.querySelector("#crazy-status").hidden = true;
+      document.querySelector("#btn-hold").disabled = false;
+      document.querySelector("#btn-soft").disabled = false;
+      document.querySelector("#btn-rot").disabled = false;
+      document.querySelector("#btn-rot .pad-label").textContent = t("rotateRight");
+      document.querySelector("#btn-hold .pad-label").textContent = t("keep");
       paused = false;
       session = null;
       game.phase = "ready";
@@ -1768,6 +1837,53 @@
       sound.blip(160, 0.05);
     }
 
+    function previewCrazy(on) {
+      document.body.classList.toggle("crazy-preview", on);
+      document.querySelector("#go-crazy").setAttribute("aria-pressed", String(on));
+      document.querySelector("#crazy-preview-hint").hidden = !on;
+    }
+    function beginCrazy() {
+      begin("crazy");
+      crazy = createCrazy();
+      document.body.dataset.game = "bridge";
+      document.body.classList.add("crazy-active");
+      document.querySelector("#crazy-help").hidden = false;
+      document.querySelector("#crazy-status").hidden = false;
+      fitBoard();
+    }
+    function crazyPress(action, down = true) {
+      if (!crazy) return false;
+      if (!paused && !document.querySelector("#game").hidden) {
+        if (action === "rotate" && !["bridge", "sand"].includes(crazy.mode)) action = "action";
+        inputCrazy(crazy, action, down);
+      }
+      return true;
+    }
+    const crazyKeys = { ArrowLeft: "left", ArrowRight: "right", ArrowDown: "down", ArrowUp: "rotate", x: "rotate", X: "rotate", z: "rotateLeft", Z: "rotateLeft", " ": "action", Enter: "action", c: "alt", C: "alt", Shift: "alt" };
+    const crazyChoice = document.querySelector("#go-crazy");
+    crazyChoice.addEventListener("pointerenter", () => { if (!coarseDevice()) previewCrazy(true); });
+    crazyChoice.addEventListener("pointerleave", () => { if (!coarseDevice()) previewCrazy(false); });
+    crazyChoice.addEventListener("focus", () => { if (!coarseDevice()) previewCrazy(true); });
+    crazyChoice.addEventListener("blur", () => { if (!coarseDevice()) previewCrazy(false); });
+    crazyChoice.addEventListener("click", () => {
+      if (coarseDevice() && !document.body.classList.contains("crazy-preview")) { previewCrazy(true); return; }
+      beginCrazy();
+    });
+    const previewCat = document.querySelector("#crazy-preview-cat").getContext("2d");
+    drawMischiefCat(previewCat, 130, 83, 1.3);
+    board.addEventListener("pointerdown", event => {
+      if (!crazy || paused) return;
+      event.preventDefault();
+      const r = board.getBoundingClientRect();
+      pointCrazy(crazy, (event.clientX - r.left) * 280 / r.width, (event.clientY - r.top) * 560 / r.height);
+    });
+    function releaseCrazyInputs() {
+      if (!crazy) return;
+      for (const action of [...crazy.held]) inputCrazy(crazy, action, false);
+    }
+    window.addEventListener("blur", () => { if (crazy && !crazy.over) { releaseCrazyInputs(); paused = true; } });
+    document.addEventListener("visibilitychange", () => { if (document.hidden && crazy && !crazy.over) { releaseCrazyInputs(); paused = true; } });
+
     document.querySelector("#go-start").addEventListener("click", beginSelected);
     document.querySelector("#game-prev").addEventListener("click", () => shiftCatalog(-1));
     document.querySelector("#game-next").addEventListener("click", () => shiftCatalog(1));
@@ -1797,7 +1913,8 @@
     document.querySelector("#veil-menu").addEventListener("click", backToMenu);
     document.querySelector("#veil-btn").addEventListener("click", () => {
       if (game.phase === "over" || game.phase === "done") {
-        if (game.mode === "ten" || game.mode === "twenty") beginPuzzle(game.mode);
+        if (crazy) beginCrazy();
+        else if (game.mode === "ten" || game.mode === "twenty") beginPuzzle(game.mode);
         else if (game.mode === "breakout" || game.mode === "bbtan" || game.mode === "pinball") beginArcade(game.mode);
         else begin(game.mode);
       }
@@ -1828,7 +1945,12 @@
       const key = event.key;
       if (["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", " "].includes(key)) event.preventDefault();
       if (key === "p" || key === "P" || key === "Escape") {
-        if (puzzle || ["playing", "resolving", "breakout", "bbtan", "pinball", "sand"].includes(game.phase)) paused = !paused;
+        if (crazy && !crazy.over) { paused = !paused; releaseCrazyInputs(); }
+        else if (puzzle || ["playing", "resolving", "breakout", "bbtan", "pinball", "sand"].includes(game.phase)) paused = !paused;
+        return;
+      }
+      if (crazy) {
+        if (crazyKeys[key]) { event.preventDefault(); crazyPress(crazyKeys[key]); }
         return;
       }
       if (puzzle && !paused) {
@@ -1871,6 +1993,7 @@
     });
 
     window.addEventListener("keyup", (event) => {
+      if (crazy && crazyKeys[event.key]) { crazyPress(crazyKeys[event.key], false); return; }
       if (event.key === "ArrowLeft") { heldKeys.delete("left"); steer(-1, false); }
       if (event.key === "ArrowRight") { heldKeys.delete("right"); steer(1, false); }
       if (event.key === "ArrowDown") heldKeys.delete("down");
@@ -1910,38 +2033,45 @@
     }
 
     bindPress("#btn-left", () => {
+      if (crazyPress("left")) return;
       if (playPuzzlePad("left")) return;
       if (session) { steer(-1, true); return; }
       shift(-1);
       leftTimer = window.setInterval(() => shift(-1), 70);
-    }, () => { steer(-1, false); window.clearInterval(leftTimer); });
+    }, () => { if (crazyPress("left", false)) return; steer(-1, false); window.clearInterval(leftTimer); });
     bindPress("#btn-right", () => {
+      if (crazyPress("right")) return;
       if (playPuzzlePad("right")) return;
       if (session) { steer(1, true); return; }
       shift(1);
       rightTimer = window.setInterval(() => shift(1), 70);
-    }, () => { steer(1, false); window.clearInterval(rightTimer); });
+    }, () => { if (crazyPress("right", false)) return; steer(1, false); window.clearInterval(rightTimer); });
     bindPress("#btn-soft", () => {
+      if (crazyPress("down")) return;
       if (playPuzzlePad("down")) return;
       heldKeys.add("down");
-    }, () => heldKeys.delete("down"));
+    }, () => { if (crazyPress("down", false)) return; heldKeys.delete("down"); });
     bindPress("#btn-rot", () => {
+      if (crazyPress("rotate")) return;
       if (playPuzzlePad("up")) return;
       doRotate(1);
-    });
+    }, () => { crazyPress("rotate", false); });
     bindPress("#btn-rot-left", () => {
+      if (crazyPress("rotateLeft")) return;
       if (puzzle || session) return;
       doRotate(-1);
-    });
+    }, () => { crazyPress("rotateLeft", false); });
     bindPress("#btn-hold", () => {
+      if (crazyPress("alt")) return;
       if (playPuzzlePad("cycle")) return;
       doHold();
-    });
+    }, () => { crazyPress("alt", false); });
     bindPress("#btn-drop", () => {
+      if (crazyPress("action")) return;
       if (puzzle?.kind === "twenty") { playPuzzlePad("down"); return; }
       if (puzzle?.kind === "ten") { playPuzzlePad("place"); return; }
       doHard();
-    });
+    }, () => { crazyPress("action", false); });
 
     function ink() { return document.body.dataset.theme === "dark" ? "#f5f5f7" : "#1d1d1f"; }
     const CURSE_COLOR = {
@@ -2610,7 +2740,9 @@
     }
 
     function draw() {
-      const danger = !paused && !session && !puzzle ? dangerLevel(game) : 0;
+      const danger = crazy
+        ? !paused && !crazy.over ? crazy.hp <= 25 ? 2 : crazy.hp <= 50 ? 1 : 0 : 0
+        : !paused && !session && !puzzle ? dangerLevel(game) : 0;
       const consolePanel = document.querySelector("#game .console");
       consolePanel.classList.toggle("danger-warning", danger === 1);
       consolePanel.classList.toggle("danger-critical", danger === 2);
@@ -2620,6 +2752,26 @@
       feverAura.hidden = gameHidden || !!puzzle || !feverActive(game) || ["over", "done", "ready"].includes(game.phase);
       feverAura.classList.toggle("paused", paused);
       if (gameHidden) return;
+      if (crazy) {
+        feverAura.hidden = true;
+        document.querySelector("#coach").hidden = true;
+        document.querySelector("#callout").hidden = true;
+        document.querySelector("#btn-rot-left").hidden = !["bridge", "sand"].includes(crazy.mode);
+        document.body.dataset.crazyPhase = String(crazy.phase);
+        prepareBoard();
+        drawCrazy(ctx, crazy, t, { reducedMotion: paused || reducedMotion.matches });
+        const blocks = ["bridge", "sand"].includes(crazy.mode);
+        document.querySelector("#btn-soft").disabled = !blocks;
+        document.querySelector("#btn-hold").disabled = !blocks && !["tiger", "mahjong"].includes(crazy.mode);
+        document.querySelector("#btn-rot .pad-label").textContent = blocks ? t("rotateRight") : t("crazyAction");
+        document.querySelector("#btn-hold .pad-label").textContent = blocks ? t("keep") : crazy.mode === "tiger" ? t("crazyBank") : t("crazyReset");
+        document.querySelector("#btn-drop .pad-label").textContent = blocks ? t("drop") : t("crazyAction");
+        document.querySelector("#crazy-help").textContent = t("crazyHint_" + crazy.mode);
+        document.querySelector("#crazy-status").textContent = `HP ${crazy.hp}/100 · BOSS ${crazy.bossHp}/${crazy.boss.hp} · ${t("crazyPhaseLabel")} ${crazy.phase}/3 · ${t("score")} ${crazy.score}`;
+        if (paused && !crazy.over) showVeil(t("paused"), t("pauseHint"), t("resume"));
+        else if (!crazy.over) veil.hidden = true;
+        return;
+      }
       if (puzzle) {
         prepareBoard();
         ctx.fillStyle = wellColor();
@@ -2701,6 +2853,26 @@
     function frame(now) {
       const dt = Math.min(34, now - last);
       last = now;
+      if (crazy) {
+        if (!paused && !document.querySelector("#game").hidden) {
+          updateCrazy(crazy, dt);
+          for (const event of crazy.events.splice(0)) {
+            if (event.key === "crazyHit") sound.blip(700, .03);
+            else if (event.amount < 0) sound.blip(120, .08);
+            else if (event.key === "crazyCatWarning") sound.blip(980, .04);
+            else if (event.key === "crazyPhase") sound.playCombo(crazy.phase + 2);
+          }
+          if (crazy.over && game.phase !== "over" && game.phase !== "done") {
+            game.phase = crazy.won ? "done" : "over";
+            game.score = crazy.score;
+            remember(crazy.score);
+            showVeil(t(crazy.won ? "crazyVictory" : "crazyDefeat"), `${crazy.finishReason ? t(crazy.finishReason) + " · " : ""}${t("score")} ${crazy.score} · ${formatTime(crazy.elapsed)}`, t("again"));
+          }
+        }
+        const live = !paused && !crazy.over && !document.querySelector("#game").hidden;
+        if (live) { sound.start(); sound.tick(); } else sound.stop();
+        fitBoard(); draw(); requestAnimationFrame(frame); return;
+      }
       if (puzzle?.over && game.phase !== "over") {
         game.phase = "over";
         remember(puzzle.score);
