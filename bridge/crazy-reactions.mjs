@@ -106,11 +106,18 @@ function pusherCoin(random, x, y, dropped = false) {
 }
 export function pusherFront(m) { return 260 + (Math.sin(m.clock / (m.strokePeriod || 500)) + 1) * 35; }
 export function createPusher(random, duration = 20000) {
+  // Keep a packed bed, but stagger rows and scatter each coin independently.
+  // Loose, fully random placement leaves gaps that absorb the pusher's motion.
+  const rowOffsets = Array.from({ length: 8 }, () => (random() - .5) * 6);
   return { aim: 140, clock: 0, stock: Math.min(24, Math.max(12, Math.round(duration / 1250))), pending: 0,
     collected: 0, risk: null, riskUsed: false, strokePeriod: 450 + random() * 180, falling: [],
     reels: [0, 1, 2], spin: null, jackpotFlash: 0, jackpotTier: 0,
     jackpots: [6 + Math.floor(random() * 5), 16 + Math.floor(random() * 9), 35 + Math.floor(random() * 16)],
-    coins: Array.from({ length: 96 }, (_, i) => pusherCoin(random, 35 + i % 12 * 19 + (random() - .5), 310 + Math.floor(i / 12) * 19)), obstacles: [] };
+    coins: Array.from({ length: 96 }, (_, i) => {
+      const row = Math.floor(i / 12);
+      return pusherCoin(random, 35 + i % 12 * 19 + rowOffsets[row] + (random() - .5) * 8,
+        310 + row * 19 + (random() - .5) * 10);
+    }), obstacles: [] };
 }
 function startPusherSpin(s, api) {
   const m = s.mini;

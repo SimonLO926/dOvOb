@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { createPusher } from './crazy-reactions.mjs';
 import { crazyRoundDuration, pachinkoBins, createCrazy, FIRST_BOSS, CRAZY_MODES, advanceCrazy, updateCrazy, inputCrazy, pointCrazy, hitCrazyBoss, healCrazy, hurtCrazy, skipCrazyCinematic } from './crazy.mjs';
 
 function enter(s, mode) {
@@ -430,6 +431,21 @@ test('Pusher reward is settled once even when the time expires or a risk is bank
   const s = createCrazy(); advanceCrazy(s, 'pusher'); s.mini.pending = 20; s.mini.risk = {time: 4000, win: false}; s.timeLeft = 50;
   updateCrazy(s, 50); assert.notEqual(s.mode, 'pusher'); assert.equal(s.bossHp, 890);
   const hp = s.bossHp; updateCrazy(s, 50); assert.equal(s.bossHp, hp);
+});
+
+test('New pusher beds vary coin positions while keeping every starting coin inside the tray', () => {
+  const make = initial => {
+    let seed = initial;
+    return createPusher(() => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296));
+  };
+  const layouts = Array.from({ length: 10 }, (_, i) => make(i + 1).coins);
+  assert.equal(new Set(layouts.map(coins => JSON.stringify(coins.map(c => [c.x, c.y])))).size, 10);
+  for (const coins of layouts) {
+    assert.equal(coins.length, 96);
+    assert.ok(coins.every(c => c.x > 27 && c.x < 253 && c.y > 300 && c.y < 465));
+    assert.ok(new Set(coins.slice(0, 12).map(c => c.y)).size > 1);
+  }
+  assert.deepEqual(make(1).coins, layouts[0]);
 });
 
 test('The packed pusher bed pays out through normal physics and dropped stock increases rewards', () => {
