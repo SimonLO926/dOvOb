@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createCrazy, FIRST_BOSS, CRAZY_MODES, advanceCrazy, updateCrazy, inputCrazy, pointCrazy, hitCrazyBoss, healCrazy, hurtCrazy, skipCrazyCinematic } from './crazy.mjs';
+import { pachinkoBins, createCrazy, FIRST_BOSS, CRAZY_MODES, advanceCrazy, updateCrazy, inputCrazy, pointCrazy, hitCrazyBoss, healCrazy, hurtCrazy, skipCrazyCinematic } from './crazy.mjs';
 
 function enter(s, mode) {
   s.mode = 'bridge'; s.encounter = 0; s.bag = [mode]; advanceCrazy(s);
@@ -106,6 +106,7 @@ test('Mahjong clears pairs and finishes a board without selecting removed tiles 
 
 test('Pachinko uses distinct reward bins and a bounded ball count', () => {
   const s = createCrazy(); enter(s, 'pachinko'); s.hp = 50;
+  s.mini.bins = [{ x: 12, w: 44, kind: 'heal', amount: 8 }, { x: 56, w: 56, kind: 'attack', amount: 22 }, { x: 112, w: 56, kind: 'hurt', amount: 6 }, { x: 168, w: 56, kind: 'attack', amount: 22 }, { x: 224, w: 44, kind: 'heal', amount: 8 }];
   pointCrazy(s, 500, 100); assert.equal(s.mini.aim, 260);
   s.mini.balls = [{ x: 20, y: 504, vx: 0, vy: 100 }, { x: 80, y: 504, vx: 0, vy: 100 }, { x: 140, y: 504, vx: 0, vy: 100 }];
   updateCrazy(s, 50); assert.equal(s.hp, 52); assert.equal(s.bossHp, 878); assert.equal(s.mini.balls.length, 0);
@@ -496,4 +497,43 @@ test('Most recently pressed direction controls Crazy Bridge repeats, matching Ma
   run(s, 150); assert.equal(s.bridge.active.x, 5);
   inputCrazy(s, 'right', false); run(s, 100); assert.equal(s.bridge.active.x, 5);
   advanceCrazy(s, 'bridge'); assert.equal(s.horizontalDir, 0); assert.equal(s.horizontalMs, 0);
+});
+
+test('Random pachinko bins cover the arena and retain both rewards and a bounded penalty', () => {
+  let seed = 592; const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const layouts = new Set(), values = new Set(), widths = new Set();
+  for (let round = 0; round < 100; round++) {
+    const bins = pachinkoBins(random);
+    assert.equal(bins[0].x, 12); assert.equal(bins.at(-1).x + bins.at(-1).w, 268);
+    assert.equal(bins.filter(b => b.kind === 'heal').length, 2);
+    assert.equal(bins.filter(b => b.kind === 'attack').length, 2);
+    assert.equal(bins.filter(b => b.kind === 'hurt').length, 1);
+    for (const [i,b] of bins.entries()) {
+      if (i) assert.equal(b.x, bins[i-1].x + bins[i-1].w);
+      assert.ok(b.w >= 34 && b.w <= 72);
+      const [min,max] = b.kind === 'heal' ? [4,12] : b.kind === 'attack' ? [12,32] : [4,10];
+      assert.ok(Number.isInteger(b.amount) && b.amount >= min && b.amount <= max);
+      values.add(`${b.kind}:${b.amount}`); widths.add(b.w);
+    }
+    layouts.add(bins.map(b => b.kind).join(','));
+  }
+  assert.ok(layouts.size > 10); assert.ok(values.size > 20); assert.ok(widths.size > 10);
+});
+
+test('Pachinko landing follows the displayed randomized bin boundaries and amounts exactly once', () => {
+  const s = createCrazy(); enter(s, 'pachinko'); s.catDue = Infinity; s.attackDone = true;
+  s.hp = 40; s.protection = 0; s.damageLeft = 200;
+  const bins = s.mini.bins.map(b => ({...b}));
+  let heal = 0, damage = 0, penalty = 0;
+  for (const bin of bins) {
+    s.protection = 0;
+    s.mini.balls = [{x:bin.x+bin.w/2,y:504,vx:0,vy:100}]; updateCrazy(s, 50);
+    assert.equal(s.mini.balls.length, 0);
+    if (bin.kind === 'heal') heal += bin.amount;
+    else if (bin.kind === 'hurt') penalty += bin.amount;
+    else damage += bin.amount;
+    assert.deepEqual(s.mini.bins, bins, 'Bins must not reroll during flight or payout');
+  }
+  assert.equal(s.hp, 40 + heal - penalty); assert.equal(s.bossHp, 900 - damage);
+  const hp = s.hp, bossHp = s.bossHp; updateCrazy(s, 50); assert.equal(s.hp, hp); assert.equal(s.bossHp, bossHp);
 });

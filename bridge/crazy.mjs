@@ -1,7 +1,7 @@
-import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.5';
-import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.5';
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.5';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.5';
+import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.6';
+import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.6';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.6';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.6';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, secondHp: 1200, limit: 720000 });
 export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand', 'dodge']);
@@ -18,6 +18,19 @@ const shuffled = (items, random) => {
   return out;
 };
 
+export function pachinkoBins(random = Math.random) {
+  // Keep two healing, two boss-hit and one penalty bin; position, width and value vary by encounter.
+  const kinds = shuffled(['heal', 'heal', 'attack', 'attack', 'hurt'], random);
+  const weights = kinds.map(() => .8 + random() * .4), total = weights.reduce((sum, value) => sum + value, 0);
+  let x = 12;
+  return kinds.map((kind, index) => {
+    const w = index === 4 ? 268 - x : Math.round(weights[index] / total * 256);
+    const min = kind === 'heal' ? 4 : kind === 'attack' ? 12 : 4;
+    const max = kind === 'heal' ? 12 : kind === 'attack' ? 32 : 10;
+    const bin = { kind, amount: min + Math.floor(random() * (max - min + 1)), x, w };
+    x += w; return bin;
+  });
+}
 export function createCrazy({ random = Math.random, boss = FIRST_BOSS } = {}) {
   const bridge = createGame({ mode: 'marathon', random });
   startGame(bridge, 'marathon');
@@ -157,7 +170,7 @@ export function advanceCrazy(s, preferredMode = null) {
   } else if (s.mode === 'tiger') {
     s.mini = { reels: [0, 1, 2], pending: 0, risks: 0, clock: 0, spin: null };
   } else if (s.mode === 'pachinko') {
-    s.mini = { aim: 140, balls: [], pegs: Array.from({ length: 36 }, (_, i) => ({ x: 28 + (i % 6) * 42 + (Math.floor(i / 6) % 2) * 12 + (s.random() - .5) * 14, y: 174 + Math.floor(i / 6) * 48 + (s.random() - .5) * 12 })) };
+    s.mini = { aim: 140, balls: [], bins: pachinkoBins(s.random), pegs: Array.from({ length: 36 }, (_, i) => ({ x: 28 + (i % 6) * 42 + (Math.floor(i / 6) % 2) * 12 + (s.random() - .5) * 14, y: 174 + Math.floor(i / 6) * 48 + (s.random() - .5) * 12 })) };
   } else if (s.mode === 'dodge') {
     s.mini = { x: 140, y: 400, target: null, hazards: [], wave: 0, spawn: 850, survival: 0, dash: 0, dashReady: 0, lastX: 0, lastY: -1 };
   } else if (GREED_ATTACKS.includes(s.mode)) { s.mini = createReaction(s.mode); }
@@ -426,10 +439,10 @@ function updatePachinko(s, dt) {
       }
     }
     if (b.y >= 505) {
-      const bin = Math.min(4, Math.max(0, Math.floor(b.x / 56)));
-      if (bin === 0 || bin === 4) healCrazy(s, 8);
-      else if (bin === 2) hurtCrazy(s, 6, 'crazyMiss');
-      else hitCrazyBoss(s, 22);
+      const bin = m.bins.find(bin => b.x < bin.x + bin.w) || m.bins.at(-1);
+      if (bin.kind === 'heal') healCrazy(s, bin.amount);
+      else if (bin.kind === 'hurt') hurtCrazy(s, bin.amount, 'crazyMiss');
+      else hitCrazyBoss(s, bin.amount);
     }
   }
   m.balls = m.balls.filter(b => b.y < 505);
