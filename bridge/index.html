@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
-  <link rel="preload" href="./assets/mischief-cat.png?v=1.2.0" as="image">
-  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.0" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="./assets/mischief-cat.png?v=1.2.4" as="image">
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.4" as="font" type="font/woff" crossorigin>
   <style>
     /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
     @font-face {
       font-family: "Fever Brush";
-      src: url("./fonts/fever-brush.woff?v=1.2.0") format("woff");
+      src: url("./fonts/fever-brush.woff?v=1.2.4") format("woff");
       font-weight: 400;
       font-display: swap;
     }
@@ -950,10 +950,10 @@
     #go-crazy.crazy-choice { border: 1px solid #ce486f; margin-top: 8px; }
     .crazy-choice span { display: block; font-size: 12px; opacity: .8; margin-top: 3px; }
     #crazy-preview-hint { max-width: 330px; font-size: 13px; margin: 8px 0; color: #ffd6a0; }
-    #crazy-ambient { display: none; position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: radial-gradient(ellipse at 50% 35%, #56243d, #130f25 60%, #070910); }
-    #crazy-ambient::before { content: ""; position: absolute; inset: -30%; background: repeating-conic-gradient(from 0deg, transparent 0deg 20deg, #ff426619 20deg 22deg); animation: crazy-orbit 30s linear infinite; }
+    #crazy-ambient { display: none; position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: radial-gradient(ellipse at 15% 30%, #50213788, transparent 50%), radial-gradient(ellipse at 85% 75%, #37366977, transparent 55%), #0b0c17; }
+    #crazy-ambient::before { content: ""; position: absolute; inset: -30%; background: conic-gradient(from 0deg, transparent, #d4904222, transparent 35%, #b831651c, transparent 70%); animation: crazy-orbit 30s linear infinite; }
     #crazy-ambient::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 90px #df285777; animation: crazy-pressure 2s ease-in-out infinite alternate; }
-    #crazy-ambient b { position: absolute; left: var(--x); top: var(--y); transform: rotate(var(--r)); font-size: clamp(26px, 5vw, 70px); color: #eac0ad; opacity: .32; animation: crazy-drift 4s ease-in-out infinite alternate; }
+    #crazy-ambient b { position: absolute; left: var(--x); top: var(--y); transform: rotate(var(--r)); font-size: clamp(26px, 5vw, 70px); color: #eac0ad; opacity: .14; animation: crazy-drift 4s ease-in-out infinite alternate; }
     #crazy-preview-cat { position: absolute; left: 1%; bottom: 1%; width: min(220px, 36vw); opacity: .8; transform: rotate(-8deg); }
     body.crazy-preview, body.crazy-active { --ink: #fff0e7; --muted: #d3a7ba; --md-on-surface: #fff0e7; --md-container: #322335; --md-outline: #77556b; --md-primary: #ffbe83; --blue: #ff9aaf; }
     body.crazy-preview #crazy-ambient, body.crazy-active #crazy-ambient { display: block; }
@@ -965,15 +965,17 @@
     body.crazy-preview #go-crazy.crazy-choice { background: #70233f; box-shadow: 0 0 24px #ff456f55; }
     body.crazy-active .console, body.touch.crazy-active .console { grid-template-columns: auto; width: 100%; justify-content: center; }
     body.crazy-active .rail { display: none; }
+    #crazy-boss-frame { display: none; position: absolute; top: 0; left: -50%; width: 200%; height: 100%; pointer-events: none; image-rendering: pixelated; }
+    body.crazy-active #crazy-boss-frame { display: block; }
     #crazy-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     body.crazy-active #game { height: 100svh; max-height: 100svh; min-height: 0; }
-    body.crazy-active #game .nav { flex: 0 0 58px; }
+    body.crazy-active #game .nav { flex: 0 0 40px; }
     html.touch body.crazy-active #game .stage, body.crazy-active #game .stage { padding-bottom: 0; flex: 1; min-height: 0; overflow: hidden; }
     body.crazy-active #crazy-help { position: static; transform: none; flex: 0 0 auto; width: 100%; max-width: 720px; align-self: center; margin: 6px 0; padding: 8px 12px; border: 1px solid #654155; border-radius: 8px; background: #120f23ee; font-size: 12px; line-height: 1.5; text-align: center; overflow-wrap: anywhere; }
-    html.touch body.crazy-active #game .pad, body.touch.crazy-active #game .pad { position: relative; left: auto; right: auto; bottom: auto; flex: 0 0 var(--pad-size); margin-top: 64px; }
+    html.touch body.crazy-active #game .pad, body.touch.crazy-active #game .pad { position: relative; left: auto; right: auto; bottom: auto; flex: 0 0 var(--pad-size); margin-top: 52px; }
     html.touch body.crazy-active[data-crazy-controls="mini"] #game .pad, body.crazy-active[data-crazy-controls="mini"] #game .pad { margin-top: 12px; }
-    body.crazy-active #game .pad #btn-rot-left { bottom: calc(100% + 6px); height: 52px; }
-    @media (max-width: 760px) { body.crazy-active #game .pad { position: relative; left: auto; right: auto; bottom: auto; flex: 0 0 var(--pad-size); margin-top: 64px; } }
+    body.crazy-active #game .pad #btn-rot-left { bottom: calc(100% + 6px); height: 44px; }
+    @media (max-width: 760px) { body.crazy-active #game .pad { position: relative; left: auto; right: auto; bottom: auto; flex: 0 0 var(--pad-size); margin-top: 52px; } }
     @keyframes crazy-orbit { to { transform: rotate(360deg); } }
     @keyframes crazy-pressure { from { opacity: .4; } to { opacity: 1; } }
     @keyframes crazy-drift { from { translate: 0 -4px; } to { translate: 0 6px; } }
@@ -981,21 +983,32 @@
       #crazy-ambient::before, #crazy-ambient::after, #crazy-ambient b { animation: none; }
     }
 
-    #bosses { min-height: 100svh; padding: 24px max(18px, env(safe-area-inset-left)); background: radial-gradient(ellipse at 65% 40%, #442039, #110b1b 70%); color: #fff0d8; overflow: auto; touch-action: pan-y; }
+    #bosses { position: relative; isolation: isolate; height: 100svh; max-height: 100svh; min-height: 100svh; padding: 24px max(18px, env(safe-area-inset-left)); background: radial-gradient(ellipse at 70% 15%, #35283788, transparent 55%), radial-gradient(ellipse at 0% 85%, #29213b88, transparent 60%), #0d0e17; color: #fff0d8; overflow: auto; touch-action: pan-y; }
+    .sins-sky { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: radial-gradient(ellipse at 50% 100%, #724c3922, transparent 65%); }
+    .sins-sky svg { position: absolute; left: var(--x); top: var(--y); width: clamp(90px, 14vw, 200px); height: clamp(90px, 14vw, 200px); fill: none; stroke: var(--tone); stroke-width: .35; opacity: .13; transform: rotate(-12deg); }
+    .sin-emblem { width: 27px; height: 27px; flex: 0 0 27px; margin-right: 12px; fill: none; stroke: currentColor; stroke-width: 1.2; }
+    .sins-list button span { margin-right: auto; }
+    .sins-list button[data-sin="wrath"] { border-color: #79424b; color: #ec9a9f; }
     .sins-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: 1100px; margin: 0 auto 20px; }
-    body.boss-select { background: #120b1d; }
+    body.boss-select { background: #0d0e17; }
     body.boss-select .page { padding: 0; max-width: none; }
+    .sins-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    #crazy-ranks { max-width: 440px; margin: 24px auto; padding: 20px 24px; background: #241321; border: 1px solid #ac7754; }
+    #crazy-ranks .board-line span { color: #d2a6bc; }
+    #crazy-ranks .board-line b { color: #ffd58c; }
     .sins-head button { white-space: nowrap; flex: 0 0 auto; padding: 10px 14px; font-size: 14px; }
     .sins-head h1 { margin: 0; font-size: clamp(25px, 5vw, 44px); color: #ffd58c; }
     .sins-head p { color: #d2a6bc; margin: 8px 0 0; font-size: 13px; }
-    .sins-layout { max-width: 1100px; margin: auto; display: grid; grid-template-columns: minmax(180px, .7fr) minmax(0, 1.7fr); gap: 24px; align-items: center; }
-    .sins-list { display: grid; gap: 10px; }
-    .sins-list button { text-align: left; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; color: #e9b99d; border: 1px solid #765144; background: #241321; border-radius: 3px; min-height: 54px; }
+    .sins-layout { max-width: 1100px; margin: auto; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+    .sins-list { position: relative; display: grid; grid-template-columns: 1fr; gap: 24px; padding: 8px 0; }
+    .sins-list button { position: relative; width: 78%; z-index: 1; }
+    .sins-list button:nth-of-type(even) { justify-self: end; }
+    .sins-list button { text-align: left; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; color: #d1bbc6; border: 1px solid #685365; background: linear-gradient(110deg, #211c2df5, #181721f5); border-radius: 3px; min-height: 64px; }
     .sins-list button:disabled { opacity: .38; cursor: default; }
-    .sins-list #select-greed { background: linear-gradient(90deg, #6c2b3b, #342038); border-color: #ffc982; box-shadow: 0 0 24px #f2a44a22; color: #ffe3a4; }
+    .sins-list #select-greed { background: linear-gradient(110deg, #563328, #282032); border-color: #ffc982; box-shadow: 0 0 24px #f2a44a22; color: #ffe3a4; }
     .sins-list #select-greed:hover, .sins-list #select-greed:focus-visible { box-shadow: 0 0 30px #f2a44a55; outline: 2px solid #ffe7b7; outline-offset: 3px; }
     .sins-list small { font-size: 11px; }
-    .greed-preview { position: relative; height: min(65svh, 620px); min-height: 330px; overflow: hidden; border: 1px solid #8a5f4a; background: #110b19; box-shadow: 0 0 50px #0008; }
+    .greed-preview { position: sticky; top: 24px; height: min(65svh, 620px); min-height: 330px; overflow: hidden; border: 1px solid #8a5f4a; background: #110b19; box-shadow: 0 0 50px #0008; }
     .greed-first-art { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: 35% center; image-rendering: pixelated; opacity: .16; transition: opacity .22s; z-index: 1; }
     .greed-preview.previewing .greed-first-art, .greed-preview.cleared .greed-first-art { opacity: 1; }
     .greed-preview.cleared .greed-first-art { width: 77%; mask-image: linear-gradient(90deg, #000 65%, transparent); }
@@ -1022,15 +1035,25 @@
     @media (max-width: 700px) {
       #bosses { padding: 18px 16px; }
       .sins-layout { display: flex; flex-direction: column-reverse; gap: 15px; }
-      .greed-preview { width: 100%; height: 34svh; min-height: 220px; }
-      .sins-list { width: 100%; grid-template-columns: 1fr 1fr; gap: 8px; }
-      .sins-list #select-greed { grid-column: 1 / -1; }
-      .sins-list button { min-height: 47px; padding: 10px 14px; font-size: 14px; }
+      .greed-preview { position: relative; top: auto; width: 100%; height: 34svh; min-height: 220px; }
+      .sins-list { width: 100%; grid-template-columns: 1fr; gap: 24px; }
+      .sins-list button { min-height: 64px; padding: 10px 14px; font-size: 14px; }
       .sins-head { margin-bottom: 16px; }
       .greed-caption { padding: 14px; } .greed-caption h2 { font-size: 19px; margin: 18px 0 4px; }
       .greed-caption p { font-size: 11px; }
       .result-stats { gap: 6px 14px; padding: 12px; }
     }
+    #game #game-menu { width: 44px; height: 40px; padding: 0; border-radius: 12px; font-size: 21px; line-height: 1; }
+    html.touch #game .nav { min-height: 40px; margin-bottom: 4px; }
+    html.touch #game .nav .logo { width: 130px; height: 28px; }
+    #play-menu { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 20px; overflow: auto; touch-action: pan-y; background: #080912a8; }
+    .play-menu-card { width: min(380px, 100%); padding: 24px; background: var(--md-container); color: var(--ink); border: 1px solid var(--md-outline); border-radius: 18px; box-shadow: 0 12px 70px #0007; }
+    .play-menu-card h2 { font-size: 24px; margin: 0 0 12px; }
+    .play-menu-card p { font-size: 13px; line-height: 1.6; }
+    .play-menu-card label { display: grid; grid-template-columns: 1fr auto; margin: 20px 0; gap: 8px; font-size: 15px; }
+    .play-menu-card input { grid-column: 1 / -1; width: 100%; min-height: 32px; accent-color: var(--blue); }
+    .play-menu-card button { min-height: 44px; font-size: 14px; margin: 6px 6px 0 0; }
+    body.crazy-active #play-menu { background: #08091266; }
     @media (prefers-reduced-motion: reduce) { .greed-first-art { transition: none; } }
   </style>
 </head>
@@ -1039,7 +1062,8 @@
   <div id="crazy-ambient" aria-hidden="true">
     <b style="--x:7%;--y:16%;--r:-15deg">♠ ♥</b><b style="--x:76%;--y:12%;--r:14deg">7 7 7</b>
     <b style="--x:10%;--y:64%;--r:12deg">中 發</b><b style="--x:77%;--y:67%;--r:-12deg">◉ · ◉</b>
-    <b style="--x:34%;--y:4%;--r:-8deg">★ ▦ ★</b><b style="--x:55%;--y:88%;--r:8deg">⚔ ♦ ▣</b>
+    <b style="--x:34%;--y:4%;--r:-8deg">↑ ♥ ↑</b><b style="--x:55%;--y:88%;--r:8deg">◈ ◎ ◈</b>
+    <b style="--x:3%;--y:42%;--r:18deg">● · ●</b><b style="--x:82%;--y:38%;--r:-16deg">↗ ◉ ↙</b>
     <canvas id="crazy-preview-cat" width="220" height="170"></canvas>
   </div>
   <div class="page">
@@ -1165,21 +1189,26 @@
       </div>
     </section>
 
+    <svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs><symbol id="sin-icon-greed" viewBox="0 0 32 32"><path d="M4 9 L7 18 H25 L28 9 L21 13 L16 5 L11 13 Z M7 23 H25"/></symbol><symbol id="sin-icon-pride" viewBox="0 0 32 32"><path d="M3 16 Q16 2 29 16 Q16 30 3 16Z"/><circle cx="16" cy="16" r="4"/></symbol><symbol id="sin-icon-envy" viewBox="0 0 32 32"><path d="M6 7 Q27 5 23 18 Q19 28 8 24 M26 7 Q5 5 9 18 Q13 28 24 24"/></symbol><symbol id="sin-icon-lust" viewBox="0 0 32 32"><path d="M16 26 L5 15 C0 5 12 2 16 10 C20 2 32 5 27 15Z"/></symbol><symbol id="sin-icon-gluttony" viewBox="0 0 32 32"><path d="M8 5 H24 V12 Q24 22 16 22 Q8 22 8 12Z M16 22 V28 M10 28 H22 M24 8 H29 V14 H24"/></symbol><symbol id="sin-icon-sloth" viewBox="0 0 32 32"><path d="M7 5 H25 M7 27 H25 M10 5 Q10 12 16 16 Q22 20 22 27 M22 5 Q22 12 16 16 Q10 20 10 27"/></symbol><symbol id="sin-icon-wrath" viewBox="0 0 32 32"><path d="M17 3 Q29 15 23 25 Q16 33 8 25 Q3 19 10 10 Q8 20 14 18 Q20 16 17 3Z M17 18 Q24 26 16 28 Q10 25 17 18Z"/></symbol></defs></svg>
     <section id="bosses" hidden aria-labelledby="sins-title">
-      <header class="sins-head"><div><h1 id="sins-title" data-i18n="crazySevenSins">Seven Deadly Sins</h1><p data-i18n="crazyChooseBoss">Choose your opponent</p></div><button id="bosses-back" type="button" data-i18n="menu">Menu</button></header>
+      <div class="sins-sky" aria-hidden="true"><svg style="--x:6%;--y:12%;--tone:#ab8d66"><use href="#sin-icon-greed"/></svg><svg style="--x:78%;--y:7%;--tone:#ab8d66"><use href="#sin-icon-pride"/></svg><svg style="--x:34%;--y:52%;--tone:#ab8d66"><use href="#sin-icon-envy"/></svg><svg style="--x:86%;--y:48%;--tone:#ab8d66"><use href="#sin-icon-lust"/></svg><svg style="--x:8%;--y:76%;--tone:#ab8d66"><use href="#sin-icon-gluttony"/></svg><svg style="--x:55%;--y:85%;--tone:#ab8d66"><use href="#sin-icon-sloth"/></svg><svg style="--x:69%;--y:71%;--tone:#b93c59"><use href="#sin-icon-wrath"/></svg></div>
+      <header class="sins-head"><div><h1 id="sins-title" data-i18n="crazySevenSins">Seven Deadly Sins</h1><p data-i18n="crazyChooseBoss">Choose your opponent</p></div><div class="sins-actions"><button id="crazy-ranks-toggle" type="button" data-i18n="boards" aria-expanded="false" aria-controls="crazy-ranks">Ranks</button><button id="bosses-back" type="button" data-i18n="menu">Menu</button></div></header>
+      <section id="crazy-ranks" hidden aria-label="Crazy rankings"><div id="crazy-board-card"></div><button id="crazy-ranks-close" class="text-btn" type="button" data-i18n="close">Back</button></section>
       <div class="sins-layout">
         <div class="sins-list">
-          <button id="select-greed" type="button"><span data-i18n="crazyGreed">Greed</span><small id="greed-clear-state" data-i18n="crazyChallenge">Challenge</small></button>
-          <button type="button" disabled><span data-i18n="sinPride">Pride</span><small data-i18n="crazyLocked">Locked</small></button>
-          <button type="button" disabled><span data-i18n="sinEnvy">Envy</span><small data-i18n="crazyLocked">Locked</small></button>
-          <button type="button" disabled><span data-i18n="sinWrath">Wrath</span><small data-i18n="crazyLocked">Locked</small></button>
-          <button type="button" disabled><span data-i18n="sinLust">Lust</span><small data-i18n="crazyLocked">Locked</small></button>
-          <button type="button" disabled><span data-i18n="sinGluttony">Gluttony</span><small data-i18n="crazyLocked">Locked</small></button>
-          <button type="button" disabled><span data-i18n="sinSloth">Sloth</span><small data-i18n="crazyLocked">Locked</small></button>
+
+          <button id="select-greed" data-sin="greed" type="button"><svg class="sin-emblem" aria-hidden="true"><use href="#sin-icon-greed"/></svg><span data-i18n="crazyGreed">Greed</span><small id="greed-clear-state" data-i18n="crazyChallenge">Challenge</small></button>
+          <button data-sin="pride" type="button" disabled><svg class="sin-emblem" aria-hidden="true"><use href="#sin-icon-pride"/></svg><span data-i18n="sinPride">Pride</span><small data-i18n="crazyLocked">Locked</small></button>
+          <button data-sin="envy" type="button" disabled><svg class="sin-emblem" aria-hidden="true"><use href="#sin-icon-envy"/></svg><span data-i18n="sinEnvy">Envy</span><small data-i18n="crazyLocked">Locked</small></button>
+
+          <button data-sin="lust" type="button" disabled><svg class="sin-emblem" aria-hidden="true"><use href="#sin-icon-lust"/></svg><span data-i18n="sinLust">Lust</span><small data-i18n="crazyLocked">Locked</small></button>
+          <button data-sin="gluttony" type="button" disabled><svg class="sin-emblem" aria-hidden="true"><use href="#sin-icon-gluttony"/></svg><span data-i18n="sinGluttony">Gluttony</span><small data-i18n="crazyLocked">Locked</small></button>
+          <button data-sin="sloth" type="button" disabled><svg class="sin-emblem" aria-hidden="true"><use href="#sin-icon-sloth"/></svg><span data-i18n="sinSloth">Sloth</span><small data-i18n="crazyLocked">Locked</small></button>
+          <button data-sin="wrath" type="button" disabled><svg class="sin-emblem" aria-hidden="true"><use href="#sin-icon-wrath"/></svg><span data-i18n="sinWrath">Wrath</span><small data-i18n="crazyLocked">Locked</small></button>
         </div>
         <div class="greed-preview">
-          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.png?v=1.2.0" alt="" aria-hidden="true">
-          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.png?v=1.2.0" alt="Greed, the casino dealer's first form">
+          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.png?v=1.2.4" alt="" aria-hidden="true">
+          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.png?v=1.2.4" alt="Greed, the casino dealer's first form">
           <div class="greed-caption"><h2 data-i18n="crazyDealer">The Mad Dealer</h2><p data-i18n="crazyGreedLore">The house wants everything. Defeat both forms.</p></div>
         </div>
       </div>
@@ -1392,7 +1421,7 @@
 <rect class="logo-type" x="180.8" y="26.6" width="4.4" height="4.4" rx="1.3"/>
 <rect class="logo-type" x="186.2" y="26.6" width="4.4" height="4.4" rx="1.3"/>
       </svg>
-        <button id="game-menu" class="md-tonal" type="button" data-i18n="menu">Menu</button>
+        <button id="game-menu" class="md-tonal" type="button" aria-label="Pause" aria-haspopup="dialog"><span id="game-menu-icon" aria-hidden="true">Ⅱ</span></button>
       </div>
       <div class="stage">
         <div class="console">
@@ -1411,6 +1440,7 @@
             </section>
           </aside>
           <div class="board-wrap">
+            <canvas id="crazy-boss-frame" width="560" height="720" aria-hidden="true"></canvas>
             <canvas id="board" width="280" height="560"></canvas>
             <div class="veil" id="veil" hidden>
               <h2 id="veil-title"></h2>
@@ -1479,11 +1509,23 @@
       </div>
     </section>
   </div>
+  <div id="play-menu" hidden role="dialog" aria-modal="true" aria-labelledby="play-menu-title">
+    <div class="play-menu-card">
+      <h2 id="play-menu-title"></h2><p id="play-menu-note"></p>
+      <div id="play-menu-options">
+        <label><span data-i18n="bgmVolume">BGM</span><output id="bgm-level"></output><input id="play-bgm" type="range" min="0" max="100" step="1" aria-label="BGM"></label>
+        <label><span data-i18n="sfxVolume">Sound effects</span><output id="sfx-level"></output><input id="play-sfx" type="range" min="0" max="100" step="1" aria-label="Sound effects"></label>
+        <button id="play-menu-close" type="button" data-i18n="resume">Resume</button>
+        <button id="play-menu-quit" class="text-btn" type="button" data-i18n="quitToMenu">Exit to main menu</button>
+      </div>
+      <div id="play-menu-confirm" hidden><p data-i18n="quitConfirm">Exit this game? Your current run will end.</p><button id="play-menu-cancel" type="button" data-i18n="cancel">Cancel</button><button id="play-menu-exit" type="button" data-i18n="confirmExit">Exit</button></div>
+    </div>
+  </div>
   <div id="crazy-cinematic" hidden role="dialog" aria-modal="true" aria-label="Boss cinematic">
     <canvas id="cinematic-canvas" aria-hidden="true"></canvas><div class="cinematic-controls"><button id="cinematic-pause" type="button" data-i18n="paused">Pause</button><button id="cinematic-skip" type="button" data-i18n="crazySkip">Skip</button></div>
   </div>
   <div id="crazy-result" hidden role="dialog" aria-modal="true" aria-labelledby="result-title">
-    <img class="result-art" loading="lazy" src="./assets/greed-defeated.png?v=1.2.0" alt="Defeated Greed surrounded by spilled coins">
+    <img class="result-art" loading="lazy" src="./assets/greed-defeated.png?v=1.2.4" alt="Defeated Greed surrounded by spilled coins">
     <div class="result-content"><small>GREED · CLEARED</small><h1 id="result-title" data-i18n="crazyGreedBroken">Greed defeated</h1><div class="result-score" id="result-score"></div><div class="result-stats" id="result-stats"></div><p data-i18n="crazyClearUnlock">Second-form silhouette unlocked</p><div class="result-buttons"><button id="result-retry" type="button" data-i18n="again">Again</button><button id="result-bosses" type="button" data-i18n="crazySevenSins">Seven Deadly Sins</button></div></div>
   </div>
   <div id="fever-aura" hidden aria-hidden="true">
@@ -1501,21 +1543,22 @@
     <i style="--x:83%;--y:97%;--delay:-1.87s"></i>
   </div>
   <script type="module">
-    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.0";
-    import { drawCrazy, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.0";
-    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.0";
-    import { drawGreedCinematic, readGreedClear, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.0";
-    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.0";
-    import { createSound } from "./audio.mjs?v=1.2.0";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.0";
-    import { translate } from "./i18n.mjs?v=1.2.0";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.0";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.0";
-    import { VERSION } from "./version.mjs?v=1.2.0";
+    import { sinProgress } from "./crazy-sins.mjs?v=1.2.4";
+    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.4";
+    import { drawCrazy, drawCrazyFrame, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.4";
+    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.4";
+    import { drawGreedCinematic, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.4";
+    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.4";
+    import { createSound } from "./audio.mjs?v=1.2.4";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.4";
+    import { translate } from "./i18n.mjs?v=1.2.4";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.4";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.4";
+    import { VERSION } from "./version.mjs?v=1.2.4";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SAND_HEX, SHAPES, activateFever, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.2.0";
+    } from "./logic.mjs?v=1.2.4";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -1544,6 +1587,8 @@
     let crazy = null;
     let puzzle = null;
     let paused = false;
+    let gameMenuOpen = false;
+    let menuPauseStart = 0;
     let acc = 0;
     let softAcc = 0;
     let lockMs = 0;
@@ -1557,8 +1602,8 @@
     let dasDir = 0;
     let dasTime = 0;
     let dasOn = false;
-    const sound = createSound(() => settings.volume);
-    const crazyMusic = createCrazyMusic(() => settings.volume);
+    const sound = createSound(() => 1, { music: () => settings.bgmVolume, sfx: () => settings.sfxVolume });
+    const crazyMusic = createCrazyMusic(() => settings.bgmVolume);
     const fx = [];
     const callouts = [];
     const curseUntil = { reverse: 0, blind: 0, rush: 0, norotate: 0 };
@@ -1572,10 +1617,12 @@
         if (!saved.touch) saved.touch = "auto";
         if (!saved.pace) saved.pace = "normal";
         saved.paceSpeed = paceOf({ pace: saved.paceSpeed ?? 1 });
+        saved.bgmVolume = Math.max(0, Math.min(1, saved.bgmVolume ?? saved.volume));
+        saved.sfxVolume = Math.max(0, Math.min(1, saved.sfxVolume ?? saved.volume));
         saved.game = "bridge";
         return saved;
       } catch {
-        return { lang: "en", volume: 0.7, theme: "light", touch: "auto", pace: "normal", paceSpeed: 1, game: "bridge" };
+        return { lang: "en", volume: 0.7, bgmVolume: 0.7, sfxVolume: 0.7, theme: "light", touch: "auto", pace: "normal", paceSpeed: 1, game: "bridge" };
       }
     }
 
@@ -1601,6 +1648,7 @@
       syncPace();
       syncPicker();
       sound.setVolume();
+      syncGameMenuAudio();
     }
 
     function currentGame() {
@@ -1687,16 +1735,19 @@
     function renderBoards() {
       const id = currentGame();
       const card = document.querySelector("#board-card");
-      card.replaceChildren();
       const groups = id === "bridge"
         ? [
           [t("normal"), readBoard("bridge-best-marathon-normal", { legacy: ["bridge-best-marathon"] }), (value) => String(value)],
           [`${t("hard")} ×2`, readBoard("bridge-best-marathon-hard"), (value) => String(value)],
           [t("sprint"), readBoard("bridge-best-sprint", { lower: true }), formatTime],
-          ["Crazy", readBoard("bridge-best-crazy"), (value) => String(value)],
           ...(settings.pace === "custom" ? [[`${t("custom")} ×${paceOf({ pace: settings.paceSpeed })}`, readBoard(`bridge-best-marathon-custom-${paceOf({ pace: settings.paceSpeed })}`), (value) => String(value)]] : []),
         ]
         : [[t(GAMES.find(([name]) => name === id)[1]), readBoard(`bridge-best-${id}`), (value) => String(value)]];
+      renderBoardGroups(card, groups);
+    }
+
+    function renderBoardGroups(card, groups) {
+      card.replaceChildren();
       for (const [title, values, format] of groups) {
         const group = document.createElement("section");
         group.className = "board-group";
@@ -1725,6 +1776,7 @@
 
     function showScreen(id) {
       document.body.classList.toggle("boss-select", id === "bosses");
+      if (id !== "game") closeGameMenu(false);
       if (id !== "game") {
         document.body.classList.remove("crazy-active");
         crazyMusic.pause();
@@ -1858,6 +1910,7 @@
     }
 
     function backToMenu() {
+      closeGameMenu(false);
       crazy = null;
       crazyMusic.pause();
       previewCrazy(false);
@@ -1941,13 +1994,32 @@
       loadGreedArt();
       crazyMusic.pause(); sound.stop(); crazy = null; paused = false; game.phase = "ready";
       showScreen("bosses");
-      const cleared = readGreedClear(localStorage);
+      toggleCrazyRanks(false);
+      const progress = sinProgress(localStorage);
+      for (const boss of progress) {
+        const button = document.querySelector(`#bosses [data-sin="${boss.id}"]`);
+        button.disabled = !boss.unlocked;
+        button.dataset.state = boss.cleared && boss.developed ? "cleared" : boss.unlocked ? "open" : "locked";
+      }
+      const cleared = progress[0].cleared;
       const preview = document.querySelector(".greed-preview");
       preview.classList.toggle("cleared", cleared);
       preview.classList.toggle("previewing", coarseDevice());
       document.querySelector("#greed-clear-state").textContent = t(cleared ? "crazyCleared" : "crazyChallenge");
       document.querySelector("#select-greed").focus({ preventScroll: true });
     }
+    function toggleCrazyRanks(open) {
+      const panel = document.querySelector("#crazy-ranks");
+      panel.hidden = !open;
+      document.querySelector("#bosses .sins-layout").hidden = open;
+      document.querySelector("#crazy-ranks-toggle").setAttribute("aria-expanded", String(open));
+      if (open) renderBoardGroups(document.querySelector("#crazy-board-card"), [["Crazy", readBoard("bridge-best-crazy"), String]]);
+    }
+    document.querySelector("#crazy-ranks-toggle").addEventListener("click", () => toggleCrazyRanks(document.querySelector("#crazy-ranks").hidden));
+    document.querySelector("#crazy-ranks-close").addEventListener("click", () => {
+      toggleCrazyRanks(false);
+      document.querySelector("#crazy-ranks-toggle").focus();
+    });
     document.querySelector("#select-greed").addEventListener("pointerenter", () => document.querySelector(".greed-preview").classList.add("previewing"));
     document.querySelector("#select-greed").addEventListener("pointerleave", () => { if (!coarseDevice()) document.querySelector(".greed-preview").classList.remove("previewing"); });
     document.querySelector("#select-greed").addEventListener("focus", () => document.querySelector(".greed-preview").classList.add("previewing"));
@@ -1957,13 +2029,13 @@
     document.querySelector("#result-retry").addEventListener("click", beginCrazy);
     document.querySelector("#result-bosses").addEventListener("click", showBossSelection);
     document.querySelector("#cinematic-skip").addEventListener("click", () => { if (crazy && !paused) skipCrazyCinematic(crazy); });
-    document.querySelector("#cinematic-pause").addEventListener("click", () => { paused = !paused; if (paused) crazyMusic.pause(); });
+    document.querySelector("#cinematic-pause").addEventListener("click", openGameMenu);
     function renderCrazyPresentation() {
       const overlay = document.querySelector("#crazy-cinematic"), result = document.querySelector("#crazy-result");
       const cinematic = !!crazy?.cutscene, won = !!crazy?.won && !cinematic;
       const newlyShown = overlay.hidden && cinematic;
       overlay.hidden = !cinematic; result.hidden = !won;
-      document.querySelector("#game").inert = cinematic || won;
+      document.querySelector("#game").inert = cinematic || won || gameMenuOpen;
       if (cinematic) {
         veil.hidden = true;
         const canvas = document.querySelector("#cinematic-canvas"), ratio = window.innerWidth / window.innerHeight;
@@ -1971,8 +2043,8 @@
         if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
         drawGreedCinematic(canvas.getContext("2d"), crazy, t, reducedMotion.matches);
         document.querySelector("#cinematic-skip").disabled = crazy.cutscene.time < 1000 || paused;
-        document.querySelector("#cinematic-pause").textContent = t(paused ? "resume" : "paused");
-        if (newlyShown) document.querySelector("#cinematic-pause").focus({ preventScroll: true });
+        document.querySelector("#cinematic-pause").textContent = t("gameMenu");
+        if (newlyShown && !gameMenuOpen) document.querySelector("#cinematic-pause").focus({ preventScroll: true });
       }
       if (won && !crazy.resultShown) {
         crazy.resultShown = true; recordGreedClear(localStorage, crazy);
@@ -1998,7 +2070,7 @@
     function crazyPress(action, down = true) {
       if (!crazy) return false;
       if (down && crazyMusic.blocked) crazyMusic.unlock();
-      if (!paused && !document.querySelector("#game").hidden) {
+      if (!paused && !gameMenuOpen && !document.querySelector("#game").hidden) {
         if (action === "rotate" && !["bridge", "sand"].includes(crazy.mode)) action = crazy.mode === "dodge" || FLYING_ATTACKS.includes(crazy.mode) ? "up" : "action";
         inputCrazy(crazy, action, down);
       }
@@ -2017,7 +2089,7 @@
     const previewCat = document.querySelector("#crazy-preview-cat").getContext("2d");
     catImageReady.then(() => { previewCat.clearRect(0, 0, 220, 170); drawMischiefCat(previewCat, 110, 91, 1.3); });
     board.addEventListener("pointerdown", event => {
-      if (!crazy || paused) return;
+      if (!crazy || paused || gameMenuOpen) return;
       if (crazyMusic.blocked) crazyMusic.unlock();
       event.preventDefault();
       if (["dodge", "jump", ...FLYING_ATTACKS].includes(crazy.mode)) board.setPointerCapture(event.pointerId);
@@ -2034,8 +2106,8 @@
       if (!crazy) return;
       for (const action of [...crazy.held]) inputCrazy(crazy, action, false);
     }
-    window.addEventListener("blur", () => { if (crazy && (!crazy.over || crazy.cutscene)) { releaseCrazyInputs(); crazyMusic.pause(); paused = true; } });
-    document.addEventListener("visibilitychange", () => { if (document.hidden && crazy && (!crazy.over || crazy.cutscene)) { releaseCrazyInputs(); crazyMusic.pause(); paused = true; } });
+    window.addEventListener("blur", () => { if (crazy && (!crazy.over || crazy.cutscene)) { releaseCrazyInputs(); } });
+    document.addEventListener("visibilitychange", () => { if (document.hidden && crazy && (!crazy.over || crazy.cutscene)) { releaseCrazyInputs(); } });
 
     document.querySelector("#go-start").addEventListener("click", beginSelected);
     document.querySelector("#game-prev").addEventListener("click", () => shiftCatalog(-1));
@@ -2062,8 +2134,63 @@
       showScreen("boards");
     });
     document.querySelector("#boards-back").addEventListener("click", () => showScreen("menu"));
-    document.querySelector("#game-menu").addEventListener("click", backToMenu);
-    document.querySelector("#veil-menu").addEventListener("click", backToMenu);
+    function syncGameMenuAudio() {
+      for (const [id, setting, output] of [["play-bgm", "bgmVolume", "bgm-level"], ["play-sfx", "sfxVolume", "sfx-level"]]) {
+        const level = Math.round(settings[setting] * 100);
+        document.querySelector(`#${id}`).value = String(level);
+        document.querySelector(`#${output}`).textContent = `${level}%`;
+      }
+    }
+    function openGameMenu() {
+      if (document.querySelector("#game").hidden || gameMenuOpen) return;
+      menuPauseStart = crazy ? 0 : performance.now();
+      gameMenuOpen = true;
+      paused = !crazy;
+      heldKeys.clear(); dasDir = 0; steer(-1, false); steer(1, false);
+      window.clearInterval(leftTimer); window.clearInterval(rightTimer); releaseCrazyInputs();
+      document.querySelector("#play-menu").hidden = false;
+      document.querySelector("#play-menu-options").hidden = false;
+      document.querySelector("#play-menu-confirm").hidden = true;
+      document.querySelector("#play-menu-title").textContent = t(crazy ? "gameMenu" : "paused");
+      document.querySelector("#play-menu-note").textContent = crazy ? t("crazyMenuLive") : "";
+      document.querySelector("#play-menu-close").textContent = t(crazy ? "close" : "resume");
+      document.querySelector("#game").inert = true;
+      syncGameMenuAudio();
+      document.querySelector("#play-menu-close").focus({ preventScroll: true });
+    }
+    function closeGameMenu(focus = true) {
+      if (!gameMenuOpen) return;
+      if (menuPauseStart) {
+        const duration = performance.now() - menuPauseStart;
+        if (startedAt && !frozenTime) startedAt += duration;
+        for (const key of Object.keys(curseUntil)) if (curseUntil[key] > menuPauseStart) curseUntil[key] += duration;
+      }
+      menuPauseStart = 0; gameMenuOpen = false; paused = false;
+      document.querySelector("#play-menu").hidden = true;
+      document.querySelector("#game").inert = !!crazy?.cutscene || !!crazy?.won;
+      if (focus && !document.querySelector("#game").inert) document.querySelector("#game-menu").focus({ preventScroll: true });
+    }
+    document.querySelector("#game-menu").addEventListener("click", openGameMenu);
+    document.querySelector("#veil-menu").addEventListener("click", openGameMenu);
+    document.querySelector("#play-menu-close").addEventListener("click", () => closeGameMenu());
+    document.querySelector("#play-menu-quit").addEventListener("click", () => {
+      document.querySelector("#play-menu-options").hidden = true;
+      document.querySelector("#play-menu-confirm").hidden = false;
+      document.querySelector("#play-menu-cancel").focus();
+    });
+    document.querySelector("#play-menu-cancel").addEventListener("click", () => {
+      document.querySelector("#play-menu-options").hidden = false;
+      document.querySelector("#play-menu-confirm").hidden = true;
+      document.querySelector("#play-menu-quit").focus();
+    });
+    document.querySelector("#play-menu-exit").addEventListener("click", backToMenu);
+    for (const [id, setting] of [["play-bgm", "bgmVolume"], ["play-sfx", "sfxVolume"]]) {
+      document.querySelector(`#${id}`).addEventListener("input", event => {
+        settings[setting] = Number(event.target.value) / 100;
+        settings.volume = Math.max(settings.bgmVolume, settings.sfxVolume);
+        saveSettings(); sound.setVolume(); syncGameMenuAudio();
+      });
+    }
     document.querySelector("#veil-btn").addEventListener("click", () => {
       if (game.phase === "over" || game.phase === "done") {
         if (crazy) beginCrazy();
@@ -2080,6 +2207,7 @@
     });
     document.querySelector("#volume").addEventListener("input", (event) => {
       settings.volume = Number(event.target.value) / 100;
+      settings.bgmVolume = settings.sfxVolume = settings.volume;
       saveSettings();
       applySettings();
       if (settings.volume <= 0) sound.stop();
@@ -2096,11 +2224,20 @@
 
     window.addEventListener("keydown", (event) => {
       const key = event.key;
+      if (gameMenuOpen) {
+        if (key === "Escape") { event.preventDefault(); closeGameMenu(); }
+        else if (key === "Tab") {
+          const controls = [...document.querySelectorAll("#play-menu button, #play-menu input")].filter(el => el.getClientRects().length && !el.disabled);
+          const first = controls[0], last = controls.at(-1);
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+        return;
+      }
       if (!document.querySelector("#crazy-result").hidden || event.target.closest("#crazy-cinematic, #bosses") || ["Enter", " "].includes(key) && event.target.closest("button") && !event.target.closest(".pad")) return;
       if (["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", " "].includes(key)) event.preventDefault();
       if (key === "p" || key === "P" || key === "Escape") {
-        if (crazy && !crazy.over) { paused = !paused; releaseCrazyInputs(); }
-        else if (puzzle || ["playing", "resolving", "breakout", "bbtan", "pinball", "sand"].includes(game.phase)) paused = !paused;
+        if (crazy || puzzle || ["playing", "resolving", "breakout", "bbtan", "pinball", "sand"].includes(game.phase)) openGameMenu();
         return;
       }
       if (crazy) {
@@ -2836,7 +2973,7 @@
     function elapsed() {
       if (!startedAt) return 0;
       if (frozenTime) return frozenTime - startedAt;
-      return performance.now() - startedAt;
+      return (menuPauseStart || performance.now()) - startedAt;
     }
 
     function drawTenBoard() {
@@ -2901,6 +3038,7 @@
       consolePanel.classList.toggle("danger-warning", danger === 1);
       consolePanel.classList.toggle("danger-critical", danger === 2);
       document.querySelector("#btn-rot-left").hidden = !!(puzzle || session);
+      if (!crazy) { document.querySelector("#game-menu-icon").textContent = "Ⅱ"; document.querySelector("#game-menu").setAttribute("aria-label", t("paused")); }
       const gameHidden = document.querySelector("#game").hidden;
       const feverAura = document.querySelector("#fever-aura");
       feverAura.hidden = gameHidden || !!puzzle || !feverActive(game) || ["over", "done", "ready"].includes(game.phase);
@@ -2913,12 +3051,18 @@
         document.querySelector("#btn-rot-left").hidden = !["bridge", "sand"].includes(crazy.mode);
         document.body.dataset.crazyPhase = String(crazy.phase);
         document.body.dataset.crazyControls = ["bridge", "sand"].includes(crazy.mode) ? "blocks" : "mini";
+        document.querySelector("#game-menu-icon").textContent = "☰";
+        document.querySelector("#game-menu").setAttribute("aria-label", t("gameMenu"));
         prepareBoard();
         drawCrazy(ctx, crazy, t, {
           reducedMotion: paused || reducedMotion.matches,
           paintGrid: (context, grid) => drawGridCells(context, grid, new Set(), CELL),
           paintPiece: (context, piece, ghost) => drawBlob(context, cellsOf(piece.type, piece.rot, piece.x, piece.y), piece.type, CELL, ghost, piece.bombIndex, piece.curse, piece.sand ?? null, piece.rot, piece.curseIndex),
         });
+        const bossFrame = document.querySelector("#crazy-boss-frame");
+        const frameHeight = crazyCanvasHeight(crazy.mode);
+        if (bossFrame.height !== frameHeight) bossFrame.height = frameHeight;
+        drawCrazyFrame(bossFrame.getContext("2d"), crazy, { reducedMotion: paused || reducedMotion.matches });
         const blocks = ["bridge", "sand"].includes(crazy.mode);
         const flying = crazy.mode === "dodge" || FLYING_ATTACKS.includes(crazy.mode);
         document.querySelector("#btn-soft").disabled = !blocks && !flying;
@@ -2999,7 +3143,7 @@
         copy.hidden = !session.teach;
         if (session.teach) copy.textContent = t(teachName);
       }
-      if (paused && game.phase !== "over" && game.phase !== "done") showVeil(t("paused"), t("pauseHint"), t("resume"));
+      if (paused && !gameMenuOpen && game.phase !== "over" && game.phase !== "done") showVeil(t("paused"), t("pauseHint"), t("resume"));
       else if (!paused && (game.phase === "playing" || session)) veil.hidden = true;
     }
 
@@ -3217,7 +3361,7 @@
         gameEl.style.top = `${Math.round(vv ? vv.offsetTop : 0)}px`;
         const padEl = document.querySelector(".pad");
         const available = padEl.clientWidth || window.innerWidth - 28;
-        const pad = Math.max(108, Math.min(Math.round(height * 0.34), 232, Math.floor((available - 12) / 2)));
+        const pad = crazy ? Math.max(144, Math.min(158, Math.round(height * .18))) : Math.max(108, Math.min(Math.round(height * 0.34), 232, Math.floor((available - 12) / 2)));
         gameEl.style.setProperty("--pad-size", `${pad}px`);
       } else {
         gameEl.style.height = "";
@@ -3253,7 +3397,7 @@
     }
     document.addEventListener("touchmove", (event) => {
       if (!document.documentElement.classList.contains("touch")) return;
-      if (event.target.closest(".settings-wrap, input, select, .settings-card")) return;
+      if (event.target.closest(".settings-wrap, #bosses, #crazy-result, #play-menu, input, select, .settings-card")) return;
       event.preventDefault();
     }, { passive: false });
 

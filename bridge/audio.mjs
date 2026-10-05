@@ -40,7 +40,7 @@ export function sandPitches() {
   return [62, 67, 74];
 }
 
-export function createSound(getVolume) {
+export function createSound(getVolume, { music: getMusic = () => 1, sfx: getSfx = () => 1 } = {}) {
   let ctx = null;
   let master = null;
   let musicGain = null;
@@ -62,13 +62,15 @@ export function createSound(getVolume) {
       sfxGain.gain.value = MIX.sfx;
       sfxGain.connect(master);
     }
-    master.gain.value = Math.max(0, getVolume());
+    setVolume();
     if (ctx.state === "suspended") ctx.resume();
     return getVolume() > 0;
   }
 
   function setVolume() {
     if (master) master.gain.value = Math.max(0, getVolume());
+    if (musicGain) musicGain.gain.value = MIX.music * Math.max(0, getMusic());
+    if (sfxGain) sfxGain.gain.value = MIX.sfx * Math.max(0, getSfx());
   }
 
   function beep(freq, when, dur, type, peak, dest) {
@@ -202,7 +204,7 @@ export function createSound(getVolume) {
   }
 
   function tick() {
-    if (!playing || !ctx || getVolume() <= 0) return;
+    if (!playing || !ctx || getVolume() <= 0 || getMusic() <= 0) return;
     if (nextTime < ctx.currentTime) nextTime = ctx.currentTime + 0.02;
     const horizon = ctx.currentTime + 0.28;
     while (nextTime < horizon) {

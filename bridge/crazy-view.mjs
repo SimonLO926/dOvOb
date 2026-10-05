@@ -1,8 +1,8 @@
-import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.0';
-import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.0';
-import { greedImages } from './crazy-screen.mjs?v=1.2.0';
-import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.0';
-import { drawSession } from './arcade.mjs?v=1.2.0';
+import { drawFineDealer, drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.4';
+import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.4';
+import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.4';
+import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.4';
+import { drawSession } from './arcade.mjs?v=1.2.4';
 export const CRAZY_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 356 });
 export const CRAZY_BLOCK_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 512 });
 export function crazyCanvasHeight(mode) { return mode === 'bridge' || mode === 'sand' ? 720 : 560; }
@@ -15,7 +15,7 @@ const catPhoto = typeof Image === 'undefined' ? null : new Image();
 export const catImageReady = catPhoto ? new Promise(resolve => {
   catPhoto.onload = () => resolve(true);
   catPhoto.onerror = () => resolve(false);
-  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.0', import.meta.url).href;
+  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.4', import.meta.url).href;
 }) : Promise.resolve(false);
 const COLORS = { I: '#64d2ff', O: '#ffd60a', T: '#bf5af2', S: '#30d158', Z: '#ff453a', J: '#0a84ff', L: '#ff9f0a', B: '#9da4b9' };
 const SYMBOLS = ['★', '♥', '7', '♠'];
@@ -36,59 +36,60 @@ export function drawMischiefCat(c, x, y, scale = 1, facingLeft = false) {
   c.save(); c.translate(x, y); if (facingLeft) c.scale(-1, 1);
   c.imageSmoothingEnabled = true; c.drawImage(catPhoto, -w / 2, -h / 2, w, h); c.restore();
 }
-const DEALER_PIXELS = [
-  '................................',
-  '..C............C.............C..',
-  '..CCC.........CCC..........CCC..',
-  '...CCCC......CCCCC......CCCCC...',
-  '...CCCCCCCCCCCCCCCCCCCCCCCCC....',
-  '....CCCCCCCCCCCCCCCCCCCCCC......',
-  '.....OOOOOOOOOOOOOOOOOOOOO......',
-  '....OFFFFFFFFFFFFFFFFFFFFFO.....',
-  '...OFFSSFFFFFFFFFFFFFFSSFFFO....',
-  '...OFSSMMMMMMMMMMMMMMMMSSFFO....',
-  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
-  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
-  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
-  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
-  '...OFSMMMMMMMMMMMMMMMMMMSFO.....',
-  '...OFFSSFFFFFFFFFFFFFFSSFFO....',
-  '...OFFFFSSFFFFFFFFFFSSFFFFO.....',
-  '....OFFFFOOOOOOOOOOOOFFFFO......',
-  '....OFFFOFFOFFOFFOFFOFFFO.......',
-  '.....OFFFFFFFFFFFFFFFFFO........',
-  '......OOSSSSSSSSSSSSOO..........',
-  '........OOOOOOOOOOOO............',
-  '..........VVVVVVVV..............',
-  '........VVVVVVVVVVVV............',
-];
 const PIXEL_SYMBOLS = [
   ['.X.X.', 'XXXXX', 'XXXXX', '.XXX.', '..X..'],
   ['..X..', '.XXX.', 'XXXXX', '.X.X.', '..X..'],
   ['XXXXX', '....X', '...X.', '..X..', '..X..'],
 ];
-function drawDealer(c, s, reduced) {
-  if (s.form === 1 && greedImages.firstSprite?.naturalWidth) {
-    c.save(); c.imageSmoothingEnabled = false;
-    const img = greedImages.firstSprite, height = 88, width = height * img.naturalWidth / img.naturalHeight;
-    c.drawImage(img, 140 - width / 2, 23, width, height); c.restore(); return;
-  }
-  if (s.form === 2 && greedImages.second?.naturalWidth) {
-    c.save(); c.imageSmoothingEnabled = false;
-    c.drawImage(greedImages.second, 69, 23, 142, 92); c.restore(); return;
-  }
-  const pixel = 3, left = 92, top = 30 + (reduced ? 0 : Math.round(Math.sin(s.elapsed / 500)) * pixel);
-  const palette = { C: s.phase === 3 ? '#ffc25d' : '#ff486d', O: '#100e20', F: '#f4e9f8', S: '#b9a6d2', M: '#281331', V: '#74528e' };
+export function drawCrazyFrame(c, s, { reducedMotion = false } = {}) {
+  const height = crazyCanvasHeight(s.mode);
+  c.clearRect(0, 0, 560, height);
+  const gold = s.form === 2, attack = !!s.attack;
+  const trim = '#ffd361';
+  const body = gold ? '#6c173c' : '#47172e';
+  const pulse = reducedMotion ? 0 : Math.round(Math.sin(s.elapsed / 350)) * 4;
   c.save(); c.imageSmoothingEnabled = false;
-  DEALER_PIXELS.forEach((row, y) => [...row].forEach((v, x) => {
-    if (v === '.') return;
-    c.fillStyle = palette[v]; c.fillRect(left + x * pixel, top + y * pixel, pixel, pixel);
-  }));
-  for (let i = 0; i < 3; i++) {
-    const glyph = PIXEL_SYMBOLS[s.phase === 3 ? 2 : (i + s.phase - 1) % 3];
-    c.fillStyle = s.attack ? '#ff4969' : '#ffe5a2';
-    glyph.forEach((row, y) => [...row].forEach((v, x) => { if (v === 'X') c.fillRect(left + 8 * pixel + i * 6 * pixel + x * pixel, top + 10 * pixel + y * pixel, pixel, pixel); }));
+  // Stepped shoulders and robes surround the board (x=140..420); keep the arena clear.
+  for (const side of [-1, 1]) {
+    c.save(); if (side === 1) { c.translate(560, 0); c.scale(-1, 1); }
+    c.fillStyle = body;
+    c.beginPath(); c.moveTo(140, 65); c.lineTo(110, 65); c.lineTo(110, 85);
+    c.lineTo(82, 85); c.lineTo(82, 125); c.lineTo(64, 125); c.lineTo(64, height - 75);
+    c.lineTo(90, height - 75); c.lineTo(90, height - 45); c.lineTo(136, height - 45);
+    c.lineTo(136, 120); c.lineTo(140, 120); c.closePath(); c.fill();
+    // Bevelled pauldrons, suit insignia and ruby brooches echo the boss concept.
+    c.fillStyle = gold ? '#7a451e' : '#4e2534';
+    c.beginPath(); c.moveTo(81,82); c.lineTo(126,82); c.lineTo(136,92); c.lineTo(136,142); c.lineTo(124,154); c.lineTo(80,148); c.lineTo(73,133); c.lineTo(73,96); c.closePath(); c.fill();
+    c.fillStyle = gold ? '#bd863c' : '#842d49'; c.fillRect(78,94,52,39);
+    c.fillStyle = '#e5b866'; c.fillRect(82,85,42,2); c.fillRect(77,95,2,36); c.fillRect(82,143,42,2);
+    c.fillStyle = '#fff0bc'; c.fillRect(85,85,15,1); c.fillRect(77,100,1,13);
+    c.fillStyle = gold ? '#edc779' : '#c79872'; c.fillRect(87,98,36,28);
+    const emblem = PIXEL_SYMBOLS[1]; c.fillStyle = '#3a1c2d';
+    emblem.forEach((row, y) => [...row].forEach((v, x) => { if (v === 'X') c.fillRect(97 + x * 3, 103 + y * 3, 3, 3); }));
+    for (const [x,y] of [[81,93],[126,93],[82,135],[125,136]]) { c.fillStyle='#71421e';c.fillRect(x,y,3,3);c.fillStyle='#fff0bc';c.fillRect(x,y,1,1); }
+    c.fillStyle = '#f3c374'; c.fillRect(116,159,11,11); c.fillStyle = '#9a226c'; c.fillRect(118,161,7,7); c.fillStyle='#ff94d7';c.fillRect(119,162,2,2);
+    // Fine chain links, embroidered hems and shaded fabric folds.
+    for (let y = 178; y < height - 70; y += 9) {
+      const x = 86 + Math.round(Math.sin(y / 110) * 7);
+      c.fillStyle='#98612e';c.fillRect(x,y,4,5);c.fillStyle='#e3b65e';c.fillRect(x,y,1,5);c.fillRect(x+1,y,2,1);
+      c.fillStyle=body;c.fillRect(x+1,y+1,2,3);
+    }
+    for (let y = 170; y < height - 70; y += 5) {c.fillStyle=gold?'#ac3853':'#7c304f';c.fillRect(108,y,2,4);c.fillStyle='#301526';c.fillRect(121,y,2,5);}
+    const y = 220 + pulse, reach = attack ? 14 : 0, x = 103 + reach;
+    drawFineGauntlet(c, x, y, gold);
+    if (attack) {
+      c.fillStyle = gold ? '#ff657d' : '#ffe5a0';
+      for (let i = 0; i < 3; i++) c.fillRect(132, y + i * 28, 6, 14);
+    }
+    c.restore();
   }
+  if (gold) {
+    c.fillStyle = '#a96526'; c.fillRect(136, 176, 4, height - 230); c.fillRect(420, 176, 4, height - 230);
+    c.fillStyle = '#ffd361';
+    for (let y = 185; y < height - 70; y += 40) { c.fillRect(132, y, 6, 6); c.fillRect(422, y, 6, 6); }
+  }
+  c.fillStyle = trim;
+  for (let x = 140; x < 420; x += 28) c.fillRect(x, height - 4, 16, 4);
   c.restore();
 }
 function bar(c, x, y, w, value, color) { box(c, x, y, w, 6, '#302138', 3); box(c, x, y, Math.max(0.01, w * value), 6, color, 3); }
@@ -248,7 +249,7 @@ export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiec
   const height = crazyCanvasHeight(s.mode);
   c.save(); c.clearRect(0, 0, 280, height);
   const bg = c.createLinearGradient(0, 0, 0, height); bg.addColorStop(0, '#21112e'); bg.addColorStop(1, '#0b1020'); c.fillStyle = bg; c.fillRect(0, 0, 280, height);
-  text(c, `${t('crazyGreed')} · ${t(s.form === 2 ? 'crazyTrueName' : s.boss.name)}`, 140, 15, 16, '#ffd69b'); drawDealer(c, s, reducedMotion); drawBridgePreviews(c, s, t, paintPiece);
+  text(c, `${t('crazyGreed')} · ${t(s.form === 2 ? 'crazyTrueName' : s.boss.name)}`, 140, 15, 16, '#ffd69b'); drawFineDealer(c, s, reducedMotion); drawBridgePreviews(c, s, t, paintPiece);
   text(c, `${s.damageLeft === 0 ? '◇ ' : ''}BOSS · ${t('crazyForm')} ${s.form === 2 ? 'II' : 'I'}`, 140, 117, 12, '#ff829d'); bar(c, 24, 128, 232, s.bossHp / s.bossMaxHp, '#ff476f');
   const a = s.arcade || ['bridge', 'sand'].includes(s.mode) ? crazyPlayfield(s.mode) : CRAZY_ARENA;
   box(c, a.x - 2, a.y - 2, a.w + 4, a.h + 4, s.attack ? '#a63b5e' : '#674068', 5); box(c, a.x, a.y, a.w, a.h, '#100e1b', 3);

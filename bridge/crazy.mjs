@@ -1,6 +1,6 @@
-import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.0';
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.0';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.0';
+import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.4';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.4';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.4';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, secondHp: 1200, limit: 720000 });
 export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand', 'dodge']);
@@ -156,7 +156,7 @@ export function advanceCrazy(s, preferredMode = null) {
   } else if (s.mode === 'tiger') {
     s.mini = { reels: [0, 1, 2], pending: 0, risks: 0, clock: 0, spin: null };
   } else if (s.mode === 'pachinko') {
-    s.mini = { aim: 140, balls: [], pegs: Array.from({ length: 36 }, (_, i) => ({ x: 28 + (i % 6) * 42 + (Math.floor(i / 6) % 2) * 12, y: 160 + Math.floor(i / 6) * 48 })) };
+    s.mini = { aim: 140, balls: [], pegs: Array.from({ length: 36 }, (_, i) => ({ x: 28 + (i % 6) * 42 + (Math.floor(i / 6) % 2) * 12 + (s.random() - .5) * 14, y: 174 + Math.floor(i / 6) * 48 + (s.random() - .5) * 12 })) };
   } else if (s.mode === 'dodge') {
     s.mini = { x: 140, y: 400, target: null, hazards: [], wave: 0, spawn: 850, survival: 0, dash: 0, dashReady: 0, lastX: 0, lastY: -1 };
   } else if (GREED_ATTACKS.includes(s.mode)) { s.mini = createReaction(s.mode); }
@@ -224,7 +224,7 @@ function miniAction(s, action) {
   } else if (s.mode === 'dodge' && action === 'action' && m.dashReady <= 0) {
     m.dash = 180; m.dashReady = 1400; notify(s, 'crazyDashSound');
   } else if (s.mode === 'pachinko' && action === 'action' && m.balls.length < 3) {
-    notify(s, 'crazyLaunchSound'); m.balls.push({ x: m.aim, y: 154, vx: (m.aim - 140) * 0.7, vy: 40 }); s.cooldown = 500;
+    notify(s, 'crazyLaunchSound'); m.balls.push({ x: m.aim, y: 154, vx: (m.aim - 140) * 0.7 + (s.random() - .5) * 48, vy: 40 }); s.cooldown = 500;
   } else if (['cards', 'mahjong'].includes(s.mode)) {
     if (action === 'left') m.focus = (m.focus - 1 + m.items.length) % m.items.length;
     if (action === 'right') m.focus = (m.focus + 1) % m.items.length;
@@ -404,7 +404,7 @@ function updatePachinko(s, dt) {
         const dot = b.vx * nx + b.vy * ny;
         b.x = p.x + nx * 10.1; b.y = p.y + ny * 10.1;
         if (dot < 0) { b.vx -= 1.55 * dot * nx; b.vy -= 1.55 * dot * ny; if (m.pegSound <= 0) { notify(s, 'crazyPegSound'); m.pegSound = 85; } }
-        b.vx += dx >= 0 ? 6 : -6;
+        b.vx = Math.max(-240, Math.min(240, b.vx + (dx >= 0 ? 10 : -10) + (s.random() - .5) * 70));
       }
     }
     if (b.y >= 505) {
