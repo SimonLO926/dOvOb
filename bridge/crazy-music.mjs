@@ -3,7 +3,9 @@ export function crazyTrack(s) {
   if (!s || s.over) return null;
   if (s.cutscene?.kind === 'transform') return s.cutscene.time >= 2200 ? 'second-bridge' : 'first-last';
   const form = s.form === 2 ? 'second' : 'first';
-  const part = s.bossHp <= s.bossMaxHp * .15 ? 'last' : s.mode === 'bridge' ? 'bridge' : 'special';
+  const lastStand = s.form === 2 && s.vaultStarted;
+  const lowHealth = s.bossHp <= s.bossMaxHp * (s.form === 2 ? .2 : .15);
+  const part = lastStand || lowHealth ? 'last' : s.mode === 'bridge' ? 'bridge' : 'special';
   return `${form}-${part}`;
 }
 // Six persistent HTMLAudio elements retain independent playheads across mode switches.

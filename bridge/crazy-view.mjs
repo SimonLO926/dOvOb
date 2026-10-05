@@ -1,8 +1,9 @@
-import { drawFineDealer, drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.15';
-import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.15';
-import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.15';
-import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.15';
-import { drawSession } from './arcade.mjs?v=1.2.15';
+import { drawVault } from './crazy-vault.mjs';
+import { drawFineDealer, drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.16';
+import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.16';
+import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.16';
+import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.16';
+import { drawSession } from './arcade.mjs?v=1.2.16';
 export const CRAZY_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 356 });
 export const CRAZY_BLOCK_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 512 });
 export function crazyCanvasHeight(mode) { return mode === 'bridge' || mode === 'sand' ? 720 : 560; }
@@ -15,7 +16,7 @@ const catPhoto = typeof Image === 'undefined' ? null : new Image();
 export const catImageReady = catPhoto ? new Promise(resolve => {
   catPhoto.onload = () => resolve(true);
   catPhoto.onerror = () => resolve(false);
-  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.15', import.meta.url).href;
+  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.16', import.meta.url).href;
 }) : Promise.resolve(false);
 const COLORS = { I: '#64d2ff', O: '#ffd60a', T: '#bf5af2', S: '#30d158', Z: '#ff453a', J: '#0a84ff', L: '#ff9f0a', B: '#9da4b9' };
 const SYMBOLS = ['★', '♥', '7', '♠'];
@@ -254,7 +255,7 @@ export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiec
   c.save(); c.clearRect(0, 0, 280, height);
   const bg = c.createLinearGradient(0, 0, 0, height); bg.addColorStop(0, '#21112e'); bg.addColorStop(1, '#0b1020'); c.fillStyle = bg; c.fillRect(0, 0, 280, height);
   text(c, `${t('crazyGreed')} · ${t(s.form === 2 ? 'crazyTrueName' : s.boss.name)}`, 140, 15, 16, '#ffd69b'); drawFineDealer(c, s, reducedMotion); drawBridgePreviews(c, s, t, paintPiece);
-  text(c, `${s.damageLeft === 0 ? '◇ ' : ''}BOSS · ${t('crazyForm')} ${s.form === 2 ? 'II' : 'I'}`, 140, 117, 12, '#ff829d'); bar(c, 24, 128, 232, s.bossHp / s.bossMaxHp, '#ff476f');
+  text(c, `${s.vaultLocked ? '🔒 ' : s.damageLeft === 0 ? '◇ ' : ''}BOSS · ${t('crazyForm')} ${s.form === 2 ? 'II' : 'I'}`, 140, 117, 12, '#ff829d'); bar(c, 24, 128, 232, s.bossHp / s.bossMaxHp, '#ff476f');
   const a = s.arcade || ['bridge', 'sand'].includes(s.mode) ? crazyPlayfield(s.mode) : CRAZY_ARENA;
   box(c, a.x - 2, a.y - 2, a.w + 4, a.h + 4, s.attack ? '#a63b5e' : '#674068', 5); box(c, a.x, a.y, a.w, a.h, '#100e1b', 3);
   if (s.mode === 'bridge' || s.mode === 'sand') bridgeBoard(c, s, { paintGrid, paintPiece });
@@ -263,7 +264,8 @@ export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiec
     if (paintGrid) paintGrid(c, s.arcade.grid);
     else for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (s.arcade.grid[y][x]) box(c, x * 28 + 1, y * 28 + 1, 26, 26, COLORS[s.arcade.grid[y][x].type] || '#e0b469', 3);
     drawSession(c, s.arcade, '#f2deef', { speed: t('arcadeSpeed'), double: t('arcadeDouble'), triple: t('arcadeTriple'), wide: t('arcadeWide'), narrow: t('arcadeNarrow') }); c.restore();
-  } else if (GREED_ATTACKS.includes(s.mode)) drawReaction(c, s, t, reducedMotion);
+  } else if (s.mode === 'vault') drawVault(c, s.mini);
+  else if (GREED_ATTACKS.includes(s.mode)) drawReaction(c, s, t, reducedMotion);
   else if (s.mode === 'pusher') drawPusher(c, s, t, reducedMotion);
   else miniBoard(c, s, t, reducedMotion);
   text(c, `${t('crazyMode_' + s.mode)} · ${Math.ceil(Math.max(0, s.timeLeft) / 1000)}s`, 140, 141, 12, '#ffc7d6');
@@ -305,6 +307,7 @@ export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiec
       c.restore();
     }
   }
+  if (s.vaultRetry != null) text(c, `金庫重試 ${Math.ceil(s.vaultRetry/1000)}s · Boss 鎖血`, 140, height-57, 10, '#ffb878');
   text(c, `HP ${s.hp}/100 · ${t('crazyPhaseLabel')} ${s.phase}/3`, 140, height - 38, 14, '#f2deef');
   bar(c, 24, height - 25, 232, s.hp / 100, s.hp <= 25 ? '#ff466c' : '#6bdfb2');
   if (s.attack) text(c, `${t('crazyAttackWarning')} ${Math.ceil(s.attack.time / 1000)}`, 140, height - 10, 11, '#fff1a2');

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>貪婪金庫跑跳 · 1.2.16 試玩</title>
+<style>
+@font-face{font-family:Pixel Hant;src:url('./fonts/fusion-pixel-zh-hant.woff2')}*{box-sizing:border-box}body{margin:0;background:#100e13;color:#f2e8d2;font-family:system-ui,sans-serif;background-image:radial-gradient(ellipse at 32% 35%,#35222266,transparent 65%)}button{font:inherit;cursor:pointer;border:1px solid #6b553e;background:#28212a;color:#f6e9c6;border-radius:5px;padding:12px 15px}button:hover{background:#453327}button:focus-visible{outline:3px solid #a9ffd5}header{max-width:1120px;margin:auto;padding:25px 28px;display:flex;justify-content:space-between;border-bottom:1px solid #42342b;font-size:12px;letter-spacing:2px;color:#c3ad89}main{max-width:1120px;margin:28px auto;display:grid;grid-template-columns:minmax(320px,510px) 1fr;gap:48px;padding:0 28px}.kicker{font-size:12px;letter-spacing:4px;color:#d3a35e}h1{font-size:32px;margin:12px 0;letter-spacing:4px}p{color:#bcb0a4;line-height:1.8;font-size:14px}.stage{position:relative;background:#100e18;border:1px solid #685035;border-radius:8px;box-shadow:0 14px 70px #0009;max-width:490px;margin:auto;overflow:hidden}.stage canvas{display:block;width:100%;height:auto;touch-action:none;image-rendering:pixelated}.gate{position:absolute;inset:0;background:#120e15cc;display:grid;place-content:center;text-align:center;padding:28px;backdrop-filter:blur(3px)}.gate strong{font-size:24px;color:#ffda8f}.gate button{background:#ddb477;color:#1b1410;font-weight:700;margin-top:20px}.hidden{display:none}.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:18px 0}.stats div{border:1px solid #514032;padding:13px 10px;background:#201b21}.stats small{display:block;font-size:10px;color:#b6a384;letter-spacing:1px}.stats b{font-size:23px;display:block;margin-top:5px;color:#ffdd9f}.flow{font-size:12px;line-height:1.9;color:#9f938a}.flow span{color:#ffe0a4}.rule{display:flex;gap:13px;margin:18px 0}.rule b{font-family:monospace;font-size:11px;border:1px solid #5a4938;height:26px;width:26px;display:grid;place-items:center;flex-shrink:0;color:#d6aa6c}.rule p{margin:0;color:#cfbfa8}.rule strong{color:#f3e6cb}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}.actions button{font-size:12px;padding:10px}.status{min-height:42px;padding:12px;border-left:2px solid #d8a459;background:#251e22;font-size:13px;line-height:1.6;color:#ffdb9f}.pad{display:flex;justify-content:space-between;gap:20px;width:min(100%,390px);height:64px;margin:14px auto}.hand-move,.hand-action{pointer-events:auto}.hand-move{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:48%}.hand-action{width:26%}.pad button{width:100%;height:100%;user-select:none;-webkit-user-select:none;touch-action:none;padding:8px;border-radius:12px}.note{font-size:11px;color:#a19587}.result{position:static;pointer-events:none;padding:8px 12px;margin-top:8px;border-left:2px solid #85e6b4;background:#17362b;color:#b7f6d4;font-size:13px;line-height:1.5}.below{max-width:1064px;margin:30px auto;padding:20px 0;border-top:1px solid #42342b;font-size:12px;color:#ac9d88}.music{color:#7edcbd}label{font-size:11px;display:flex;align-items:center;gap:8px;margin-top:14px}input{accent-color:#d3aa69}@media(max-width:760px){header{padding:16px}main{grid-template-columns:1fr;padding:0 16px;gap:24px;margin:18px auto}.stage{max-width:430px}h1{font-size:32px}.below{margin:20px 16px}main>section:last-child{padding-bottom:25px}.gate strong{font-size:20px}}
+.sidebar{max-width:430px;padding-top:8px}.goal{margin:8px 0}.essentials{font-size:13px;line-height:1.9;margin:16px 0}.demo-tools{margin-top:20px;color:#9e9287;font-size:12px}.demo-tools summary{cursor:pointer}.demo-tools .actions{margin-top:10px}
+@media(max-width:760px){
+ header{padding:12px;font-size:10px;letter-spacing:1px}main{padding:0 12px;margin:12px auto;gap:16px}
+ .stage{width:min(100%,calc((100svh - 174px) * 320 / 560));max-width:none}
+ body{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+ .pad{position:fixed;left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));bottom:calc(6px + env(safe-area-inset-bottom));width:auto;height:64px;margin:0;z-index:2;pointer-events:none}.hand-move,.hand-action{pointer-events:auto}.hand-move{width:min(46vw,220px)}.hand-action{width:min(26vw,112px)}
+ main>section:first-child{min-height:calc(100svh - 65px)}main>section:first-child>.note{font-size:10px}.sidebar{padding-top:0}h1{font-size:26px}.stats{margin:12px 0}
+}
+@media(orientation:landscape) and (max-height:500px) and (max-width:1000px){
+ header{display:none}main{grid-template-columns:minmax(0,1fr) minmax(0,1fr);padding:0 12px;margin:12px auto;gap:20px}
+ .stage{width:min(100%,calc((100svh - 90px - env(safe-area-inset-bottom)) * 320 / 428));max-width:none}
+ body{padding-bottom:calc(78px + env(safe-area-inset-bottom))}main>section:first-child{min-height:0}
+ .pad{position:fixed;left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));bottom:calc(6px + env(safe-area-inset-bottom));width:auto;height:64px;margin:0;z-index:2;pointer-events:none}
+ .hand-move{width:min(34vw,220px)}.hand-action{width:112px}main>section:first-child>.note{display:none}
+ .sidebar{padding:0!important;max-height:calc(100svh - 90px - env(safe-area-inset-bottom));overflow:auto}h1{font-size:20px;margin:0 0 4px}.goal{font-size:12px;margin:4px 0}
+ .stats{margin:8px 0;gap:5px}.stats div{padding:6px}.stats b{font-size:18px}.status{padding:6px;min-height:0;font-size:12px}
+ .essentials{font-size:11px;line-height:1.6;margin:8px 0}.actions{margin-top:8px}label{margin-top:8px}.demo-tools{margin-top:8px}
+}
+</style>
+<header><span>BRIDGE / CRAZY / GREED</span><span>1.2.16 · 金庫試玩</span></header>
+<main><section><div class="stage"><canvas id="board" width="560" height="560" aria-label="貪婪金庫跑跳遊戲畫面"></canvas><div class="gate" id="gate"><strong>20% HP · 最後的貪念</strong><p>他鎖住了自己的血量。<br>跑跳撿金幣，帶回銀行存入 360。</p><button id="start">開始金庫挑戰</button><p class="note">← → / A D 跑 · ↑ / W / SPACE 跳<br>60 秒 · 失敗扣 80 HP</p></div></div><div class="pad" aria-label="遊戲觸控操作"><div class="hand-move" role="group" aria-label="左右移動"><button data-move="left" aria-label="向左移動">←</button><button data-move="right" aria-label="向右移動">→</button></div><div class="hand-action"><button data-move="action">跳躍</button></div></div><div class="note" style="text-align:center">左右跑、按跳躍跨過障礙 · 回銀行自動結算</div></section>
+<section class="sidebar">
+<h1>金庫跑跳</h1>
+<p class="goal">60 秒內帶回銀行，累積存入 360。</p>
+<div class="stats"><div><small>剩餘時間</small><b id="time">60.0s</b></div><div><small>已存／目標</small><b id="bank">0 / 360</b></div><div><small>負重／上限</small><b id="carry">0 / 120</b></div></div>
+<div class="status" id="status">Boss 20% 鎖血 · 殘血 BGM</div>
+<div class="result hidden" id="result" role="status" aria-live="polite"></div>
+<p class="essentials">← → / A D 移動 · ↑ / W / Space 跳躍<br>回起點自動存款 · 障礙扣血<br>超時扣 80 HP，存活者 20 秒後重試。</p>
+<div class="actions"><button id="restart">重新試玩</button><button id="pause">暫停</button></div>
+<label><input id="volume" type="range" min="0" max="1" step=".05" value=".55">BGM <span class="music" id="track">second-last</span></label>
+<details class="demo-tools"><summary>流程示範</summary><div class="actions"><button id="fail">快轉失敗</button><button id="retry">快轉重試</button><button id="finish">破解後收尾</button></div></details>
+</section></main>
+<script type="module">
+import {createCrazy, hitCrazyBoss, updateCrazy, inputCrazy, pointCrazy} from './crazy.mjs';
+import {drawCrazy, drawCrazyFrame} from './crazy-view.mjs';
+import {createCrazyMusic,crazyTrack} from './crazy-music.mjs';
+import {translate} from './i18n.mjs';
+import {VAULT_RULES} from './crazy-vault.mjs';
+const $=s=>document.querySelector(s),c=$('#board').getContext('2d'),t=k=>translate('zh-Hant',k);
+let s=null,paused=false,started=false,previous=performance.now(),resultSeen=null,viewCrop=0;
+const music=createCrazyMusic(()=>Number($('#volume').value));
+function reset(){let seed=37; s=createCrazy({random:()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296)});s.form=2;s.phase=3;s.bossMaxHp=1200;s.bossHp=260;s.hp=100;s.damageLeft=50;hitCrazyBoss(s,40);paused=false;resultSeen=null;$('#result').classList.add('hidden');$('#pause').textContent='暫停';}
+function begin(){reset();started=true;$('#gate').classList.add('hidden');music.reset();music.unlock();music.select(crazyTrack(s));}
+$('#start').onclick=begin;$('#restart').onclick=begin;
+$('#fail').onclick=()=>{if(!started)begin();if(s.mode!=='vault')reset();while(s.mode==='vault'&&!s.over)updateCrazy(s,50);paused=true;$('#pause').textContent='繼續';render();};
+$('#retry').onclick=()=>{if(s.vaultRetry==null)return;paused=false;s.vaultRetry=50;updateCrazy(s,50);resultSeen=null;$('#result').classList.add('hidden');$('#pause').textContent='暫停';render();};
+$('#finish').onclick=()=>{if(!s.vaultCleared)return;for(let i=0;i<4&&!s.over;i++){s.damageLeft=100;hitCrazyBoss(s,100);}paused=true;render();};
+$('#pause').onclick=()=>{if(!started)return;paused=!paused;$('#pause').textContent=paused?'繼續':'暫停';if(paused){s.held.clear();music.pause();}else music.select(crazyTrack(s));};
+const keys={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',w:'up',a:'left',s:'down',d:'right',' ':'action'};
+window.addEventListener('keydown',e=>{if(!keys[e.key]||!started||paused)return;e.preventDefault();inputCrazy(s,keys[e.key]);});
+window.addEventListener('keyup',e=>{if(keys[e.key]&&s)inputCrazy(s,keys[e.key],false);});
+window.addEventListener('blur',()=>{if(s)s.held.clear();});
+$('#board').addEventListener('pointerdown',e=>{if(!started||paused)return;const r=e.currentTarget.getBoundingClientRect();pointCrazy(s,(e.clientX-r.left)*e.currentTarget.width/r.width-(e.currentTarget.width-280)/2,(e.clientY-r.top)*e.currentTarget.height/r.height+viewCrop);});
+for(const b of document.querySelectorAll('[data-move]')){b.onpointerdown=e=>{if(!started||paused)return;e.preventDefault();b.setPointerCapture(e.pointerId);inputCrazy(s,b.dataset.move,true,'touch');};b.onpointerup=b.onpointercancel=()=>{if(s)inputCrazy(s,b.dataset.move,false,'touch');};}
+function render(){if(!s)return;
+ const landscape=matchMedia('(orientation:landscape) and (max-height:500px) and (max-width:1000px)').matches;
+ const compact=landscape||matchMedia('(max-width:760px)').matches;
+ const fullHeight=['bridge','sand'].includes(s.mode)?720:560,w=compact?320:560;
+ viewCrop=landscape?132:0;const h=fullHeight-viewCrop;
+ if($('#board').width!==w)$('#board').width=w;if($('#board').height!==h)$('#board').height=h;
+ c.clearRect(0,0,w,h);c.save();c.translate((w-560)/2,-viewCrop);drawCrazyFrame(c,s);c.restore();
+ c.save();c.translate((w-280)/2,-viewCrop);drawCrazy(c,s,t);c.restore();
+ if(s.mode==='vault'){$('#time').textContent=(s.timeLeft/1000).toFixed(1)+'s';$('#bank').textContent=`${s.mini.banked} / 360`;$('#carry').textContent=`${s.mini.carry} / 120`;$('#status').textContent=`HP ${s.hp}/100 · Boss 鎖血${s.over?' · 玩家倒下':s.mini.carry>=100?' · 滿載，折返銀行':''}`;}
+ else{if(s.vaultLastResult){$('#bank').textContent=`${s.vaultLastResult.banked} / 360`;$('#carry').textContent='0 / 120';}$('#time').textContent=s.vaultRetry!=null?`${(s.vaultRetry/1000).toFixed(1)}s`:'—';$('#status').textContent=`${s.won?'Boss 已擊敗':s.over?'挑戰結束':s.vaultLocked?'等待重試 · Boss 保持鎖血':'已破解 · Boss 解除鎖血'} · HP ${s.hp}/100`;}
+ if(s.vaultLastResult&&resultSeen!==s.vaultLastResult){resultSeen=s.vaultLastResult;const success=resultSeen.result==='success';$('#result').textContent=success?'金庫破解 · 鎖血解除':s.over?'超時扣 80 HP · 挑戰結束':'超時扣 80 HP · 20 秒後重試';$('#result').classList.remove('hidden');setTimeout(()=>{if(!paused)$('#result').classList.add('hidden');},4000);}
+ $('#track').textContent=crazyTrack(s)||'已停止';}
+function frame(now){const dt=Math.min(50,now-previous);previous=now;if(started&&!paused){updateCrazy(s,dt);music.select(crazyTrack(s));music.tick(dt);}render();requestAnimationFrame(frame);}reset();requestAnimationFrame(frame);
+// Read-only observation for automated validation and recording; no shortcut alters gameplay.
+Object.defineProperty(window,'demoState',{get:()=>s});
+Object.defineProperty(window,'demoMusicState',{get:()=>({active:music.active,blocked:music.blocked})});
+</script></html>
