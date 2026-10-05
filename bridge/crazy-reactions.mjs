@@ -104,7 +104,7 @@ function pusherCoin(random, x, y, dropped = false) {
   return { x, y, vx: dropped ? (random() - .5) * 30 : 0, vy: dropped ? 280 + random() * 60 : 0,
     kind, green: kind === 'heal', shine: random() };
 }
-export function pusherFront(m) { return 260 + (Math.sin(m.clock / (m.strokePeriod || 500)) + 1) * 35; }
+export function pusherFront(m) { return 250 + (Math.sin(m.clock / (m.strokePeriod || 500)) + 1) * 25; }
 export function createPusher(random, duration = 20000) {
   // Keep a packed bed, but stagger rows and scatter each coin independently.
   // Loose, fully random placement leaves gaps that absorb the pusher's motion.
@@ -167,8 +167,8 @@ export function updatePusher(s, dt, api) {
   m.falling = m.falling.filter(c => c.time < 700);
   const front = pusherFront(m);
   for (const c of m.coins) {
-    c.x += c.vx * sec; c.y += c.vy * sec; c.vx *= Math.exp(-2 * sec); c.vy *= Math.exp(-2 * sec);
-    if (c.y < front + 9) { c.y = front + 9; c.vy = Math.max(c.vy, 35); }
+    c.x += c.vx * sec; c.y += c.vy * sec; c.vx *= Math.exp(-.8 * sec); c.vy *= Math.exp(-.8 * sec);
+    if (c.y < front + 9) { c.y = front + 9; c.vy = Math.max(c.vy, 0); }
     c.x = Math.max(27, Math.min(253, c.x));
   }
   for (let pass = 0; pass < 8; pass++) for (let a = 0; a < m.coins.length; a++) {
@@ -178,6 +178,7 @@ export function updatePusher(s, dt, api) {
     for (const o of m.obstacles) { const dx = c.x - o.x, dy = c.y - o.y, d = Math.hypot(dx, dy) || 1; if (d < 24) { c.x += dx / d * (24 - d); c.y += dy / d * (24 - d); } }
     for (let b = a + 1; b < m.coins.length; b++) {
       const other = m.coins[b]; let dx = other.x - c.x, dy = other.y - c.y;
+      if (Math.abs(dx) >= 18 || Math.abs(dy) >= 18) continue;
       if (Math.abs(dx) + Math.abs(dy) < .001) dy = 1;
       const d = Math.hypot(dx, dy);
       if (d >= 18) continue;

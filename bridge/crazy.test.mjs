@@ -464,9 +464,22 @@ test('The packed pusher bed pays out through normal physics and dropped stock in
     };
     for (const step of [10, 50]) {
       const idle = play(false, step), active = play(true, step);
-      assert.ok(active >= 8, `No meaningful payout at aim ${aim}, step ${step}: ${active}`);
+      assert.ok(idle <= 1, `Idle pusher must not pay out freely: ${idle}`);
+      assert.ok(active >= 12, `Normal play must push out at least twelve coins at aim ${aim}, step ${step}: ${active}`);
       assert.ok(active > idle, `Dropped coins must increase payout: ${active} vs ${idle}`);
     }
+  }
+});
+
+test('An untouched pusher does not empty the bed during the longest thirty-second round', () => {
+  for (const initial of [1, 9, 30]) {
+    let seed = initial;
+    const s = createCrazy({ random: () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296) });
+    advanceCrazy(s, 'pusher'); s.catDue = Infinity; s.duration = s.timeLeft = 30000;
+    const mini = s.mini;
+    run(s, 30000);
+    assert.ok(mini.collected <= 1, `Untouched bed paid out ${mini.collected} coins`);
+    assert.notEqual(s.mode, 'pusher'); assert.equal(s.bossHp, 900);
   }
 });
 
