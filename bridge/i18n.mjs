@@ -23,7 +23,7 @@ const TEXT = {
     crazyCatGift: "魚乾回血",
 
     crazySevenSins: "七大罪",
-    crazyChooseBoss: "依序挑戰七大罪 · 憤怒為最終關",
+    crazyChooseBoss: "依序挑戰七大罪 · 通關後揭開下一關",
     crazyChallenge: "挑戰",
     crazyLocked: "未解鎖",
     crazyCleared: "完整通關",
@@ -269,7 +269,7 @@ const TEXT = {
     crazyCatGift: "鱼干回血",
 
     crazySevenSins: "七大罪",
-    crazyChooseBoss: "依序挑战七大罪 · 愤怒为最终关",
+    crazyChooseBoss: "依序挑战七大罪 · 通关后揭开下一关",
     crazyChallenge: "挑戰",
     crazyLocked: "未解锁",
     crazyCleared: "完整通關",
@@ -513,7 +513,7 @@ const TEXT = {
     crazyCatGift: "Cat treat · HP",
 
     crazySevenSins: "Seven Deadly Sins",
-    crazyChooseBoss: "Challenge the sins in order · Wrath awaits last",
+    crazyChooseBoss: "Challenge the sins in order · Clear a boss to reveal the next",
     crazyChallenge: "Challenge",
     crazyLocked: "Locked",
     crazyCleared: "Cleared",

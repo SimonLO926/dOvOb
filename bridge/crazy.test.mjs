@@ -468,3 +468,32 @@ test('Pachinko layouts vary while keeping every peg inside its playable lane', (
   assert.notDeepEqual(low.mini.pegs, high.mini.pegs);
   for (const s of [low, high]) assert.ok(s.mini.pegs.every(p => p.x >= 10 && p.x <= 270 && p.y >= 160 && p.y <= 430));
 });
+
+test('Crazy Bridge keyboard waits for Marathon DAS even after an idle repeat tick, then repeats at ARR', () => {
+  const s = createCrazy(); s.catDue = Infinity; s.attackDone = true;
+  s.bridge.active = { ...s.bridge.active, type: 'O', rot: 0, x: 4, y: 0 };
+  run(s, 95); inputCrazy(s, 'left'); assert.equal(s.bridge.active.x, 3);
+  run(s, 145); assert.equal(s.bridge.active.x, 3, 'No accidental second move before 150ms');
+  run(s, 5); assert.equal(s.bridge.active.x, 2);
+  run(s, 34); assert.equal(s.bridge.active.x, 2);
+  run(s, 1); assert.equal(s.bridge.active.x, 1);
+  inputCrazy(s, 'left', false); run(s, 150); assert.equal(s.bridge.active.x, 1);
+});
+
+test('Crazy Bridge touch repeats at Marathon touch cadence and restarts the delay on each press', () => {
+  const s = createCrazy(); s.catDue = Infinity; s.attackDone = true;
+  s.bridge.active = { ...s.bridge.active, type: 'O', rot: 0, x: 4, y: 0 };
+  inputCrazy(s, 'left', true, 'touch'); assert.equal(s.bridge.active.x, 3);
+  run(s, 69); assert.equal(s.bridge.active.x, 3); run(s, 1); assert.equal(s.bridge.active.x, 2);
+  inputCrazy(s, 'left', false); run(s, 20); inputCrazy(s, 'right', true, 'touch'); assert.equal(s.bridge.active.x, 3);
+  run(s, 69); assert.equal(s.bridge.active.x, 3); run(s, 1); assert.equal(s.bridge.active.x, 4);
+});
+
+test('Most recently pressed direction controls Crazy Bridge repeats, matching Marathon', () => {
+  const s = createCrazy(); s.catDue = Infinity; s.attackDone = true;
+  s.bridge.active = { ...s.bridge.active, type: 'O', rot: 0, x: 4, y: 0 };
+  inputCrazy(s, 'left'); inputCrazy(s, 'right'); assert.equal(s.bridge.active.x, 4);
+  run(s, 150); assert.equal(s.bridge.active.x, 5);
+  inputCrazy(s, 'right', false); run(s, 100); assert.equal(s.bridge.active.x, 5);
+  advanceCrazy(s, 'bridge'); assert.equal(s.horizontalDir, 0); assert.equal(s.horizontalMs, 0);
+});

@@ -1,2 +1,2 @@
 // Increment the patch version on each update.
-export const VERSION = "1.2.4";
+export const VERSION = "1.2.5";
