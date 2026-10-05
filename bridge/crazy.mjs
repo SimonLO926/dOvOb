@@ -1,8 +1,8 @@
-import { VAULT_RULES, createVault, updateVault, vaultPoint } from './crazy-vault.mjs?v=1.2.18';
-import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.18';
-import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.18';
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.18';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.18';
+import { VAULT_RULES, createVault, updateVault, vaultPoint } from './crazy-vault.mjs?v=1.2.19';
+import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.19';
+import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.19';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.19';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.19';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, secondHp: 1200, limit: 720000 });
 export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand', 'dodge']);
@@ -35,11 +35,11 @@ export function pachinkoBins(random = Math.random) {
 export function crazyRoundDuration(mode, form, phase, random = Math.random) {
   return mode === 'pusher' ? (10 + Math.floor(random() * 11)) * 1000 : (form === 2 ? 18000 : 22000) - phase * 2000;
 }
-export function createCrazy({ random = Math.random, boss = FIRST_BOSS } = {}) {
+export function createCrazy({ random = Math.random, boss = FIRST_BOSS, difficulty = 'hard' } = {}) {
   const bridge = createGame({ mode: 'marathon', random });
   startGame(bridge, 'marathon');
   const state = {
-    random, boss, hp: 100, maxHp: 100, vaultStarted: false, vaultCleared: false, vaultLocked: false, vaultRetry: null, bossHp: boss.hp, bossMaxHp: boss.hp, form: 1, phase: 1, cutscene: null, rewardCharge: 0, pusherDue: false,
+    random, boss, difficulty: difficulty === 'normal' ? 'normal' : 'hard', hp: 100, maxHp: 100, vaultStarted: false, vaultCleared: false, vaultLocked: false, vaultRetry: null, bossHp: boss.hp, bossMaxHp: boss.hp, form: 1, phase: 1, cutscene: null, rewardCharge: 0, pusherDue: false,
     stats: { hits: 0, damage: 0, damageTaken: 0, healed: 0, counters: 0, coins: 0, firstTime: 0, secondTime: 0 }, score: 0, elapsed: 0,
     over: false, won: false, damageLeft: 50, mode: 'bridge', encounter: 0, bag: [], hardStreak: 0,
     bridge, parkedPiece: null, curses: { reverse: 0, blind: 0, rush: 0, norotate: 0 }, arcade: null, mini: null, held: new Set(), actionReady: true,
@@ -65,7 +65,7 @@ export function hurtCrazy(s, amount, reason = 'crazyHurt') {
 }
 export function healCrazy(s, amount) {
   if (s.over || s.mode === 'vault' || amount <= 0) return;
-  const gained = Math.min(Math.max(1, Math.round(amount * .7)), s.maxHp - s.hp);
+  const gained = Math.min(Math.max(1, Math.round(amount * (s.difficulty === 'normal' ? 1 : .7))), s.maxHp - s.hp);
   s.hp += gained; s.stats.healed += gained;
   if (gained) notify(s, 'crazyHeal', gained);
 }

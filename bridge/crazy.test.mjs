@@ -785,3 +785,25 @@ test('Optional pusher risk cannot extend the bonus beyond twenty seconds', () =>
   const s=createCrazy({random:()=>.999});advanceCrazy(s,'pusher');s.mini.stock=0;s.mini.pending=9;
   run(s,550);const duration=s.duration, left=s.timeLeft;tap(s,'action');assert.equal(duration,20000);assert.equal(s.duration,20000);assert.equal(s.timeLeft,left);assert.equal(s.mini.riskUsed,true);
 });
+
+test('Normal restores original healing while Hard retains current recovery, HP caps and exclusions',()=>{
+ for(const [difficulty,gift,transform] of [['normal',8,20],['hard',6,14]]){
+  const s=createCrazy({difficulty});assert.equal(s.difficulty,difficulty);s.hp=50;
+  healCrazy(s,8);assert.equal(s.hp,50+gift);healCrazy(s,20);assert.equal(s.hp,50+gift+transform);
+  const hp=s.hp;healCrazy(s,0);healCrazy(s,-8);assert.equal(s.hp,hp);
+  healCrazy(s,100);assert.equal(s.hp,100);assert.equal(s.stats.healed,50);
+  s.hp=50;s.mode='vault';healCrazy(s,20);assert.equal(s.hp,50);
+  s.mode='bridge';s.over=true;healCrazy(s,20);assert.equal(s.hp,50);
+ }
+ assert.equal(createCrazy().difficulty,'hard');
+});
+
+test('Normal and Hard keep the same attacks and vault gate while phase recovery differs',()=>{
+ for(const [difficulty,phaseHP] of [['normal',62],['hard',58]]){
+  const s=createCrazy({difficulty});s.hp=50;s.damageLeft=300;hitCrazyBoss(s,300);
+  assert.equal(s.phase,2);assert.equal(s.hp,phaseHP);assert.equal(s.bossHp,600);
+  s.protection=0;hurtCrazy(s,8);assert.equal(s.hp,phaseHP-8);
+  s.form=2;s.phase=3;s.bossMaxHp=1200;s.bossHp=250;s.damageLeft=100;hitCrazyBoss(s,40);
+  assert.equal(s.mode,'vault');assert.equal(s.bossHp,240);assert.equal(s.vaultLocked,true);assert.equal(s.duration,60000);assert.equal(s.difficulty,difficulty);
+ }
+});
