@@ -22,21 +22,21 @@ test('Crazy opens on Bridge with a separate dealer boss and bounded HP', () => {
 
 test('Boss phases lead to a protected transformation, then a separate higher-HP second form and victory', () => {
   const s = createCrazy(); s.hp = 50;
-  s.damageLeft = 300; hitCrazyBoss(s, 300); assert.equal(s.phase, 2); assert.equal(s.hp, 58);
-  s.damageLeft = 300; hitCrazyBoss(s, 300); assert.equal(s.phase, 3); assert.equal(s.hp, 66);
+  s.damageLeft = 300; hitCrazyBoss(s, 300); assert.equal(s.phase, 2); assert.equal(s.hp, 56);
+  s.damageLeft = 300; hitCrazyBoss(s, 300); assert.equal(s.phase, 3); assert.equal(s.hp, 62);
   s.damageLeft = 300; hitCrazyBoss(s, 300);
   assert.equal(s.bossHp, 0); assert.equal(s.over, false); assert.equal(s.form, 1); assert.equal(s.cutscene.kind, 'transform');
   const elapsed = s.elapsed, hp = s.hp; s.protection = 0;
   assert.equal(hurtCrazy(s, 30), false); hitCrazyBoss(s, 900); tap(s, 'action');
   run(s, 4450); assert.equal(s.form, 1); assert.equal(s.hp, hp); assert.equal(s.elapsed, elapsed);
   run(s, 50); assert.equal(s.form, 2); assert.equal(s.bossHp, 1200); assert.equal(s.bossMaxHp, 1200); assert.equal(s.mode, 'jump');
-  assert.equal(s.hp, 79); assert.equal(s.held.size, 0);
+  assert.equal(s.hp, 72); assert.equal(s.held.size, 0);
   // This test covers victory after the separately tested vault gate has been cleared.
   s.vaultCleared = true;
   s.damageLeft = 1200; hitCrazyBoss(s, 1200);
   assert.equal(s.bossHp, 0); assert.equal(s.over, true); assert.equal(s.won, true); assert.equal(s.cutscene.kind, 'victory');
   const score = s.score; hitCrazyBoss(s, 30); healCrazy(s, 20); run(s, 6500);
-  assert.equal(s.score, score); assert.equal(s.hp, 87); assert.equal(s.cutscene, null);
+  assert.equal(s.score, score); assert.equal(s.hp, 78); assert.equal(s.cutscene, null);
 });
 
 test('Zero player HP and the eight-minute limit both end the fight', () => {
@@ -85,7 +85,7 @@ test('Tiger lever banks or risks rewards independently of timed reel stops', () 
   const s = createCrazy({ random: () => 0 }); enter(s, 'tiger'); s.hp = 80;
   tap(s, 'action'); assert.ok(s.mini.spin); assert.equal(s.mini.pending, 0); run(s, 1050); assert.equal(s.mini.pending, 32); assert.equal(s.bossHp, 900);
   tap(s, 'action'); assert.equal(s.mini.pending, 32); run(s, 1050); assert.equal(s.mini.pending, 64);
-  tap(s, 'alt'); assert.equal(s.mini.pending, 0); assert.equal(s.bossHp, 850); assert.equal(s.hp, 83);
+  tap(s, 'alt'); assert.equal(s.mini.pending, 0); assert.equal(s.bossHp, 850); assert.equal(s.hp, 82);
 });
 
 test('A lost Tiger gamble removes its reward and costs HP', () => {
@@ -112,7 +112,7 @@ test('Pachinko uses distinct reward bins and a bounded ball count', () => {
   s.mini.bins = [{ x: 12, w: 44, kind: 'heal', amount: 8 }, { x: 56, w: 56, kind: 'attack', amount: 22 }, { x: 112, w: 56, kind: 'hurt', amount: 6 }, { x: 168, w: 56, kind: 'attack', amount: 22 }, { x: 224, w: 44, kind: 'heal', amount: 8 }];
   pointCrazy(s, 500, 100); assert.equal(s.mini.aim, 260);
   s.mini.balls = [{ x: 20, y: 504, vx: 0, vy: 100 }, { x: 80, y: 504, vx: 0, vy: 100 }, { x: 140, y: 504, vx: 0, vy: 100 }];
-  updateCrazy(s, 50); assert.equal(s.hp, 49); assert.equal(s.bossHp, 878); assert.equal(s.mini.balls.length, 0);
+  updateCrazy(s, 50); assert.equal(s.hp, 48); assert.equal(s.bossHp, 878); assert.equal(s.mini.balls.length, 0);
 });
 
 test('Boss attacks are telegraphed and a hit cancels the pending strike', () => {
@@ -132,7 +132,7 @@ test('The tabby cat warns before one disruption and sometimes gives a healing gi
   pointCrazy(s, 40, 220); assert.equal(s.mini.selected.length, 0);
   const gift = createCrazy({ random: () => 0 }); gift.hp = 70; gift.catDue = 0;
   for (let i = 0; i < 25; i++) updateCrazy(gift, 50);
-  assert.equal(gift.hp, 75); assert.equal(gift.cat.gift, true);
+  assert.equal(gift.hp, 74); assert.equal(gift.cat.gift, true);
 });
 
 test('Arcade encounters return immediately on ball loss and preserve the Bridge board', () => {
@@ -739,7 +739,7 @@ test('Pachinko landing follows the displayed randomized bin boundaries and amoun
     s.protection = 0;
     s.mini.balls = [{x:bin.x+bin.w/2,y:504,vx:0,vy:100}]; updateCrazy(s, 50);
     assert.equal(s.mini.balls.length, 0);
-    if (bin.kind === 'heal') heal += Math.max(1,Math.round(bin.amount*.65));
+    if (bin.kind === 'heal') heal += Math.max(1,Math.floor(bin.amount/2));
     else if (bin.kind === 'hurt') penalty += bin.amount;
     else damage += bin.amount;
     assert.deepEqual(s.mini.bins, bins, 'Bins must not reroll during flight or payout');
@@ -778,7 +778,7 @@ test('Lucky coins earn an actual jackpot once, then banking settles it even duri
 test('Pusher coin variants heal or double reward while preserving physical collection counts', () => {
   const s=createCrazy();advanceCrazy(s,'pusher');s.catDue=Infinity;s.hp=60;
   s.mini.coins=[{x:100,y:466,vx:0,vy:0,kind:'heal'},{x:140,y:466,vx:0,vy:0,kind:'ruby'},{x:180,y:466,vx:0,vy:0,kind:'gold'}];
-  updateCrazy(s,50);assert.equal(s.hp,62);assert.equal(s.mini.pending,9);assert.equal(s.stats.coins,3);assert.equal(s.mini.falling.length,3);
+  updateCrazy(s,50);assert.equal(s.hp,61);assert.equal(s.mini.pending,9);assert.equal(s.stats.coins,3);assert.equal(s.mini.falling.length,3);
 });
 
 test('Optional pusher risk cannot extend the bonus beyond twenty seconds', () => {
@@ -786,8 +786,8 @@ test('Optional pusher risk cannot extend the bonus beyond twenty seconds', () =>
   run(s,550);const duration=s.duration, left=s.timeLeft;tap(s,'action');assert.equal(duration,20000);assert.equal(s.duration,20000);assert.equal(s.timeLeft,left);assert.equal(s.mini.riskUsed,true);
 });
 
-test('Normal restores original healing while Hard retains current recovery, HP caps and exclusions',()=>{
- for(const [difficulty,gift,transform] of [['normal',8,20],['hard',5,13]]){
+test('Normal keeps full healing while Hard restores original half recovery, HP caps and exclusions',()=>{
+ for(const [difficulty,gift,transform] of [['normal',8,20],['hard',4,10]]){
   const s=createCrazy({difficulty});assert.equal(s.difficulty,difficulty);s.hp=50;
   healCrazy(s,8);assert.equal(s.hp,50+gift);healCrazy(s,20);assert.equal(s.hp,50+gift+transform);
   const hp=s.hp;healCrazy(s,0);healCrazy(s,-8);assert.equal(s.hp,hp);
@@ -799,7 +799,7 @@ test('Normal restores original healing while Hard retains current recovery, HP c
 });
 
 test('Normal and Hard keep the same attacks and vault gate while phase recovery differs',()=>{
- for(const [difficulty,phaseHP] of [['normal',62],['hard',58]]){
+ for(const [difficulty,phaseHP] of [['normal',62],['hard',56]]){
   const s=createCrazy({difficulty});s.hp=50;s.damageLeft=300;hitCrazyBoss(s,300);
   assert.equal(s.phase,2);assert.equal(s.hp,phaseHP);assert.equal(s.bossHp,600);
   s.protection=0;hurtCrazy(s,8);assert.equal(s.hp,phaseHP-8);
