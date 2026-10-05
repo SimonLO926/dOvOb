@@ -1,7 +1,8 @@
-import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.15';
-import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.15';
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.15';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.15';
+import { VAULT_RULES, createVault, updateVault, vaultPoint } from './crazy-vault.mjs';
+import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.16';
+import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.16';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.16';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.16';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, secondHp: 1200, limit: 720000 });
 export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand', 'dodge']);
@@ -38,7 +39,7 @@ export function createCrazy({ random = Math.random, boss = FIRST_BOSS } = {}) {
   const bridge = createGame({ mode: 'marathon', random });
   startGame(bridge, 'marathon');
   const state = {
-    random, boss, hp: 100, maxHp: 100, bossHp: boss.hp, bossMaxHp: boss.hp, form: 1, phase: 1, cutscene: null, rewardCharge: 0, pusherDue: false,
+    random, boss, hp: 100, maxHp: 100, vaultStarted: false, vaultCleared: false, vaultLocked: false, vaultRetry: null, bossHp: boss.hp, bossMaxHp: boss.hp, form: 1, phase: 1, cutscene: null, rewardCharge: 0, pusherDue: false,
     stats: { hits: 0, damage: 0, damageTaken: 0, healed: 0, counters: 0, coins: 0, firstTime: 0, secondTime: 0 }, score: 0, elapsed: 0,
     over: false, won: false, damageLeft: 50, mode: 'bridge', encounter: 0, bag: [], hardStreak: 0,
     bridge, parkedPiece: null, curses: { reverse: 0, blind: 0, rush: 0, norotate: 0 }, arcade: null, mini: null, held: new Set(), actionReady: true,
@@ -63,14 +64,19 @@ export function hurtCrazy(s, amount, reason = 'crazyHurt') {
   return true;
 }
 export function healCrazy(s, amount) {
-  if (s.over) return;
-  const gained = Math.min(amount, s.maxHp - s.hp);
+  if (s.over || s.mode === 'vault' || amount <= 0) return;
+  const gained = Math.min(Math.max(1, Math.floor(amount / 2)), s.maxHp - s.hp);
   s.hp += gained; s.stats.healed += gained;
   if (gained) notify(s, 'crazyHeal', gained);
 }
 export function hitCrazyBoss(s, amount) {
   if (s.over || s.cutscene) return;
-  const damage = Math.min(amount, s.damageLeft, s.bossHp);
+  if (s.vaultLocked) {
+    if (s.attack) { s.attack = null; notify(s, 'crazyCounter'); }
+    return;
+  }
+  const floor = s.form === 2 && !s.vaultCleared ? s.bossMaxHp * .2 : 0;
+  const damage = Math.min(amount, s.damageLeft, Math.max(0, s.bossHp - floor));
   s.damageLeft -= damage;
   s.bossHp -= damage;
   if (damage) { s.stats.hits++; s.stats.damage += damage; }
@@ -80,6 +86,9 @@ export function hitCrazyBoss(s, amount) {
   const phase = s.bossHp <= s.bossMaxHp / 3 ? 3 : s.bossHp <= s.bossMaxHp * 2 / 3 ? 2 : 1;
   if (phase > s.phase) { s.phase = phase; healCrazy(s, 12); notify(s, 'crazyPhase', phase); }
   else notify(s, damage ? 'crazyHit' : 'crazyGuard', damage);
+  if (s.form === 2 && !s.vaultCleared && !s.vaultStarted && s.bossHp <= s.bossMaxHp * .2) {
+    s.vaultStarted = true; s.vaultLocked = true; enterCrazyVault(s); return;
+  }
   if (s.bossHp === 0) {
     s.held.clear(); s.attack = null;
     if (s.form === 1 && s.boss.secondHp) {
@@ -143,6 +152,7 @@ function leaveSand(s) {
 }
 export function advanceCrazy(s, preferredMode = null) {
   if (s.over || s.cutscene) return;
+  if (s.mode === 'vault') return;
   if (s.mode === 'sand') leaveSand(s);
   const from = s.mode;
   const bonus = preferredMode === 'pusher' || (!preferredMode && s.pusherDue);
@@ -268,6 +278,10 @@ export function inputCrazy(s, action, down = true, source = 'keyboard') {
   if (s.cat?.action === 'player' && s.cat.time < 1200 && ['left', 'right'].includes(action)) s.cat.dodged = true;
   if (s.held.has(action)) return;
   s.held.add(action);
+  if (s.mode === 'vault') {
+    if (action === 'up' || action === 'action') s.mini.jumpBuffer = 120;
+    return;
+  }
   if (action === 'action' && !s.actionReady) return;
   if (s.arcade) {
     if (action === 'left' || action === 'right') { s.arcade[action] = true; if (s.mode === 'pinball') notify(s, 'crazyFlipperSound'); }
@@ -291,6 +305,7 @@ export function inputCrazy(s, action, down = true, source = 'keyboard') {
 // All mini-game hit regions use the same logical 280 x 560 coordinates as the renderer.
 export function pointCrazy(s, x, y) {
   if (s.over || s.cutscene || !s.actionReady || s.catBlock > 0) return;
+  if (s.mode === 'vault') { vaultPoint(s.mini, x, y); return; }
   if (GREED_ATTACKS.includes(s.mode)) { reactionPoint(s, x, y); return; }
   if (s.mode === 'pusher') { s.mini.aim = Math.max(30, Math.min(250, x)); return; }
   if (s.mode === 'dodge') { s.mini.target = { x: Math.max(22, Math.min(258, x)), y: Math.max(172, Math.min(494, y)) }; return; }
@@ -512,6 +527,7 @@ function updateCat(s, dt) {
     } else if (s.cat.action === 'blocks') { if (!catSmashBlocks(s)) catMischief(s); }
     else catMischief(s);
   }
+  if (s.mode === 'vault') return;
   if (s.cat.time >= 2400) { s.cat = null; s.catDue = 10000 - s.phase * 1000; }
 }
 
@@ -524,6 +540,17 @@ export function updateCrazy(s, elapsed) {
     return s;
   }
   if (s.over) return s;
+  if (s.vaultRetry != null && s.mode !== 'vault') {
+    s.vaultRetry -= dt;
+    if (s.vaultRetry <= 0) { s.elapsed += dt; enterCrazyVault(s); return s; }
+  }
+  if (s.mode === 'vault') {
+    s.elapsed += dt; s.transition = null;
+    s.protection = Math.max(0, s.protection - dt); s.hitFlash = Math.max(0, s.hitFlash - dt);
+    const result = updateVault(s.mini, dt, s.held, { hurt: (amount, reason) => hurtCrazy(s, amount, reason) }); s.timeLeft = s.mini.timeLeft;
+    if (result && !s.over) finishCrazyVault(s, result);
+    return s;
+  }
   if (s.transition) { s.transition.time += dt; if (s.transition.time >= 800) s.transition = null; }
   s.elapsed += dt; s.timeLeft -= dt; s.protection = Math.max(0, s.protection - dt);
   s.hitFlash = Math.max(0, s.hitFlash - dt); s.noticeTime = Math.max(0, s.noticeTime - dt);
@@ -543,6 +570,7 @@ export function updateCrazy(s, elapsed) {
     if (s.attack.time <= 0) { s.attack = null; hurtCrazy(s, 4 + s.phase * 2, 'crazyBossAttack'); }
   }
   updateCat(s, dt);
+  if (s.mode === 'vault') return s;
   if (s.mode === 'bridge' || s.mode === 'sand') updateBridge(s, dt);
   else if (s.arcade) {
     const cleared = s.arcade.cleared;
@@ -558,6 +586,7 @@ export function updateCrazy(s, elapsed) {
     }
     const hits = s.arcade.cleared - cleared;
     if (hits) hitCrazyBoss(s, hits * 4);
+    if (s.mode === 'vault') return s;
     if (s.arcade.over) {
       if (s.arcade.full) { hitCrazyBoss(s, 30); healCrazy(s, 6); }
       else hurtCrazy(s, 12, 'crazyBallLost');
@@ -573,6 +602,7 @@ export function updateCrazy(s, elapsed) {
   else if (s.mode === 'dodge') updateDodge(s, dt);
   else if (GREED_ATTACKS.includes(s.mode)) updateReaction(s, dt, reactionApi);
   else if (s.mode === 'pusher') { updatePusher(s, dt, reactionApi); return s; }
+  if (s.mode === 'vault') return s;
   if (s.mini?.clock != null) s.mini.clock += dt;
   if (s.cutscene) return s;
   if (s.elapsed >= s.boss.limit && !s.over) {
@@ -587,4 +617,30 @@ export function updateCrazy(s, elapsed) {
     advanceCrazy(s);
   }
   return s;
+}
+
+export function enterCrazyVault(s) {
+  if (s.over || s.cutscene || !s.vaultLocked) return;
+  if (s.mode === 'sand') leaveSand(s);
+  s.mode='vault'; s.mini=createVault(); s.arcade=null; s.attack=null; s.cat=null; s.vaultRetry=null;
+  s.held.clear(); s.timeLeft=s.duration=VAULT_RULES.duration; s.actionReady=true; s.transition=null; s.cooldown=0;
+  notify(s,'crazyVaultStart');
+}
+function finishCrazyVault(s, result) {
+  s.vaultLastResult = { result, banked:s.mini.banked, elapsed:s.mini.elapsed };
+  if(result === 'success') { s.vaultCleared=true; s.vaultLocked=false; s.vaultRetry=null; }
+  else {
+    s.stats.damageTaken+=Math.min(s.hp,VAULT_RULES.penalty); s.hp=Math.max(0,s.hp-VAULT_RULES.penalty);
+    s.hitFlash=300;
+    if(!s.hp) {s.over=true;s.won=false;s.finishReason='crazyVaultFailed';}
+    else s.vaultRetry=VAULT_RULES.retry;
+  }
+  s.mode='bridge'; s.mini=null; s.held.clear();
+  if(!s.over) {
+    advanceCrazy(s,'jump');
+    // Combat resumes immediately; keep the arena visible during the vault result.
+    s.transition = null;
+    s.actionReady = true;
+  }
+  notify(s,result==='success'?'crazyVaultCleared':'crazyVaultFailed',result==='success'?0:-VAULT_RULES.penalty);
 }

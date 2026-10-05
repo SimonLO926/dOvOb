@@ -348,7 +348,12 @@ export function createGame(options = {}) {
       }
       if (curseRoll < rates.nohold + rates.curse + FEVER_CHANCE) return describe("F");
       if (curseRoll < rates.nohold + rates.curse + FEVER_CHANCE + rates.garbage) return describe("G", "garbage");
-      const roll = random();
+      // Penalties grow by stage; compensate their earlier return so rewards retain
+      // the same per-piece probability as stage 1 in both Normal and Hard.
+      const baseRates = marathonPenaltyRates(1);
+      const baseEligible = 1 - baseRates.nohold - baseRates.curse - FEVER_CHANCE - baseRates.garbage;
+      const eligible = 1 - rates.nohold - rates.curse - FEVER_CHANCE - rates.garbage;
+      const roll = random() * eligible / baseEligible;
       const breakoutAt = REWARD_CHANCE.breakout;
       const bbtanAt = breakoutAt + REWARD_CHANCE.bbtan;
       const pinballAt = bbtanAt + REWARD_CHANCE.pinball;
@@ -632,7 +637,7 @@ function explodeFrom(grid, bombs, random, cleared = []) {
       if (clearing.has(key)) clearing.get(key).cause = "blast";
       const target = grid[cy][cx];
       if (!target) continue;
-      blasted.push({ x: cx, y: cy, type: target.type, feverId: target.feverId ?? null, curse: target.curse ?? null, cause: "blast" });
+      blasted.push({ x: cx, y: cy, type: target.type, feverId: target.feverId ?? null, reward: target.reward ?? null, curse: target.curse ?? null, cause: "blast" });
       grid[cy][cx] = null;
     }
   }
@@ -1140,7 +1145,7 @@ export function pump(game) {
     const lineBonus = noteLines(game, rows.length);
     if (game.mode === "tetris" || garbageGraceActive(game) || garbageQueued > 0) collapseRows(game.grid, rows);
     if (game.mode === "marathon") {
-      const reward = pickReward(rewards);
+      const reward = pickReward([...rewards, ...blasts.map(cell => cell.reward)]);
       if (reward) game.pendingReward = reward;
     }
     return { type: "clear", rows, cells, blasts, fever: feverActive(game), feverStarted, garbageQueued, combo: game.combo, tspin: kind === "tspin", spinName: kind ? tSpinName(kind, rows.length) : null, bonus, lineBonus };
@@ -1162,7 +1167,9 @@ export function pump(game) {
   if (game.pendingReward) {
     const reward = game.pendingReward;
     game.pendingReward = null;
-    if (brickCount(game.grid) === 0) {
+    if (reward === "sand") {
+      return { type: "reward", reward, flip: false };
+    } else if (brickCount(game.grid) === 0) {
       game.score += 2000 * scoreMult(game);
     } else if (!hasLaunchRoom(game.grid)) {
       game.score += 500 * scoreMult(game);
@@ -1244,7 +1251,7 @@ export function chainBlast(grid, x, y, random) {
       const target = grid[cy][cx];
       if (!target) continue;
       const wasBomb = !!target.bomb;
-      removed.push({ x: cx, y: cy, type: target.type, bomb: wasBomb, feverId: target.feverId ?? null, curse: target.curse ?? null, cause: "blast" });
+      removed.push({ x: cx, y: cy, type: target.type, bomb: wasBomb, feverId: target.feverId ?? null, reward: target.reward ?? null, curse: target.curse ?? null, cause: "blast" });
       grid[cy][cx] = null;
       if (wasBomb) queue.push([cx, cy]);
     }

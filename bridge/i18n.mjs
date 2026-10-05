@@ -1119,6 +1119,8 @@ const TEXT = {
   },
 };
 
+const VAULT_TEXT = { crazyMode_vault:'金庫跑跳', crazyVaultStart:'60 秒：跑跳撿幣，帶回銀行存入 360', crazyVaultCleared:'金庫破解！Boss 解除鎖血', crazyVaultFailed:'金庫失敗 · 扣 80 HP', crazyVaultMove:'移動' };
 export function translate(lang, key) {
+  if (VAULT_TEXT[key]) return VAULT_TEXT[key];
   return (TEXT[lang] || TEXT["zh-Hant"])[key] ?? TEXT.en[key] ?? key;
 }
