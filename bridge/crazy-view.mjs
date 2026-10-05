@@ -1,9 +1,9 @@
-import { drawVault } from './crazy-vault.mjs?v=1.2.20';
-import { drawFineDealer, drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.20';
-import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.20';
-import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.20';
-import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.20';
-import { drawSession } from './arcade.mjs?v=1.2.20';
+import { drawVault } from './crazy-vault.mjs?v=1.2.21';
+import { drawFineDealer, drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.21';
+import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.21';
+import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.21';
+import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.21';
+import { drawSession } from './arcade.mjs?v=1.2.21';
 export const CRAZY_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 356 });
 export const CRAZY_BLOCK_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 512 });
 export function crazyCanvasHeight(mode) { return mode === 'bridge' || mode === 'sand' ? 720 : 560; }
@@ -16,7 +16,7 @@ const catPhoto = typeof Image === 'undefined' ? null : new Image();
 export const catImageReady = catPhoto ? new Promise(resolve => {
   catPhoto.onload = () => resolve(true);
   catPhoto.onerror = () => resolve(false);
-  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.20', import.meta.url).href;
+  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.21', import.meta.url).href;
 }) : Promise.resolve(false);
 const COLORS = { I: '#64d2ff', O: '#ffd60a', T: '#bf5af2', S: '#30d158', Z: '#ff453a', J: '#0a84ff', L: '#ff9f0a', B: '#9da4b9' };
 const SYMBOLS = ['★', '♥', '7', '♠'];
