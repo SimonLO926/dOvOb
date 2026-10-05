@@ -1,5 +1,5 @@
-import { pusherFront } from './crazy-reactions.mjs?v=1.2.10';
-import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.10';
+import { pusherFront } from './crazy-reactions.mjs?v=1.2.13';
+import { GREED_ATTACKS, ROULETTE_LASER_WIDTH } from './crazy-reactions.mjs?v=1.2.13';
 const label = (c, value, x, y, size = 13, color = '#ffe7a3') => { c.fillStyle = color; c.font = `bold ${size}px "Pixel Latin", "Pixel Hant", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(value, x, y, 248); };
 export function pixelCore(c, x, y, color) {
   const pixels = ['.XX.XX.', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..', '...X...'];
@@ -30,11 +30,26 @@ export function drawReaction(c, s, t, reduced) {
       else coin(c, h.x, h.y, 6);
     } else if (h.kind === 'motion') {
       const color = h.tone === 'blue' ? '#62d2ff' : '#ffb455';
-      c.fillStyle = color; c.fillRect(12, warn ? 188 : h.y - 4, 256, warn ? 3 : 8);
+      if (h.offset == null) { c.fillStyle = color; c.fillRect(12, warn ? 188 : h.y - 4, 256, warn ? 3 : 8); }
+      else {
+        const x = h.nx*h.offset, y = h.ny*h.offset;
+        c.strokeStyle = color; c.lineWidth = warn ? 3 : 8;
+        c.beginPath();c.moveTo(x-h.ny*600,y+h.nx*600);c.lineTo(x+h.ny*600,y-h.nx*600);c.stroke();
+        if (warn) {
+          const reach = Math.min(h.nx ? 128/Math.abs(h.nx) : Infinity, h.ny ? 178/Math.abs(h.ny) : Infinity);
+          label(c,['→','↘','↓','↙','←','↖','↑','↗'][h.direction],Math.max(30,Math.min(250,140-h.nx*reach)),Math.max(174,Math.min(486,330-h.ny*reach)),20,color);
+        }
+      }
       if (warn) label(c, t(h.tone === 'blue' ? 'crazyKeepMoving' : 'crazyStayStill'), 140, 214, 16, color);
     } else if (h.kind === 'laser') {
-      c.strokeStyle = warn ? '#d56688' : '#ffe294'; c.lineWidth = warn ? 2 : 12; c.setLineDash(warn ? [8, 6] : []);
-      c.beginPath(); c.moveTo(h.a.x, h.a.y); c.lineTo(h.b.x, h.b.y); c.stroke(); c.setLineDash([]);
+      if (!warn) c.globalAlpha = Math.max(0, Math.min(1, (h.warn + 350 - h.age) / 100));
+      const width = h.width ?? ROULETTE_LASER_WIDTH, alpha = c.globalAlpha;
+      c.strokeStyle = warn ? '#d56688' : '#ffe294'; c.lineWidth = width;
+      if (warn) c.globalAlpha *= .28;
+      c.beginPath(); c.moveTo(h.a.x, h.a.y); c.lineTo(h.b.x, h.b.y); c.stroke();
+      c.globalAlpha = alpha; c.lineWidth = warn ? 2 : width * .35;
+      c.strokeStyle = warn ? '#f6a0b7' : '#fff7d4'; c.setLineDash(warn ? [8, 6] : []);
+      c.stroke(); c.setLineDash([]);
     }
   }
   c.globalAlpha = 1; for (const d of m.drops) coin(c, d.x, d.y, 7, true);

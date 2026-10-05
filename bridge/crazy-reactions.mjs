@@ -1,6 +1,15 @@
 // Second-form attacks and earned coin-pusher rewards use logical 280 × 560 coordinates.
 export const GREED_ATTACKS = Object.freeze(['jump', 'coins', 'motion', 'vortex', 'roulette']);
 export const FLYING_ATTACKS = Object.freeze(['coins', 'motion', 'vortex', 'roulette']);
+export const ROULETTE_LASER_WIDTH = 24;
+export function motionSweep(random, tone, speed) {
+  const direction = Math.floor(random() * 8), angle = direction * Math.PI / 4;
+  const nx = Math.abs(Math.cos(angle)) < 1e-9 ? 0 : Math.cos(angle);
+  const ny = Math.abs(Math.sin(angle)) < 1e-9 ? 0 : Math.sin(angle);
+  const edges = [[12,152],[268,152],[12,508],[268,508]].map(([x,y]) => nx*x+ny*y);
+  return { kind: 'motion', tone, direction, nx, ny, offset: Math.min(...edges)+8,
+    end: Math.max(...edges)+20, warn: 600, age: 0, speed };
+}
 export function createReaction(mode) {
   return { x: 140, y: mode === 'jump' ? 464 : 410, vy: 0, grounded: true, target: null,
     hazards: [], drops: [], spawn: 850, wave: 0, clock: 0, survival: 0,
@@ -21,6 +30,31 @@ const distanceLine = (x, y, a, b) => {
   const t = Math.max(0, Math.min(1, ((x - a.x) * dx + (y - a.y) * dy) / (length || 1)));
   return Math.hypot(x - a.x - t * dx, y - a.y - t * dy);
 };
+export function rouletteLasers(random, x, y) {
+  const roll = random(), count = roll < .5 ? 1 : roll < .8 ? 2 : 3;
+  const direction = random() * Math.PI * 2;
+  let safe;
+  // Reserve an entire disk, reachable at walking speed before the warning ends.
+  for (let i = 0; i < 12; i++) {
+    const angle = direction + i * Math.PI / 6;
+    const point = { x: Math.max(50, Math.min(230, x + Math.cos(angle) * 74)),
+      y: Math.max(208, Math.min(456, y + Math.sin(angle) * 74)), radius: 28 };
+    if (!safe || Math.hypot(point.x - 140, point.y - 330) > Math.hypot(safe.x - 140, safe.y - 330)) safe = point;
+    if (Math.hypot(point.x - 140, point.y - 330) >= 64) { safe = point; break; }
+  }
+  const base = Math.atan2(safe.y - 330, safe.x - 140) + Math.PI / 2 + (random() - .5) * .7;
+  const spacing = .14 + random() * .21;
+  const staggered = count > 1 && random() >= .5;
+  let warning = 520;
+  const lasers = Array.from({ length: count }, (_, i) => {
+    const angle = base + (i - (count - 1) / 2) * spacing;
+    if (i && staggered) warning += 40 + Math.floor(random() * 81);
+    return { kind: 'laser', width: ROULETTE_LASER_WIDTH,
+      a: { x: 140 - Math.cos(angle) * 320, y: 330 - Math.sin(angle) * 320 },
+      b: { x: 140 + Math.cos(angle) * 320, y: 330 + Math.sin(angle) * 320 }, warn: warning, age: 0, fired: false };
+  });
+  return { lasers, safe };
+}
 function wave(s) {
   const m = s.mini, rand = s.random, speed = 285 + s.phase * 32;
   if (s.mode === 'jump') {
@@ -28,10 +62,10 @@ function wave(s) {
     m.hazards.push({ kind: high ? 'high' : 'ground', x: 290, y: high ? 380 : 446,
       w: high ? 58 : 26, h: high ? 50 : 36, warn: 450, age: 0, vx: -speed });
   } else if (s.mode === 'roulette') {
-    const angle = rand() * Math.PI, a = { x: 140 - Math.cos(angle) * 320, y: 330 - Math.sin(angle) * 320 }, b = { x: 140 + Math.cos(angle) * 320, y: 330 + Math.sin(angle) * 320 };
-    m.hazards.push({ kind: 'laser', a, b, warn: 520, age: 0, fired: false });
+    const salvo = rouletteLasers(rand, m.x, m.y);
+    m.laserSafe = salvo.safe; m.hazards.push(...salvo.lasers);
   } else if (s.mode === 'motion') {
-    m.hazards.push({ kind: 'motion', tone: m.wave % 2 ? 'orange' : 'blue', y: 160, warn: 600, age: 0, speed: 265 + s.phase * 30 });
+    m.hazards.push(motionSweep(rand, m.wave % 2 ? 'orange' : 'blue', 265 + s.phase * 30));
   } else {
     const safe = Math.floor(rand() * 6);
     for (let i = 0; i < 6; i++) {
@@ -41,7 +75,9 @@ function wave(s) {
     }
     if (m.wave % 3 === 1) m.drops.push({ x: 34 + safe * 42, y: 160, vy: 100, life: 5000 });
   }
-  m.wave++; m.spawn += s.mode === 'jump' ? 1100 - s.phase * 90 : s.mode === 'roulette' ? 1050 - s.phase * 90 : s.mode === 'motion' ? 1200 - s.phase * 70 : 1020 - s.phase * 80;
+  const interval = s.mode === 'roulette' ? Math.max(1050 - s.phase * 90, ...m.hazards.map(h => h.warn + 350))
+    : s.mode === 'jump' ? 1100 - s.phase * 90 : s.mode === 'motion' ? 1200 - s.phase * 70 : 1020 - s.phase * 80;
+  m.wave++; m.spawn += interval;
 }
 export function updateReaction(s, dt, { hurt, hit, heal, emit }) {
   const m = s.mini, sec = dt / 1000;
@@ -71,6 +107,7 @@ export function updateReaction(s, dt, { hurt, hit, heal, emit }) {
   m.moving = length > 0 && Math.hypot(m.x - oldX, m.y - oldY) > .1;
   m.spawn -= dt; if (m.spawn <= 0) wave(s);
   let collision = s.mode === 'vortex' && Math.hypot(m.x - 140, m.y - 265) < 22;
+  let laserSound = false;
   for (const h of m.hazards) {
     h.age += dt; if (h.age < h.warn) continue;
     const step = Math.min(dt, h.age - h.warn) / 1000;
@@ -81,14 +118,18 @@ export function updateReaction(s, dt, { hurt, hit, heal, emit }) {
       const a = { x: h.x, y: h.y }; h.x += h.vx * step; h.y += h.vy * step;
       if (distanceLine(m.x, m.y, a, h) < 13) collision = true;
     } else if (h.kind === 'motion') {
-      const y = h.y; h.y += h.speed * step;
-      if (m.y >= y - 9 && m.y <= h.y + 9 && (h.tone === 'blue' ? !m.moving : m.moving)) collision = true;
+      const old = h.offset ?? h.y;
+      const next = old + h.speed * step;
+      if (h.offset == null) h.y = next; else h.offset = next;
+      const projection = h.offset == null ? m.y : h.nx * m.x + h.ny * m.y;
+      if (projection >= old - 9 && projection <= next + 9 && (h.tone === 'blue' ? !m.moving : m.moving)) collision = true;
     } else if (h.kind === 'laser' && h.age < h.warn + 250) {
-      if (!h.fired) { h.fired = true; emit(s, 'crazyLaserSound'); }
-      if (distanceLine(m.x, m.y, h.a, h.b) < 12) collision = true;
+      if (!h.fired) { h.fired = true; if (!laserSound) { emit(s, 'crazyLaserSound'); laserSound = true; } }
+      if (distanceLine(m.x, m.y, h.a, h.b) < (h.width ?? ROULETTE_LASER_WIDTH) / 2 + 6) collision = true;
     }
   }
-  m.hazards = m.hazards.filter(h => h.kind === 'laser' ? h.age < h.warn + 350 : (h.x ?? 0) > -80 && (h.y ?? 0) < 530);
+  m.hazards = m.hazards.filter(h => h.kind === 'laser' ? h.age < h.warn + 350
+    : h.kind === 'motion' && h.offset != null ? h.offset < h.end : (h.x ?? 0) > -80 && (h.y ?? 0) < 530);
   for (const drop of m.drops) {
     drop.y += drop.vy * sec; drop.life -= dt;
     if (Math.hypot(m.x - drop.x, m.y - drop.y) < 15) { drop.life = 0; heal(s, 3); emit(s, 'crazyCoinSound'); }
@@ -139,11 +180,11 @@ export function pusherAction(s, action, api) {
   if (action === 'alt') {
     finishPusherSpin(s, api);
     if (m.risk && !m.risk.win) m.pending = Math.floor(m.pending / 2);
-    hit(s, m.pending); m.pending = 0; emit(s, 'crazyPusherBank'); advance(s); return;
+    const reward = m.pending; hit(s, reward); m.pending = 0; emit(s, 'crazyPusherBank', reward); advance(s); return;
   }
   if (action !== 'action' || s.cooldown > 0 || s.timeLeft <= 2000) return;
   if (m.stock > 0) {
-    m.stock--; m.coins.push(pusherCoin(s.random, m.aim, 250, true)); s.cooldown = 280; emit(s, 'crazyCoinSound');
+    m.stock--; m.coins.push(pusherCoin(s.random, m.aim, 250, true)); s.cooldown = 280; emit(s, 'crazyPusherInsertSound');
   } else if (!m.riskUsed && m.pending > 0) {
     m.riskUsed = true; m.stock = 4;
     const extra = Math.min(4000, Math.max(0, 20000 - s.duration));
@@ -187,15 +228,15 @@ export function updatePusher(s, dt, api) {
       if (c.vy > other.vy) other.vy += (c.vy - other.vy) * .3;
     }
   }
-  let collected = false;
+  let collected = 0;
   m.coins = m.coins.filter(c => {
     if (c.y < 465) return true;
-    m.collected++; s.stats.coins++; collected = true;
+    m.collected++; s.stats.coins++; collected++;
     m.falling.push({ x: c.x, kind: c.kind || (c.green ? 'heal' : 'gold'), time: 0 });
     if (c.green || c.kind === 'heal') api.heal(s, 3);
     else { m.pending += c.kind === 'ruby' ? 6 : 3; if (c.kind === 'lucky') startPusherSpin(s, api); }
     return false;
   });
-  if (collected) api.emit(s, 'crazyCoinSound');
+  if (collected) api.emit(s, 'crazyPusherDropSound', collected);
   if (s.timeLeft <= 0) pusherAction(s, 'alt', api);
 }
