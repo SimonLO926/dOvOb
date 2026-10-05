@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
-  <link rel="preload" href="./assets/mischief-cat.png?v=1.2.20" as="image">
-  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.20" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="./assets/mischief-cat.png?v=1.2.21" as="image">
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.21" as="font" type="font/woff" crossorigin>
   <style>
     /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
     @font-face {
       font-family: "Fever Brush";
-      src: url("./fonts/fever-brush.woff?v=1.2.20") format("woff");
+      src: url("./fonts/fever-brush.woff?v=1.2.21") format("woff");
       font-weight: 400;
       font-display: swap;
     }
@@ -715,11 +715,17 @@
     }
     .pad svg { width: min(42px, 42%); height: min(42px, 42%); display: block; }
     .hand-cross svg { width: 22px; height: 22px; }
-    #game .console.danger-warning,
-    #game .console.danger-critical {
-      --danger-shake: 1px;
-      animation: danger-shake 900ms linear infinite;
+    @media (prefers-reduced-motion: no-preference) {
+      body[data-danger-effect="shake"] #game .console.danger-warning {
+        --danger-shake: 1px;
+        animation: danger-shake 900ms linear infinite;
+      }
+      body[data-danger-effect="shake"] #game .console.danger-critical {
+        --danger-shake: 3px;
+        animation: danger-shake 240ms linear infinite;
+      }
     }
+    #game .console.danger-critical { position: relative; }
     #game .console.danger-critical::after {
       content: "";
       position: absolute;
@@ -1060,12 +1066,15 @@
     html.touch #game .nav { min-height: 40px; margin-bottom: 4px; }
     html.touch #game .nav .logo { width: 130px; height: 28px; }
     #play-menu { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 20px; overflow: auto; touch-action: pan-y; background: #080912a8; }
-    .play-menu-card { width: min(380px, 100%); padding: 24px; background: var(--md-container); color: var(--ink); border: 1px solid var(--md-outline); border-radius: 18px; box-shadow: 0 12px 70px #0007; }
+    .play-menu-card { width: min(380px, 100%); max-height: calc(100svh - 40px); overflow-y: auto; touch-action: pan-y; padding: 24px; background: var(--md-container); color: var(--ink); border: 1px solid var(--md-outline); border-radius: 18px; box-shadow: 0 12px 70px #0007; }
     .play-menu-card h2 { font-size: 24px; margin: 0 0 12px; }
     .play-menu-card p { font-size: 13px; line-height: 1.6; }
     .play-menu-card label { display: grid; grid-template-columns: 1fr auto; margin: 20px 0; gap: 8px; font-size: 15px; }
     .play-menu-card input { grid-column: 1 / -1; width: 100%; min-height: 32px; accent-color: var(--blue); }
     .play-menu-card button { min-height: 44px; font-size: 14px; margin: 6px 6px 0 0; }
+    .danger-effects { flex-wrap: wrap; }
+    .play-menu-card .danger-effects button { margin: 0; }
+    .play-menu-card .game-danger-settings { margin: 18px 0; }
     body.crazy-active #play-menu { background: #08091266; }
     @media (prefers-reduced-motion: reduce) { .greed-first-art { transition: none; } }
   </style>
@@ -1225,8 +1234,8 @@
           <button data-sin="wrath" type="button" disabled><svg class="sin-lock" viewBox="0 0 24 28" aria-hidden="true"><path d="M6 12 V8 A6 6 0 0 1 18 8 V12"/><rect x="3" y="12" width="18" height="14" rx="2"/><path d="M12 18 V22"/><circle cx="12" cy="18" r="1"/></svg><svg class="sin-emblem" hidden aria-hidden="true"><use href="#sin-icon-wrath"/></svg><span hidden data-i18n="sinWrath">Wrath</span><small hidden data-i18n="crazyLocked">Locked</small></button>
         </div>
         <div class="greed-preview">
-          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.png?v=1.2.20" alt="" aria-hidden="true">
-          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.png?v=1.2.20" alt="Greed, the casino dealer's first form">
+          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.png?v=1.2.21" alt="" aria-hidden="true">
+          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.png?v=1.2.21" alt="Greed, the casino dealer's first form">
           <div class="greed-caption"><h2 data-i18n="crazyDealer">The Mad Dealer</h2><p data-i18n="crazyGreedLore">The house wants everything. Defeat both forms.</p></div>
         </div>
       </div>
@@ -1336,6 +1345,13 @@
             <button id="touch-auto" type="button" data-i18n="touchAuto">Auto</button>
             <button id="touch-on" type="button" data-i18n="touchOn">On</button>
             <button id="touch-off" type="button" data-i18n="touchOff">Off</button>
+          </div>
+        </div>
+        <div class="field">
+          <span id="danger-effect-label" data-i18n="dangerEffect">Danger effect</span>
+          <div class="theme-row danger-effects" role="group" aria-labelledby="danger-effect-label">
+            <button type="button" data-danger-effect="shake" data-i18n="screenShake" aria-pressed="false">Shake</button>
+            <button type="button" data-danger-effect="warning" data-i18n="noScreenShake" aria-pressed="true">No shake</button>
           </div>
         </div>
         <div class="field">
@@ -1534,6 +1550,13 @@
       <div id="play-menu-options">
         <label><span data-i18n="bgmVolume">BGM</span><output id="bgm-level"></output><input id="play-bgm" type="range" min="0" max="100" step="1" aria-label="BGM"></label>
         <label><span data-i18n="sfxVolume">Sound effects</span><output id="sfx-level"></output><input id="play-sfx" type="range" min="0" max="100" step="1" aria-label="Sound effects"></label>
+        <div class="game-danger-settings">
+          <p id="play-danger-effect-label" data-i18n="dangerEffect">Danger effect</p>
+          <div class="theme-row danger-effects" role="group" aria-labelledby="play-danger-effect-label">
+            <button type="button" data-danger-effect="shake" data-i18n="screenShake" aria-pressed="false">Shake</button>
+            <button type="button" data-danger-effect="warning" data-i18n="noScreenShake" aria-pressed="true">No shake</button>
+          </div>
+        </div>
         <button id="play-menu-close" type="button" data-i18n="resume">Resume</button>
         <button id="play-menu-quit" class="text-btn" type="button" data-i18n="quitToMenu">Exit to main menu</button>
       </div>
@@ -1544,7 +1567,7 @@
     <canvas id="cinematic-canvas" aria-hidden="true"></canvas><div class="cinematic-controls"><button id="cinematic-pause" type="button" data-i18n="paused">Pause</button><button id="cinematic-skip" type="button" data-i18n="crazySkip">Skip</button></div>
   </div>
   <div id="crazy-result" hidden role="dialog" aria-modal="true" aria-labelledby="result-title">
-    <img class="result-art" loading="lazy" src="./assets/greed-defeated.png?v=1.2.20" alt="Defeated Greed surrounded by spilled coins">
+    <img class="result-art" loading="lazy" src="./assets/greed-defeated.png?v=1.2.21" alt="Defeated Greed surrounded by spilled coins">
     <div class="result-content"><small>GREED · CLEARED</small><h1 id="result-title" data-i18n="crazyGreedBroken">Greed defeated</h1><div class="result-score" id="result-score"></div><div class="result-stats" id="result-stats"></div><p data-i18n="crazyClearUnlock">Second-form silhouette unlocked</p><div class="result-buttons"><button id="result-retry" type="button" data-i18n="again">Again</button><button id="result-bosses" type="button" data-i18n="crazySevenSins">Seven Deadly Sins</button></div></div>
   </div>
   <div id="fever-aura" hidden aria-hidden="true">
@@ -1562,23 +1585,23 @@
     <i style="--x:83%;--y:97%;--delay:-1.87s"></i>
   </div>
   <script type="module">
-    import { BRIDGE_REPEAT } from "./bridge-controls.mjs?v=1.2.20";
-    import { sinProgress } from "./crazy-sins.mjs?v=1.2.20";
-    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.20";
-    import { drawCrazy, drawCrazyFrame, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.20";
-    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.20";
-    import { drawGreedCinematic, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.20";
-    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.20";
-    import { createSound, CASINO_EFFECTS } from "./audio.mjs?v=1.2.20";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.20";
-    import { translate } from "./i18n.mjs?v=1.2.20";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.20";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.20";
-    import { VERSION } from "./version.mjs?v=1.2.20";
+    import { BRIDGE_REPEAT } from "./bridge-controls.mjs?v=1.2.21";
+    import { sinProgress } from "./crazy-sins.mjs?v=1.2.21";
+    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.21";
+    import { drawCrazy, drawCrazyFrame, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.21";
+    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.21";
+    import { drawGreedCinematic, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.21";
+    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.21";
+    import { createSound, CASINO_EFFECTS } from "./audio.mjs?v=1.2.21";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.21";
+    import { translate } from "./i18n.mjs?v=1.2.21";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.21";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.21";
+    import { VERSION } from "./version.mjs?v=1.2.21";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SAND_HEX, SHAPES, activateFever, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.2.20";
+    } from "./logic.mjs?v=1.2.21";
 
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
@@ -1633,17 +1656,18 @@
 
     function loadSettings() {
       try {
-        const saved = { lang: "en", volume: 0.7, theme: "light", touch: "auto", pace: "normal", paceSpeed: 1, crazyDifficulty: "normal", ...JSON.parse(localStorage.getItem("bridge-settings") || "{}") };
+        const saved = { lang: "en", volume: 0.7, theme: "light", touch: "auto", pace: "normal", paceSpeed: 1, crazyDifficulty: "normal", dangerEffect: "warning", ...JSON.parse(localStorage.getItem("bridge-settings") || "{}") };
         if (!saved.touch) saved.touch = "auto";
         if (!saved.pace) saved.pace = "normal";
         saved.crazyDifficulty = saved.crazyDifficulty === "hard" ? "hard" : "normal";
+        saved.dangerEffect = saved.dangerEffect === "shake" ? "shake" : "warning";
         saved.paceSpeed = paceOf({ pace: saved.paceSpeed ?? 1 });
         saved.bgmVolume = Math.max(0, Math.min(1, saved.bgmVolume ?? saved.volume));
         saved.sfxVolume = Math.max(0, Math.min(1, saved.sfxVolume ?? saved.volume));
         saved.game = "bridge";
         return saved;
       } catch {
-        return { lang: "en", volume: 0.7, bgmVolume: 0.7, sfxVolume: 0.7, theme: "light", touch: "auto", pace: "normal", paceSpeed: 1, crazyDifficulty: "normal", game: "bridge" };
+        return { lang: "en", volume: 0.7, bgmVolume: 0.7, sfxVolume: 0.7, theme: "light", touch: "auto", pace: "normal", paceSpeed: 1, crazyDifficulty: "normal", dangerEffect: "warning", game: "bridge" };
       }
     }
 
@@ -1666,6 +1690,7 @@
       document.querySelector("#theme-dark").setAttribute("aria-pressed", String(settings.theme === "dark"));
       document.querySelector("#version-label").textContent = VERSION;
       applyTouch();
+      syncDangerEffect();
       syncPace();
       syncPicker();
       syncCrazyDifficulty();
@@ -1721,6 +1746,11 @@
       for (const mode of ["auto", "on", "off"]) {
         document.querySelector(`#touch-${mode}`).setAttribute("aria-pressed", String((settings.touch || "auto") === mode));
       }
+    }
+
+    function syncDangerEffect() {
+      document.body.dataset.dangerEffect = settings.dangerEffect;
+      for (const button of document.querySelectorAll("button[data-danger-effect]")) button.setAttribute("aria-pressed", String(button.dataset.dangerEffect === settings.dangerEffect));
     }
 
     function bestKey() {
@@ -2255,6 +2285,10 @@
         applySettings();
       });
     }
+    for (const button of document.querySelectorAll("button[data-danger-effect]")) button.addEventListener("click", () => {
+      settings.dangerEffect = button.dataset.dangerEffect;
+      saveSettings(); syncDangerEffect();
+    });
     document.querySelector("#theme-light").addEventListener("click", () => { settings.theme = "light"; saveSettings(); applySettings(); });
     document.querySelector("#theme-dark").addEventListener("click", () => { settings.theme = "dark"; saveSettings(); applySettings(); });
 

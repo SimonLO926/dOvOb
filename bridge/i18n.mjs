@@ -2,6 +2,9 @@ export const LANGS = ["zh-Hant", "zh-Hans", "en", "ja", "ko", "pt", "es"];
 
 const TEXT = {
   "zh-Hant": {
+    dangerEffect: "危險提示效果",
+    screenShake: "抖動",
+    noScreenShake: "不抖動",
     crazyDifficulty: "難度",
     gameMenu: "遊戲選單",
     bgmVolume: "BGM 音量",
@@ -253,6 +256,9 @@ const TEXT = {
     keys: "方向鍵移動，上 / X 轉，Z 反轉，空白鍵直落，C 保留，P 暫停。",
   },
   "zh-Hans": {
+    dangerEffect: "危险提示效果",
+    screenShake: "抖动",
+    noScreenShake: "不抖动",
     crazyDifficulty: "难度",
     gameMenu: "游戏菜单",
     bgmVolume: "BGM 音量",
@@ -503,6 +509,9 @@ const TEXT = {
     keys: "方向键移动，上 / X 转，Z 反转，空格直落，C 保留，P 暂停。",
   },
   en: {
+    dangerEffect: "Danger effect",
+    screenShake: "Shake",
+    noScreenShake: "No shake",
     crazyDifficulty: "Difficulty",
     gameMenu: "Game menu",
     bgmVolume: "BGM volume",
@@ -753,6 +762,9 @@ const TEXT = {
     keys: "Arrows move, Up / X rotate, Z reverse, Space drops, C holds, P pauses.",
   },
   ja: {
+    dangerEffect: "危険時の表示",
+    screenShake: "揺らす",
+    noScreenShake: "揺らさない",
     crazyDifficulty: "難易度",
     title: "ブリッジ",
     back: "作品一覧へ",
@@ -846,6 +858,9 @@ const TEXT = {
     keys: "矢印で移動、上 / X で回転、Z で逆回転、Space で落下、C でホールド、P で一時停止。",
   },
   ko: {
+    dangerEffect: "위험 알림 효과",
+    screenShake: "흔들림",
+    noScreenShake: "흔들림 없음",
     crazyDifficulty: "난이도",
     title: "브리지",
     back: "작품 목록",
@@ -939,6 +954,9 @@ const TEXT = {
     keys: "화살표 이동, 위 / X 회전, Z 역회전, Space 낙하, C 홀드, P 일시정지.",
   },
   pt: {
+    dangerEffect: "Efeito de perigo",
+    screenShake: "Vibração",
+    noScreenShake: "Sem vibração",
     crazyDifficulty: "Dificuldade",
     title: "Ponte",
     back: "Voltar aos trabalhos",
@@ -1032,6 +1050,9 @@ const TEXT = {
     keys: "Setas movem, Cima / X roda, Z inverte, Espaço larga, C reserva, P pausa.",
   },
   es: {
+    dangerEffect: "Efecto de peligro",
+    screenShake: "Temblor",
+    noScreenShake: "Sin temblor",
     crazyDifficulty: "Dificultad",
     title: "Puente",
     back: "Volver a los trabajos",
