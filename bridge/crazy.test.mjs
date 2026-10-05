@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { pachinkoBins, createCrazy, FIRST_BOSS, CRAZY_MODES, advanceCrazy, updateCrazy, inputCrazy, pointCrazy, hitCrazyBoss, healCrazy, hurtCrazy, skipCrazyCinematic } from './crazy.mjs';
+import { crazyRoundDuration, pachinkoBins, createCrazy, FIRST_BOSS, CRAZY_MODES, advanceCrazy, updateCrazy, inputCrazy, pointCrazy, hitCrazyBoss, healCrazy, hurtCrazy, skipCrazyCinematic } from './crazy.mjs';
 
 function enter(s, mode) {
   s.mode = 'bridge'; s.encounter = 0; s.bag = [mode]; advanceCrazy(s);
@@ -419,7 +419,7 @@ test('Blue sweeps hurt stationary cores, orange sweeps hurt moving cores, and wa
 test('Earned pusher rewards preserve encounter cadence, prevent damage and bank actual dropped coins', () => {
   const s = createCrazy(); s.form = 2; advanceCrazy(s, 'coins'); s.damageLeft = 100;
   hitCrazyBoss(s, 40); assert.equal(s.pusherDue, true); const encounter = s.encounter;
-  advanceCrazy(s); assert.equal(s.mode, 'pusher'); assert.equal(s.encounter, encounter); assert.equal(s.duration, 12000);
+  advanceCrazy(s); assert.equal(s.mode, 'pusher'); assert.equal(s.encounter, encounter); assert.ok(s.duration >= 15000 && s.duration <= 30000);
   s.protection = 0; assert.equal(hurtCrazy(s, 100), false); assert.equal(s.hp, 100);
   s.mini.coins = [{x: 140, y: 466, vx: 0, vy: 0, green: false}]; updateCrazy(s, 50);
   assert.equal(s.mini.pending, 3); assert.equal(s.stats.coins, 1);
@@ -536,4 +536,42 @@ test('Pachinko landing follows the displayed randomized bin boundaries and amoun
   }
   assert.equal(s.hp, 40 + heal - penalty); assert.equal(s.bossHp, 900 - damage);
   const hp = s.hp, bossHp = s.bossHp; updateCrazy(s, 50); assert.equal(s.hp, hp); assert.equal(s.bossHp, bossHp);
+});
+
+test('Only pusher encounter duration changes; normal Crazy modes retain form and phase timings', () => {
+  for (const form of [1,2]) for (const phase of [1,2,3]) {
+    for (const mode of ['bridge', ...CRAZY_MODES, 'jump', 'coins', 'motion', 'vortex', 'roulette']) {
+      assert.equal(crazyRoundDuration(mode,form,phase,()=>0), (form===2?18000:22000)-phase*2000);
+      assert.equal(crazyRoundDuration(mode,form,phase,()=>.999), (form===2?18000:22000)-phase*2000);
+    }
+  }
+  assert.equal(crazyRoundDuration('pusher',1,1,()=>0),15000);
+  assert.equal(crazyRoundDuration('pusher',2,3,()=>.999),30000);
+  const durations=new Set(Array.from({length:16},(_,i)=>crazyRoundDuration('pusher',1,1,()=>i/16)));
+  assert.equal(durations.size,16);
+});
+
+test('Lucky coins earn an actual jackpot once, then banking settles it even during a spin', () => {
+  for (const early of [false,true]) {
+    const s=createCrazy(); advanceCrazy(s,'pusher'); s.catDue=Infinity; s.damageLeft=500;
+    s.mini.coins=[{x:140,y:466,vx:0,vy:0,kind:'lucky'}];
+    s.random=()=>.5; const reward=s.mini.jackpots[2], stock=s.mini.stock;
+    updateCrazy(s,50); assert.ok(s.mini.spin); assert.equal(s.mini.pending,3);
+    const mini=s.mini;
+    if (early) run(s,550);
+    if (!early) { run(s,1000); assert.equal(mini.spin,null); assert.equal(mini.pending,3+reward); assert.equal(mini.stock,stock+4); run(s,100); assert.equal(mini.pending,3+reward); }
+    tap(s,'alt'); assert.notEqual(s.mode,'pusher'); assert.equal(s.bossHp,900-3-reward); assert.equal(mini.pending,0);
+    assert.equal(s.stats.coins,1);
+  }
+});
+
+test('Pusher coin variants heal or double reward while preserving physical collection counts', () => {
+  const s=createCrazy();advanceCrazy(s,'pusher');s.catDue=Infinity;s.hp=60;
+  s.mini.coins=[{x:100,y:466,vx:0,vy:0,kind:'heal'},{x:140,y:466,vx:0,vy:0,kind:'ruby'},{x:180,y:466,vx:0,vy:0,kind:'gold'}];
+  updateCrazy(s,50);assert.equal(s.hp,63);assert.equal(s.mini.pending,9);assert.equal(s.stats.coins,3);assert.equal(s.mini.falling.length,3);
+});
+
+test('Optional pusher risk cannot extend the bonus beyond thirty seconds', () => {
+  const s=createCrazy({random:()=>.999});advanceCrazy(s,'pusher');s.mini.stock=0;s.mini.pending=9;
+  run(s,550);const duration=s.duration, left=s.timeLeft;tap(s,'action');assert.equal(duration,30000);assert.equal(s.duration,30000);assert.equal(s.timeLeft,left);assert.equal(s.mini.riskUsed,true);
 });

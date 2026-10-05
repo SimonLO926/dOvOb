@@ -99,21 +99,48 @@ export function updateReaction(s, dt, { hurt, hit, heal, emit }) {
   if (m.survival >= 2000) { m.survival -= 2000; hit(s, 12); s.stats.counters++; }
 }
 
-export function createPusher(random) {
-  return { aim: 140, clock: 0, stock: 8, pending: 0, collected: 0, risk: null, riskUsed: false,
-    coins: Array.from({ length: 96 }, (_, i) => ({ x: 35 + i % 12 * 19 + (random() - .5), y: 310 + Math.floor(i / 12) * 19, vx: 0, vy: 0, green: i % 11 === 0 })), obstacles: [] };
+function pusherCoin(random, x, y, dropped = false) {
+  const roll = random(), kind = roll < .08 ? 'heal' : roll < .15 ? 'ruby' : roll < .21 ? 'lucky' : 'gold';
+  return { x, y, vx: dropped ? (random() - .5) * 30 : 0, vy: dropped ? 280 + random() * 60 : 0,
+    kind, green: kind === 'heal', shine: random() };
 }
-export function pusherAction(s, action, { hit, heal, emit, advance }) {
+export function pusherFront(m) { return 260 + (Math.sin(m.clock / (m.strokePeriod || 500)) + 1) * 35; }
+export function createPusher(random, duration = 20000) {
+  return { aim: 140, clock: 0, stock: Math.min(24, Math.max(12, Math.round(duration / 1250))), pending: 0,
+    collected: 0, risk: null, riskUsed: false, strokePeriod: 450 + random() * 180, falling: [],
+    reels: [0, 1, 2], spin: null, jackpotFlash: 0, jackpotTier: 0,
+    jackpots: [6 + Math.floor(random() * 5), 16 + Math.floor(random() * 9), 35 + Math.floor(random() * 16)],
+    coins: Array.from({ length: 96 }, (_, i) => pusherCoin(random, 35 + i % 12 * 19 + (random() - .5), 310 + Math.floor(i / 12) * 19)), obstacles: [] };
+}
+function startPusherSpin(s, api) {
+  const m = s.mini;
+  if (m.spin) { m.pending += 3; return; }
+  m.spin = { time: 0, reels: Array.from({length: 3}, () => Math.floor(s.random() * 4)), stopped: 0 };
+  api.emit(s, 'crazyRolling');
+}
+function finishPusherSpin(s, api) {
+  const m = s.mini; if (!m.spin) return;
+  const distinct = new Set(m.spin.reels).size;
+  const tier = distinct === 1 ? 3 : distinct === 2 ? 2 : 1;
+  m.reels = m.spin.reels; m.spin = null; m.jackpotTier = tier; m.jackpotFlash = 1600;
+  m.pending += m.jackpots[tier - 1]; m.stock += tier === 3 ? 4 : tier === 2 ? 2 : 0;
+  api.emit(s, 'crazyPusherJackpot', m.jackpots[tier - 1]);
+}
+export function pusherAction(s, action, api) {
+  const { hit, emit, advance } = api;
   const m = s.mini;
   if (action === 'alt') {
+    finishPusherSpin(s, api);
     if (m.risk && !m.risk.win) m.pending = Math.floor(m.pending / 2);
     hit(s, m.pending); m.pending = 0; emit(s, 'crazyPusherBank'); advance(s); return;
   }
   if (action !== 'action' || s.cooldown > 0 || s.timeLeft <= 2000) return;
   if (m.stock > 0) {
-    m.stock--; m.coins.push({ x: m.aim, y: 250, vx: 0, vy: 300, green: false }); s.cooldown = 280; emit(s, 'crazyCoinSound');
+    m.stock--; m.coins.push(pusherCoin(s.random, m.aim, 250, true)); s.cooldown = 280; emit(s, 'crazyCoinSound');
   } else if (!m.riskUsed && m.pending > 0) {
-    m.riskUsed = true; m.stock = 4; s.timeLeft += 4000;
+    m.riskUsed = true; m.stock = 4;
+    const extra = Math.min(4000, Math.max(0, 30000 - s.duration));
+    s.timeLeft += extra; s.duration += extra;
     m.risk = { time: 4000, win: s.random() < .6 }; m.obstacles = [{ x: 82, y: 367 }, { x: 198, y: 367 }]; emit(s, 'crazyPusherRisk');
   }
 }
@@ -122,7 +149,16 @@ export function updatePusher(s, dt, api) {
   if (s.held.has('left')) m.aim = Math.max(30, m.aim - dt * .18);
   if (s.held.has('right')) m.aim = Math.min(250, m.aim + dt * .18);
   if (m.risk) { m.risk.time -= dt; if (m.risk.time <= 0) { if (!m.risk.win) m.pending = Math.floor(m.pending / 2); m.risk = null; api.emit(s, 'crazyPusherSettled'); } }
-  const front = 260 + (Math.sin(m.clock / 500) + 1) * 35;
+  m.jackpotFlash = Math.max(0, m.jackpotFlash - dt);
+  if (m.spin) {
+    m.spin.time += dt;
+    const stopped = Math.min(3, Math.max(0, Math.floor((m.spin.time - 350) / 220) + 1));
+    if (stopped > m.spin.stopped) { m.spin.stopped = stopped; api.emit(s, 'crazyReelStop'); }
+    if (m.spin.time >= 1000) finishPusherSpin(s, api);
+  }
+  for (const c of m.falling) c.time += dt;
+  m.falling = m.falling.filter(c => c.time < 700);
+  const front = pusherFront(m);
   for (const c of m.coins) {
     c.x += c.vx * sec; c.y += c.vy * sec; c.vx *= Math.exp(-2 * sec); c.vy *= Math.exp(-2 * sec);
     if (c.y < front + 9) { c.y = front + 9; c.vy = Math.max(c.vy, 35); }
@@ -143,10 +179,15 @@ export function updatePusher(s, dt, api) {
       if (c.vy > other.vy) other.vy += (c.vy - other.vy) * .3;
     }
   }
+  let collected = false;
   m.coins = m.coins.filter(c => {
     if (c.y < 465) return true;
-    m.collected++; s.stats.coins++; if (c.green) api.heal(s, 3); else m.pending += 3;
-    api.emit(s, 'crazyCoinSound'); return false;
+    m.collected++; s.stats.coins++; collected = true;
+    m.falling.push({ x: c.x, kind: c.kind || (c.green ? 'heal' : 'gold'), time: 0 });
+    if (c.green || c.kind === 'heal') api.heal(s, 3);
+    else { m.pending += c.kind === 'ruby' ? 6 : 3; if (c.kind === 'lucky') startPusherSpin(s, api); }
+    return false;
   });
+  if (collected) api.emit(s, 'crazyCoinSound');
   if (s.timeLeft <= 0) pusherAction(s, 'alt', api);
 }

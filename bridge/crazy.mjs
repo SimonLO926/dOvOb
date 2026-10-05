@@ -1,7 +1,7 @@
-import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.6';
-import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.6';
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.6';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.6';
+import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.7';
+import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.7';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.7';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.7';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, secondHp: 1200, limit: 720000 });
 export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand', 'dodge']);
@@ -30,6 +30,9 @@ export function pachinkoBins(random = Math.random) {
     const bin = { kind, amount: min + Math.floor(random() * (max - min + 1)), x, w };
     x += w; return bin;
   });
+}
+export function crazyRoundDuration(mode, form, phase, random = Math.random) {
+  return mode === 'pusher' ? (15 + Math.floor(random() * 16)) * 1000 : (form === 2 ? 18000 : 22000) - phase * 2000;
 }
 export function createCrazy({ random = Math.random, boss = FIRST_BOSS } = {}) {
   const bridge = createGame({ mode: 'marathon', random });
@@ -147,7 +150,7 @@ export function advanceCrazy(s, preferredMode = null) {
   if (bonus) s.pusherDue = false;
   s.transition = { from, to: s.mode, time: 0 };
   s.hardStreak = HARD.has(s.mode) ? s.hardStreak + 1 : 0;
-  s.duration = s.mode === 'pusher' ? 12000 : (s.form === 2 ? 18000 : 22000) - s.phase * 2000;
+  s.duration = crazyRoundDuration(s.mode, s.form, s.phase, s.random);
   s.damageLeft = (s.form === 2 ? 80 : 45) + s.phase * 5;
   s.timeLeft = s.duration; s.protection = 500; s.held.clear(); s.actionReady = false;
   s.cooldown = 0; s.fallMs = 0; s.lockMs = 0; s.repeatMs = 0; s.horizontalMs = 0; s.horizontalDir = 0; s.horizontalRepeating = false; s.horizontalSource = 'keyboard'; s.resolveMs = 0;
@@ -174,7 +177,7 @@ export function advanceCrazy(s, preferredMode = null) {
   } else if (s.mode === 'dodge') {
     s.mini = { x: 140, y: 400, target: null, hazards: [], wave: 0, spawn: 850, survival: 0, dash: 0, dashReady: 0, lastX: 0, lastY: -1 };
   } else if (GREED_ATTACKS.includes(s.mode)) { s.mini = createReaction(s.mode); }
-  else if (s.mode === 'pusher') { s.mini = createPusher(s.random); }
+  else if (s.mode === 'pusher') { s.mini = createPusher(s.random, s.duration); }
   else deal(s);
   notify(s, 'crazySwitch');
 }
@@ -212,7 +215,7 @@ function choose(s, index) {
 
 function miniAction(s, action) {
   const m = s.mini;
-  if (!m || s.cooldown > 0 || s.catBlock > 0 || m.spin) return;
+  if (!m || s.cooldown > 0 || s.catBlock > 0 || (m.spin && s.mode !== 'pusher')) return;
   if (s.mode === 'slots' && action === 'action') {
     m.reels[m.stop] = Math.floor(m.clock / (250 - s.phase * 20) + m.stop) % 4;
     m.stop += 1; notify(s, 'crazyReelStop');
