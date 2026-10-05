@@ -39,21 +39,36 @@ export function rouletteLasers(random, x, y) {
     const angle = direction + i * Math.PI / 6;
     const point = { x: Math.max(50, Math.min(230, x + Math.cos(angle) * 74)),
       y: Math.max(208, Math.min(456, y + Math.sin(angle) * 74)), radius: 28 };
-    if (!safe || Math.hypot(point.x - 140, point.y - 330) > Math.hypot(safe.x - 140, safe.y - 330)) safe = point;
-    if (Math.hypot(point.x - 140, point.y - 330) >= 64) { safe = point; break; }
+    if (!safe || Math.hypot(point.x - x, point.y - y) > Math.hypot(safe.x - x, safe.y - y)) safe = point;
+    if (Math.hypot(point.x - x, point.y - y) >= 64) { safe = point; break; }
   }
-  const base = Math.atan2(safe.y - 330, safe.x - 140) + Math.PI / 2 + (random() - .5) * .7;
+  const tangent = Math.atan2(safe.y - y, safe.x - x) + Math.PI / 2;
+  const jitter = (random() - .5) * .7, base = tangent + jitter;
   const spacing = .14 + random() * .21;
   const staggered = count > 1 && random() >= .5;
+  const layout = random(), pattern = layout < .4 ? 'fan' : layout < .7 ? 'parallel' : 'cross';
   let warning = 520;
   const lasers = Array.from({ length: count }, (_, i) => {
-    const angle = base + (i - (count - 1) / 2) * spacing;
+    const angle = pattern === 'parallel' ? base : pattern === 'cross' && i
+      ? tangent + (i % 2 ? -1 : 1) * (.45 + random() * .2)
+      : pattern === 'cross' ? base : base + (i - (count - 1) / 2) * spacing;
+    let nx = -Math.sin(angle), ny = Math.cos(angle);
+    if (nx * (safe.x-x) + ny * (safe.y-y) < 0) { nx = -nx; ny = -ny; }
+    const projection = nx*x+ny*y, clearance = nx*(safe.x-x)+ny*(safe.y-y);
+    const edges = [[12,152],[268,152],[12,508],[268,508]].map(([px,py])=>nx*px+ny*py);
+    const lower = Math.max(-45, Math.min(...edges)+8-projection);
+    const upper = Math.min(32, clearance-safe.radius-ROULETTE_LASER_WIDTH/2-8, Math.max(...edges)-8-projection);
+    // First ray always targets the position at warning time; others cover separate lanes.
+    const from = pattern === 'parallel' && i === 2 ? lower + (upper-lower)*.6 : lower;
+    const to = pattern === 'parallel' && i === 1 ? lower + (upper-lower)*.4 : upper;
+    const offset = i ? from + random() * (to-from) : 0;
+    const cx = x + nx*offset, cy = y + ny*offset;
     if (i && staggered) warning += 40 + Math.floor(random() * 81);
     return { kind: 'laser', width: ROULETTE_LASER_WIDTH,
-      a: { x: 140 - Math.cos(angle) * 320, y: 330 - Math.sin(angle) * 320 },
-      b: { x: 140 + Math.cos(angle) * 320, y: 330 + Math.sin(angle) * 320 }, warn: warning, age: 0, fired: false };
+      a: { x: cx - Math.cos(angle) * 600, y: cy - Math.sin(angle) * 600 },
+      b: { x: cx + Math.cos(angle) * 600, y: cy + Math.sin(angle) * 600 }, warn: warning, age: 0, fired: false };
   });
-  return { lasers, safe };
+  return { lasers, safe, pattern };
 }
 function wave(s) {
   const m = s.mini, rand = s.random, speed = 285 + s.phase * 32;
@@ -142,10 +157,11 @@ export function updateReaction(s, dt, { hurt, hit, heal, emit }) {
 
 function pusherCoin(random, x, y, dropped = false) {
   const roll = random(), kind = roll < .08 ? 'heal' : roll < .15 ? 'ruby' : roll < .21 ? 'lucky' : 'gold';
-  return { x, y, vx: dropped ? (random() - .5) * 30 : 0, vy: dropped ? 280 + random() * 60 : 0,
+  return { x, y, vx: 0, vy: 0, level: dropped ? 'upper' : 'lower', entry: dropped ? 140 : 0,
     kind, green: kind === 'heal', shine: random() };
 }
-export function pusherFront(m) { return 250 + (Math.sin(m.clock / (m.strokePeriod || 500)) + 1) * 25; }
+export const PUSHER_STEP = 330;
+export function pusherFront(m) { return 250 + (Math.sin(m.clock / (m.strokePeriod || 500)) + 1) * 35; }
 export function createPusher(random, duration = 20000) {
   // Keep a packed bed, but stagger rows and scatter each coin independently.
   // Loose, fully random placement leaves gaps that absorb the pusher's motion.
@@ -154,11 +170,14 @@ export function createPusher(random, duration = 20000) {
     collected: 0, risk: null, riskUsed: false, strokePeriod: 450 + random() * 180, falling: [],
     reels: [0, 1, 2], spin: null, jackpotFlash: 0, jackpotTier: 0,
     jackpots: [6 + Math.floor(random() * 5), 16 + Math.floor(random() * 9), 35 + Math.floor(random() * 16)],
-    coins: Array.from({ length: 96 }, (_, i) => {
+    coins: [...Array.from({ length: 96 }, (_, i) => {
       const row = Math.floor(i / 12);
       return pusherCoin(random, 35 + i % 12 * 19 + rowOffsets[row] + (random() - .5) * 8,
         310 + row * 19 + (random() - .5) * 10);
-    }), obstacles: [] };
+    }), ...Array.from({ length: 12 }, (_, i) => ({
+      ...pusherCoin(random, 35 + i * 19 + (random() - .5) * 4, 315 + (random() - .5) * 4), level: 'upper'
+    }))],
+    transferred: 0, obstacles: [] };
 }
 function startPusherSpin(s, api) {
   const m = s.mini;
@@ -184,7 +203,7 @@ export function pusherAction(s, action, api) {
   }
   if (action !== 'action' || s.cooldown > 0 || s.timeLeft <= 2000) return;
   if (m.stock > 0) {
-    m.stock--; m.coins.push(pusherCoin(s.random, m.aim, 250, true)); s.cooldown = 280; emit(s, 'crazyPusherInsertSound');
+    m.stock--; m.coins.push(pusherCoin(s.random, m.aim, Math.min(PUSHER_STEP - 10, Math.max(275, pusherFront(m) + 12)), true)); s.cooldown = 280; emit(s, 'crazyPusherInsertSound');
   } else if (!m.riskUsed && m.pending > 0) {
     m.riskUsed = true; m.stock = 4;
     const extra = Math.min(4000, Math.max(0, 20000 - s.duration));
@@ -208,17 +227,31 @@ export function updatePusher(s, dt, api) {
   m.falling = m.falling.filter(c => c.time < 700);
   const front = pusherFront(m);
   for (const c of m.coins) {
+    if (c.entry > 0) {
+      c.entry = Math.max(0, c.entry - dt);
+      if (c.entry > 0) continue;
+    }
+    if (c.level === 'transfer') {
+      c.transfer = Math.max(0, c.transfer - dt);
+      c.y = PUSHER_STEP + 14 * (1 - c.transfer / 180);
+      if (c.transfer > 0) continue;
+      // Landing on the sloped lower shelf transfers momentum into its coin bed.
+      c.level = 'lower'; c.vy = 165; api.emit(s, 'crazyPusherStepSound', 1);
+    }
     c.x += c.vx * sec; c.y += c.vy * sec; c.vx *= Math.exp(-.8 * sec); c.vy *= Math.exp(-.8 * sec);
-    if (c.y < front + 9) { c.y = front + 9; c.vy = Math.max(c.vy, 0); }
+    const rear = c.level === 'upper' ? front + 9 : 309;
+    if (c.y < rear) { c.y = rear; c.vy = Math.max(c.vy, 0); }
     c.x = Math.max(27, Math.min(253, c.x));
   }
   for (let pass = 0; pass < 8; pass++) for (let a = 0; a < m.coins.length; a++) {
     const c = m.coins[a];
+    if (c.entry > 0 || c.level === 'transfer') continue;
     // The rigid pusher must keep exerting force through the packed coin bed.
-    c.y = Math.max(front + 9, c.y); c.x = Math.max(27, Math.min(253, c.x));
-    for (const o of m.obstacles) { const dx = c.x - o.x, dy = c.y - o.y, d = Math.hypot(dx, dy) || 1; if (d < 24) { c.x += dx / d * (24 - d); c.y += dy / d * (24 - d); } }
+    c.y = Math.max(c.level === 'upper' ? front + 9 : 309, c.y); c.x = Math.max(27, Math.min(253, c.x));
+    if (c.level !== 'upper') for (const o of m.obstacles) { const dx = c.x - o.x, dy = c.y - o.y, d = Math.hypot(dx, dy) || 1; if (d < 24) { c.x += dx / d * (24 - d); c.y += dy / d * (24 - d); } }
     for (let b = a + 1; b < m.coins.length; b++) {
       const other = m.coins[b]; let dx = other.x - c.x, dy = other.y - c.y;
+      if (other.entry > 0 || other.level === 'transfer' || (other.level === 'upper') !== (c.level === 'upper')) continue;
       if (Math.abs(dx) >= 18 || Math.abs(dy) >= 18) continue;
       if (Math.abs(dx) + Math.abs(dy) < .001) dy = 1;
       const d = Math.hypot(dx, dy);
@@ -230,6 +263,13 @@ export function updatePusher(s, dt, api) {
   }
   let collected = 0;
   m.coins = m.coins.filter(c => {
+    if (c.level === 'upper') {
+      if (!c.entry && c.y >= PUSHER_STEP) {
+        c.level = 'transfer'; c.transfer = 180; c.y = PUSHER_STEP; c.vx = 0; c.vy = 0; m.transferred++;
+      }
+      return true;
+    }
+    if (c.level === 'transfer') return true;
     if (c.y < 465) return true;
     m.collected++; s.stats.coins++; collected++;
     m.falling.push({ x: c.x, kind: c.kind || (c.green ? 'heal' : 'gold'), time: 0 });

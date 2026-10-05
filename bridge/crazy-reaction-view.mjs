@@ -1,5 +1,5 @@
-import { pusherFront } from './crazy-reactions.mjs?v=1.2.13';
-import { GREED_ATTACKS, ROULETTE_LASER_WIDTH } from './crazy-reactions.mjs?v=1.2.13';
+import { pusherFront, PUSHER_STEP } from './crazy-reactions.mjs?v=1.2.15';
+import { GREED_ATTACKS, ROULETTE_LASER_WIDTH } from './crazy-reactions.mjs?v=1.2.15';
 const label = (c, value, x, y, size = 13, color = '#ffe7a3') => { c.fillStyle = color; c.font = `bold ${size}px "Pixel Latin", "Pixel Hant", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(value, x, y, 248); };
 export function pixelCore(c, x, y, color) {
   const pixels = ['.XX.XX.', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..', '...X...'];
@@ -95,33 +95,40 @@ export function drawPusher(c, s, t, reduced = false) {
   }
   for(let i=0;i<3;i++){metalCoin(c,226,241-i*5,10,'gold');metalCoin(c,242,244-i*4,7,'gold');}
   label(c,m.jackpotFlash>0?`JP${m.jackpotTier} +${m.jackpots[m.jackpotTier-1]}`:'CHANCE',140,247,10,m.jackpotFlash>0?'#fff0ab':'#ca9fb5');
-  // Small chute pins, then a shelf that physically advances into the dense bed.
-  for(let row=0;row<2;row++)for(let i=0;i<7;i++){c.fillStyle='#ac899a';c.fillRect(82+i*18+(row%2)*5,259+row*10,2,3);}
-  const edge=trayPoint(140,front),half=(140+100*edge.depth)/2;
+  const lift=22, step=trayPoint(140,PUSHER_STEP), stepHalf=(140+100*step.depth)/2;
   trayPolygon(c,[[70,280],[210,280],[260,lip],[20,lip]],'#674f48');
   trayPolygon(c,[[74,281],[206,281],[255,lip-4],[25,lip-4]],'#ae8553');
-  const platform=c.createLinearGradient(0,278,0,edge.y);platform.addColorStop(0,'#718087');platform.addColorStop(1,'#c8c3a7');
-  trayPolygon(c,[[70,280],[210,280],[140+half,edge.y],[140-half,edge.y]],platform);
-  trayPolygon(c,[[140-half,edge.y],[140+half,edge.y],[140+half,edge.y+7],[140-half,edge.y+7]],'#6f626b');
-  c.fillStyle='#f7e6b7';c.fillRect(140-half,edge.y,half*2,2);
-  // Back-to-front ordering makes the stacked coins overlap like a real machine.
+  // Lower coins sit under a visibly raised upper shelf.
   const tokens=[...m.coins].sort((a,b)=>a.y-b.y);
-  for(const token of tokens) {
+  for(const token of tokens.filter(o=>o.level!=='upper'&&o.level!=='transfer')) {
     const q=trayPoint(token.x,token.y);
     metalCoin(c,q.x,q.y,5.4+q.depth*3.1,token.kind||(token.green?'heal':'gold'),token.shine||0);
   }
+  trayPolygon(c,[[70,280-lift],[210,280-lift],[140+stepHalf,step.y-lift],[140-stepHalf,step.y-lift]],'#9d967c');
+  trayPolygon(c,[[140-stepHalf,step.y-lift],[140+stepHalf,step.y-lift],[140+stepHalf,step.y],[140-stepHalf,step.y]],'#514044');
+  c.fillStyle='#f1d692';c.fillRect(140-stepHalf,step.y-lift,stepHalf*2,3);
+  const edge=trayPoint(140,front),half=(140+100*edge.depth)/2;
+  const platform=c.createLinearGradient(0,280-lift,0,Math.max(281-lift,edge.y-lift));platform.addColorStop(0,'#718087');platform.addColorStop(1,'#d4d0b2');
+  trayPolygon(c,[[70,280-lift],[210,280-lift],[140+half,edge.y-lift],[140-half,edge.y-lift]],platform);
+  trayPolygon(c,[[140-half,edge.y-lift],[140+half,edge.y-lift],[140+half,edge.y-lift+5],[140-half,edge.y-lift+5]],'#655665');
+  c.fillStyle='#fff1b9';c.fillRect(140-half,edge.y-lift,half*2,2);
+  for(const token of tokens.filter(o=>o.level==='upper'||o.level==='transfer')) {
+    const q=trayPoint(token.x,token.y);
+    const height=token.level==='transfer'?lift*token.transfer/180:lift+(reduced?0:(token.entry||0)/140*18);
+    metalCoin(c,q.x,q.y-height,5.4+q.depth*3.1,token.kind,token.shine||0);
+  }
   for(const o of m.obstacles){const q=trayPoint(o.x,o.y);c.fillStyle='#49355e';c.fillRect(q.x-8,q.y-7,16,14);label(c,'♠',q.x,q.y,10);}
   // Raised side rails and a real collection chute; dropped coins animate into it.
-  trayPolygon(c,[[63,277],[71,280],[24,lip],[15,lip+12]],'#48344a');
-  trayPolygon(c,[[209,280],[217,277],[265,lip+12],[256,lip]],'#48344a');
-  c.strokeStyle='#c6a36e';c.lineWidth=2;c.beginPath();c.moveTo(67,280);c.lineTo(19,lip+4);c.moveTo(213,280);c.lineTo(261,lip+4);c.stroke();
+  trayPolygon(c,[[63,277-lift],[71,280-lift],[24,lip],[15,lip+12]],'#48344a');
+  trayPolygon(c,[[209,280-lift],[217,277-lift],[265,lip+12],[256,lip]],'#48344a');
+  c.strokeStyle='#c6a36e';c.lineWidth=2;c.beginPath();c.moveTo(67,280-lift);c.lineTo(19,lip+4);c.moveTo(213,280-lift);c.lineTo(261,lip+4);c.stroke();
   trayPolygon(c,[[19,lip+4],[261,lip+4],[244,486],[36,486]],'#100e1a');
   c.fillStyle='#f2cc7a';c.fillRect(21,lip+2,238,3);
   for(const token of m.falling) {
     const progress=token.time/700,q=trayPoint(token.x,465);
     c.globalAlpha=1-progress;metalCoin(c,q.x,lip+9+progress*24,8*(1-progress*.45),token.kind);c.globalAlpha=1;
   }
-  const aim=trayPoint(m.aim,250);label(c,'▼',aim.x,270,11,'#ffd2a1');
+  const aim=trayPoint(m.aim,250);label(c,'▼',aim.x,258,11,'#ffd2a1');
   c.restore();
   label(c,`${t('crazyPusherStock')} ${m.stock} · ${t('crazyPending')} ${m.pending}`,140,170,12);
   label(c,s.timeLeft<=2000?t('crazyPusherSettle'):m.risk?t('crazyPusherRisk'):t('crazyPusherReward'),140,497,11,'#93ffe0');

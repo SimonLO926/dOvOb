@@ -5,7 +5,7 @@ export const MIX = { music: 0.78, sfx: 1, lead: 0.34, bass: 0.24, blip: 0.55, cl
 export const CASINO_EFFECTS = Object.freeze({
   crazyRolling: 'lever', crazyRiskRolling: 'risk', crazyReelStop: 'reel',
   crazySlotStartSound: 'slotStart', crazySlotTickSound: 'slotTick', crazySlotWinSound: 'slotWin', crazySlotMissSound: 'slotMiss',
-  crazyPusherInsertSound: 'coinInsert', crazyPusherDropSound: 'coinDrop', crazyPusherBank: 'payout',
+  crazyPusherInsertSound: 'coinInsert', crazyPusherStepSound: 'coinDrop', crazyPusherDropSound: 'coinDrop', crazyPusherBank: 'payout',
   crazyCasinoPayoutSound: 'payout', crazyPusherJackpot: 'jackpot', crazyCoinSound: 'coin',
   crazyCardSound: 'card', crazyTileSound: 'tile', crazyLaunchSound: 'launch', crazyPegSound: 'reel',
   crazyFlipperSound: 'tile', crazyJump: 'jump', crazyDashSound: 'dash', crazyLaserSound: 'laser',

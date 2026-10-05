@@ -61,6 +61,7 @@ test('Casino collection batches produce metallic clatter, throttle bursts and ob
   try {
     const sound=createSound(()=>1,{music:()=>0,sfx:()=>sfx});
     assert.equal(CASINO_EFFECTS.crazyPusherDropSound,'coinDrop');
+    assert.equal(CASINO_EFFECTS.crazyPusherStepSound,'coinDrop');
     assert.notEqual(CASINO_EFFECTS.crazyPusherInsertSound,CASINO_EFFECTS.crazyPusherDropSound);
     assert.equal(CASINO_EFFECTS.crazyCasinoPayoutSound,'payout');
     sound.playCasino('coinDrop',2);const first=tones.length;assert.ok(first>=4);

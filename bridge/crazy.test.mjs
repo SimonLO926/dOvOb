@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createPusher, rouletteLasers, motionSweep } from './crazy-reactions.mjs';
+import { createPusher, PUSHER_STEP, rouletteLasers, motionSweep } from './crazy-reactions.mjs';
 import { crazyRoundDuration, pachinkoBins, createCrazy, FIRST_BOSS, CRAZY_MODES, advanceCrazy, updateCrazy, inputCrazy, pointCrazy, hitCrazyBoss, healCrazy, hurtCrazy, skipCrazyCinematic } from './crazy.mjs';
 
 function enter(s, mode) {
@@ -464,8 +464,8 @@ test('Roulette draws one, two or three lasers with the requested 50/30/20 weight
 
 test('Every roulette salvo leaves a reachable safe disk, including at all arena edges', () => {
   for (let x = 22; x <= 258; x += 29.5) for (let y = 180; y <= 484; y += 38) {
-    for (const roll of [0, .5, .8]) for (const direction of [0, .25, .5, .75]) for (const jitter of [0, .999]) for (const spacing of [0, .999]) {
-      const values = [roll, direction, jitter, spacing, .99, .99, .99];
+    for (const roll of [0, .5, .8]) for (const direction of [0, .25, .5, .75]) for (const jitter of [0, .999]) for (const spacing of [0, .999]) for (const layout of [.1,.5,.9]) for (const offset of [0,.999]) {
+      const values = [roll, direction, jitter, spacing, .99, layout, offset, .999, offset, .999];
       const { lasers, safe } = rouletteLasers(() => values.shift() ?? .5, x, y);
       assert.ok(safe.x - safe.radius >= 22 && safe.x + safe.radius <= 258);
       assert.ok(safe.y - safe.radius >= 180 && safe.y + safe.radius <= 484);
@@ -481,7 +481,7 @@ test('Every roulette salvo leaves a reachable safe disk, including at all arena 
 
 test('Roulette warns about the entire salvo together and may fire simultaneously or staggered', () => {
   const make = timing => {
-    const values = [.9, .1, .5, .999, timing, .999, .999];
+    const values = [.9, .1, .5, .999, timing, 0, .5, .999, .5, .999];
     return rouletteLasers(() => values.shift() ?? .5, 140, 410).lasers;
   };
   assert.deepEqual(make(.1).map(h => h.warn), [520, 520, 520]);
@@ -492,7 +492,7 @@ test('Roulette warns about the entire salvo together and may fire simultaneously
 
 test('Dense roulette salvos vary angular spacing and each staggered firing interval', () => {
   const make = spacing => {
-    const values = [.9, .1, .5, spacing, .9, 0, .999];
+    const values = [.9, .1, .5, spacing, .9, 0, .5, 0, .5, .999];
     return rouletteLasers(() => values.shift() ?? .5, 140, 410).lasers;
   };
   const narrow = make(0), wide = make(.999);
@@ -501,6 +501,34 @@ test('Dense roulette salvos vary angular spacing and each staggered firing inter
   assert.ok(Math.abs(angle(wide[1]) - angle(wide[0])) < .4, 'Even the widest spacing is denser than before');
   assert.deepEqual(narrow.map(h => h.warn), [520, 560, 680]);
   assert.ok(narrow.every(h => h.width === 24));
+});
+
+test('Every laser salvo targets the warning-time player position, including former camping spots', () => {
+  for (const [x,y] of [[22,180],[258,484],[70,400],[210,280],[140,410]]) for (const random of [0,.55,.99]) {
+    const s=createCrazy();s.form=2;advanceCrazy(s,'roulette');s.catDue=Infinity;
+    s.mini.x=x;s.mini.y=y;s.mini.spawn=0;s.random=()=>random;s.protection=0;
+    updateCrazy(s,50);s.mini.spawn=Infinity;run(s,450);
+    assert.equal(s.hp,100,'Aimed preview must still allow time to react');
+    run(s,50);assert.ok(s.hp<100,`Standing still at ${x}/${y} must no longer avoid the salvo`);
+  }
+});
+
+test('Laser salvos mix separated parallel lanes, fans and broad crossing directions', () => {
+  const make = layout => {
+    const values=[.9,.1,.5,.8,.1,layout];
+    return rouletteLasers(()=>values.shift()??.55,70,400);
+  };
+  const fan=make(.1),parallel=make(.5),cross=make(.9);
+  assert.equal(fan.pattern,'fan');assert.equal(parallel.pattern,'parallel');assert.equal(cross.pattern,'cross');
+  const angle = h => Math.atan2(h.b.y-h.a.y,h.b.x-h.a.x);
+  assert.ok(Math.abs(angle(fan.lasers[0])-angle(fan.lasers[1]))>.1);
+  assert.ok(parallel.lasers.every(h=>Math.abs(angle(h)-angle(parallel.lasers[0]))<1e-9));
+  const centers=parallel.lasers.map(h=>[(h.a.x+h.b.x)/2,(h.a.y+h.b.y)/2]);
+  assert.equal(new Set(centers.map(c=>JSON.stringify(c))).size,3,'Parallel rays must cover different lanes');
+  assert.ok(Math.abs(angle(cross.lasers[1])-angle(cross.lasers[2]))>.85);
+  for(const salvo of [fan,parallel,cross]){
+    const first=salvo.lasers[0];assert.ok(Math.hypot((first.a.x+first.b.x)/2-70,(first.a.y+first.b.y)/2-400)<1e-9);
+  }
 });
 
 test('Widened roulette beams hit the newly covered band but leave adjacent space safe', () => {
@@ -570,17 +598,38 @@ test('New pusher beds vary coin positions while keeping every starting coin insi
   const layouts = Array.from({ length: 10 }, (_, i) => make(i + 1).coins);
   assert.equal(new Set(layouts.map(coins => JSON.stringify(coins.map(c => [c.x, c.y])))).size, 10);
   for (const coins of layouts) {
-    assert.equal(coins.length, 96);
+    assert.equal(coins.length, 108);
+    assert.equal(coins.filter(c => c.level === "lower").length, 96);
+    assert.equal(coins.filter(c => c.level === "upper").length, 12);
     assert.ok(coins.every(c => c.x > 27 && c.x < 253 && c.y > 300 && c.y < 465));
     assert.ok(new Set(coins.slice(0, 12).map(c => c.y)).size > 1);
   }
   assert.deepEqual(make(1).coins, layouts[0]);
 });
 
+test('Inserted coins settle on the upper shelf and only the front chute pays rewards', () => {
+  const s = createCrazy(); advanceCrazy(s, 'pusher'); s.catDue = Infinity; run(s, 550);
+  s.mini.coins = []; s.events = []; tap(s, 'action');
+  const coin = s.mini.coins[0];
+  assert.equal(coin.level, 'upper'); assert.equal(coin.vy, 0); assert.equal(coin.entry, 140);
+  assert.ok(coin.y < PUSHER_STEP); const start = coin.y;
+  run(s, 100); assert.equal(coin.y, start); assert.equal(s.mini.collected, 0);
+  run(s, 50); assert.equal(coin.entry, 0); assert.equal(coin.level, 'upper');
+  coin.y = PUSHER_STEP; updateCrazy(s, 10);
+  assert.equal(coin.level, 'transfer'); assert.equal(s.mini.transferred, 1);
+  assert.equal(s.mini.collected, 0); assert.equal(s.mini.pending, 0);
+  run(s, 150); assert.equal(coin.level, 'transfer'); assert.equal(s.mini.collected, 0);
+  run(s, 50); assert.equal(coin.level, 'lower'); assert.equal(s.mini.collected, 0);
+  assert.equal(s.events.filter(e => e.key === 'crazyPusherStepSound').length, 1);
+  coin.kind = 'gold'; coin.green = false; coin.y = 466; updateCrazy(s, 10);
+  assert.equal(s.mini.collected, 1); assert.equal(s.mini.pending, 3);
+  run(s, 50); assert.equal(s.mini.collected, 1);
+});
+
 test('The packed pusher bed pays out through normal physics and dropped stock increases rewards', () => {
-  for (const aim of [35, 140, 245]) {
+  for (const aim of [35, 140, 245]) for (const initial of [9, 9127]) {
     const play = (drop, step) => {
-      let seed = 9127; const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+      let seed = initial; const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
       const s = createCrazy({ random }); advanceCrazy(s, 'pusher'); s.catDue = Infinity;
       s.duration = s.timeLeft = 10000; s.mini.stock = 12; const mini = s.mini;
       let nextDrop = 600;
