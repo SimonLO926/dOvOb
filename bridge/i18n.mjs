@@ -2,6 +2,9 @@ export const LANGS = ["zh-Hant", "zh-Hans", "en", "ja", "ko", "pt", "es"];
 
 const TEXT = {
   "zh-Hant": {
+    crazyDifficulty: "難度",
+    crazyNormalHealing: "回血較多",
+    crazyHardHealing: "回血較少",
     gameMenu: "遊戲選單",
     bgmVolume: "BGM 音量",
     sfxVolume: "聲效音量",
@@ -252,6 +255,9 @@ const TEXT = {
     keys: "方向鍵移動，上 / X 轉，Z 反轉，空白鍵直落，C 保留，P 暫停。",
   },
   "zh-Hans": {
+    crazyDifficulty: "难度",
+    crazyNormalHealing: "回血较多",
+    crazyHardHealing: "回血较少",
     gameMenu: "游戏菜单",
     bgmVolume: "BGM 音量",
     sfxVolume: "声效音量",
@@ -501,6 +507,9 @@ const TEXT = {
     keys: "方向键移动，上 / X 转，Z 反转，空格直落，C 保留，P 暂停。",
   },
   en: {
+    crazyDifficulty: "Difficulty",
+    crazyNormalHealing: "More healing",
+    crazyHardHealing: "Less healing",
     gameMenu: "Game menu",
     bgmVolume: "BGM volume",
     sfxVolume: "Sound effects",
@@ -750,6 +759,9 @@ const TEXT = {
     keys: "Arrows move, Up / X rotate, Z reverse, Space drops, C holds, P pauses.",
   },
   ja: {
+    crazyDifficulty: "難易度",
+    crazyNormalHealing: "回復多め",
+    crazyHardHealing: "回復少なめ",
     title: "ブリッジ",
     back: "作品一覧へ",
     marathon: "マラソン",
@@ -842,6 +854,9 @@ const TEXT = {
     keys: "矢印で移動、上 / X で回転、Z で逆回転、Space で落下、C でホールド、P で一時停止。",
   },
   ko: {
+    crazyDifficulty: "난이도",
+    crazyNormalHealing: "회복 증가",
+    crazyHardHealing: "회복 감소",
     title: "브리지",
     back: "작품 목록",
     marathon: "마라톤",
@@ -934,6 +949,9 @@ const TEXT = {
     keys: "화살표 이동, 위 / X 회전, Z 역회전, Space 낙하, C 홀드, P 일시정지.",
   },
   pt: {
+    crazyDifficulty: "Dificuldade",
+    crazyNormalHealing: "Mais cura",
+    crazyHardHealing: "Menos cura",
     title: "Ponte",
     back: "Voltar aos trabalhos",
     marathon: "Maratona",
@@ -1026,6 +1044,9 @@ const TEXT = {
     keys: "Setas movem, Cima / X roda, Z inverte, Espaço larga, C reserva, P pausa.",
   },
   es: {
+    crazyDifficulty: "Dificultad",
+    crazyNormalHealing: "Más curación",
+    crazyHardHealing: "Menos curación",
     title: "Puente",
     back: "Volver a los trabajos",
     marathon: "Maratón",
