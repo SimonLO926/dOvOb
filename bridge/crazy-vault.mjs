@@ -52,8 +52,10 @@ export function updateVault(v, elapsed, held=new Set(), {hurt}={}) {
     // Solid undersides prevent jumping through a platform.
     if(v.vy<0)for(const p of v.platforms){if(v.x+9>p.x&&v.x-9<p.x+p.w&&oldY-28>=p.y+p.h&&v.y-28<p.y+p.h){v.y=p.y+p.h+28;v.vy=0;}}
     for(const enemy of v.enemies){enemy.x+=enemy.dir*48*sec;if(enemy.x>enemy.max){enemy.x=enemy.max;enemy.dir=-1;}if(enemy.x<enemy.min){enemy.x=enemy.min;enemy.dir=1;}}
-    if(v.grounded&&v.y===VAULT_WORLD.floor&&v.grounds.some(g=>v.x>g.x+24&&v.x<g.end-24))v.safeX=v.x;
-    for(const spike of v.spikes)if(v.x+9>spike.x&&v.x-9<spike.x+spike.w&&v.y>VAULT_WORLD.floor-18)damageVault(v,6,false,hurt);
+    const safeFromSpikes=v.spikes.every(spike=>v.x+16<=spike.x||v.x-16>=spike.x+spike.w);
+    const safeFromEnemies=v.enemies.every(enemy=>Math.abs(v.x-enemy.x)>=32);
+    if(v.grounded&&v.y===VAULT_WORLD.floor&&safeFromSpikes&&safeFromEnemies&&v.grounds.some(g=>v.x>g.x+24&&v.x<g.end-24))v.safeX=v.x;
+    for(const spike of v.spikes)if(v.x+9>spike.x&&v.x-9<spike.x+spike.w&&v.y>VAULT_WORLD.floor-18)damageVault(v,3,false,hurt);
     for(const enemy of v.enemies)if(Math.abs(v.x-enemy.x)<23&&v.y>enemy.y-24&&v.y-28<enemy.y)damageVault(v,8,false,hurt);
     if(v.y>680)damageVault(v,12,true,hurt);
     for(const item of v.loot){if(!item.collected&&v.carry+item.value<=VAULT_RULES.capacity&&Math.hypot(v.x-item.x,v.y-14-item.y)<23){item.collected=true;v.carry+=item.value;v.flash=`+${item.value}`;v.flashTime=700;}}
