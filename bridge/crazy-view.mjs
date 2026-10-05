@@ -1,8 +1,8 @@
-import { drawFineDealer, drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.4';
-import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.4';
-import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.4';
-import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.4';
-import { drawSession } from './arcade.mjs?v=1.2.4';
+import { drawFineDealer, drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.10';
+import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.10';
+import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.10';
+import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.10';
+import { drawSession } from './arcade.mjs?v=1.2.10';
 export const CRAZY_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 356 });
 export const CRAZY_BLOCK_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 512 });
 export function crazyCanvasHeight(mode) { return mode === 'bridge' || mode === 'sand' ? 720 : 560; }
@@ -15,7 +15,7 @@ const catPhoto = typeof Image === 'undefined' ? null : new Image();
 export const catImageReady = catPhoto ? new Promise(resolve => {
   catPhoto.onload = () => resolve(true);
   catPhoto.onerror = () => resolve(false);
-  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.4', import.meta.url).href;
+  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.10', import.meta.url).href;
 }) : Promise.resolve(false);
 const COLORS = { I: '#64d2ff', O: '#ffd60a', T: '#bf5af2', S: '#30d158', Z: '#ff453a', J: '#0a84ff', L: '#ff9f0a', B: '#9da4b9' };
 const SYMBOLS = ['★', '♥', '7', '♠'];
@@ -219,7 +219,11 @@ function miniBoard(c, s, t, reducedMotion) {
     c.beginPath(); c.moveTo(m.aim, 154); c.lineTo(m.aim, 180); c.stroke();
     for (const p of m.pegs) ellipse(c, p.x, p.y, 4, 4, '#ffe5aa');
     for (const b of m.balls) ellipse(c, b.x, b.y, 5, 5, '#a0efff');
-    for (let i = 0; i < 5; i++) { box(c, i * 56 + 3, 475, 50, 32, i === 2 ? '#8e2346' : i % 2 ? '#555097' : '#245948', 3); text(c, i === 2 ? '−6' : i % 2 ? '⚔' : '+8', i * 56 + 28, 491, 17); }
+    for (const bin of m.bins) {
+      box(c, bin.x + 1, 475, bin.w - 2, 32, bin.kind === 'hurt' ? '#8e2346' : bin.kind === 'attack' ? '#555097' : '#245948', 3);
+      text(c, bin.kind === 'attack' ? '⚔' : 'HP', bin.x + bin.w / 2, 482, 9);
+      text(c, `${bin.kind === 'hurt' ? '−' : bin.kind === 'heal' ? '+' : ''}${bin.amount}`, bin.x + bin.w / 2, 497, 13);
+    }
   }
   if (['cards', 'mahjong'].includes(s.mode)) {
     const fraction = Math.max(0, m.roundLeft / m.roundTime);
@@ -260,7 +264,7 @@ export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiec
     else for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (s.arcade.grid[y][x]) box(c, x * 28 + 1, y * 28 + 1, 26, 26, COLORS[s.arcade.grid[y][x].type] || '#e0b469', 3);
     drawSession(c, s.arcade, '#f2deef', { speed: t('arcadeSpeed'), double: t('arcadeDouble'), triple: t('arcadeTriple'), wide: t('arcadeWide'), narrow: t('arcadeNarrow') }); c.restore();
   } else if (GREED_ATTACKS.includes(s.mode)) drawReaction(c, s, t, reducedMotion);
-  else if (s.mode === 'pusher') drawPusher(c, s, t);
+  else if (s.mode === 'pusher') drawPusher(c, s, t, reducedMotion);
   else miniBoard(c, s, t, reducedMotion);
   text(c, `${t('crazyMode_' + s.mode)} · ${Math.ceil(Math.max(0, s.timeLeft) / 1000)}s`, 140, 141, 12, '#ffc7d6');
   if (s.cat) {

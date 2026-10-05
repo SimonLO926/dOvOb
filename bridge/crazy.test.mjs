@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createCrazy, FIRST_BOSS, CRAZY_MODES, advanceCrazy, updateCrazy, inputCrazy, pointCrazy, hitCrazyBoss, healCrazy, hurtCrazy, skipCrazyCinematic } from './crazy.mjs';
+import { createPusher } from './crazy-reactions.mjs';
+import { crazyRoundDuration, pachinkoBins, createCrazy, FIRST_BOSS, CRAZY_MODES, advanceCrazy, updateCrazy, inputCrazy, pointCrazy, hitCrazyBoss, healCrazy, hurtCrazy, skipCrazyCinematic } from './crazy.mjs';
 
 function enter(s, mode) {
   s.mode = 'bridge'; s.encounter = 0; s.bag = [mode]; advanceCrazy(s);
@@ -106,6 +107,7 @@ test('Mahjong clears pairs and finishes a board without selecting removed tiles 
 
 test('Pachinko uses distinct reward bins and a bounded ball count', () => {
   const s = createCrazy(); enter(s, 'pachinko'); s.hp = 50;
+  s.mini.bins = [{ x: 12, w: 44, kind: 'heal', amount: 8 }, { x: 56, w: 56, kind: 'attack', amount: 22 }, { x: 112, w: 56, kind: 'hurt', amount: 6 }, { x: 168, w: 56, kind: 'attack', amount: 22 }, { x: 224, w: 44, kind: 'heal', amount: 8 }];
   pointCrazy(s, 500, 100); assert.equal(s.mini.aim, 260);
   s.mini.balls = [{ x: 20, y: 504, vx: 0, vy: 100 }, { x: 80, y: 504, vx: 0, vy: 100 }, { x: 140, y: 504, vx: 0, vy: 100 }];
   updateCrazy(s, 50); assert.equal(s.hp, 52); assert.equal(s.bossHp, 878); assert.equal(s.mini.balls.length, 0);
@@ -418,7 +420,7 @@ test('Blue sweeps hurt stationary cores, orange sweeps hurt moving cores, and wa
 test('Earned pusher rewards preserve encounter cadence, prevent damage and bank actual dropped coins', () => {
   const s = createCrazy(); s.form = 2; advanceCrazy(s, 'coins'); s.damageLeft = 100;
   hitCrazyBoss(s, 40); assert.equal(s.pusherDue, true); const encounter = s.encounter;
-  advanceCrazy(s); assert.equal(s.mode, 'pusher'); assert.equal(s.encounter, encounter); assert.equal(s.duration, 12000);
+  advanceCrazy(s); assert.equal(s.mode, 'pusher'); assert.equal(s.encounter, encounter); assert.ok(s.duration >= 10000 && s.duration <= 20000);
   s.protection = 0; assert.equal(hurtCrazy(s, 100), false); assert.equal(s.hp, 100);
   s.mini.coins = [{x: 140, y: 466, vx: 0, vy: 0, green: false}]; updateCrazy(s, 50);
   assert.equal(s.mini.pending, 3); assert.equal(s.stats.coins, 1);
@@ -431,25 +433,54 @@ test('Pusher reward is settled once even when the time expires or a risk is bank
   const hp = s.bossHp; updateCrazy(s, 50); assert.equal(s.bossHp, hp);
 });
 
+test('New pusher beds vary coin positions while keeping every starting coin inside the tray', () => {
+  const make = initial => {
+    let seed = initial;
+    return createPusher(() => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296));
+  };
+  const layouts = Array.from({ length: 10 }, (_, i) => make(i + 1).coins);
+  assert.equal(new Set(layouts.map(coins => JSON.stringify(coins.map(c => [c.x, c.y])))).size, 10);
+  for (const coins of layouts) {
+    assert.equal(coins.length, 96);
+    assert.ok(coins.every(c => c.x > 27 && c.x < 253 && c.y > 300 && c.y < 465));
+    assert.ok(new Set(coins.slice(0, 12).map(c => c.y)).size > 1);
+  }
+  assert.deepEqual(make(1).coins, layouts[0]);
+});
+
 test('The packed pusher bed pays out through normal physics and dropped stock increases rewards', () => {
   for (const aim of [35, 140, 245]) {
     const play = (drop, step) => {
       let seed = 9127; const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
       const s = createCrazy({ random }); advanceCrazy(s, 'pusher'); s.catDue = Infinity;
+      s.duration = s.timeLeft = 10000; s.mini.stock = 12; const mini = s.mini;
       let nextDrop = 600;
-      for (let time = 0; time < 11500; time += step) {
+      for (let time = 0; time < 10000; time += step) {
         s.mini.aim = aim;
         if (drop && time >= nextDrop && s.mini.stock) { tap(s, 'action'); nextDrop += 500; }
         updateCrazy(s, step);
       }
-      assert.equal(s.hp, 100); assert.ok(s.mini.coins.every(c => Number.isFinite(c.x) && Number.isFinite(c.y)));
-      return s.mini.collected;
+      assert.equal(s.hp, 100); assert.ok(mini.coins.every(c => Number.isFinite(c.x) && Number.isFinite(c.y)));
+      return mini.collected;
     };
     for (const step of [10, 50]) {
       const idle = play(false, step), active = play(true, step);
-      assert.ok(active >= 8, `No meaningful payout at aim ${aim}, step ${step}: ${active}`);
+      assert.ok(idle <= 1, `Idle pusher must not pay out freely: ${idle}`);
+      assert.ok(active >= 12, `Normal play must push out at least twelve coins at aim ${aim}, step ${step}: ${active}`);
       assert.ok(active > idle, `Dropped coins must increase payout: ${active} vs ${idle}`);
     }
+  }
+});
+
+test('An untouched pusher does not empty the bed during the longest twenty-second round', () => {
+  for (const initial of [1, 9, 30]) {
+    let seed = initial;
+    const s = createCrazy({ random: () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296) });
+    advanceCrazy(s, 'pusher'); s.catDue = Infinity; s.duration = s.timeLeft = 20000;
+    const mini = s.mini;
+    run(s, 20000);
+    assert.ok(mini.collected <= 1, `Untouched bed paid out ${mini.collected} coins`);
+    assert.notEqual(s.mode, 'pusher'); assert.equal(s.bossHp, 900);
   }
 });
 
@@ -467,4 +498,110 @@ test('Pachinko layouts vary while keeping every peg inside its playable lane', (
   advanceCrazy(low, 'pachinko'); advanceCrazy(high, 'pachinko');
   assert.notDeepEqual(low.mini.pegs, high.mini.pegs);
   for (const s of [low, high]) assert.ok(s.mini.pegs.every(p => p.x >= 10 && p.x <= 270 && p.y >= 160 && p.y <= 430));
+});
+
+test('Crazy Bridge keyboard waits for Marathon DAS even after an idle repeat tick, then repeats at ARR', () => {
+  const s = createCrazy(); s.catDue = Infinity; s.attackDone = true;
+  s.bridge.active = { ...s.bridge.active, type: 'O', rot: 0, x: 4, y: 0 };
+  run(s, 95); inputCrazy(s, 'left'); assert.equal(s.bridge.active.x, 3);
+  run(s, 145); assert.equal(s.bridge.active.x, 3, 'No accidental second move before 150ms');
+  run(s, 5); assert.equal(s.bridge.active.x, 2);
+  run(s, 34); assert.equal(s.bridge.active.x, 2);
+  run(s, 1); assert.equal(s.bridge.active.x, 1);
+  inputCrazy(s, 'left', false); run(s, 150); assert.equal(s.bridge.active.x, 1);
+});
+
+test('Crazy Bridge touch repeats at Marathon touch cadence and restarts the delay on each press', () => {
+  const s = createCrazy(); s.catDue = Infinity; s.attackDone = true;
+  s.bridge.active = { ...s.bridge.active, type: 'O', rot: 0, x: 4, y: 0 };
+  inputCrazy(s, 'left', true, 'touch'); assert.equal(s.bridge.active.x, 3);
+  run(s, 69); assert.equal(s.bridge.active.x, 3); run(s, 1); assert.equal(s.bridge.active.x, 2);
+  inputCrazy(s, 'left', false); run(s, 20); inputCrazy(s, 'right', true, 'touch'); assert.equal(s.bridge.active.x, 3);
+  run(s, 69); assert.equal(s.bridge.active.x, 3); run(s, 1); assert.equal(s.bridge.active.x, 4);
+});
+
+test('Most recently pressed direction controls Crazy Bridge repeats, matching Marathon', () => {
+  const s = createCrazy(); s.catDue = Infinity; s.attackDone = true;
+  s.bridge.active = { ...s.bridge.active, type: 'O', rot: 0, x: 4, y: 0 };
+  inputCrazy(s, 'left'); inputCrazy(s, 'right'); assert.equal(s.bridge.active.x, 4);
+  run(s, 150); assert.equal(s.bridge.active.x, 5);
+  inputCrazy(s, 'right', false); run(s, 100); assert.equal(s.bridge.active.x, 5);
+  advanceCrazy(s, 'bridge'); assert.equal(s.horizontalDir, 0); assert.equal(s.horizontalMs, 0);
+});
+
+test('Random pachinko bins cover the arena and retain both rewards and a bounded penalty', () => {
+  let seed = 592; const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const layouts = new Set(), values = new Set(), widths = new Set();
+  for (let round = 0; round < 100; round++) {
+    const bins = pachinkoBins(random);
+    assert.equal(bins[0].x, 12); assert.equal(bins.at(-1).x + bins.at(-1).w, 268);
+    assert.equal(bins.filter(b => b.kind === 'heal').length, 2);
+    assert.equal(bins.filter(b => b.kind === 'attack').length, 2);
+    assert.equal(bins.filter(b => b.kind === 'hurt').length, 1);
+    for (const [i,b] of bins.entries()) {
+      if (i) assert.equal(b.x, bins[i-1].x + bins[i-1].w);
+      assert.ok(b.w >= 34 && b.w <= 72);
+      const [min,max] = b.kind === 'heal' ? [4,12] : b.kind === 'attack' ? [12,32] : [4,10];
+      assert.ok(Number.isInteger(b.amount) && b.amount >= min && b.amount <= max);
+      values.add(`${b.kind}:${b.amount}`); widths.add(b.w);
+    }
+    layouts.add(bins.map(b => b.kind).join(','));
+  }
+  assert.ok(layouts.size > 10); assert.ok(values.size > 20); assert.ok(widths.size > 10);
+});
+
+test('Pachinko landing follows the displayed randomized bin boundaries and amounts exactly once', () => {
+  const s = createCrazy(); enter(s, 'pachinko'); s.catDue = Infinity; s.attackDone = true;
+  s.hp = 40; s.protection = 0; s.damageLeft = 200;
+  const bins = s.mini.bins.map(b => ({...b}));
+  let heal = 0, damage = 0, penalty = 0;
+  for (const bin of bins) {
+    s.protection = 0;
+    s.mini.balls = [{x:bin.x+bin.w/2,y:504,vx:0,vy:100}]; updateCrazy(s, 50);
+    assert.equal(s.mini.balls.length, 0);
+    if (bin.kind === 'heal') heal += bin.amount;
+    else if (bin.kind === 'hurt') penalty += bin.amount;
+    else damage += bin.amount;
+    assert.deepEqual(s.mini.bins, bins, 'Bins must not reroll during flight or payout');
+  }
+  assert.equal(s.hp, 40 + heal - penalty); assert.equal(s.bossHp, 900 - damage);
+  const hp = s.hp, bossHp = s.bossHp; updateCrazy(s, 50); assert.equal(s.hp, hp); assert.equal(s.bossHp, bossHp);
+});
+
+test('Only pusher encounter duration changes; normal Crazy modes retain form and phase timings', () => {
+  for (const form of [1,2]) for (const phase of [1,2,3]) {
+    for (const mode of ['bridge', ...CRAZY_MODES, 'jump', 'coins', 'motion', 'vortex', 'roulette']) {
+      assert.equal(crazyRoundDuration(mode,form,phase,()=>0), (form===2?18000:22000)-phase*2000);
+      assert.equal(crazyRoundDuration(mode,form,phase,()=>.999), (form===2?18000:22000)-phase*2000);
+    }
+  }
+  assert.equal(crazyRoundDuration('pusher',1,1,()=>0),10000);
+  assert.equal(crazyRoundDuration('pusher',2,3,()=>.999),20000);
+  const durations=new Set(Array.from({length:11},(_,i)=>crazyRoundDuration('pusher',1,1,()=>i/11)));
+  assert.equal(durations.size,11);
+});
+
+test('Lucky coins earn an actual jackpot once, then banking settles it even during a spin', () => {
+  for (const early of [false,true]) {
+    const s=createCrazy(); advanceCrazy(s,'pusher'); s.catDue=Infinity; s.damageLeft=500;
+    s.mini.coins=[{x:140,y:466,vx:0,vy:0,kind:'lucky'}];
+    s.random=()=>.5; const reward=s.mini.jackpots[2], stock=s.mini.stock;
+    updateCrazy(s,50); assert.ok(s.mini.spin); assert.equal(s.mini.pending,3);
+    const mini=s.mini;
+    if (early) run(s,550);
+    if (!early) { run(s,1000); assert.equal(mini.spin,null); assert.equal(mini.pending,3+reward); assert.equal(mini.stock,stock+4); run(s,100); assert.equal(mini.pending,3+reward); }
+    tap(s,'alt'); assert.notEqual(s.mode,'pusher'); assert.equal(s.bossHp,900-3-reward); assert.equal(mini.pending,0);
+    assert.equal(s.stats.coins,1);
+  }
+});
+
+test('Pusher coin variants heal or double reward while preserving physical collection counts', () => {
+  const s=createCrazy();advanceCrazy(s,'pusher');s.catDue=Infinity;s.hp=60;
+  s.mini.coins=[{x:100,y:466,vx:0,vy:0,kind:'heal'},{x:140,y:466,vx:0,vy:0,kind:'ruby'},{x:180,y:466,vx:0,vy:0,kind:'gold'}];
+  updateCrazy(s,50);assert.equal(s.hp,63);assert.equal(s.mini.pending,9);assert.equal(s.stats.coins,3);assert.equal(s.mini.falling.length,3);
+});
+
+test('Optional pusher risk cannot extend the bonus beyond twenty seconds', () => {
+  const s=createCrazy({random:()=>.999});advanceCrazy(s,'pusher');s.mini.stock=0;s.mini.pending=9;
+  run(s,550);const duration=s.duration, left=s.timeLeft;tap(s,'action');assert.equal(duration,20000);assert.equal(s.duration,20000);assert.equal(s.timeLeft,left);assert.equal(s.mini.riskUsed,true);
 });

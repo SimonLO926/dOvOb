@@ -1,6 +1,7 @@
-import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.4';
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.4';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.4';
+import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.10';
+import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.10';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.10';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.10';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, secondHp: 1200, limit: 720000 });
 export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand', 'dodge']);
@@ -17,6 +18,22 @@ const shuffled = (items, random) => {
   return out;
 };
 
+export function pachinkoBins(random = Math.random) {
+  // Keep two healing, two boss-hit and one penalty bin; position, width and value vary by encounter.
+  const kinds = shuffled(['heal', 'heal', 'attack', 'attack', 'hurt'], random);
+  const weights = kinds.map(() => .8 + random() * .4), total = weights.reduce((sum, value) => sum + value, 0);
+  let x = 12;
+  return kinds.map((kind, index) => {
+    const w = index === 4 ? 268 - x : Math.round(weights[index] / total * 256);
+    const min = kind === 'heal' ? 4 : kind === 'attack' ? 12 : 4;
+    const max = kind === 'heal' ? 12 : kind === 'attack' ? 32 : 10;
+    const bin = { kind, amount: min + Math.floor(random() * (max - min + 1)), x, w };
+    x += w; return bin;
+  });
+}
+export function crazyRoundDuration(mode, form, phase, random = Math.random) {
+  return mode === 'pusher' ? (10 + Math.floor(random() * 11)) * 1000 : (form === 2 ? 18000 : 22000) - phase * 2000;
+}
 export function createCrazy({ random = Math.random, boss = FIRST_BOSS } = {}) {
   const bridge = createGame({ mode: 'marathon', random });
   startGame(bridge, 'marathon');
@@ -25,7 +42,7 @@ export function createCrazy({ random = Math.random, boss = FIRST_BOSS } = {}) {
     stats: { hits: 0, damage: 0, damageTaken: 0, healed: 0, counters: 0, coins: 0, firstTime: 0, secondTime: 0 }, score: 0, elapsed: 0,
     over: false, won: false, damageLeft: 50, mode: 'bridge', encounter: 0, bag: [], hardStreak: 0,
     bridge, parkedPiece: null, curses: { reverse: 0, blind: 0, rush: 0, norotate: 0 }, arcade: null, mini: null, held: new Set(), actionReady: true,
-    timeLeft: 20000, duration: 20000, protection: 500, cooldown: 0, fallMs: 0, lockMs: 0, repeatMs: 0,
+    timeLeft: 20000, duration: 20000, protection: 500, cooldown: 0, fallMs: 0, lockMs: 0, repeatMs: 0, horizontalMs: 0, horizontalDir: 0, horizontalRepeating: false, horizontalSource: 'keyboard',
     resolveMs: 0, successes: 0, events: [], hitFlash: 0, cat: null, catDue: 9000, catBlock: 0,
     transition: null, notice: 'crazyOpening', noticeTime: 3500, attack: null, attackDone: false,
   };
@@ -133,10 +150,10 @@ export function advanceCrazy(s, preferredMode = null) {
   if (bonus) s.pusherDue = false;
   s.transition = { from, to: s.mode, time: 0 };
   s.hardStreak = HARD.has(s.mode) ? s.hardStreak + 1 : 0;
-  s.duration = s.mode === 'pusher' ? 12000 : (s.form === 2 ? 18000 : 22000) - s.phase * 2000;
+  s.duration = crazyRoundDuration(s.mode, s.form, s.phase, s.random);
   s.damageLeft = (s.form === 2 ? 80 : 45) + s.phase * 5;
   s.timeLeft = s.duration; s.protection = 500; s.held.clear(); s.actionReady = false;
-  s.cooldown = 0; s.fallMs = 0; s.lockMs = 0; s.repeatMs = 0; s.resolveMs = 0;
+  s.cooldown = 0; s.fallMs = 0; s.lockMs = 0; s.repeatMs = 0; s.horizontalMs = 0; s.horizontalDir = 0; s.horizontalRepeating = false; s.horizontalSource = 'keyboard'; s.resolveMs = 0;
   s.successes = 0; s.arcade = null; s.mini = null; s.cat = null; s.catBlock = 0; s.attack = null; s.attackDone = false;
   s.catDue = Math.min(8000, s.duration / 2);
   if (s.mode === 'bridge' || s.mode === 'sand') {
@@ -156,11 +173,11 @@ export function advanceCrazy(s, preferredMode = null) {
   } else if (s.mode === 'tiger') {
     s.mini = { reels: [0, 1, 2], pending: 0, risks: 0, clock: 0, spin: null };
   } else if (s.mode === 'pachinko') {
-    s.mini = { aim: 140, balls: [], pegs: Array.from({ length: 36 }, (_, i) => ({ x: 28 + (i % 6) * 42 + (Math.floor(i / 6) % 2) * 12 + (s.random() - .5) * 14, y: 174 + Math.floor(i / 6) * 48 + (s.random() - .5) * 12 })) };
+    s.mini = { aim: 140, balls: [], bins: pachinkoBins(s.random), pegs: Array.from({ length: 36 }, (_, i) => ({ x: 28 + (i % 6) * 42 + (Math.floor(i / 6) % 2) * 12 + (s.random() - .5) * 14, y: 174 + Math.floor(i / 6) * 48 + (s.random() - .5) * 12 })) };
   } else if (s.mode === 'dodge') {
     s.mini = { x: 140, y: 400, target: null, hazards: [], wave: 0, spawn: 850, survival: 0, dash: 0, dashReady: 0, lastX: 0, lastY: -1 };
   } else if (GREED_ATTACKS.includes(s.mode)) { s.mini = createReaction(s.mode); }
-  else if (s.mode === 'pusher') { s.mini = createPusher(s.random); }
+  else if (s.mode === 'pusher') { s.mini = createPusher(s.random, s.duration); }
   else deal(s);
   notify(s, 'crazySwitch');
 }
@@ -198,7 +215,7 @@ function choose(s, index) {
 
 function miniAction(s, action) {
   const m = s.mini;
-  if (!m || s.cooldown > 0 || s.catBlock > 0 || m.spin) return;
+  if (!m || s.cooldown > 0 || s.catBlock > 0 || (m.spin && s.mode !== 'pusher')) return;
   if (s.mode === 'slots' && action === 'action') {
     m.reels[m.stop] = Math.floor(m.clock / (250 - s.phase * 20) + m.stop) % 4;
     m.stop += 1; notify(s, 'crazyReelStop');
@@ -233,10 +250,13 @@ function miniAction(s, action) {
   }
 }
 
-export function inputCrazy(s, action, down = true) {
+export function inputCrazy(s, action, down = true, source = 'keyboard') {
   if (s.over || s.cutscene) return;
   if (!down) {
     s.held.delete(action);
+    if ((action === 'left' && s.horizontalDir === -1) || (action === 'right' && s.horizontalDir === 1)) {
+      s.horizontalDir = 0; s.horizontalMs = 0; s.horizontalRepeating = false;
+    }
     if (action === 'action') s.actionReady = true;
     if (s.arcade && ['left', 'right'].includes(action)) s.arcade[action] = false;
     return;
@@ -251,7 +271,12 @@ export function inputCrazy(s, action, down = true) {
   } else if (s.mode === 'bridge' || s.mode === 'sand') {
     const g = s.bridge;
     if (g.phase !== 'playing') return;
-    if (action === 'left' || action === 'right') tryMove(g, (action === 'left' ? -1 : 1) * (s.curses.reverse > 0 ? -1 : 1), 0);
+    if (action === 'left' || action === 'right') {
+      s.horizontalDir = action === 'left' ? -1 : 1;
+      s.horizontalMs = 0; s.horizontalRepeating = false;
+      s.horizontalSource = source;
+      tryMove(g, s.horizontalDir * (s.curses.reverse > 0 ? -1 : 1), 0);
+    }
     if (action === 'down') tryMove(g, 0, 1);
     if ((action === 'rotate' || action === 'rotateLeft') && s.curses.norotate <= 0) tryRotate(g, action === 'rotate' ? 1 : -1);
     if (action === 'alt') hold(g);
@@ -376,11 +401,20 @@ function updateBridge(s, dt) {
     return;
   }
   if (!g.active) return;
+  if (s.horizontalDir && s.held.has(s.horizontalDir < 0 ? 'left' : 'right')) {
+    s.horizontalMs += dt;
+    const touch = s.horizontalSource === 'touch';
+    const interval = touch ? BRIDGE_REPEAT.touchInterval : s.horizontalRepeating ? BRIDGE_REPEAT.keyboardInterval : BRIDGE_REPEAT.keyboardDelay;
+    if (s.horizontalMs >= interval) {
+      // Marathon keyboard repeats once per frame; touch follows its 70ms timer.
+      s.horizontalMs = touch ? s.horizontalMs - interval : 0;
+      s.horizontalRepeating = true;
+      tryMove(g, s.horizontalDir * (s.curses.reverse > 0 ? -1 : 1), 0);
+    }
+  } else { s.horizontalMs = 0; s.horizontalRepeating = false; }
   s.repeatMs += dt;
   if (s.repeatMs >= 100) {
     s.repeatMs = 0;
-    if (s.held.has('left')) tryMove(g, s.curses.reverse > 0 ? 1 : -1, 0);
-    if (s.held.has('right')) tryMove(g, s.curses.reverse > 0 ? -1 : 1, 0);
     if (s.held.has('down')) tryMove(g, 0, 1);
   }
   s.fallMs += dt;
@@ -408,10 +442,10 @@ function updatePachinko(s, dt) {
       }
     }
     if (b.y >= 505) {
-      const bin = Math.min(4, Math.max(0, Math.floor(b.x / 56)));
-      if (bin === 0 || bin === 4) healCrazy(s, 8);
-      else if (bin === 2) hurtCrazy(s, 6, 'crazyMiss');
-      else hitCrazyBoss(s, 22);
+      const bin = m.bins.find(bin => b.x < bin.x + bin.w) || m.bins.at(-1);
+      if (bin.kind === 'heal') healCrazy(s, bin.amount);
+      else if (bin.kind === 'hurt') hurtCrazy(s, bin.amount, 'crazyMiss');
+      else hitCrazyBoss(s, bin.amount);
     }
   }
   m.balls = m.balls.filter(b => b.y < 505);
