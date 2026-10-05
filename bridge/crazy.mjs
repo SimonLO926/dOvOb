@@ -1,7 +1,7 @@
-import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.9';
-import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.9';
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.9';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.9';
+import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.10';
+import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.10';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.10';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.10';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, secondHp: 1200, limit: 720000 });
 export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand', 'dodge']);
@@ -32,7 +32,7 @@ export function pachinkoBins(random = Math.random) {
   });
 }
 export function crazyRoundDuration(mode, form, phase, random = Math.random) {
-  return mode === 'pusher' ? (15 + Math.floor(random() * 16)) * 1000 : (form === 2 ? 18000 : 22000) - phase * 2000;
+  return mode === 'pusher' ? (10 + Math.floor(random() * 11)) * 1000 : (form === 2 ? 18000 : 22000) - phase * 2000;
 }
 export function createCrazy({ random = Math.random, boss = FIRST_BOSS } = {}) {
   const bridge = createGame({ mode: 'marathon', random });

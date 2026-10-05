@@ -420,7 +420,7 @@ test('Blue sweeps hurt stationary cores, orange sweeps hurt moving cores, and wa
 test('Earned pusher rewards preserve encounter cadence, prevent damage and bank actual dropped coins', () => {
   const s = createCrazy(); s.form = 2; advanceCrazy(s, 'coins'); s.damageLeft = 100;
   hitCrazyBoss(s, 40); assert.equal(s.pusherDue, true); const encounter = s.encounter;
-  advanceCrazy(s); assert.equal(s.mode, 'pusher'); assert.equal(s.encounter, encounter); assert.ok(s.duration >= 15000 && s.duration <= 30000);
+  advanceCrazy(s); assert.equal(s.mode, 'pusher'); assert.equal(s.encounter, encounter); assert.ok(s.duration >= 10000 && s.duration <= 20000);
   s.protection = 0; assert.equal(hurtCrazy(s, 100), false); assert.equal(s.hp, 100);
   s.mini.coins = [{x: 140, y: 466, vx: 0, vy: 0, green: false}]; updateCrazy(s, 50);
   assert.equal(s.mini.pending, 3); assert.equal(s.stats.coins, 1);
@@ -453,14 +453,15 @@ test('The packed pusher bed pays out through normal physics and dropped stock in
     const play = (drop, step) => {
       let seed = 9127; const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
       const s = createCrazy({ random }); advanceCrazy(s, 'pusher'); s.catDue = Infinity;
+      s.duration = s.timeLeft = 10000; s.mini.stock = 12; const mini = s.mini;
       let nextDrop = 600;
-      for (let time = 0; time < 11500; time += step) {
+      for (let time = 0; time < 10000; time += step) {
         s.mini.aim = aim;
         if (drop && time >= nextDrop && s.mini.stock) { tap(s, 'action'); nextDrop += 500; }
         updateCrazy(s, step);
       }
-      assert.equal(s.hp, 100); assert.ok(s.mini.coins.every(c => Number.isFinite(c.x) && Number.isFinite(c.y)));
-      return s.mini.collected;
+      assert.equal(s.hp, 100); assert.ok(mini.coins.every(c => Number.isFinite(c.x) && Number.isFinite(c.y)));
+      return mini.collected;
     };
     for (const step of [10, 50]) {
       const idle = play(false, step), active = play(true, step);
@@ -471,13 +472,13 @@ test('The packed pusher bed pays out through normal physics and dropped stock in
   }
 });
 
-test('An untouched pusher does not empty the bed during the longest thirty-second round', () => {
+test('An untouched pusher does not empty the bed during the longest twenty-second round', () => {
   for (const initial of [1, 9, 30]) {
     let seed = initial;
     const s = createCrazy({ random: () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296) });
-    advanceCrazy(s, 'pusher'); s.catDue = Infinity; s.duration = s.timeLeft = 30000;
+    advanceCrazy(s, 'pusher'); s.catDue = Infinity; s.duration = s.timeLeft = 20000;
     const mini = s.mini;
-    run(s, 30000);
+    run(s, 20000);
     assert.ok(mini.collected <= 1, `Untouched bed paid out ${mini.collected} coins`);
     assert.notEqual(s.mode, 'pusher'); assert.equal(s.bossHp, 900);
   }
@@ -574,10 +575,10 @@ test('Only pusher encounter duration changes; normal Crazy modes retain form and
       assert.equal(crazyRoundDuration(mode,form,phase,()=>.999), (form===2?18000:22000)-phase*2000);
     }
   }
-  assert.equal(crazyRoundDuration('pusher',1,1,()=>0),15000);
-  assert.equal(crazyRoundDuration('pusher',2,3,()=>.999),30000);
-  const durations=new Set(Array.from({length:16},(_,i)=>crazyRoundDuration('pusher',1,1,()=>i/16)));
-  assert.equal(durations.size,16);
+  assert.equal(crazyRoundDuration('pusher',1,1,()=>0),10000);
+  assert.equal(crazyRoundDuration('pusher',2,3,()=>.999),20000);
+  const durations=new Set(Array.from({length:11},(_,i)=>crazyRoundDuration('pusher',1,1,()=>i/11)));
+  assert.equal(durations.size,11);
 });
 
 test('Lucky coins earn an actual jackpot once, then banking settles it even during a spin', () => {
@@ -600,7 +601,7 @@ test('Pusher coin variants heal or double reward while preserving physical colle
   updateCrazy(s,50);assert.equal(s.hp,63);assert.equal(s.mini.pending,9);assert.equal(s.stats.coins,3);assert.equal(s.mini.falling.length,3);
 });
 
-test('Optional pusher risk cannot extend the bonus beyond thirty seconds', () => {
+test('Optional pusher risk cannot extend the bonus beyond twenty seconds', () => {
   const s=createCrazy({random:()=>.999});advanceCrazy(s,'pusher');s.mini.stock=0;s.mini.pending=9;
-  run(s,550);const duration=s.duration, left=s.timeLeft;tap(s,'action');assert.equal(duration,30000);assert.equal(s.duration,30000);assert.equal(s.timeLeft,left);assert.equal(s.mini.riskUsed,true);
+  run(s,550);const duration=s.duration, left=s.timeLeft;tap(s,'action');assert.equal(duration,20000);assert.equal(s.duration,20000);assert.equal(s.timeLeft,left);assert.equal(s.mini.riskUsed,true);
 });

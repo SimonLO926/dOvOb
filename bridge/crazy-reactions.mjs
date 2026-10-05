@@ -146,7 +146,7 @@ export function pusherAction(s, action, api) {
     m.stock--; m.coins.push(pusherCoin(s.random, m.aim, 250, true)); s.cooldown = 280; emit(s, 'crazyCoinSound');
   } else if (!m.riskUsed && m.pending > 0) {
     m.riskUsed = true; m.stock = 4;
-    const extra = Math.min(4000, Math.max(0, 30000 - s.duration));
+    const extra = Math.min(4000, Math.max(0, 20000 - s.duration));
     s.timeLeft += extra; s.duration += extra;
     m.risk = { time: 4000, win: s.random() < .6 }; m.obstacles = [{ x: 82, y: 367 }, { x: 198, y: 367 }]; emit(s, 'crazyPusherRisk');
   }
