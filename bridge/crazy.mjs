@@ -1,8 +1,8 @@
-import { VAULT_RULES, createVault, updateVault, vaultPoint } from './crazy-vault.mjs?v=1.2.23';
-import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.23';
-import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.23';
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.23';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.23';
+import { VAULT_RULES, createVault, updateVault, vaultPoint } from './crazy-vault.mjs?v=1.2.24';
+import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.24';
+import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.24';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.24';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.24';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, secondHp: 1200, limit: 720000 });
 export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand', 'dodge']);

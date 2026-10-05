@@ -5,7 +5,7 @@ export function loadGreedArt() {
   [['first', 'greed-first.png'], ['firstSprite', 'greed-first-sprite.png'], ['second', 'greed-second.png'], ['defeated', 'greed-defeated.png']].map(([key, file]) => new Promise(resolve => {
     const img = new Image(); greedImages[key] = img;
     img.onload = () => resolve(true); img.onerror = () => resolve(false);
-    img.src = new URL(`./assets/${file}?v=1.2.23`, import.meta.url).href;
+    img.src = new URL(`./assets/${file}?v=1.2.24`, import.meta.url).href;
   }))
   );
 }
@@ -41,7 +41,7 @@ export function drawGreedCinematic(c, s, t, reduced = false) {
     text(c, t('crazyVictorySub'), w / 2, h * .29, 12, '#ffe0a1');
   } else if (reduced || time >= 2200) {
     cover(c, greedImages.first); c.fillStyle = '#12081dde'; c.fillRect(0, 0, w, h);
-    text(c, 'FORM II', w / 2, h * .15, 25, '#ffc971');
+    text(c, 'BOSS', w / 2, h * .15, 25, '#ffc971');
     c.strokeStyle = '#a67643'; c.lineWidth = 2;
     for (let i = 0; i < 12; i++) { const angle = i * Math.PI / 6 + (reduced ? 0 : time / 2500); c.beginPath(); c.moveTo(w / 2, h * .48); c.lineTo(w / 2 + Math.cos(angle) * w, h * .48 + Math.sin(angle) * h); c.stroke(); }
     coinRain(c, time, reduced, true);
@@ -51,7 +51,7 @@ export function drawGreedCinematic(c, s, t, reduced = false) {
       c.drawImage(img, (w - size) / 2, h * .43 - size / 3, size, size * img.naturalHeight / img.naturalWidth);
     }
     c.fillStyle = '#160a20cc'; c.fillRect(0, h * .73, w, h * .19);
-    text(c, t('crazyTrueForm'), w / 2, h * .79, 24); text(c, t('crazyTransformSub'), w / 2, h * .86, 12, '#fbc08d');
+    text(c, t('crazyTrueName'), w / 2, h * .79, 24); text(c, t('crazyTransformSub'), w / 2, h * .86, 12, '#fbc08d');
   } else {
     cover(c, greedImages.first); c.fillStyle = '#0f081e88'; c.fillRect(0, 0, w, h);
     if (time > 850) {
