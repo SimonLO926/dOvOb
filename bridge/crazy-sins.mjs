@@ -1,4 +1,4 @@
-import { readGreedClear } from './crazy-screen.mjs?v=1.2.17';
+import { readGreedClear } from './crazy-screen.mjs?v=1.2.18';
 
 // Add a playable encounter and mark it developed when each future boss ships.
 export const SIN_BOSSES = Object.freeze([

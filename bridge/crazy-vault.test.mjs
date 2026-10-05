@@ -36,13 +36,13 @@ test('Returning to the bank automatically deposits; over-capacity pickups stay a
  v.x=65;updateVault(v,50);assert.equal(v.carry,0);assert.equal(v.banked,110);
 });
 test('Spikes and patrols deal real HP damage with cooldown; pits respawn without erasing deposits',()=>{
- const s=gate();s.protection=0;s.mini.x=345;updateCrazy(s,50);assert.equal(s.hp,94);updateCrazy(s,50);assert.equal(s.hp,94);
+ const s=gate();s.protection=0;s.mini.x=345;updateCrazy(s,50);assert.equal(s.hp,97);updateCrazy(s,50);assert.equal(s.hp,97);
  const v=createVault();let damage=0;v.banked=80;v.carry=40;v.safeX=380;v.x=450;v.y=675;v.vy=300;updateVault(v,50,new Set(),{hurt:n=>damage+=n});assert.equal(damage,12);assert.equal(v.x,380);assert.equal(v.banked,80);assert.equal(v.carry,40);
  const e=createVault();e.x=550;updateVault(e,50,new Set(),{hurt:n=>damage+=n});assert.equal(damage,20);
 });
-test('Normal healing restores rounded 65% awards, remains bounded, and stays disabled in the vault and after defeat',()=>{
+test('Normal healing restores rounded 70% awards, remains bounded, and stays disabled in the vault and after defeat',()=>{
  const s=createCrazy();s.hp=50;
- for(const [award,expected] of [[1,1],[2,1],[3,2],[4,3],[6,4],[8,5],[12,8],[20,13]]){
+ for(const [award,expected] of [[1,1],[2,1],[3,2],[4,3],[6,4],[8,6],[12,8],[20,14]]){
   const before=s.hp;healCrazy(s,award);assert.equal(s.hp-before,expected);
  }
  const hp=s.hp;healCrazy(s,0);healCrazy(s,-10);assert.equal(s.hp,hp);
@@ -93,4 +93,27 @@ test('A completed vault resumes controllable combat without a covering transitio
  assert.equal(s.vaultCleared,true);assert.equal(s.mode,'jump');assert.equal(s.transition,null);assert.equal(s.cutscene,null);
  const x=s.mini.x;inputCrazy(s,'right');updateCrazy(s,50);assert.ok(s.mini.x>x);
  inputCrazy(s,'action');updateCrazy(s,16);assert.ok(s.mini.y<464);
+});
+
+test('Spikes and patrols cannot overwrite the safe checkpoint used after falling into a pit',()=>{
+ const v=createVault();v.x=300;updateVault(v,16);assert.equal(v.safeX,300);
+ v.x=345;updateVault(v,16);assert.equal(v.safeX,300);
+ v.x=550;updateVault(v,16);assert.equal(v.safeX,300);
+ v.x=450;v.y=675;v.vy=300;let damage=0;
+ updateVault(v,16,new Set(),{hurt:amount=>damage+=amount});
+ assert.equal(v.x,300);assert.equal(v.y,560);assert.equal(damage,12);
+ for(let i=0;i<100;i++)updateVault(v,16,new Set(),{hurt:amount=>damage+=amount});
+ assert.equal(damage,12,'Respawning and waiting must not cause another spike hit');
+});
+
+test('A fully loaded player can run and briefly tap jump out of every spike patch in either direction',()=>{
+ for(const dt of [16,50])for(const spike of createVault().spikes)for(const direction of ['left','right']){
+  const s=gate();s.protection=0;s.mini.carry=120;s.mini.x=spike.x+spike.w/2;
+  updateCrazy(s,dt);assert.equal(s.hp,97);
+  inputCrazy(s,direction,true,'touch');inputCrazy(s,'action',true,'touch');inputCrazy(s,'action',false,'touch');
+  updateCrazy(s,dt);assert.ok(s.mini.y<560);
+  for(let i=0;i<Math.ceil(400/dt);i++)updateCrazy(s,dt);
+  assert.ok(s.mini.x+9<=spike.x||s.mini.x-9>=spike.x+spike.w);
+  assert.equal(s.hp,97,'Leaving the spike patch must not cause repeated damage');
+ }
 });
