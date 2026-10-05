@@ -3,8 +3,6 @@ export const LANGS = ["zh-Hant", "zh-Hans", "en", "ja", "ko", "pt", "es"];
 const TEXT = {
   "zh-Hant": {
     crazyDifficulty: "難度",
-    crazyNormalHealing: "回血較多",
-    crazyHardHealing: "回血較少",
     gameMenu: "遊戲選單",
     bgmVolume: "BGM 音量",
     sfxVolume: "聲效音量",
@@ -256,8 +254,6 @@ const TEXT = {
   },
   "zh-Hans": {
     crazyDifficulty: "难度",
-    crazyNormalHealing: "回血较多",
-    crazyHardHealing: "回血较少",
     gameMenu: "游戏菜单",
     bgmVolume: "BGM 音量",
     sfxVolume: "声效音量",
@@ -508,8 +504,6 @@ const TEXT = {
   },
   en: {
     crazyDifficulty: "Difficulty",
-    crazyNormalHealing: "More healing",
-    crazyHardHealing: "Less healing",
     gameMenu: "Game menu",
     bgmVolume: "BGM volume",
     sfxVolume: "Sound effects",
@@ -760,8 +754,6 @@ const TEXT = {
   },
   ja: {
     crazyDifficulty: "難易度",
-    crazyNormalHealing: "回復多め",
-    crazyHardHealing: "回復少なめ",
     title: "ブリッジ",
     back: "作品一覧へ",
     marathon: "マラソン",
@@ -855,8 +847,6 @@ const TEXT = {
   },
   ko: {
     crazyDifficulty: "난이도",
-    crazyNormalHealing: "회복 증가",
-    crazyHardHealing: "회복 감소",
     title: "브리지",
     back: "작품 목록",
     marathon: "마라톤",
@@ -950,8 +940,6 @@ const TEXT = {
   },
   pt: {
     crazyDifficulty: "Dificuldade",
-    crazyNormalHealing: "Mais cura",
-    crazyHardHealing: "Menos cura",
     title: "Ponte",
     back: "Voltar aos trabalhos",
     marathon: "Maratona",
@@ -1045,8 +1033,6 @@ const TEXT = {
   },
   es: {
     crazyDifficulty: "Dificultad",
-    crazyNormalHealing: "Más curación",
-    crazyHardHealing: "Menos curación",
     title: "Puente",
     back: "Volver a los trabajos",
     marathon: "Maratón",
