@@ -40,8 +40,16 @@ test('Spikes and patrols deal real HP damage with cooldown; pits respawn without
  const v=createVault();let damage=0;v.banked=80;v.carry=40;v.safeX=380;v.x=450;v.y=675;v.vy=300;updateVault(v,50,new Set(),{hurt:n=>damage+=n});assert.equal(damage,12);assert.equal(v.x,380);assert.equal(v.banked,80);assert.equal(v.carry,40);
  const e=createVault();e.x=550;updateVault(e,50,new Set(),{hurt:n=>damage+=n});assert.equal(damage,20);
 });
-test('Every normal healing source is reduced, retained, bounded and cannot heal zero or negative awards',()=>{
- const s=createCrazy();s.hp=50;for(const value of [1,2,3,4,6,8,12,20]){const before=s.hp;healCrazy(s,value);assert.equal(s.hp-before,Math.max(1,Math.floor(value/2)));}const hp=s.hp;healCrazy(s,0);healCrazy(s,-10);assert.equal(s.hp,hp);
+test('Normal healing restores rounded 65% awards, remains bounded, and stays disabled in the vault and after defeat',()=>{
+ const s=createCrazy();s.hp=50;
+ for(const [award,expected] of [[1,1],[2,1],[3,2],[4,3],[6,4],[8,5],[12,8],[20,13]]){
+  const before=s.hp;healCrazy(s,award);assert.equal(s.hp-before,expected);
+ }
+ const hp=s.hp;healCrazy(s,0);healCrazy(s,-10);assert.equal(s.hp,hp);
+ healCrazy(s,20);assert.equal(s.hp,100);assert.equal(s.stats.healed,50);
+ healCrazy(s,8);assert.equal(s.hp,100);assert.equal(s.stats.healed,50);
+ s.hp=50;s.mode='vault';healCrazy(s,20);assert.equal(s.hp,50);assert.equal(s.stats.healed,50);
+ s.mode='bridge';s.over=true;healCrazy(s,20);assert.equal(s.hp,50);assert.equal(s.stats.healed,50);
 });
 test('Cat boss damage may cross the gate mid-update without leaving stale cat state',()=>{
  const s=createCrazy();s.form=2;s.phase=3;s.bossMaxHp=1200;s.bossHp=250;s.cat={action:'boss',time:1190,applied:false};s.catDue=Infinity;s.damageLeft=100;

@@ -1,8 +1,8 @@
 import { VAULT_RULES, createVault, updateVault, vaultPoint } from './crazy-vault.mjs';
-import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.16';
-import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.16';
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.16';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.16';
+import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.17';
+import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.17';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.17';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.17';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, secondHp: 1200, limit: 720000 });
 export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand', 'dodge']);
@@ -65,7 +65,7 @@ export function hurtCrazy(s, amount, reason = 'crazyHurt') {
 }
 export function healCrazy(s, amount) {
   if (s.over || s.mode === 'vault' || amount <= 0) return;
-  const gained = Math.min(Math.max(1, Math.floor(amount / 2)), s.maxHp - s.hp);
+  const gained = Math.min(Math.max(1, Math.round(amount * .65)), s.maxHp - s.hp);
   s.hp += gained; s.stats.healed += gained;
   if (gained) notify(s, 'crazyHeal', gained);
 }
