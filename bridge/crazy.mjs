@@ -1,7 +1,7 @@
-import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.10';
-import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.10';
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.10';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.10';
+import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.13';
+import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.13';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.13';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.13';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, secondHp: 1200, limit: 720000 });
 export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand', 'dodge']);
@@ -53,6 +53,7 @@ function notify(s, key, amount = 0) {
   s.notice = key; s.noticeAmount = amount; s.noticeTime = 1800;
   s.events.push({ key, amount });
 }
+function casinoSound(s, key, amount = 0) { s.events.push({ key, amount }); }
 export function hurtCrazy(s, amount, reason = 'crazyHurt') {
   if (s.over || s.cutscene || s.protection > 0 || s.mode === 'pusher') return false;
   s.stats.damageTaken += Math.min(s.hp, amount);
@@ -169,7 +170,8 @@ export function advanceCrazy(s, preferredMode = null) {
     s.arcade = createSession(s.mode, brickWall(s.random), s.phase, s.random);
     s.arcade.prep = 0; s.arcade.teach = false;
   } else if (s.mode === 'slots') {
-    s.mini = { reels: [null, null, null], stop: 0, clock: 0, round: 0 };
+    s.mini = { reels: [null, null, null], stop: 0, clock: 0, round: 0, rollSound: 0 };
+    casinoSound(s, 'crazySlotStartSound');
   } else if (s.mode === 'tiger') {
     s.mini = { reels: [0, 1, 2], pending: 0, risks: 0, clock: 0, spin: null };
   } else if (s.mode === 'pachinko') {
@@ -223,14 +225,16 @@ function miniAction(s, action) {
       const count = Math.max(...m.reels.map(v => m.reels.filter(x => x === v).length));
       if (count >= 2) { hitCrazyBoss(s, count === 3 ? 48 : 24); healCrazy(s, count === 3 ? 8 : 3); }
       else hurtCrazy(s, 6, 'crazyMiss');
+      casinoSound(s, count >= 2 ? 'crazySlotWinSound' : 'crazySlotMissSound');
       s.cooldown = 650;
     }
   } else if (s.mode === 'tiger') {
     if (action === 'alt' && m.pending) {
+      casinoSound(s, 'crazyCasinoPayoutSound', m.pending);
       hitCrazyBoss(s, m.pending); healCrazy(s, 4); m.pending = 0; s.cooldown = 650;
     } else if (action === 'action' && !m.spin) {
       const risk = m.pending > 0;
-      m.spin = { time: 0, duration: 1050, risk, won: risk ? s.random() < .55 : null,
+      m.spin = { time: 0, duration: 1050, stopped: 0, risk, won: risk ? s.random() < .55 : null,
         result: risk ? null : Array.from({ length: 3 }, () => Math.floor(s.random() * 4)) };
       notify(s, risk ? 'crazyRiskRolling' : 'crazyRolling');
     }
@@ -305,16 +309,19 @@ function updateTiger(s, dt) {
   const m = s.mini, spin = m.spin;
   if (!spin) return;
   spin.time += dt;
+  const stopped = Math.min(3, Math.max(0, Math.floor((spin.time - 550) / 250) + 1));
+  for (let i = spin.stopped ?? 0; i < stopped; i++) casinoSound(s, 'crazyReelStop');
+  spin.stopped = stopped;
   if (spin.time < spin.duration) return;
   m.spin = null;
   if (spin.risk) {
-    if (spin.won) { m.pending *= 2; m.risks++; notify(s, 'crazyBankOrRisk'); if (m.risks === 3) miniAction(s, 'alt'); }
-    else { m.pending = 0; hurtCrazy(s, 10, 'crazyRiskLost'); s.cooldown = 650; }
+    if (spin.won) { m.pending *= 2; m.risks++; casinoSound(s, 'crazySlotWinSound'); notify(s, 'crazyBankOrRisk'); if (m.risks === 3) miniAction(s, 'alt'); }
+    else { m.pending = 0; casinoSound(s, 'crazySlotMissSound'); hurtCrazy(s, 10, 'crazyRiskLost'); s.cooldown = 650; }
   } else {
     m.reels = spin.result; m.risks = 0;
     const count = Math.max(...m.reels.map(v => m.reels.filter(x => x === v).length));
-    if (count >= 2) { m.pending = count === 3 ? 32 : 18; notify(s, 'crazyBankOrRisk'); }
-    else { hurtCrazy(s, 6, 'crazyMiss'); s.cooldown = 650; }
+    if (count >= 2) { m.pending = count === 3 ? 32 : 18; casinoSound(s, 'crazySlotWinSound'); notify(s, 'crazyBankOrRisk'); }
+    else { casinoSound(s, 'crazySlotMissSound'); hurtCrazy(s, 6, 'crazyMiss'); s.cooldown = 650; }
   }
 }
 function updatePairs(s, dt) {
@@ -524,7 +531,7 @@ export function updateCrazy(s, elapsed) {
   for (const key of Object.keys(s.curses)) s.curses[key] = Math.max(0, s.curses[key] - dt);
   const oldCooldown = s.cooldown; s.cooldown = Math.max(0, s.cooldown - dt);
   if (oldCooldown > 0 && s.cooldown === 0 && s.mini) {
-    if (s.mode === 'slots') { s.mini.reels = [null, null, null]; s.mini.stop = 0; }
+    if (s.mode === 'slots') { s.mini.reels = [null, null, null]; s.mini.stop = 0; s.mini.rollSound = 0; casinoSound(s, 'crazySlotStartSound'); }
     else if (s.mode === 'cards' || (s.mode === 'mahjong' && s.mini.removed.length === 6)) deal(s);
     else if (s.mode === 'mahjong') s.mini.selected = [];
   }
@@ -558,6 +565,10 @@ export function updateCrazy(s, elapsed) {
     }
   } else if (s.mode === 'pachinko') updatePachinko(s, dt);
   else if (s.mode === 'tiger') updateTiger(s, dt);
+  else if (s.mode === 'slots' && s.mini.stop < 3) {
+    s.mini.rollSound -= dt;
+    if (s.mini.rollSound <= 0) { casinoSound(s, 'crazySlotTickSound', 3 - s.mini.stop); s.mini.rollSound = 95; }
+  }
   else if (s.mode === 'cards' || s.mode === 'mahjong') updatePairs(s, dt);
   else if (s.mode === 'dodge') updateDodge(s, dt);
   else if (GREED_ATTACKS.includes(s.mode)) updateReaction(s, dt, reactionApi);

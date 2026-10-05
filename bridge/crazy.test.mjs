@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createPusher } from './crazy-reactions.mjs';
+import { createPusher, rouletteLasers, motionSweep } from './crazy-reactions.mjs';
 import { crazyRoundDuration, pachinkoBins, createCrazy, FIRST_BOSS, CRAZY_MODES, advanceCrazy, updateCrazy, inputCrazy, pointCrazy, hitCrazyBoss, healCrazy, hurtCrazy, skipCrazyCinematic } from './crazy.mjs';
 
 function enter(s, mode) {
@@ -415,6 +415,135 @@ test('Blue sweeps hurt stationary cores, orange sweeps hurt moving cores, and wa
   const blueMove = make('blue'); blueMove.mini.hazards[0].age = 850; inputCrazy(blueMove, 'left'); updateCrazy(blueMove, 50); assert.equal(blueMove.hp, 100);
   const orangeMove = make('orange'); orangeMove.mini.hazards[0].age = 850; inputCrazy(orangeMove, 'left'); updateCrazy(orangeMove, 50); assert.equal(orangeMove.hp, 94);
   const orangeStill = make('orange'); orangeStill.mini.hazards[0].age = 850; updateCrazy(orangeStill, 50); assert.equal(orangeStill.hp, 100);
+});
+
+test('Motion sweeps enter from all eight directions and keep blue/orange movement rules', () => {
+  const seen = new Set();
+  for (let direction = 0; direction < 8; direction++) {
+    for (const tone of ['blue','orange']) for (const moving of [false,true]) {
+      const s = createCrazy(); advanceCrazy(s,'motion'); s.catDue=Infinity;s.protection=0;s.mini.spawn=Infinity;
+      const sweep = motionSweep(()=>direction/8,tone,350);seen.add(sweep.direction);
+      assert.ok(Math.abs(Math.hypot(sweep.nx,sweep.ny)-1)<1e-9);
+      sweep.offset=sweep.nx*s.mini.x+sweep.ny*s.mini.y-2;sweep.age=sweep.warn;
+      s.mini.hazards=[sweep];if(moving)inputCrazy(s,'right');updateCrazy(s,10);
+      assert.equal(s.hp<100,tone==='blue'?!moving:moving, `${direction}/${tone}/${moving}`);
+      sweep.offset=sweep.end+1;updateCrazy(s,10);assert.equal(s.mini.hazards.length,0);
+    }
+  }
+  assert.equal(seen.size,8);
+});
+
+test('Casino actions emit their actual insertion, collection, reel and payout sounds once', () => {
+  const p=createCrazy();advanceCrazy(p,'pusher');p.catDue=Infinity;run(p,550);p.events=[];
+  p.mini.coins=[];tap(p,'action');assert.equal(p.events.filter(e=>e.key==='crazyPusherInsertSound').length,1);
+  p.mini.coins=[{x:120,y:466,vx:0,vy:0,kind:'gold'},{x:170,y:466,vx:0,vy:0,kind:'gold'}];
+  updateCrazy(p,50);assert.equal(p.events.find(e=>e.key==='crazyPusherDropSound').amount,2);
+  run(p,300);tap(p,'alt');assert.equal(p.events.filter(e=>e.key==='crazyPusherBank').length,1);
+  assert.equal(p.events.find(e=>e.key==='crazyPusherBank').amount,6);
+  const t=createCrazy({random:()=>0});enter(t,'tiger');t.catDue=Infinity;t.events=[];
+  tap(t,'action');run(t,1050);assert.equal(t.events.filter(e=>e.key==='crazyReelStop').length,3);
+  assert.equal(t.events.filter(e=>e.key==='crazySlotWinSound').length,1);
+  tap(t,'alt');assert.equal(t.events.filter(e=>e.key==='crazyCasinoPayoutSound').length,1);
+  const slots=createCrazy();enter(slots,'slots');slots.catDue=Infinity;slots.events=[];
+  run(slots,100);assert.ok(slots.events.some(e=>e.key==='crazySlotTickSound'));
+  for(let i=0;i<3;i++){slots.mini.clock=(4-i)*230;tap(slots,'action');}
+  const ticks=slots.events.filter(e=>e.key==='crazySlotTickSound').length;
+  run(slots,300);assert.equal(slots.events.filter(e=>e.key==='crazySlotTickSound').length,ticks);
+  assert.equal(slots.events.filter(e=>e.key==='crazySlotWinSound').length,1);
+});
+
+test('Roulette draws one, two or three lasers with the requested 50/30/20 weights', () => {
+  const counts = [0, 0, 0];
+  for (let i = 0; i < 1000; i++) {
+    let call = 0;
+    const salvo = rouletteLasers(() => call++ === 0 ? i / 1000 : .25, 140, 410);
+    counts[salvo.lasers.length - 1]++;
+  }
+  assert.deepEqual(counts, [500, 300, 200]);
+});
+
+test('Every roulette salvo leaves a reachable safe disk, including at all arena edges', () => {
+  for (let x = 22; x <= 258; x += 29.5) for (let y = 180; y <= 484; y += 38) {
+    for (const roll of [0, .5, .8]) for (const direction of [0, .25, .5, .75]) for (const jitter of [0, .999]) for (const spacing of [0, .999]) {
+      const values = [roll, direction, jitter, spacing, .99, .99, .99];
+      const { lasers, safe } = rouletteLasers(() => values.shift() ?? .5, x, y);
+      assert.ok(safe.x - safe.radius >= 22 && safe.x + safe.radius <= 258);
+      assert.ok(safe.y - safe.radius >= 180 && safe.y + safe.radius <= 484);
+      assert.ok(Math.hypot(safe.x - x, safe.y - y) <= 90, 'Refuge must be reachable before the first firing');
+      for (const h of lasers) {
+        const dx = h.b.x - h.a.x, dy = h.b.y - h.a.y;
+        const distance = Math.abs((safe.x - h.a.x) * dy - (safe.y - h.a.y) * dx) / Math.hypot(dx, dy);
+        assert.ok(distance >= safe.radius + h.width / 2 + 6, 'The whole refuge must avoid every widened laser hitbox');
+      }
+    }
+  }
+});
+
+test('Roulette warns about the entire salvo together and may fire simultaneously or staggered', () => {
+  const make = timing => {
+    const values = [.9, .1, .5, .999, timing, .999, .999];
+    return rouletteLasers(() => values.shift() ?? .5, 140, 410).lasers;
+  };
+  assert.deepEqual(make(.1).map(h => h.warn), [520, 520, 520]);
+  const staggered = make(.9);
+  assert.deepEqual(staggered.map(h => h.warn), [520, 640, 760]);
+  assert.ok(staggered.every(h => h.age === 0 && !h.fired));
+});
+
+test('Dense roulette salvos vary angular spacing and each staggered firing interval', () => {
+  const make = spacing => {
+    const values = [.9, .1, .5, spacing, .9, 0, .999];
+    return rouletteLasers(() => values.shift() ?? .5, 140, 410).lasers;
+  };
+  const narrow = make(0), wide = make(.999);
+  const angle = h => Math.atan2(h.b.y - h.a.y, h.b.x - h.a.x);
+  assert.ok(Math.abs(angle(narrow[1]) - angle(narrow[0])) < Math.abs(angle(wide[1]) - angle(wide[0])));
+  assert.ok(Math.abs(angle(wide[1]) - angle(wide[0])) < .4, 'Even the widest spacing is denser than before');
+  assert.deepEqual(narrow.map(h => h.warn), [520, 560, 680]);
+  assert.ok(narrow.every(h => h.width === 24));
+});
+
+test('Widened roulette beams hit the newly covered band but leave adjacent space safe', () => {
+  for (const [x, expectedHit] of [[157, true], [159, false]]) {
+    const s = createCrazy(); s.form = 2; advanceCrazy(s, 'roulette'); s.catDue = Infinity;
+    s.mini.spawn = Infinity; s.mini.x = x; s.mini.y = 400; s.protection = 0;
+    s.mini.hazards = [{ kind: 'laser', width: 24, a: { x: 140, y: 152 }, b: { x: 140, y: 508 }, warn: 520, age: 520, fired: false }];
+    updateCrazy(s, 10);
+    assert.equal(s.hp < 100, expectedHit);
+  }
+});
+
+test('Walking to the shared refuge avoids every staggered shot without a dash', () => {
+  for (const [x, y] of [[22, 180], [258, 484], [140, 330], [140, 410]]) {
+    const s = createCrazy(); s.form = 2; advanceCrazy(s, 'roulette'); s.catDue = Infinity;
+    run(s, 800); s.phase = 3; s.mini.x = x; s.mini.y = y; s.random = () => .99; s.protection = 0;
+    updateCrazy(s, 50); assert.equal(s.mini.hazards.length, 3);
+    const lasers = s.mini.hazards, safe = s.mini.laserSafe;
+    s.mini.spawn = Infinity; pointCrazy(s, safe.x, safe.y);
+    run(s, 1100);
+    assert.equal(s.hp, 100); assert.equal(s.mini.dash, 0);
+    assert.ok(lasers.every(h => h.fired));
+    assert.equal(s.events.filter(e => e.key === 'crazyLaserSound').length, 3);
+  }
+  const hit = createCrazy(); hit.form = 2; advanceCrazy(hit, 'roulette'); hit.catDue = Infinity;
+  run(hit, 800); hit.mini.x = 140; hit.mini.y = 330; hit.random = () => .99; hit.protection = 0;
+  updateCrazy(hit, 50); hit.mini.spawn = Infinity; run(hit, 450);
+  assert.equal(hit.hp, 100, 'Preview lines never cause damage');
+  run(hit, 50); assert.ok(hit.hp < 100, 'Standing on the firing line still causes damage');
+});
+
+test('A new roulette wave never overlaps the previous staggered salvo', () => {
+  const s = createCrazy(); s.form = 2; advanceCrazy(s, 'roulette'); s.catDue = Infinity;
+  s.phase = 3; s.random = () => .99; s.protection = Infinity;
+  let waves = 0;
+  for (let time = 0; time < 12000; time += 50) {
+    const previous = s.mini.wave; updateCrazy(s, 50);
+    if (s.mini.wave !== previous) {
+      waves++; assert.equal(s.mini.hazards.length, 3);
+      assert.ok(s.mini.hazards.every(h => h.age === 50), 'Old salvo must be gone before the next preview');
+    }
+  }
+  assert.ok(waves >= 8);
 });
 
 test('Earned pusher rewards preserve encounter cadence, prevent damage and bank actual dropped coins', () => {

@@ -2,6 +2,15 @@ export const TEMPO = 112;
 export const STEP = 60 / TEMPO / 2;
 
 export const MIX = { music: 0.78, sfx: 1, lead: 0.34, bass: 0.24, blip: 0.55, clear: 0.48 };
+export const CASINO_EFFECTS = Object.freeze({
+  crazyRolling: 'lever', crazyRiskRolling: 'risk', crazyReelStop: 'reel',
+  crazySlotStartSound: 'slotStart', crazySlotTickSound: 'slotTick', crazySlotWinSound: 'slotWin', crazySlotMissSound: 'slotMiss',
+  crazyPusherInsertSound: 'coinInsert', crazyPusherDropSound: 'coinDrop', crazyPusherBank: 'payout',
+  crazyCasinoPayoutSound: 'payout', crazyPusherJackpot: 'jackpot', crazyCoinSound: 'coin',
+  crazyCardSound: 'card', crazyTileSound: 'tile', crazyLaunchSound: 'launch', crazyPegSound: 'reel',
+  crazyFlipperSound: 'tile', crazyJump: 'jump', crazyDashSound: 'dash', crazyLaserSound: 'laser',
+  crazyTransform: 'transform', crazyVictorySound: 'victory'
+});
 
 export const LEAD = [
   64, 67, 72, 67, 69, 67, 64, null,
@@ -48,6 +57,7 @@ export function createSound(getVolume, { music: getMusic = () => 1, sfx: getSfx 
   let playing = false;
   let nextTime = 0;
   let step = 0;
+  const lastEffect = new Map();
 
   function ensure() {
     if (typeof AudioContext === "undefined") return false;
@@ -154,10 +164,30 @@ export function createSound(getVolume, { music: getMusic = () => 1, sfx: getSfx 
   }
 
   function playCasino(kind, amount = 0) {
-    if (!ensure()) return;
+    if (!ensure() || getSfx() <= 0) return;
     const start = ctx.currentTime;
+    const throttle = kind === 'coinDrop' ? .075 : kind === 'slotTick' ? .07 : 0;
+    if (throttle && start - (lastEffect.get(kind) ?? -Infinity) < throttle) return;
+    lastEffect.set(kind, start);
     const ping = (freq, offset, dur = .06, gain = .12, type = "triangle") => beep(freq, start + offset, dur, type, gain, sfxGain);
-    if (kind === "victory") {
+    const coins = (count, offset = 0, gap = .025) => {
+      for (let i = 0; i < count; i++) {
+        const freq = 1900 + (i * 617 % 2300), time = offset + i * gap;
+        ping(freq, time, .055, .075); ping(freq * 1.47, time + .006, .035, .04, 'sine');
+      }
+    };
+    if (kind === 'coinInsert') { ping(230, 0, .025, .12, 'square'); ping(2700, .025, .065, .09); }
+    else if (kind === 'coinDrop') coins(Math.max(2, Math.min(8, amount || 1)), 0, .019);
+    else if (kind === 'payout') {
+      ping(1350, 0, .08, .1);
+      if (amount > 0) { coins(Math.max(6, Math.min(16, Math.ceil(amount / 4))), .07, .032); ping(midi(84), .16, .18, .08); }
+    } else if (kind === 'slotStart') { [330,440,660].forEach((f,i)=>ping(f,i*.045,.035,.08,'square')); }
+    else if (kind === 'slotTick') { ping(380 + amount * 65, 0, .024, .045, 'square'); }
+    else if (kind === 'slotWin' || kind === 'jackpot') {
+      [72,76,79,84].forEach((note,i)=>ping(midi(note),i*.075,.17,.12));
+      if (kind === 'jackpot') coins(12,.15,.027);
+    } else if (kind === 'slotMiss') { [440,330,220].forEach((f,i)=>ping(f,i*.08,.07,.065,'square')); }
+    else if (kind === "victory") {
       [60, 64, 67, 72, 76, 79, 84].forEach((note, i) => ping(midi(note), i * .105, .32, .2));
       // Metallic coin pairs, with diminishing scattered impacts and a bright final chord.
       for (let i = 0; i < 42; i++) {
