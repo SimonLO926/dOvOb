@@ -1,0 +1,32 @@
+[
+  {
+    "file": "source-assets/greed/images/greed-first.png",
+    "originalLocation": "bridge/assets/greed-first.png",
+    "bytes": 2229925,
+    "sha256": "a97bdcf26a52d75a05d9e0b90079f8a52b8185c0f51ba57e91d806c95d9531a8"
+  },
+  {
+    "file": "source-assets/greed/images/greed-second.png",
+    "originalLocation": "bridge/assets/greed-second.png",
+    "bytes": 2440831,
+    "sha256": "02db8a5555f19cc7ad60de6fa8d11e0efb7f502057414bfd1fa66836d54a5fb6"
+  },
+  {
+    "file": "source-assets/greed/images/greed-defeated.png",
+    "originalLocation": "bridge/assets/greed-defeated.png",
+    "bytes": 3016384,
+    "sha256": "1605ab811f6b34ae7b2df49147ec115cb825323d941fbc2eed41e5003a89f0d5"
+  },
+  {
+    "file": "source-assets/greed/images/mischief-cat.png",
+    "originalLocation": "bridge/assets/mischief-cat.png",
+    "bytes": 2465040,
+    "sha256": "ecbfe49948f01886d7f5a495d5e54dff845640254c1dc9a6b522b35f979a3651"
+  },
+  {
+    "file": "source-assets/greed/images/greed-first-sprite.png",
+    "originalLocation": "bridge/assets/greed-first-sprite.png",
+    "bytes": 2030769,
+    "sha256": "088038d13eebeba59707a7df4029d9bf21b801fb109240c3c14bcd75ad5506d3"
+  }
+]

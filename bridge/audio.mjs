@@ -9,7 +9,7 @@ export const CASINO_EFFECTS = Object.freeze({
   crazyCasinoPayoutSound: 'payout', crazyPusherJackpot: 'jackpot', crazyCoinSound: 'coin',
   crazyCardSound: 'card', crazyTileSound: 'tile', crazyLaunchSound: 'launch', crazyPegSound: 'reel',
   crazyFlipperSound: 'tile', crazyJump: 'jump', crazyDashSound: 'dash', crazyLaserSound: 'laser',
-  crazyTransform: 'transform', crazyVictorySound: 'victory'
+  crazyTransform: 'transform', crazyVictorySound: 'victory', prideMirrorAppearSound: 'laser'
 });
 
 export const LEAD = [

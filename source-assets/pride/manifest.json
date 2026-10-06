@@ -1,0 +1,92 @@
+[
+  {
+    "file": "source-assets/pride/images/pride-defeated.png",
+    "originalLocation": "bridge/assets/pride-defeated.png",
+    "bytes": 541473,
+    "sha256": "ac2d247537952d7338d5dfb1e4bc581a39f7b43d684e203ec3e989477c997bb6"
+  },
+  {
+    "file": "source-assets/pride/images/pride-first.png",
+    "originalLocation": "bridge/assets/pride-first.png",
+    "bytes": 524252,
+    "sha256": "4ebfde03d5389deb4e82a0efe773eb2f16102e2602d91a0573b1282a63287edb"
+  },
+  {
+    "file": "source-assets/pride/images/pride-mirror-defeated.png",
+    "originalLocation": "bridge/assets/pride-mirror-defeated.png",
+    "bytes": 3460994,
+    "sha256": "4db43125e4ff0342803c682c0b81972111fcde1d8a770ba64d91f5539a856655"
+  },
+  {
+    "file": "source-assets/pride/images/pride-palace.png",
+    "originalLocation": "bridge/assets/pride-palace.png",
+    "bytes": 2845132,
+    "sha256": "3d9f6f97510c838639b49ee1f5645c1bba3bfb267e5f671dfcca94109bb899aa"
+  },
+  {
+    "file": "source-assets/pride/images/pride-second.png",
+    "originalLocation": "bridge/assets/pride-second.png",
+    "bytes": 3086025,
+    "sha256": "b2ecb05a1da83ca7fdb2e32b3ac1606d15678cd269c2d3eb4fa271592af801ee"
+  },
+  {
+    "file": "source-assets/pride/images/pride-tower-collapse.png",
+    "originalLocation": "bridge/assets/pride-tower-collapse.png",
+    "bytes": 3196074,
+    "sha256": "3c1066687dbe7c401d0565467a3d3a0fb9981a142ec9c736e50b236aa23c44c0"
+  },
+  {
+    "file": "source-assets/pride/images/pride-tower-ruins.png",
+    "originalLocation": "bridge/assets/pride-tower-ruins.png",
+    "bytes": 3066791,
+    "sha256": "b4ec6db504b26c9145434c8c6ad80c478e822d2ad170edfacaab06e049232a9d"
+  },
+  {
+    "file": "source-assets/pride/music/escape.mp3",
+    "originalLocation": "bridge/assets/pride-music/escape.mp3",
+    "bytes": 1616133,
+    "sha256": "7eee7876ce79582c15c3f6cf14927b52125d4012bb90adf22aa5611d3145762c"
+  },
+  {
+    "file": "source-assets/pride/music/first-bridge.mp3",
+    "originalLocation": "bridge/assets/pride-music/first-bridge.mp3",
+    "bytes": 2997906,
+    "sha256": "780df1b2dc7543629e6704c0fa515a5f9de3dd9bd32d26fc1c36d33e3e25367e"
+  },
+  {
+    "file": "source-assets/pride/music/first-last.mp3",
+    "originalLocation": "bridge/assets/pride-music/first-last.mp3",
+    "bytes": 3566330,
+    "sha256": "6e918bf49f1cffc843ec1e0383cbd1ed317889407d7d44608abc13b476445fdb"
+  },
+  {
+    "file": "source-assets/pride/music/first-special.mp3",
+    "originalLocation": "bridge/assets/pride-music/first-special.mp3",
+    "bytes": 2895924,
+    "sha256": "2f1a2656673b16b3933916b734ab209dbf67136c6876ee38efcf9c6d7aac1407"
+  },
+  {
+    "file": "source-assets/pride/music/second-bridge.mp3",
+    "originalLocation": "bridge/assets/pride-music/second-bridge.mp3",
+    "bytes": 13798807,
+    "sha256": "125ceb4b61779f28c1786c7ac26f24c4806d89a1bd6479744bded80038c11975"
+  },
+  {
+    "file": "source-assets/pride/music/second-last.mp3",
+    "originalLocation": "bridge/assets/pride-music/second-last.mp3",
+    "bytes": 3871441,
+    "sha256": "f8f7bf3dd955b4f259c87a6a81cbd06d1705f5d20a721cf66da42ddcfb88a332"
+  },
+  {
+    "file": "source-assets/pride/music/second-mid.mp3",
+    "originalLocation": "bridge/assets/pride-music/second-mid.mp3",
+    "bytes": 3291313,
+    "sha256": "1ccecb07eeddb203b7c1c7bf51ced7a696ba002004e1bc2220ceb255477e88f2"
+  },
+  {
+    "file": "source-assets/pride/music/second-special.mp3",
+    "originalLocation": "bridge/assets/pride-music/second-special.mp3",
+    "bytes": 2941899,
+    "sha256": "4c0d59cf2dd020281cbf5f990f2efdf0e07dcf551e24ec0d20777b912e911fac"
+  }
+]

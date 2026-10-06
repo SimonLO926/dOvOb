@@ -1,18 +1,24 @@
-import { VAULT_RULES, createVault, updateVault, vaultPoint } from './crazy-vault.mjs?v=1.2.24';
-import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.24';
-import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.24';
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.24';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.24';
+import { createPrideEscape, updatePrideEscape, prideEscapeInput, prideEscapePoint, PRIDE_ESCAPE_ID } from './pride-escape.mjs';
+import { PRIDE_SECOND_RULES, PRIDE_SECOND_ATTACKS, UPGRADED_BASES, PRIDE_ROTATING_GAMES, PRIDE_SECOND_GAMES, PRIDE_SECOND_MODES, initPrideSecond, createPrideSecondRound, prideSecondInput, prideSecondPoint, updatePrideSecond, prideSecondThresholds, breakPrideMirror } from './pride-second.mjs';
+import { PRIDE_MINIGAMES } from './minigames/index.mjs';
+import { PRIDE_ATTACKS, createPrideAttack, prideInput, pridePoint, updatePrideAttack } from './pride-attacks.mjs';
+import { startPrideFinisher, finishPrideFinisher, retryPrideFinisher, updateMirrorDuel, mirrorDuelPoint, mirrorDuelInput } from './pride-finisher.mjs';
+import { SIN_BOSSES } from './crazy-sins.mjs?v=1.2.25';
+import { VAULT_RULES, createVault, updateVault, vaultPoint } from './crazy-vault.mjs?v=1.2.25';
+import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.25';
+import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.25';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.25';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.25';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, secondHp: 1200, limit: 720000 });
-export const CRAZY_MODES = Object.freeze(['slots', 'tiger', 'pachinko', 'cards', 'mahjong', 'breakout', 'pinball', 'bbtan', 'sand', 'dodge']);
+export const PRIDE_BOSS = Object.freeze({ id: 'pride', name: 'sinPride', hp: 1000, limit: 720000 });
+export const CRAZY_MODES = SIN_BOSSES[0].minigames;
 export const CAT_ACTIONS = Object.freeze(['heal', 'boss', 'player', 'blocks', 'mischief']);
 export function catAction(random = Math.random) {
   const roll = random();
   return roll < .25 ? 'heal' : roll < .45 ? 'boss' : roll < .60 ? 'player' : roll < .85 ? 'blocks' : 'mischief';
 }
 const HARD = new Set(['pinball', 'breakout', 'bbtan', 'sand', 'dodge']);
-const RECOVERY = ['cards', 'mahjong', 'slots'];
 const shuffled = (items, random) => {
   const out = [...items];
   for (let i = out.length - 1; i > 0; i--) { const j = Math.floor(random() * (i + 1)); [out[i], out[j]] = [out[j], out[i]]; }
@@ -35,18 +41,23 @@ export function pachinkoBins(random = Math.random) {
 export function crazyRoundDuration(mode, form, phase, random = Math.random) {
   return mode === 'pusher' ? (10 + Math.floor(random() * 11)) * 1000 : (form === 2 ? 18000 : 22000) - phase * 2000;
 }
-export function createCrazy({ random = Math.random, boss = FIRST_BOSS, difficulty = 'hard' } = {}) {
+export function createCrazy({ random = Math.random, boss = FIRST_BOSS, difficulty = 'hard', sin = 'greed' } = {}) {
+  const config = SIN_BOSSES.find(config => config.id === sin && config.developed);
+  if (!config) throw new RangeError(`Undeveloped sin: ${sin}`);
+  if (sin === 'pride' && boss === FIRST_BOSS) boss = PRIDE_BOSS;
+  const arcadeModes = sin === 'pride' ? shuffled(config.arcadePool, random).slice(0, 2) : [];
   const bridge = createGame({ mode: 'marathon', random });
   startGame(bridge, 'marathon');
   const state = {
-    random, boss, difficulty: difficulty === 'normal' ? 'normal' : 'hard', hp: 100, maxHp: 100, vaultStarted: false, vaultCleared: false, vaultLocked: false, vaultRetry: null, bossHp: boss.hp, bossMaxHp: boss.hp, form: 1, phase: 1, cutscene: null, rewardCharge: 0, pusherDue: false,
+    random, boss, config, arcadeModes, difficulty: difficulty === 'normal' ? 'normal' : 'hard', hp: 100, maxHp: 100, vaultStarted: false, vaultCleared: false, vaultLocked: false, vaultRetry: null, bossHp: boss.hp, bossMaxHp: boss.hp, form: 1, phase: 1, cutscene: null, rewardCharge: 0, pusherDue: false,
     stats: { hits: 0, damage: 0, damageTaken: 0, healed: 0, counters: 0, coins: 0, firstTime: 0, secondTime: 0 }, score: 0, elapsed: 0,
     over: false, won: false, damageLeft: 50, mode: 'bridge', encounter: 0, bag: [], hardStreak: 0,
     bridge, parkedPiece: null, curses: { reverse: 0, blind: 0, rush: 0, norotate: 0 }, arcade: null, mini: null, held: new Set(), actionReady: true,
-    timeLeft: 20000, duration: 20000, protection: 500, cooldown: 0, fallMs: 0, lockMs: 0, repeatMs: 0, horizontalMs: 0, horizontalDir: 0, horizontalRepeating: false, horizontalSource: 'keyboard',
+    timeLeft: sin === 'pride' ? 15000 : 20000, duration: sin === 'pride' ? 15000 : 20000, protection: 500, cooldown: 0, fallMs: 0, lockMs: 0, repeatMs: 0, horizontalMs: 0, horizontalDir: 0, horizontalRepeating: false, horizontalSource: 'keyboard',
     resolveMs: 0, successes: 0, events: [], hitFlash: 0, cat: null, catDue: 9000, catBlock: 0,
     transition: null, notice: 'crazyOpening', noticeTime: 3500, attack: null, attackDone: false,
   };
+  if (sin === 'pride') state.cutscene = { kind: 'intro', time: 0, duration: 3000 };
   return state;
 }
 
@@ -56,7 +67,7 @@ function notify(s, key, amount = 0) {
 }
 function casinoSound(s, key, amount = 0) { s.events.push({ key, amount }); }
 export function hurtCrazy(s, amount, reason = 'crazyHurt') {
-  if (s.over || s.cutscene || s.protection > 0 || s.mode === 'pusher') return false;
+  if (s.over || s.cutscene || s.mode === 'pride-mirror-duel' || s.protection > 0 || s.mode === 'pusher') return false;
   s.stats.damageTaken += Math.min(s.hp, amount);
   s.hp = Math.max(0, s.hp - amount); s.protection = 650; s.hitFlash = 300;
   notify(s, reason, -amount);
@@ -64,18 +75,21 @@ export function hurtCrazy(s, amount, reason = 'crazyHurt') {
   return true;
 }
 export function healCrazy(s, amount) {
-  if (s.over || s.mode === 'vault' || amount <= 0) return;
+  if (s.over || (s.mode === 'vault' || s.mode === 'pride-mirror-duel') || amount <= 0) return;
   const gained = Math.min(Math.max(1, s.difficulty === 'normal' ? Math.round(amount) : Math.floor(amount / 2)), s.maxHp - s.hp);
   s.hp += gained; s.stats.healed += gained;
   if (gained) notify(s, 'crazyHeal', gained);
 }
 export function hitCrazyBoss(s, amount) {
-  if (s.over || s.cutscene) return;
+  if (s.over || s.cutscene || s.mode === PRIDE_ESCAPE_ID) return;
+  if (s.prideDuelLocked) return;
+  const secondPride = s.config.id === 'pride' && s.form === 2;
+  if (secondPride && s.mirrorWorld.puzzlePending) return;
   if (s.vaultLocked) {
     if (s.attack) { s.attack = null; notify(s, 'crazyCounter'); }
     return;
   }
-  const floor = s.form === 2 && !s.vaultCleared ? s.bossMaxHp * .2 : 0;
+  const floor = secondPride ? (!s.mirrorWorld.puzzleCleared ? s.bossMaxHp*.5 : !s.mirrorWorld.redCleared ? s.bossMaxHp*.15 : 0) : ((s.config.id === 'pride' && !s.prideDuelCleared) || (s.config.id !== 'pride' && s.form === 2 && !s.vaultCleared)) ? s.bossMaxHp * .2 : 0;
   const damage = Math.min(amount, s.damageLeft, Math.max(0, s.bossHp - floor));
   s.damageLeft -= damage;
   s.bossHp -= damage;
@@ -84,13 +98,30 @@ export function hitCrazyBoss(s, amount) {
   if (s.attack) { s.attack = null; notify(s, 'crazyCounter'); }
   s.score += damage * 10; s.successes += 1;
   const phase = s.bossHp <= s.bossMaxHp / 3 ? 3 : s.bossHp <= s.bossMaxHp * 2 / 3 ? 2 : 1;
-  if (phase > s.phase) { s.phase = phase; healCrazy(s, 12); notify(s, 'crazyPhase', phase); }
+  if (phase > s.phase) { s.phase = phase; healCrazy(s, s.config.id === 'pride' && s.difficulty === 'hard' ? 10 : 12); notify(s, 'crazyPhase', phase); }
   else notify(s, damage ? 'crazyHit' : 'crazyGuard', damage);
-  if (s.form === 2 && !s.vaultCleared && !s.vaultStarted && s.bossHp <= s.bossMaxHp * .2) {
+  if (s.config.id === 'pride' && s.form === 1 && s.bossHp <= s.bossMaxHp * .2) {
+    if (PRIDE_MINIGAMES[s.mode] && s.mini.status === 'playing') return;
+    if (s.mode === 'sand') leaveSand(s);
+    startPrideFinisher(s); s.actionReady = true; s.transition = null; return;
+  }
+  if (s.config.id !== 'pride' && s.form === 2 && !s.vaultCleared && !s.vaultStarted && s.bossHp <= s.bossMaxHp * .2) {
     s.vaultStarted = true; s.vaultLocked = true; enterCrazyVault(s); return;
+  }
+  if (secondPride && PRIDE_SECOND_GAMES.includes(s.mode) && !s.mini.finished) return;
+  if (secondPride) {
+    prideSecondThresholds(s);
+    const w = s.mirrorWorld;
+    if (!w.puzzleCleared && s.bossHp <= s.bossMaxHp * .5) { w.puzzlePending = true; advanceCrazy(s, 'pride-tower'); return; }
+    if (w.red && !w.redEntered && s.bossHp > 0) { w.redEntered = true; s.bag = []; advanceCrazy(s, 'pride-red-survival'); return; }
   }
   if (s.bossHp === 0) {
     s.held.clear(); s.attack = null;
+    if (secondPride) {
+      for(let i=0;i<3;i++)breakPrideMirror(s,i,{story:true});
+      s.stats.secondTime=s.elapsed-s.stats.firstTime; s.escapePending=true;
+      s.cat=null; s.cutscene={kind:'mirror-defeat',time:0,duration:4000}; return;
+    }
     if (s.form === 1 && s.boss.secondHp) {
       s.stats.firstTime = s.elapsed; s.cutscene = { kind: 'transform', time: 0, duration: 4500 }; notify(s, 'crazyTransform');
     } else {
@@ -101,13 +132,39 @@ export function hitCrazyBoss(s, amount) {
   }
 }
 
+export function startPrideEscape(s) {
+ leaveSand(s);s.mode=PRIDE_ESCAPE_ID;s.mini=createPrideEscape({difficulty:s.difficulty,random:s.random});
+ s.duration=s.timeLeft=s.mini.timeLeft;s.over=false;s.won=false;s.held.clear();s.attack=null;s.cat=null;
+ s.transition=null;s.actionReady=true;s.escapePending=false;
+}
+export function finishPrideEscape(s, success) {
+ const game=s.mini;if(s.mode!==PRIDE_ESCAPE_ID||s.over||s.cutscene)return;
+ s.held.clear();s.attack=null;s.cat=null;s.score+=game.score;
+ if(success){s.escaped=true;s.over=true;s.won=true;s.score+=5000+s.hp*50;s.cutscene={kind:'victory',time:0,duration:5000};notify(s,'crazyVictorySound');return;}
+ s.escapeFailures=(s.escapeFailures||0)+1;s.boss={...s.boss,limit:s.boss.limit+game.elapsed};
+ s.bossHp=s.bossMaxHp*.15;s.mirrorWorld.red=true;s.mirrorWorld.redEntered=true;s.mirrorWorld.redCleared=false;s.mirrorWorld.puzzleCleared=true;
+ s.mirrorWorld.mirrors.forEach((v,i)=>{v.broken=i!==0;v.hp=i===0?120:0;});
+ s.mirrorWorld.selected=0;s.mirrorWorld.mirrors[0].x=140;s.bag=[];s.mode='bridge';s.phase=3;advanceCrazy(s,'pride-red-survival');
+ s.mini.feedback='未逃到 100 層 · 紅鏡復甦';s.transition=null;s.actionReady=true;
+}
+
 export function skipCrazyCinematic(s) {
   if (!s.cutscene || s.cutscene.time < 1000) return false;
   finishCinematic(s); return true;
 }
 function finishCinematic(s) {
   const kind = s.cutscene.kind; s.cutscene = null; s.held.clear();
+  if (kind === 'king-defeat') { s.cutscene={kind:'transform',time:0,duration:3500}; return; }
+  if (kind === 'mirror-defeat') { s.cutscene={kind:'tower-collapse',time:0,duration:3500}; return; }
+  if (kind === 'tower-collapse') { startPrideEscape(s); return; }
   if (kind === 'transform') {
+    if (s.config.id === 'pride') {
+      leaveSand(s); s.form = 2; s.bossMaxHp = s.bossHp = s.boss.secondHp ?? PRIDE_SECOND_RULES[s.difficulty]; s.phase = 1; s.bag = []; s.encounter = 0;
+      // Leave the completed duel before scheduling a normal round: the duel
+      // guard in advanceCrazy must still protect active, unfinished duels.
+      s.mode = 'bridge'; s.mini = null;
+      initPrideSecond(s); healCrazy(s, s.difficulty === 'hard' ? 18 : 20); advanceCrazy(s, 'bridge'); return;
+    }
     leaveSand(s); s.form = 2; s.bossMaxHp = s.boss.secondHp; s.bossHp = s.bossMaxHp; s.phase = 1;
     s.bag = []; s.pusherDue = false; s.rewardCharge = 0;
     for (const key of Object.keys(s.curses)) s.curses[key] = 0;
@@ -116,12 +173,23 @@ function finishCinematic(s) {
 }
 function nextMode(s) {
   if (s.encounter % 3 === 0) return 'bridge';
-  if (!s.bag.length) s.bag = shuffled(s.form === 2 ? [...CRAZY_MODES, ...GREED_ATTACKS] : CRAZY_MODES, s.random);
-  let index = s.form === 2 && s.encounter % 3 === 1 ? s.bag.findIndex(m => GREED_ATTACKS.includes(m) && m !== s.mode) : -1;
-  if (index < 0) index = s.bag.findIndex(m => m !== s.mode && (s.hardStreak < 2 || RECOVERY.includes(m)));
+  if (s.config.id === 'pride' && s.form === 2) {
+    if (!s.bag.length) s.bag = shuffled(s.mirrorWorld.red ? (s.mirrorWorld.redCleared?['pride-gaze-up','pride-crown-up','pride-reflect-up']:['pride-red-survival','pride-gaze-up','pride-crown-up']) : [...PRIDE_SECOND_ATTACKS, ...PRIDE_ROTATING_GAMES], s.random);
+    const index = s.bag.findIndex(mode => mode !== s.mode);
+    return s.bag.splice(Math.max(0, index), 1)[0];
+  }
+  const { minigames, attacks, recovery } = s.config;
+  if (s.config.id === 'pride') {
+    if (!s.bag.length) s.bag = shuffled([...minigames, ...attacks, ...s.arcadeModes], s.random);
+    const index = s.bag.findIndex(mode => mode !== s.mode);
+    return s.bag.splice(Math.max(0, index), 1)[0];
+  }
+  if (!s.bag.length) s.bag = shuffled(s.form === 2 ? [...minigames, ...attacks] : minigames, s.random);
+  let index = s.form === 2 && s.encounter % 3 === 1 ? s.bag.findIndex(m => attacks.includes(m) && m !== s.mode) : -1;
+  if (index < 0) index = s.bag.findIndex(m => m !== s.mode && (s.hardStreak < 2 || recovery.includes(m)));
   if (index < 0) {
     // Insert a recovery encounter without discarding the rest of the shuffled deck.
-    return RECOVERY.find(m => m !== s.mode) || 'cards';
+    return recovery.find(m => m !== s.mode) || minigames[0];
   }
   return s.bag.splice(index, 1)[0];
 }
@@ -152,8 +220,9 @@ function leaveSand(s) {
 }
 export function advanceCrazy(s, preferredMode = null) {
   if (s.over || s.cutscene) return;
-  if (s.mode === 'vault') return;
+  if (s.mode === 'vault' || s.mode === 'pride-mirror-duel') return;
   if (s.mode === 'sand') leaveSand(s);
+  if (s.config.id === 'pride' && s.form === 2 && s.mirrorWorld?.puzzlePending && preferredMode !== 'pride-tower') return;
   const from = s.mode;
   const bonus = preferredMode === 'pusher' || (!preferredMode && s.pusherDue);
   if (!bonus) s.encounter += 1;
@@ -161,12 +230,14 @@ export function advanceCrazy(s, preferredMode = null) {
   if (bonus) s.pusherDue = false;
   s.transition = { from, to: s.mode, time: 0 };
   s.hardStreak = HARD.has(s.mode) ? s.hardStreak + 1 : 0;
-  s.duration = crazyRoundDuration(s.mode, s.form, s.phase, s.random);
+  const roundDuration = crazyRoundDuration(s.mode, s.form, s.phase, s.random);
+  s.duration = s.config.id === 'pride' && PRIDE_ATTACKS.includes(s.mode) ? Math.min(14000,roundDuration) : roundDuration;
+  if(s.config.id === 'pride' && !PRIDE_ATTACKS.includes(s.mode) && !PRIDE_SECOND_ATTACKS.includes(s.mode)) s.duration *= .75;
   s.damageLeft = (s.form === 2 ? 80 : 45) + s.phase * 5;
   s.timeLeft = s.duration; s.protection = 500; s.held.clear(); s.actionReady = false;
   s.cooldown = 0; s.fallMs = 0; s.lockMs = 0; s.repeatMs = 0; s.horizontalMs = 0; s.horizontalDir = 0; s.horizontalRepeating = false; s.horizontalSource = 'keyboard'; s.resolveMs = 0;
   s.successes = 0; s.arcade = null; s.mini = null; s.cat = null; s.catBlock = 0; s.attack = null; s.attackDone = false;
-  s.catDue = Math.min(8000, s.duration / 2);
+  s.catDue = Math.min(8000, roundDuration / 2);
   if (s.mode === 'bridge' || s.mode === 'sand') {
     if (s.mode === 'sand') {
       beginSand(s.bridge, Infinity);
@@ -190,6 +261,13 @@ export function advanceCrazy(s, preferredMode = null) {
     s.mini = { x: 140, y: 400, target: null, hazards: [], wave: 0, spawn: 850, survival: 0, dash: 0, dashReady: 0, lastX: 0, lastY: -1 };
   } else if (GREED_ATTACKS.includes(s.mode)) { s.mini = createReaction(s.mode); }
   else if (s.mode === 'pusher') { s.mini = createPusher(s.random, s.duration); }
+  else if (s.form === 2 && PRIDE_SECOND_MODES.includes(s.mode)) { s.mini = createPrideSecondRound(s); s.duration = s.timeLeft = s.mini.duration; s.damageLeft = Infinity; s.catDue = Math.min(8000, s.duration / 2); }
+  else if (PRIDE_ATTACKS.includes(s.mode)) s.mini = createPrideAttack(s.mode, { difficulty: s.difficulty, bossHpRatio: s.bossHp / s.bossMaxHp });
+  else if (PRIDE_MINIGAMES[s.mode]) {
+    s.mini = PRIDE_MINIGAMES[s.mode].init({ difficulty: s.difficulty, random: s.random, bossHpRatio: s.bossHp / s.bossMaxHp });
+    s.duration = s.timeLeft = s.mini.timeLeft;
+    if(s.mini.held)s.mini.held=s.held;
+  }
   else deal(s);
   notify(s, 'crazySwitch');
 }
@@ -282,7 +360,12 @@ export function inputCrazy(s, action, down = true, source = 'keyboard') {
     if (action === 'up' || action === 'action') s.mini.jumpBuffer = 120;
     return;
   }
+  if (s.mode === 'pride-mirror-duel') { mirrorDuelInput(s.mini, action); return; }
+  if(s.mode===PRIDE_ESCAPE_ID){prideEscapeInput(s.mini,action);return;}
   if (action === 'action' && !s.actionReady) return;
+  if (s.form === 2 && PRIDE_SECOND_MODES.includes(s.mode)) { prideSecondInput(s, action); return; }
+  if (PRIDE_ATTACKS.includes(s.mode)) { prideInput(s, action); return; }
+  if (PRIDE_MINIGAMES[s.mode]) { PRIDE_MINIGAMES[s.mode].input(s.mini, action); return; }
   if (s.arcade) {
     if (action === 'left' || action === 'right') { s.arcade[action] = true; if (s.mode === 'pinball') notify(s, 'crazyFlipperSound'); }
     if (action === 'action') { s.arcade.fire = true; if (s.arcade.aiming || !s.arcade.launched) notify(s, 'crazyLaunchSound'); }
@@ -304,7 +387,12 @@ export function inputCrazy(s, action, down = true, source = 'keyboard') {
 
 // All mini-game hit regions use the same logical 280 x 560 coordinates as the renderer.
 export function pointCrazy(s, x, y) {
+  if(s.mode===PRIDE_ESCAPE_ID){if(!s.over&&!s.cutscene)prideEscapePoint(s.mini,x);return;}
   if (s.over || s.cutscene || !s.actionReady || s.catBlock > 0) return;
+  if (s.mode === 'pride-mirror-duel') { mirrorDuelPoint(s.mini, x, y); return; }
+  if (s.form === 2 && PRIDE_SECOND_MODES.includes(s.mode)) { prideSecondPoint(s, x, y); return; }
+  if (PRIDE_ATTACKS.includes(s.mode)) { pridePoint(s, x, y); return; }
+  if (PRIDE_MINIGAMES[s.mode]) { PRIDE_MINIGAMES[s.mode].point(s.mini, x, y); return; }
   if (s.mode === 'vault') { vaultPoint(s.mini, x, y); return; }
   if (GREED_ATTACKS.includes(s.mode)) { reactionPoint(s, x, y); return; }
   if (s.mode === 'pusher') { s.mini.aim = Math.max(30, Math.min(250, x)); return; }
@@ -413,12 +501,13 @@ function updateBridge(s, dt) {
     }
     if (step?.type === 'clear') {
       hitCrazyBoss(s, ((step.sand ? 12 : 16 * step.rows.length) + Math.min(12, step.combo * 2)) * (feverActive(g) ? 3 : 1));
-      if (step.combo >= 2) healCrazy(s, 2);
+      if (s.config.id === 'pride') healCrazy(s, Math.min(8, 2 + (step.rows?.length || 1) * 2));
+      else if (step.combo >= 2) healCrazy(s, 2);
       if (feverActive(g)) for (const key of Object.keys(s.curses)) s.curses[key] = 0;
       else for (const cell of penaltyCells(step.cells)) if (cell.curse in s.curses) s.curses[cell.curse] = cell.curse === 'blind' ? 5000 : 20000;
     }
     if (step?.type === 'flip') flipGrid(g);
-    if (step?.type === 'reward') { advanceCrazy(s, step.reward); return; }
+    if (step?.type === 'reward' && s.config.id === 'greed') { advanceCrazy(s, step.reward); return; }
     if (step?.type === 'over') recoverBridge(s);
     return;
   }
@@ -508,6 +597,7 @@ function updateCat(s, dt) {
   s.catBlock = Math.max(0, s.catBlock - dt);
   if (!s.cat && s.catDue <= 0) {
     let action = catAction(s.random);
+    if (s.config.id === 'pride' && s.difficulty === 'normal' && s.hp <= 40) action = 'heal';
     if (s.mode === 'pusher' && action === 'player') action = 'heal';
     // There are no bricks to smash in the card/slot mini-games.
     if (action === 'blocks' && !s.arcade && !['bridge', 'sand'].includes(s.mode)) action = 'boss';
@@ -527,11 +617,18 @@ function updateCat(s, dt) {
     } else if (s.cat.action === 'blocks') { if (!catSmashBlocks(s)) catMischief(s); }
     else catMischief(s);
   }
-  if (s.mode === 'vault') return;
+  if (s.mode === 'vault' || s.mode === 'pride-mirror-duel') return;
   if (s.cat.time >= 2400) { s.cat = null; s.catDue = 10000 - s.phase * 1000; }
 }
 
 const reactionApi = { hurt: hurtCrazy, hit: hitCrazyBoss, heal: healCrazy, emit: notify, advance: advanceCrazy };
+// Earned recovery checkpoints belong to the current minigame, so changing
+// rounds cannot pay the same score / floor twice. Hard uses its usual 50% amount.
+function prideRecovery(s, mini, marks, amount = 4) {
+  if (s.config.id !== 'pride' || !mini) return;
+  const previous = mini.recoveryMarks || 0;
+  if (marks > previous) { mini.recoveryMarks = marks; healCrazy(s, (marks - previous) * amount); }
+}
 export function updateCrazy(s, elapsed) {
   const dt = Math.max(0, Math.min(50, elapsed));
   if (s.cutscene) {
@@ -540,6 +637,31 @@ export function updateCrazy(s, elapsed) {
     return s;
   }
   if (s.over) return s;
+  if(s.mode===PRIDE_ESCAPE_ID){
+    s.elapsed+=dt; updatePrideEscape(s.mini,dt,s.held);s.timeLeft=s.mini.timeLeft;
+    if(s.mini.healQueue){healCrazy(s,s.mini.healQueue);s.mini.healQueue=0;}
+    if(s.mini.status!=='playing')finishPrideEscape(s,s.mini.status==='won');
+    return s;
+  }
+  if (s.config.id === 'pride') {
+    if (retryPrideFinisher(s, dt)) { s.actionReady = true; s.transition = null; return s; }
+    if (s.mode === 'pride-mirror-duel') {
+      s.transition = null;
+      const result = updateMirrorDuel(s.mini, dt, s.held);
+      s.timeLeft = s.mini.timeLeft;
+      if (result) {
+        const remaining = s.bossHp;
+        finishPrideFinisher(s, result);
+        if (result === 'success') {
+          s.stats.hits++; s.stats.damage += remaining; s.stats.firstTime = s.elapsed;
+          s.score += remaining * 10; s.over = false; s.won = false;
+          s.cutscene = { kind: 'king-defeat', time: 0, duration: 3500 }; notify(s, 'crazyVictorySound');
+        } else if (!s.over) { advanceCrazy(s, 'bridge'); s.actionReady = true; s.transition = null; }
+        else s.finishReason = 'prideDuelFailed';
+      }
+      return s;
+    }
+  }
   if (s.vaultRetry != null && s.mode !== 'vault') {
     s.vaultRetry -= dt;
     if (s.vaultRetry <= 0) { s.elapsed += dt; enterCrazyVault(s); return s; }
@@ -562,15 +684,41 @@ export function updateCrazy(s, elapsed) {
     else if (s.mode === 'cards' || (s.mode === 'mahjong' && s.mini.removed.length === 6)) deal(s);
     else if (s.mode === 'mahjong') s.mini.selected = [];
   }
-  if (s.mode !== 'pusher' && !s.attackDone && s.duration - s.timeLeft >= 4500 && !s.cat) {
+  const ownPrideAttack=s.config.id==='pride'&&(PRIDE_ATTACKS.includes(s.mode)||PRIDE_SECOND_MODES.includes(s.mode));
+  if (s.mode !== 'pusher' && !ownPrideAttack && !s.attackDone && s.duration - s.timeLeft >= 4500 && !s.cat) {
     s.attackDone = true; s.attack = { time: 3500 }; notify(s, 'crazyAttackWarning');
   }
   if (s.attack) {
     s.attack.time -= dt;
     if (s.attack.time <= 0) { s.attack = null; hurtCrazy(s, 4 + s.phase * 2, 'crazyBossAttack'); }
   }
+  if (s.config.id === 'pride' && s.elapsed >= s.boss.limit) { s.hp = 0; s.over = true; s.finishReason = 'crazyTimeout'; return s; }
   updateCat(s, dt);
-  if (s.mode === 'vault') return s;
+  if (s.over || s.cutscene || s.mode === 'pride-mirror-duel') return s;
+  if (s.form === 2 && PRIDE_SECOND_MODES.includes(s.mode)) {
+    const mode = s.mode, mini = s.mini, w = s.mirrorWorld;
+    updatePrideSecond(s, dt, reactionApi);
+    if (PRIDE_SECOND_GAMES.includes(mode)) { const gain = mini.score - (mini.appliedScore || 0); if (gain > 0) { s.score += gain; mini.appliedScore = mini.score; } }
+    if (s.over || s.cutscene || s.mode !== mode) return s;
+    if (mode === 'pride-tower') prideRecovery(s, mini, Math.floor(mini.floors / 3), 5);
+    else if (PRIDE_SECOND_GAMES.includes(mode)) prideRecovery(s, mini, Math.floor((mini.score || 0) / 200));
+    if (mode === 'pride-tower' && w.puzzlePending && (mini.finished || mini.failed || s.timeLeft <= 0)) {
+      w.puzzlePending = false;
+      if (mini.finished) { w.puzzleCleared = true; breakPrideMirror(s,1,{story:true}); healCrazy(s,s.difficulty==='normal'?12:8); prideSecondThresholds(s); }
+      else { w.mirrors[1].hp=120; s.bossHp = Math.max(s.bossHp, Math.ceil(s.bossMaxHp * .6)); s.protection = 0; hurtCrazy(s, 40 + Math.floor(s.random() * 21), 'pridePuzzleFailed'); }
+      if(s.mode === mode && !s.over) advanceCrazy(s); return s;
+    }
+    if (mode === 'pride-red-survival') {
+      const gain = mini.score - (mini.appliedScore || 0); if(gain>0){s.score+=gain;mini.appliedScore=mini.score;prideRecovery(s,mini,Math.floor(mini.score/300));}
+      if(mini.finished && !s.over){w.redCleared=true;s.bag=[];advanceCrazy(s,'bridge');notify(s,'prideRedUnlocked');}
+      return s;
+    }
+    if (PRIDE_SECOND_GAMES.includes(mode) && mini.finished) { healCrazy(s,s.difficulty==='normal'?12:8); hitCrazyBoss(s, 30); if(s.mode === mode && !s.over) advanceCrazy(s); return s; }
+    if (PRIDE_SECOND_GAMES.includes(mode) && mini.failed) { hurtCrazy(s, 8, 'crazyTimeoutRound'); if(!s.over) advanceCrazy(s); return s; }
+    if (s.timeLeft <= 0) { healCrazy(s,s.difficulty==='normal'?8:4); if (UPGRADED_BASES[mode]) hitCrazyBoss(s, 24); if (s.mode === mode && !s.cutscene && !s.over) advanceCrazy(s); }
+    return s;
+  }
+  if (s.mode === 'vault' || s.mode === 'pride-mirror-duel') return s;
   if (s.mode === 'bridge' || s.mode === 'sand') updateBridge(s, dt);
   else if (s.arcade) {
     const cleared = s.arcade.cleared;
@@ -586,12 +734,29 @@ export function updateCrazy(s, elapsed) {
     }
     const hits = s.arcade.cleared - cleared;
     if (hits) hitCrazyBoss(s, hits * 4);
-    if (s.mode === 'vault') return s;
+    if (s.mode === 'vault' || s.mode === 'pride-mirror-duel') return s;
     if (s.arcade.over) {
       if (s.arcade.full) { hitCrazyBoss(s, 30); healCrazy(s, 6); }
       else hurtCrazy(s, 12, 'crazyBallLost');
       advanceCrazy(s);
     }
+  } else if (PRIDE_MINIGAMES[s.mode]) {
+    const game = PRIDE_MINIGAMES[s.mode], mini = s.mini;
+    game.update(mini, dt); s.timeLeft = mini.timeLeft;
+    const loss = 100 - mini.hp - (mini.appliedDamage || 0);
+    if (loss > 0) { hurtCrazy(s, loss, 'prideWrongCrown'); mini.appliedDamage = 100 - mini.hp; }
+    const gain = mini.score - (mini.appliedScore || 0);
+    if (gain > 0) { mini.appliedScore = mini.score; s.score += gain; prideRecovery(s, mini, Math.floor(mini.score / 200)); hitCrazyBoss(s, gain / 10); }
+    if (s.mode === 'pride-mirror-duel' || s.over) return s;
+    if (mini.status !== 'playing') {
+      if (mini.status === 'won') { healCrazy(s, s.difficulty === 'normal' ? 16 : 10); hitCrazyBoss(s, 20); }
+      else hurtCrazy(s, 8, 'crazyTimeoutRound');
+      game.dispose(mini); advanceCrazy(s); return s;
+    }
+  } else if (PRIDE_ATTACKS.includes(s.mode)) {
+    updatePrideAttack(s, dt, reactionApi);
+    if (s.mode === 'pride-mirror-duel' || s.over) return s;
+    if (s.timeLeft <= 0) { healCrazy(s,s.difficulty==='normal'?8:4); hitCrazyBoss(s, 24); if (s.mode !== 'pride-mirror-duel') advanceCrazy(s); return s; }
   } else if (s.mode === 'pachinko') updatePachinko(s, dt);
   else if (s.mode === 'tiger') updateTiger(s, dt);
   else if (s.mode === 'slots' && s.mini.stop < 3) {
@@ -602,8 +767,8 @@ export function updateCrazy(s, elapsed) {
   else if (s.mode === 'dodge') updateDodge(s, dt);
   else if (GREED_ATTACKS.includes(s.mode)) updateReaction(s, dt, reactionApi);
   else if (s.mode === 'pusher') { updatePusher(s, dt, reactionApi); return s; }
-  if (s.mode === 'vault') return s;
-  if (s.mini?.clock != null) s.mini.clock += dt;
+  if (s.mode === 'vault' || s.mode === 'pride-mirror-duel') return s;
+  if (s.mini?.clock != null && !PRIDE_ATTACKS.includes(s.mode)) s.mini.clock += dt;
   if (s.cutscene) return s;
   if (s.elapsed >= s.boss.limit && !s.over) {
     s.hp = 0; s.over = true; s.finishReason = 'crazyTimeout'; notify(s, 'crazyTimeout');

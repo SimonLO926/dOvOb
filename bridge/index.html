@@ -4,13 +4,33 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
-  <link rel="preload" href="./assets/mischief-cat.png?v=1.2.24" as="image">
-  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.24" as="font" type="font/woff" crossorigin>
+  <link rel="preload" type="image/webp" href="./assets/mischief-cat.webp?v=1.2.25" as="image">
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.25" as="font" type="font/woff" crossorigin>
   <style>
+    #pride-preview { position: fixed; inset: 0; z-index: 160; display: flex; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; background: linear-gradient(#160b29bb, #160b29ed), url('./assets/pride-palace.webp') center / cover; }
+    .pride-preview-card { flex: none; width: min(440px, 100%); margin: auto; padding: 28px; border: 1px solid #dabb78; border-radius: 24px; text-align: left; color: #f8edda; background: #241833ed; box-shadow: 0 18px 60px #0007; }
+    .pride-preview-card small { color: #dfc181; letter-spacing: .12em; font-size: 13px; }
+    .pride-preview-card h1 { margin: 8px 0; font-size: clamp(30px, 7vw, 42px); }
+    .pride-preview-card p { margin: 8px 0 20px; font-size: 15px; }
+    .pride-preview-card label { display: grid; gap: 8px; margin: 16px 0; font-size: 15px; }
+    .pride-preview-card select { appearance: auto; padding: 12px; font: inherit; color: #f8edda; background: #362443; border: 1px solid #967647; border-radius: 10px; }
+    .pride-preview-card option, .pride-preview-card optgroup { color: #f8edda; background: #362443; }
+    #pride-preview-start { width: 100%; margin-top: 6px; padding: 14px; color: #201428; background: #e8cb88; font-size: 20px; border-radius: 12px; }
+    .pride-preview-card .pride-preview-note { margin: 16px 0 0; font-size: 12px; color: #cbbfd5; }
+    @media (max-height: 520px) {
+      .pride-preview-card { width: min(640px, 100%); display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; padding: 18px; }
+      .pride-preview-card small, .pride-preview-card h1, .pride-preview-card p, #pride-preview-start { grid-column: 1 / -1; }
+      .pride-preview-card h1 { margin: 4px 0; font-size: 28px; }
+      .pride-preview-card p { margin: 4px 0 8px; font-size: 13px; }
+      .pride-preview-card label { margin: 8px 0; font-size: 13px; }
+      .pride-preview-card select { padding: 8px; }
+      #pride-preview-start { margin: 0; padding: 10px; font-size: 18px; }
+      .pride-preview-card .pride-preview-note { margin: 8px 0 0; font-size: 11px; }
+    }
     /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
     @font-face {
       font-family: "Fever Brush";
-      src: url("./fonts/fever-brush.woff?v=1.2.24") format("woff");
+      src: url("./fonts/fever-brush.woff?v=1.2.25") format("woff");
       font-weight: 400;
       font-display: swap;
     }
@@ -990,6 +1010,15 @@
     body.crazy-preview #crazy-ambient, body.crazy-active #crazy-ambient { display: block; }
     body.crazy-active[data-crazy-phase="2"] #crazy-ambient::after { box-shadow: inset 0 0 110px #ff284a88; }
     body.crazy-active[data-crazy-phase="3"] #crazy-ambient::after { box-shadow: inset 0 0 120px #ff793caa; }
+    body.crazy-active[data-crazy-sin="pride"] #crazy-ambient {
+      background: linear-gradient(#10091c55, #170f2c33), url('./assets/pride-palace.webp') center / cover;
+    }
+    body.crazy-active[data-crazy-sin="pride"] #crazy-ambient::before {
+      background: repeating-linear-gradient(90deg, transparent 0 12%, #d6b36e12 12% 12.3%, #79589816 12.3% 18%, transparent 18% 25%);
+      opacity: .3; animation: none;
+    }
+    body.crazy-active[data-crazy-sin="pride"] #crazy-ambient::after { box-shadow: inset 0 0 100px #9066bb44; }
+    body.crazy-active[data-crazy-sin="pride"] #crazy-ambient b { color: #d6b36e; opacity: .08; }
     body.crazy-preview .hero { background: none; }
     body.crazy-preview #hero3d { opacity: .12; }
     body.crazy-preview .hero-copy { background: #110b1cc9; border-radius: 24px; }
@@ -998,6 +1027,7 @@
     body.crazy-active .rail { display: none; }
     #crazy-boss-frame { display: none; position: absolute; top: 0; left: -50%; width: 200%; height: 100%; pointer-events: none; image-rendering: pixelated; }
     body.crazy-active #crazy-boss-frame { display: block; }
+    body.crazy-active[data-crazy-escape="true"] #crazy-boss-frame, body.crazy-active[data-crazy-escape="true"] #crazy-preview-cat, body.crazy-active[data-crazy-escape="true"] #crazy-ambient b { display: none; }
     #crazy-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     body.crazy-active #game { height: 100svh; max-height: 100svh; min-height: 0; }
     body.crazy-active #game .nav { flex: 0 0 40px; }
@@ -1007,7 +1037,31 @@
     html.touch body.crazy-active[data-crazy-controls="mini"] #game .pad, body.crazy-active[data-crazy-controls="mini"] #game .pad { margin-top: 12px; }
     body.crazy-active #game .pad #btn-rot-left { bottom: calc(100% + 6px); height: 44px; }
     @media (max-width: 760px) { body.crazy-active #game .pad { position: relative; left: auto; right: auto; bottom: auto; flex: 0 0 var(--pad-size); margin-top: 52px; } }
+    @media (orientation: landscape) and (max-height: 540px) {
+      html.touch body.crazy-active[data-crazy-sin="pride"] #game .stage { position: absolute; top: 48px; bottom: 8px; left: calc(var(--pad-size) + 24px); right: calc(var(--pad-size) + 24px); }
+      html.touch body.crazy-active[data-crazy-sin="pride"] #game .pad { position: absolute; left: 8px; right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); height: var(--pad-size); margin-top: 0; pointer-events: none; }
+      html.touch body.crazy-active[data-crazy-sin="pride"] #game .pad .hand { pointer-events: auto; }
+      html.touch body.crazy-active[data-crazy-sin="pride"] #crazy-help { position: absolute; top: 56px; left: 8px; width: calc(var(--pad-size) + 8px); margin: 0; padding: 8px; font-size: 11px; text-align: left; }
+    }
     @keyframes crazy-orbit { to { transform: rotate(360deg); } }
+    html.touch body.crazy-active[data-crazy-controls="rhythm"] #game .pad,
+    body.touch.crazy-active[data-crazy-controls="rhythm"] #game .pad { display: grid; grid-template-columns: repeat(3,1fr); grid-template-rows: 1fr; height: 96px; flex: 0 0 96px; margin-top: 12px; }
+    body.crazy-active[data-crazy-controls="rhythm"] #game .pad .hand { display: contents; }
+    body.crazy-active[data-crazy-controls="rhythm"] #game .pad #btn-left { grid-area: 1 / 1; }
+    body.crazy-active[data-crazy-controls="rhythm"] #game .pad #btn-drop { grid-area: 1 / 2; }
+    body.crazy-active[data-crazy-controls="rhythm"] #game .pad #btn-right { grid-area: 1 / 3; }
+    body.crazy-active[data-crazy-controls="rhythm"] #game .pad #btn-rot,
+    body.crazy-active[data-crazy-controls="rhythm"] #game .pad #btn-rot-left,
+    body.crazy-active[data-crazy-controls="rhythm"] #game .pad #btn-soft,
+    body.crazy-active[data-crazy-controls="rhythm"] #game .pad #btn-hold,
+    body.crazy-active[data-crazy-controls="rhythm"] #game .pad svg { display: none; }
+    body.crazy-active[data-crazy-controls="rhythm"] #game .pad #btn-left::after { content: '左'; font-size: 22px; }
+    body.crazy-active[data-crazy-controls="rhythm"] #game .pad #btn-right::after { content: '右'; font-size: 22px; }
+    body.crazy-active[data-crazy-controls="rhythm"] #game .pad .pad-label { font-size: 22px; }
+    body.crazy-active[data-crazy-controls="rhythm"] #game .pad button { pointer-events: auto; }
+    @media (orientation: landscape) and (max-height: 540px) {
+      html.touch body.crazy-active[data-crazy-controls="rhythm"] #game .pad { left: auto; right: 8px; width: calc(var(--pad-size) + 8px); margin-top: 0; }
+    }
     @keyframes crazy-pressure { from { opacity: .4; } to { opacity: 1; } }
     @keyframes crazy-drift { from { translate: 0 -4px; } to { translate: 0 6px; } }
     @media (prefers-reduced-motion: reduce) {
@@ -1067,6 +1121,10 @@
     .result-stats div { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; line-height: 2; }
     .result-stats b { color: #ffe09a; }
     .result-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: auto; padding-top: 32px; }
+    #crazy-result[data-sin="pride"] { background: #150e25; }
+    #crazy-result[data-sin="pride"] .result-content { background: linear-gradient(#190d29e8, #190d29aa 40%, #190d2933 80%); }
+    #crazy-result[data-sin="pride"] .result-stats { border-color: #d6b36e; background: #241733df; }
+    #crazy-result[data-sin="pride"] h1 { text-shadow: 3px 3px #623577; }
     .result-buttons button { background: #3d223c; color: #ffe9ba; border: 1px solid #bd8451; }
     @media (max-width: 700px) {
       #bosses { padding: 18px 16px; }
@@ -1251,8 +1309,8 @@
           <button data-sin="wrath" type="button" disabled><svg class="sin-lock" viewBox="0 0 24 28" aria-hidden="true"><path d="M6 12 V8 A6 6 0 0 1 18 8 V12"/><rect x="3" y="12" width="18" height="14" rx="2"/><path d="M12 18 V22"/><circle cx="12" cy="18" r="1"/></svg><svg class="sin-emblem" hidden aria-hidden="true"><use href="#sin-icon-wrath"/></svg><span hidden data-i18n="sinWrath">Wrath</span><small hidden data-i18n="crazyLocked">Locked</small></button>
         </div>
         <div class="greed-preview">
-          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.png?v=1.2.24" alt="" aria-hidden="true">
-          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.png?v=1.2.24" alt="The Mad Dealer">
+          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.webp?v=1.2.25" onerror="this.onerror=null;this.hidden=true" alt="" aria-hidden="true">
+          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.webp?v=1.2.25" onerror="this.onerror=null;this.hidden=true" alt="The Mad Dealer">
           <div class="greed-caption"><h2 data-i18n="crazyDealer">The Mad Dealer</h2><p data-i18n="crazyGreedLore">The house wants everything. Challenge the dealer's greed.</p></div>
         </div>
       </div>
@@ -1584,7 +1642,7 @@
     <canvas id="cinematic-canvas" aria-hidden="true"></canvas><div class="cinematic-controls"><button id="cinematic-pause" type="button" data-i18n="paused">Pause</button><button id="cinematic-skip" type="button" data-i18n="crazySkip">Skip</button></div>
   </div>
   <div id="crazy-result" hidden role="dialog" aria-modal="true" aria-labelledby="result-title">
-    <img class="result-art" loading="lazy" src="./assets/greed-defeated.png?v=1.2.24" alt="Defeated Greed surrounded by spilled coins">
+    <img class="result-art" loading="lazy" src="./assets/greed-defeated.webp?v=1.2.25" onerror="this.onerror=null;this.hidden=true" alt="Defeated Greed surrounded by spilled coins">
     <div class="result-content"><small>GREED · CLEARED</small><h1 id="result-title" data-i18n="crazyGreedBroken">Greed defeated</h1><div class="result-score" id="result-score"></div><div class="result-stats" id="result-stats"></div><p data-i18n="crazyClearUnlock">Gilded Devourer silhouette unlocked</p><div class="result-buttons"><button id="result-retry" type="button" data-i18n="again">Again</button><button id="result-bosses" type="button" data-i18n="crazySevenSins">Seven Deadly Sins</button></div></div>
   </div>
   <div id="fever-aura" hidden aria-hidden="true">
@@ -1602,24 +1660,30 @@
     <i style="--x:83%;--y:97%;--delay:-1.87s"></i>
   </div>
   <script type="module">
-    import { BRIDGE_REPEAT } from "./bridge-controls.mjs?v=1.2.24";
-    import { sinProgress } from "./crazy-sins.mjs?v=1.2.24";
-    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.24";
-    import { drawCrazy, drawCrazyFrame, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.24";
-    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.24";
-    import { drawGreedCinematic, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.24";
-    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.24";
-    import { createSound, CASINO_EFFECTS } from "./audio.mjs?v=1.2.24";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.24";
-    import { translate } from "./i18n.mjs?v=1.2.24";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.24";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.24";
-    import { VERSION } from "./version.mjs?v=1.2.24";
+    import { createPridePreview, mountPridePreview, prideControls } from "./pride-preview.mjs?v=1.2.25";
+    import { BRIDGE_REPEAT } from "./bridge-controls.mjs?v=1.2.25";
+    import { sinProgress, crazyLeaderboardKey, recordSinClear } from "./crazy-sins.mjs?v=1.2.25";
+    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.25";
+    import { drawCrazy, drawCrazyFrame, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.25";
+    import { drawPrideCinematic, loadPrideArt } from "./pride-art.mjs";
+    import { PRIDE_ATTACKS } from "./pride-attacks.mjs";
+    import { PRIDE_SECOND_MODES } from "./pride-second.mjs";
+    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.25";
+    import { drawGreedCinematic, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.25";
+    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.25";
+    import { createSound, CASINO_EFFECTS } from "./audio.mjs?v=1.2.25";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.25";
+    import { translate } from "./i18n.mjs?v=1.2.25";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.25";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.25";
+    import { VERSION } from "./version.mjs?v=1.2.25";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SAND_HEX, SHAPES, activateFever, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.2.24";
+    } from "./logic.mjs?v=1.2.25";
 
+    const pridePreview = new URLSearchParams(location.search).get("preview") === "pride" || document.body.hasAttribute("data-pride-preview");
+    let previewScenario = "full", previewDifficulty = "normal", previewLauncher = null;
     const COLORS = {
       I: "#64d2ff", O: "#ffd60a", T: "#bf5af2", S: "#30d158", Z: "#ff453a",
       J: "#0a84ff", L: "#ff9f0a", B: "#8e8e93", X: "#5e5ce6", D: "#ff9f0a", R: "#ff375f", A: "#e7d3a1", F: "#ffbd2e", G: "#313842", N: "#68727d",
@@ -1771,7 +1835,7 @@
     }
 
     function bestKey() {
-      if (game.mode === "crazy") return (crazy?.difficulty || settings.crazyDifficulty) === "normal" ? "bridge-best-crazy-normal" : "bridge-best-crazy";
+      if (game.mode === "crazy") return crazyLeaderboardKey(crazy?.config.id, crazy?.difficulty || settings.crazyDifficulty);
       if (game.mode === "sprint") return "bridge-best-sprint";
       if (game.mode === "marathon" && game.paceName === "hard") return "bridge-best-marathon-hard";
       if (game.mode === "marathon" && game.paceName === "custom") return `bridge-best-marathon-custom-${paceOf(game)}`;
@@ -1793,6 +1857,7 @@
     }
 
     function remember(value) {
+      if (crazy?.preview) return [];
       const lower = game.mode === "sprint";
       const legacy = boardLegacy();
       const key = bestKey();
@@ -1845,6 +1910,7 @@
     }
 
     function showScreen(id) {
+      if (previewLauncher) { if (id === "menu") previewLauncher.show(); else previewLauncher.hide(); }
       document.body.classList.toggle("boss-select", id === "bosses");
       if (id !== "game") closeGameMenu(false);
       if (id !== "game") {
@@ -2079,6 +2145,7 @@
         button.disabled = !boss.unlocked;
         button.querySelector("span").hidden = !boss.unlocked;
         button.querySelector("small").hidden = !boss.unlocked;
+        if (boss.id === "pride") { button.querySelector("small").setAttribute("data-i18n", boss.unlocked ? "prideIntro" : "crazyLocked"); button.querySelector("small").textContent = boss.unlocked ? t("prideIntro") : t("crazyLocked"); }
         button.querySelector(".sin-emblem").hidden = !boss.unlocked;
         button.querySelector(".sin-lock").hidden = boss.unlocked;
         button.setAttribute("aria-label", t(boss.unlocked ? boss.label : "crazyLocked"));
@@ -2096,7 +2163,7 @@
       panel.hidden = !open;
       document.querySelector("#bosses .sins-layout").hidden = open;
       document.querySelector("#crazy-ranks-toggle").setAttribute("aria-expanded", String(open));
-      if (open) renderBoardGroups(document.querySelector("#crazy-board-card"), [[`Crazy · ${t("normal")}`, readBoard("bridge-best-crazy-normal"), String], [`Crazy · ${t("hard")}`, readBoard("bridge-best-crazy"), String]]);
+      if (open) renderBoardGroups(document.querySelector("#crazy-board-card"), ["greed", "pride"].flatMap(sin => ["normal", "hard"].map(difficulty => [`${t(sin === "greed" ? "crazyGreed" : "sinPride")} · ${t(difficulty)}`, readBoard(crazyLeaderboardKey(sin, difficulty)), String])));
     }
     document.querySelector("#crazy-ranks-toggle").addEventListener("click", () => toggleCrazyRanks(document.querySelector("#crazy-ranks").hidden));
     document.querySelector("#crazy-ranks-close").addEventListener("click", () => {
@@ -2107,10 +2174,11 @@
     document.querySelector("#select-greed").addEventListener("pointerleave", () => { if (!coarseDevice()) document.querySelector(".greed-preview").classList.remove("previewing"); });
     document.querySelector("#select-greed").addEventListener("focus", () => document.querySelector(".greed-preview").classList.add("previewing"));
     document.querySelector("#select-greed").addEventListener("blur", () => { if (!coarseDevice()) document.querySelector(".greed-preview").classList.remove("previewing"); });
-    document.querySelector("#select-greed").addEventListener("click", beginCrazy);
+    document.querySelector("#select-greed").addEventListener("click", () => beginCrazy("greed"));
+    document.querySelector('#bosses [data-sin="pride"]').addEventListener("click", () => { if (sinProgress(localStorage)[1].unlocked) beginCrazy("pride"); });
     document.querySelector("#bosses-back").addEventListener("click", backToMenu);
-    document.querySelector("#result-retry").addEventListener("click", beginCrazy);
-    document.querySelector("#result-bosses").addEventListener("click", showBossSelection);
+    document.querySelector("#result-retry").addEventListener("click", () => beginCrazy());
+    document.querySelector("#result-bosses").addEventListener("click", () => pridePreview ? backToMenu() : showBossSelection());
     document.querySelector("#cinematic-skip").addEventListener("click", () => { if (crazy && !paused) skipCrazyCinematic(crazy); });
     document.querySelector("#cinematic-pause").addEventListener("click", openGameMenu);
     function renderCrazyPresentation() {
@@ -2124,25 +2192,44 @@
         const canvas = document.querySelector("#cinematic-canvas"), ratio = window.innerWidth / window.innerHeight;
         const w = ratio > 1 ? 640 : 360, h = Math.round(w / ratio);
         if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
-        drawGreedCinematic(canvas.getContext("2d"), crazy, t, reducedMotion.matches);
+        (crazy.config.id === "pride" ? drawPrideCinematic : drawGreedCinematic)(canvas.getContext("2d"), crazy, t, reducedMotion.matches);
         document.querySelector("#cinematic-skip").disabled = crazy.cutscene.time < 1000 || paused;
         document.querySelector("#cinematic-pause").textContent = t("gameMenu");
         if (newlyShown && !gameMenuOpen) document.querySelector("#cinematic-pause").focus({ preventScroll: true });
       }
       if (won && !crazy.resultShown) {
-        crazy.resultShown = true; recordGreedClear(localStorage, crazy);
+        crazy.resultShown = true;
+        const pride = crazy.config.id === "pride";
+        result.dataset.sin = crazy.config.id;
+        const resultArt = result.querySelector(".result-art");
+        resultArt.src = pride ? "./assets/pride-tower-ruins.webp" : "./assets/greed-defeated.webp";
+        resultArt.alt = pride ? "巴別塔崩塌後的廢墟，前景散落碎裂鏡框" : "Defeated Greed surrounded by spilled coins";
+        if (!crazy.preview) { if (pride) recordSinClear(localStorage, crazy); else recordGreedClear(localStorage, crazy); }
+        document.querySelector("#result-title").setAttribute("data-i18n", pride ? "prideDefeated" : "crazyGreedBroken");
+        document.querySelector("#result-title").textContent = t(pride ? "prideDefeated" : "crazyGreedBroken");
+        if(pride){document.querySelector("#result-title").removeAttribute("data-i18n");document.querySelector("#result-title").textContent="打敗傲慢 · 成功逃離傲慢之塔";}
+        document.querySelector(".result-content > small").textContent = pride ? "PRIDE · ESCAPED" : "GREED · CLEARED";
+        const unlockNote = document.querySelector(".result-content > p"); unlockNote.setAttribute("data-i18n", pride ? "prideCleared" : "crazyClearUnlock"); unlockNote.textContent = crazy.preview ? "試玩完成 · 可繼續修改" : t(pride ? "prideCleared" : "crazyClearUnlock");
         document.querySelector("#result-score").textContent = `${t(crazy.difficulty)} · ${t("score")} ${crazy.score}`;
         const stats = [["time", formatTime(crazy.elapsed)], ["crazyHealth", `${crazy.hp}/100`], ["crazyDealer", formatTime(crazy.stats.firstTime)], ["crazyTrueName", formatTime(crazy.stats.secondTime)], ["crazyCounters", crazy.stats.counters], ["crazyCoins", crazy.stats.coins], ["crazyDamageTaken", crazy.stats.damageTaken], ["crazyHealed", crazy.stats.healed]];
+        if (pride) { stats[2][0] = "prideIntro"; stats[3][0] = "prideMirrorName"; stats[4] = ["逃塔重試",crazy.escapeFailures || 0]; stats[5] = ["逃離層數",crazy.mini.floor]; }
         const list = document.querySelector("#result-stats"); list.replaceChildren();
         for (const [key, value] of stats) { const row = document.createElement("div"), name = document.createElement("span"), amount = document.createElement("b"); name.textContent = t(key); amount.textContent = String(value); row.append(name, amount); list.append(row); }
         document.querySelector("#result-bosses").focus({ preventScroll: true });
       }
     }
-    function beginCrazy() {
-      loadGreedArt();
+    let selectedSin = "greed";
+    function beginCrazy(sin = selectedSin) {
+      selectedSin = sin;
+      if (sin === "pride") loadPrideArt(); else loadGreedArt();
       begin("crazy");
-      crazy = createCrazy({ difficulty: settings.crazyDifficulty });
-      crazyMusic.reset(); crazyMusic.unlock(); sound.stop();
+      crazy = pridePreview && sin === "pride"
+        ? createPridePreview(previewScenario, { difficulty: previewDifficulty })
+        : createCrazy({ difficulty: settings.crazyDifficulty, sin });
+      crazyMusic.reset(); crazyMusic.unlock(crazy.config.id); sound.stop();
+      document.body.dataset.crazySin = sin;
+      const symbols = sin === 'pride' ? ['♛', '◈', '✦', '◇', '❖', '♛', '✧', '◈'] : ['♠ ♥', '7 7 7', '中 發', '◉ · ◉', '↑ ♥ ↑', '◈ ◎ ◈', '● · ●', '↗ ◉ ↙'];
+      document.querySelectorAll('#crazy-ambient b').forEach((element, index) => { element.textContent = symbols[index]; });
       document.body.dataset.game = "bridge";
       document.body.classList.add("crazy-active");
       document.querySelector("#crazy-help").hidden = false;
@@ -2152,9 +2239,9 @@
     }
     function crazyPress(action, down = true, source = "keyboard") {
       if (!crazy) return false;
-      if (down && crazyMusic.blocked) crazyMusic.unlock();
+      if (down && crazyMusic.blocked) crazyMusic.unlock(crazy.config.id);
       if (!paused && !gameMenuOpen && !document.querySelector("#game").hidden) {
-        if (action === "rotate" && !["bridge", "sand"].includes(crazy.mode)) action = ["dodge", "vault"].includes(crazy.mode) || FLYING_ATTACKS.includes(crazy.mode) ? "up" : "action";
+        if (action === "rotate" && !["bridge", "sand"].includes(crazy.mode)) action = crazy.mode.startsWith("pride-") || ["dodge", "vault"].includes(crazy.mode) || FLYING_ATTACKS.includes(crazy.mode) ? "up" : "action";
         inputCrazy(crazy, action, down, source);
       }
       return true;
@@ -2173,14 +2260,14 @@
     catImageReady.then(() => { previewCat.clearRect(0, 0, 220, 170); drawMischiefCat(previewCat, 110, 91, 1.3); });
     board.addEventListener("pointerdown", event => {
       if (!crazy || paused || gameMenuOpen) return;
-      if (crazyMusic.blocked) crazyMusic.unlock();
+      if (crazyMusic.blocked) crazyMusic.unlock(crazy.config.id);
       event.preventDefault();
-      if (["dodge", "jump", ...FLYING_ATTACKS].includes(crazy.mode)) board.setPointerCapture(event.pointerId);
+      if (["dodge", "jump", "pride-mirror-duel", ...PRIDE_ATTACKS, ...PRIDE_SECOND_MODES, ...FLYING_ATTACKS].includes(crazy.mode)) board.setPointerCapture(event.pointerId);
       const r = board.getBoundingClientRect();
       pointCrazy(crazy, (event.clientX - r.left) * 280 / r.width, (event.clientY - r.top) * crazyCanvasHeight(crazy.mode) / r.height);
     });
     board.addEventListener("pointermove", event => {
-      if (!crazy || paused || !["dodge", "jump", ...FLYING_ATTACKS].includes(crazy.mode) || !board.hasPointerCapture(event.pointerId)) return;
+      if (!crazy || paused || !["dodge", "jump", "pride-mirror-duel", ...PRIDE_ATTACKS, ...PRIDE_SECOND_MODES, ...FLYING_ATTACKS].includes(crazy.mode) || !board.hasPointerCapture(event.pointerId)) return;
       event.preventDefault();
       const r = board.getBoundingClientRect();
       pointCrazy(crazy, (event.clientX - r.left) * 280 / r.width, (event.clientY - r.top) * crazyCanvasHeight(crazy.mode) / r.height);
@@ -3141,12 +3228,15 @@
         document.querySelector("#callout").hidden = true;
         document.querySelector("#btn-rot-left").hidden = !["bridge", "sand"].includes(crazy.mode);
         document.body.dataset.crazyPhase = String(crazy.phase);
-        document.body.dataset.crazyControls = ["bridge", "sand"].includes(crazy.mode) ? "blocks" : "mini";
+        document.body.dataset.crazySin = crazy.config.id;
+        document.body.dataset.crazyEscape = String(crazy.mode === "pride-escape");
+        document.body.dataset.crazyControls = crazy.mode==="pride-shard-storm"?"rhythm":["bridge", "sand"].includes(crazy.mode) ? "blocks" : "mini";
         document.querySelector("#game-menu-icon").textContent = "☰";
         document.querySelector("#game-menu").setAttribute("aria-label", t("gameMenu"));
         prepareBoard();
         drawCrazy(ctx, crazy, t, {
           reducedMotion: paused || reducedMotion.matches,
+          screenShake: settings.dangerEffect === "shake",
           paintGrid: (context, grid) => drawGridCells(context, grid, new Set(), CELL),
           paintPiece: (context, piece, ghost) => drawBlob(context, cellsOf(piece.type, piece.rot, piece.x, piece.y), piece.type, CELL, ghost, piece.bombIndex, piece.curse, piece.sand ?? null, piece.rot, piece.curseIndex),
         });
@@ -3154,22 +3244,23 @@
         const frameHeight = crazyCanvasHeight(crazy.mode);
         if (bossFrame.height !== frameHeight) bossFrame.height = frameHeight;
         drawCrazyFrame(bossFrame.getContext("2d"), crazy, { reducedMotion: paused || reducedMotion.matches });
+        const controls = crazy.config.id === "pride" ? prideControls(crazy.mode) : null;
         const blocks = ["bridge", "sand"].includes(crazy.mode);
-        const flying = ["dodge", "vault"].includes(crazy.mode) || FLYING_ATTACKS.includes(crazy.mode);
+        const flying = crazy.mode.startsWith("pride-") || ["dodge", "vault"].includes(crazy.mode) || FLYING_ATTACKS.includes(crazy.mode);
         document.querySelector("#btn-soft").disabled = !blocks && !flying;
-        document.querySelector("#btn-hold").disabled = blocks ? crazy.bridge.noHoldLeft > 0 : crazy.mode === "tiger" ? !crazy.mini.pending || !!crazy.mini.spin : !["mahjong", "pusher"].includes(crazy.mode);
-        const actionLabel = crazy.mode === "vault" ? "crazyJump" : crazy.mode === "jump" ? "crazyJump" : crazy.mode === "pusher" ? crazy.mini.stock > 0 ? "crazyInsertCoin" : "crazyPusherAgain" : crazy.mode === "slots" ? "crazyStop" : crazy.mode === "tiger" ? crazy.mini.spin ? "crazyRolling" : crazy.mini.pending ? "crazyRisk" : "crazyPull" : ["cards", "mahjong"].includes(crazy.mode) ? "crazySelect" : flying ? "crazyDash" : "fire";
+        document.querySelector("#btn-hold").disabled = blocks ? crazy.bridge.noHoldLeft > 0 : controls ? !controls.alt : crazy.mode === "tiger" ? !crazy.mini.pending || !!crazy.mini.spin : !["mahjong", "pusher"].includes(crazy.mode);
+        const actionLabel = ["vault", "pride-crown-shock"].includes(crazy.mode) ? "crazyJump" : crazy.mode === "jump" ? "crazyJump" : crazy.mode === "pusher" ? crazy.mini.stock > 0 ? "crazyInsertCoin" : "crazyPusherAgain" : crazy.mode === "slots" ? "crazyStop" : crazy.mode === "tiger" ? crazy.mini.spin ? "crazyRolling" : crazy.mini.pending ? "crazyRisk" : "crazyPull" : ["cards", "mahjong"].includes(crazy.mode) ? "crazySelect" : PRIDE_SECOND_MODES.includes(crazy.mode) ? "fire" : crazy.mode === "pride-mirror" ? "fire" : crazy.mode.startsWith("pride-") ? "crazySelect" : flying ? "crazyDash" : "fire";
         document.querySelector("#btn-rot .pad-label").textContent = blocks ? t("rotateRight") : t(flying ? "crazyUp" : actionLabel);
-        document.querySelector("#btn-hold .pad-label").textContent = blocks ? t("keep") : ["tiger", "pusher"].includes(crazy.mode) ? t("crazyBank") : t("crazyReset");
-        document.querySelector("#btn-drop .pad-label").textContent = blocks ? t("drop") : t(actionLabel);
-        document.querySelector("#btn-drop").disabled = crazy.mode === "tiger" && !!crazy.mini.spin || flying && crazy.mini.dashReady > 0 || crazy.mode === "pusher" && (crazy.timeLeft <= 2000 || crazy.mini.stock === 0 && (crazy.mini.riskUsed || crazy.mini.pending === 0));
+        document.querySelector("#btn-hold .pad-label").textContent = controls ? controls.alt || "—" : blocks ? t("keep") : ["tiger", "pusher"].includes(crazy.mode) ? t("crazyBank") : t("crazyReset");
+        document.querySelector("#btn-drop .pad-label").textContent = controls ? controls.action || "—" : blocks ? t("drop") : t(actionLabel);
+        document.querySelector("#btn-drop").disabled = controls ? !controls.action : crazy.mode === "tiger" && !!crazy.mini.spin || flying && crazy.mini.dashReady > 0 || crazy.mode === "pusher" && (crazy.timeLeft <= 2000 || crazy.mini.stock === 0 && (crazy.mini.riskUsed || crazy.mini.pending === 0));
         document.querySelector("#btn-rot").disabled = crazy.mode === "tiger" && !!crazy.mini.spin;
         const battleNotes = [];
         if (crazy.bridge.noHoldLeft > 0) battleNotes.push(`${t("curseNoHold")} ${crazy.bridge.noHoldLeft}`);
         if (feverActive(crazy.bridge)) battleNotes.push(`FEVER ×3 · ${crazy.bridge.feverLeft}`);
         if (garbageGraceActive(crazy.bridge)) battleNotes.push(`${t("garbageStable")} ${crazy.bridge.garbageGraceLeft}`);
         document.querySelector("#crazy-help").textContent = [t(crazy.difficulty), t("crazyHint_" + crazy.mode), ...battleNotes].join(" · ");
-        document.querySelector("#crazy-status").textContent = `HP ${crazy.hp}/100 · BOSS ${t(crazy.form === 2 ? "crazyTrueName" : crazy.boss.name)} · ${t("crazyPhaseLabel")} ${crazy.phase}/3 · ${t("score")} ${crazy.score}`;
+        document.querySelector("#crazy-status").textContent = crazy.mode === "pride-escape" ? `HP ${crazy.hp}/100 · ${crazy.mini.floor}/100 · ${t("score")} ${crazy.score}` : `HP ${crazy.hp}/100 · BOSS ${t(crazy.config.id === "pride" ? crazy.form === 2 ? "prideMirrorName" : "prideIntro" : crazy.form === 2 ? "crazyTrueName" : crazy.boss.name)} · ${t("crazyPhaseLabel")} ${crazy.phase}/3 · ${t("score")} ${crazy.score}`;
         fitBoard();
         renderCrazyPresentation();
         if (paused && !crazy.over && !crazy.cutscene) showVeil(t("paused"), t("pauseHint"), t("resume"));
@@ -3263,6 +3354,7 @@
           for (const event of crazy.events.splice(0)) {
             const effect = CASINO_EFFECTS[event.key];
             if (effect) sound.playCasino(effect, event.amount);
+            else if (event.key === "prideMirrorBreakSound") { sound.playCasino("hit", 30); sound.blip(1400, .12); }
             else if (event.key === "crazyHit") sound.playCasino("hit", event.amount);
             else if (event.amount < 0) sound.blip(120, .08);
             else if (event.key === "crazySwitch") sound.playCombo(2);
@@ -3467,10 +3559,13 @@
       const availH = Math.max(crazy ? 32 : 120, baseH - 4);
       const availW = Math.max(96, stage.clientWidth - railW);
       const logicalHeight = crazy ? crazyCanvasHeight(crazy.mode) : ROWS * CELL;
-      const fit = Math.min(availH / logicalHeight, availW / (COLS * CELL));
+      // Compress the tall Bridge presentation in short landscape viewports.
+      // Pointer routing still maps to the full logical canvas, so all rows remain usable.
+      const displayHeight = crazy?.config.id === "pride" && docked && window.innerWidth > window.innerHeight && window.innerHeight <= 540 ? Math.min(logicalHeight, 560) : logicalHeight;
+      const fit = Math.min(availH / displayHeight, availW / (COLS * CELL));
       const scale = docked || crazy ? fit : Math.max(0.7, fit);
       const width = Math.round(COLS * CELL * scale);
-      const height = Math.round(logicalHeight * scale);
+      const height = Math.round(displayHeight * scale);
       board.style.width = `${width}px`;
       board.style.height = `${height}px`;
       const radius = CORNER * scale;
@@ -3488,7 +3583,7 @@
     }
     document.addEventListener("touchmove", (event) => {
       if (!document.documentElement.classList.contains("touch")) return;
-      if (event.target.closest(".settings-wrap, #bosses, #crazy-result, #play-menu, input, select, .settings-card")) return;
+      if (event.target.closest(".settings-wrap, #pride-preview, #bosses, #crazy-result, #play-menu, input, select, .settings-card")) return;
       event.preventDefault();
     }, { passive: false });
 
@@ -3510,6 +3605,15 @@
       lastPlayTap = { target, time: now, x: touch.clientX, y: touch.clientY };
     }, { passive: false });
 
+    if (pridePreview) {
+      settings.lang = "zh-Hant";
+      applySettings();
+      document.title = "Crazy Pride · 試玩";
+      previewLauncher = mountPridePreview((scenario, difficulty) => {
+        previewScenario = scenario; previewDifficulty = difficulty;
+        closeGameMenu(false); beginCrazy("pride");
+      }, backToMenu);
+    }
     requestAnimationFrame(frame);
     startHero();
 
