@@ -1,0 +1,66 @@
+[
+  {
+    "file": "escape.mp3",
+    "original": "pride_escape_jazz_no-watermark.mp3",
+    "sha256": "7eee7876ce79582c15c3f6cf14927b52125d4012bb90adf22aa5611d3145762c",
+    "sourcePath": "source-assets/pride/music/escape.mp3",
+    "runtimeSha256": "e017a978774149a6d813ea78a89863e48a5ca0e5e9cd2bcbd909548412fb437c",
+    "runtimeBitrate": 128000
+  },
+  {
+    "file": "first-last.mp3",
+    "original": "pride_first_last_no-watermark.mp3",
+    "sha256": "6e918bf49f1cffc843ec1e0383cbd1ed317889407d7d44608abc13b476445fdb",
+    "sourcePath": "source-assets/pride/music/first-last.mp3",
+    "runtimeSha256": "d8716250a6e9319b17903dd7ec4502c9749e8189eec7170049a8212305130809",
+    "runtimeBitrate": 128000
+  },
+  {
+    "file": "first-bridge.mp3",
+    "original": "pride_first_bridge.mp3",
+    "sha256": "780df1b2dc7543629e6704c0fa515a5f9de3dd9bd32d26fc1c36d33e3e25367e",
+    "sourcePath": "source-assets/pride/music/first-bridge.mp3",
+    "runtimeSha256": "691528b49052603152ce0b7b424f77be4410727fb821b20ffdf2b40956914e06",
+    "runtimeBitrate": 128000
+  },
+  {
+    "file": "first-special.mp3",
+    "original": "pride_first_special.mp3",
+    "sha256": "2f1a2656673b16b3933916b734ab209dbf67136c6876ee38efcf9c6d7aac1407",
+    "sourcePath": "source-assets/pride/music/first-special.mp3",
+    "runtimeSha256": "8281bf1bec65fbab4fcf94802c30905c02f017f16e2552d4182351180aa556e3",
+    "runtimeBitrate": 128000
+  },
+  {
+    "file": "second-last.mp3",
+    "original": "pride_red_eye_jazz_no-watermark.mp3",
+    "sha256": "f8f7bf3dd955b4f259c87a6a81cbd06d1705f5d20a721cf66da42ddcfb88a332",
+    "sourcePath": "source-assets/pride/music/second-last.mp3",
+    "runtimeSha256": "eedddb484649ac41fc3869e14752e1c45b789cba08a137d46177bd966c5aba26",
+    "runtimeBitrate": 128000
+  },
+  {
+    "file": "second-mid.mp3",
+    "original": "pride_second_mid_no-watermark.mp3",
+    "sha256": "1ccecb07eeddb203b7c1c7bf51ced7a696ba002004e1bc2220ceb255477e88f2",
+    "sourcePath": "source-assets/pride/music/second-mid.mp3",
+    "runtimeSha256": "eb8e5dc16aacdc0f3dbe6047ffc5cb248d3c4b47e66943ec70faac11622e8e7e",
+    "runtimeBitrate": 128000
+  },
+  {
+    "file": "second-special.mp3",
+    "original": "pride_second_special_no-watermark.mp3",
+    "sha256": "4c0d59cf2dd020281cbf5f990f2efdf0e07dcf551e24ec0d20777b912e911fac",
+    "sourcePath": "source-assets/pride/music/second-special.mp3",
+    "runtimeSha256": "c43ad81fb3c0d881df5fe694bb9d485885eae97b3329ff46f9777d29588e48a5",
+    "runtimeBitrate": 128000
+  },
+  {
+    "file": "second-bridge.mp3",
+    "original": "pride_second_bridge_no-watermark.mp3",
+    "sha256": "125ceb4b61779f28c1786c7ac26f24c4806d89a1bd6479744bded80038c11975",
+    "sourcePath": "source-assets/pride/music/second-bridge.mp3",
+    "runtimeSha256": "3d48029f96bc0e180de024701910c8345543388775f60dcad7861c531ae85183",
+    "runtimeBitrate": 128000
+  }
+]

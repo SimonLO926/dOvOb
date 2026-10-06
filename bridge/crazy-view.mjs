@@ -1,9 +1,16 @@
-import { drawVault } from './crazy-vault.mjs?v=1.2.24';
-import { drawFineDealer, drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.24';
-import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.24';
-import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.24';
-import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.24';
-import { drawSession } from './arcade.mjs?v=1.2.24';
+import { drawPrideEscape, PRIDE_ESCAPE_ID } from './pride-escape.mjs';
+import { PRIDE_SECOND_MODES, SECOND_NAMES, drawPrideSecond } from './pride-second.mjs';
+import { PRIDE_MINIGAMES } from './minigames/index.mjs';
+import { PRIDE_ATTACKS, drawPrideAttack } from './pride-attacks.mjs';
+import { drawMirrorDuel } from './pride-finisher.mjs';
+import { drawPridePalace, drawPrideFrame, drawPrideBossHead } from './pride-art.mjs';
+import { drawPrideBackdrop } from './pride-theme.mjs';
+import { drawVault } from './crazy-vault.mjs?v=1.2.25';
+import { drawFineDealer, drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.25';
+import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.25';
+import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.25';
+import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.25';
+import { drawSession } from './arcade.mjs?v=1.2.25';
 export const CRAZY_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 356 });
 export const CRAZY_BLOCK_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 512 });
 export function crazyCanvasHeight(mode) { return mode === 'bridge' || mode === 'sand' ? 720 : 560; }
@@ -16,7 +23,7 @@ const catPhoto = typeof Image === 'undefined' ? null : new Image();
 export const catImageReady = catPhoto ? new Promise(resolve => {
   catPhoto.onload = () => resolve(true);
   catPhoto.onerror = () => resolve(false);
-  catPhoto.src = new URL('./assets/mischief-cat.png?v=1.2.24', import.meta.url).href;
+  catPhoto.src = new URL('./assets/mischief-cat.webp?v=1.2.25', import.meta.url).href;
 }) : Promise.resolve(false);
 const COLORS = { I: '#64d2ff', O: '#ffd60a', T: '#bf5af2', S: '#30d158', Z: '#ff453a', J: '#0a84ff', L: '#ff9f0a', B: '#9da4b9' };
 const SYMBOLS = ['★', '♥', '7', '♠'];
@@ -31,11 +38,35 @@ function ellipse(c, x, y, rx, ry, color) {
   c.fillStyle = color; c.beginPath(); c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); c.fill();
 }
 // Photographic cutout: keep the image aspect ratio and smooth fur edges.
-export function drawMischiefCat(c, x, y, scale = 1, facingLeft = false) {
+export function drawMischiefCat(c, x, y, scale = 1, facingLeft = false, pose = null) {
   if (!catPhoto?.complete || !catPhoto.naturalWidth) return;
   const w = 160 * scale, h = w * catPhoto.naturalHeight / catPhoto.naturalWidth;
-  c.save(); c.translate(x, y); if (facingLeft) c.scale(-1, 1);
-  c.imageSmoothingEnabled = true; c.drawImage(catPhoto, -w / 2, -h / 2, w, h); c.restore();
+  const time = pose?.reducedMotion ? 0 : (pose?.time || 0);
+  const action = pose?.action || 'idle';
+  const breath = pose && !pose.reducedMotion ? Math.sin(time / 420) : 0;
+  c.save(); c.translate(x, y - breath * 2); if (facingLeft) c.scale(-1, 1);
+  if (pose) {
+    if (action === 'hurt') { c.translate(0, h * .17); c.scale(1.12, .66); c.rotate(-.08); }
+    else if (action === 'attack') { c.rotate(pose.reducedMotion ? -.08 : Math.sin(time / 85) * .12); }
+    else if (action === 'victory') { c.translate(0, -h * .06); c.scale(.96, 1.08); }
+    else c.scale(1 + breath * .012, 1 + breath * .025);
+  }
+  c.imageSmoothingEnabled = true;
+  if (pose && (action === 'attack' || action === 'victory')) {
+    // The cutout is a reclining cat: its two front paws are at the lower right.
+    const paws=[{x:w*.15,y:h*.29,w:w*.19,h:h*.19},{x:w*.35,y:h*.21,w:w*.12,h:h*.26}];
+    c.save(); c.beginPath(); c.rect(-w/2,-h/2,w,h);
+    for(const paw of paws)c.rect(paw.x,paw.y,paw.w,paw.h);
+    c.clip('evenodd');c.drawImage(catPhoto,-w/2,-h/2,w,h);c.restore();
+    for(const [i,paw] of paws.entries()){
+      c.save();c.translate(paw.x+paw.w*.5,paw.y);
+      const swing=action==='victory'?-2.5-i*.2:pose.reducedMotion?-.65:Math.sin(time/85+i*.4)*.65-.65;
+      c.rotate(swing);c.translate(-paw.x-paw.w*.5,-paw.y);
+      c.beginPath();c.rect(paw.x,paw.y,paw.w,paw.h);c.clip();
+      c.drawImage(catPhoto,-w/2,-h/2,w,h);c.restore();
+    }
+  } else c.drawImage(catPhoto, -w / 2, -h / 2, w, h);
+  c.restore();
 }
 const PIXEL_SYMBOLS = [
   ['.X.X.', 'XXXXX', 'XXXXX', '.XXX.', '..X..'],
@@ -44,6 +75,7 @@ const PIXEL_SYMBOLS = [
 ];
 export function drawCrazyFrame(c, s, { reducedMotion = false } = {}) {
   const height = crazyCanvasHeight(s.mode);
+  if (s.config?.id === 'pride') { drawPrideFrame(c, height, s, reducedMotion); return; }
   c.clearRect(0, 0, 560, height);
   const gold = s.form === 2, attack = !!s.attack;
   const trim = '#ffd361';
@@ -233,7 +265,7 @@ function miniBoard(c, s, t, reducedMotion) {
   }
 }
 function drawTransition(c, s, t, reducedMotion, height) {
-  if (!s.transition) return;
+  if (!s.transition || s.config?.id === 'pride') return;
   const elapsed = s.transition.time, fade = Math.min(1, (800 - elapsed) / 250);
   c.save(); c.globalAlpha = Math.max(0, fade);
   const y = Math.min(height / 2, 330);
@@ -247,28 +279,45 @@ function drawTransition(c, s, t, reducedMotion, height) {
   box(c, 0, y - 45, 280, 90, '#301529', 0);
   c.fillStyle = '#ffc96a'; c.fillRect(0, y - 45, 280, 3); c.fillRect(0, y + 42, 280, 3);
   text(c, t('crazyIncoming'), 140, y - 21, 12, '#ffb0c5');
-  text(c, t('crazyMode_' + s.mode), 140, y + 9, 28, '#ffe5ac');
+  text(c, SECOND_NAMES[s.mode] || t('crazyMode_' + s.mode), 140, y + 9, 28, '#ffe5ac');
   c.restore();
 }
-export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiece } = {}) {
+export function drawCrazy(c, s, t, { reducedMotion = false, screenShake = true, paintGrid, paintPiece } = {}) {
   const height = crazyCanvasHeight(s.mode);
+  const prideGame = PRIDE_SECOND_MODES.includes(s.mode) || PRIDE_ATTACKS.includes(s.mode) || !!PRIDE_MINIGAMES[s.mode] || s.mode === 'pride-mirror-duel' || s.mode === PRIDE_ESCAPE_ID;
   c.save(); c.clearRect(0, 0, 280, height);
   const bg = c.createLinearGradient(0, 0, 0, height); bg.addColorStop(0, '#21112e'); bg.addColorStop(1, '#0b1020'); c.fillStyle = bg; c.fillRect(0, 0, 280, height);
-  text(c, `${t('crazyGreed')} · ${t(s.form === 2 ? 'crazyTrueName' : s.boss.name)}`, 140, 15, 16, '#ffd69b'); drawFineDealer(c, s, reducedMotion); drawBridgePreviews(c, s, t, paintPiece);
-  text(c, `${s.vaultLocked ? '🔒 ' : s.damageLeft === 0 ? '◇ ' : ''}BOSS`, 140, 117, 12, '#ff829d'); bar(c, 24, 128, 232, s.bossHp / s.bossMaxHp, '#ff476f');
+  if (s.config.id === 'pride') drawPrideBackdrop(c, {h:height,time:s.elapsed,reduced:reducedMotion});
+  if (prideGame) { /* Pride modes own the shared text bands. */ }
+  else if (s.config.id === 'pride') { text(c, t(s.form === 2 ? 'prideMirrorName' : 'prideIntro'), 140, 15, 16, '#ffd69b'); }
+  else {
+    text(c, `${t('crazyGreed')} · ${t(s.form === 2 ? 'crazyTrueName' : s.boss.name)}`, 140, 15, 16, '#ffd69b');
+    drawFineDealer(c, s, reducedMotion);
+  }
+  if (!prideGame) drawBridgePreviews(c, s, t, paintPiece);
+  if (!prideGame && s.config.id !== 'pride') { text(c, `${s.vaultLocked || s.prideDuelLocked ? '🔒 ' : s.damageLeft === 0 ? '◇ ' : ''}BOSS`, 140, 117, 12, '#ff829d'); bar(c, 24, 128, 232, s.bossHp / s.bossMaxHp, '#ff476f'); }
   const a = s.arcade || ['bridge', 'sand'].includes(s.mode) ? crazyPlayfield(s.mode) : CRAZY_ARENA;
   box(c, a.x - 2, a.y - 2, a.w + 4, a.h + 4, s.attack ? '#a63b5e' : '#674068', 5); box(c, a.x, a.y, a.w, a.h, '#100e1b', 3);
-  if (s.mode === 'bridge' || s.mode === 'sand') bridgeBoard(c, s, { paintGrid, paintPiece });
+  if(s.mode===PRIDE_ESCAPE_ID)drawPrideEscape(c,s.mini,{reducedMotion});
+  else if (s.form === 2 && PRIDE_SECOND_MODES.includes(s.mode)) drawPrideSecond(c, s, reducedMotion, { screenShake });
+  else if (s.mode === 'bridge' || s.mode === 'sand') bridgeBoard(c, s, { paintGrid, paintPiece });
   else if (s.arcade) {
     c.save(); c.translate(a.x, a.y); c.scale(a.scale, a.scale);
     if (paintGrid) paintGrid(c, s.arcade.grid);
     else for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (s.arcade.grid[y][x]) box(c, x * 28 + 1, y * 28 + 1, 26, 26, COLORS[s.arcade.grid[y][x].type] || '#e0b469', 3);
     drawSession(c, s.arcade, '#f2deef', { speed: t('arcadeSpeed'), double: t('arcadeDouble'), triple: t('arcadeTriple'), wide: t('arcadeWide'), narrow: t('arcadeNarrow') }); c.restore();
-  } else if (s.mode === 'vault') drawVault(c, s.mini);
+  } else if (PRIDE_MINIGAMES[s.mode]) {
+    PRIDE_MINIGAMES[s.mode].render(c, s.mini, s);
+  } else if (PRIDE_ATTACKS.includes(s.mode)) drawPrideAttack(c, s.mini, reducedMotion, {encounter:s, screenShake, status:`${Math.ceil(s.timeLeft/1000)}秒 · 第 ${s.mini.wave} 波`});
+  else if (s.mode === 'pride-mirror-duel') drawMirrorDuel(c, s.mini, s, { reducedMotion });
+  else if (s.mode === 'vault') drawVault(c, s.mini);
   else if (GREED_ATTACKS.includes(s.mode)) drawReaction(c, s, t, reducedMotion);
   else if (s.mode === 'pusher') drawPusher(c, s, t, reducedMotion);
   else miniBoard(c, s, t, reducedMotion);
-  text(c, `${t('crazyMode_' + s.mode)} · ${Math.ceil(Math.max(0, s.timeLeft) / 1000)}s`, 140, 141, 12, '#ffc7d6');
+  if(s.config.id==='pride' && s.mode!==PRIDE_ESCAPE_ID)drawPrideBossHead(c,s,{bridge:!prideGame});
+  if(s.config.id==='pride' && s.mode!==PRIDE_ESCAPE_ID)bar(c,prideGame?90:64,prideGame?84:116,prideGame?100:152,s.bossHp/s.bossMaxHp,s.form===2&&s.mirrorWorld?.red?'#ff476f':'#c49be8');
+  if(s.config.id==='pride'&& !prideGame && s.form===2)text(c,s.mirrorWorld.red?'紅鏡 · 狂暴':`${s.mirrorWorld.mirrors.filter(v=>!v.broken).length} 面鏡`,140,126,11,'#f2d596');
+  if (!prideGame) text(c, `${SECOND_NAMES[s.mode] || t('crazyMode_' + s.mode)} · ${Math.ceil(Math.max(0, s.timeLeft) / 1000)}s`, 140, 141, 12, '#ffc7d6');
   if (s.cat) {
     const warning = s.cat.time < 1200;
     const target = s.cat.action === 'boss' ? { x: 207, y: 74 }
@@ -277,7 +326,7 @@ export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiec
     const enter = reducedMotion ? 1 : Math.min(1, s.cat.time / 450);
     const scale = s.cat.action === 'boss' ? .48 : .64;
     const catX = warning ? 312 - enter * 82 : target.x;
-    drawMischiefCat(c, catX, target.y, scale, true);
+    drawMischiefCat(c, catX, target.y, scale, true, s.config.id === 'pride' ? { time: s.cat.time, reducedMotion, action: warning ? 'idle' : s.cat.action === 'heal' ? 'victory' : 'attack' } : null);
     if (warning) text(c, s.cat.action === 'heal' ? '+' : '!', 243, target.y - 37, 20, '#ffd46b');
     if (!warning) {
       const age = s.cat.time - 1200, fade = Math.max(0, 1 - age / 500);
@@ -307,11 +356,13 @@ export function drawCrazy(c, s, t, { reducedMotion = false, paintGrid, paintPiec
       c.restore();
     }
   }
+  if (s.prideDuelRetry != null) text(c, `${t('prideRetry')} ${Math.ceil(s.prideDuelRetry / 1000)}s`, 140, height - 57, 10, '#ffb878');
   if (s.vaultRetry != null) text(c, `金庫重試 ${Math.ceil(s.vaultRetry/1000)}s · Boss 鎖血`, 140, height-57, 10, '#ffb878');
-  text(c, `HP ${s.hp}/100 · ${t('crazyPhaseLabel')} ${s.phase}/3`, 140, height - 38, 14, '#f2deef');
-  bar(c, 24, height - 25, 232, s.hp / 100, s.hp <= 25 ? '#ff466c' : '#6bdfb2');
+  if (!prideGame) text(c, `HP ${s.hp}/100 · ${t('crazyPhaseLabel')} ${s.phase}/3`, 140, height - 38, 14, '#f2deef');
+  if (!prideGame) bar(c, 24, height - 25, 232, s.hp / 100, s.hp <= 25 ? '#ff466c' : '#6bdfb2');
   if (s.attack) text(c, `${t('crazyAttackWarning')} ${Math.ceil(s.attack.time / 1000)}`, 140, height - 10, 11, '#fff1a2');
-  else if (s.noticeTime > 0) text(c, `${t(s.notice)}${s.noticeAmount ? ` ${s.noticeAmount > 0 ? '+' : ''}${s.noticeAmount}` : ''}`, 140, height - 10, 11, '#ffe0ab');
+  else if (!prideGame && s.noticeTime > 0) text(c, `${t(s.notice)}${s.noticeAmount ? ` ${s.noticeAmount > 0 ? '+' : ''}${s.noticeAmount}` : ''}`, 140, height - 10, 11, '#ffe0ab');
+  if (prideGame && s.notice === 'crazyHeal' && s.noticeTime > 0) text(c, `♥ +${s.noticeAmount}`, 245, 18, 11, '#98ffe0');
   if (s.hitFlash > 0) { c.fillStyle = `rgba(255,40,80,${s.hitFlash / 1500})`; c.fillRect(0, 0, 280, height); }
   drawTransition(c, s, t, reducedMotion, height);
   c.restore();

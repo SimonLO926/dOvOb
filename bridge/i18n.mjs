@@ -1139,7 +1139,50 @@ const TEXT = {
 };
 
 const VAULT_TEXT = { crazyMode_vault:'金庫跑跳', crazyVaultStart:'60 秒：跑跳撿幣，帶回銀行存入 360', crazyVaultCleared:'金庫破解！Boss 解除鎖血', crazyVaultFailed:'金庫失敗 · 扣 80 HP', crazyVaultMove:'移動' };
+
+const PRIDE_TEXT = {
+  "pridePuzzleFailed": ["巴別塔失敗", "Tower challenge failed"],
+  "prideRedFailed": ["紅鏡挑戰失敗", "Red mirror challenge failed"],
+  "prideShardHit": ["碎鏡命中", "Mirror shard hit"],
+  "crazyMode_pride-escape": ["逃離傲慢之塔", "Escape the Tower of Pride"],
+  "crazyHint_pride-escape": ["左右找落腳點，空白鍵／下鍵下降，逃到 100 層", "Move left/right to land safely; Space / down drops; reach floor 100"],
+  "crazyHint_pride-doodle": ["自動彈跳；左右移動，空白鍵 射擊幻影", "Auto-jump; move left/right and shoot phantoms with Space"],
+  "crazyHint_pride-tower": ["對準頂層再放層；疊滿目標才過關", "Align with the top floor, then drop; reach the target height"],
+  "crazyHint_pride-shard-puzzle": ["旋轉碎片拼回鏡子；C／Shift 提示扣 1 秒", "Rotate the fragments to restore the mirror; C / Shift hints cost 1 second"],
+  "crazyHint_pride-truth-trial": ["追蹤真鏡；C／Shift 重看扣 2 秒", "Track the real mirror; C / Shift replays cost 2 seconds"],
+  "crazyHint_pride-mirror-maze": ["旋鏡導光，收集 3 粒水晶；C／Shift 驗證", "Turn mirrors to collect 3 crystals; C / Shift checks the route"],
+  "crazyHint_pride-kaleidoscope": ["揀相同金點圖案，再按 空白鍵 反攻", "Find the matching gold dots, then press Space to counter"],
+  "prideRedUnlocked": ["紅鏡鎖血解除！", "The red mirror's health lock is broken!"],
+  "crazyHint_pride-shard-storm": ["三軌到金線時按 左／空白鍵／右；best／good 反攻，damage 扣血", "Three lanes: Left / Space / Right; best / good reflect, damage hurts"],
+  "crazyHint_pride-nested": ["連接兩個封印到出口；C／Shift 驗證，空白鍵 反攻", "Connect both seals to the exit; C / Shift checks, Space counters"],
+  "crazyHint_pride-gaze-up": ["三鏡鎖定後離開射線；鏡亮時 空白鍵 反攻", "Dodge the locked mirror beams; Space counters glowing mirrors"],
+  "crazyHint_pride-reflect-up": ["空白鍵 射指定鏡；移動避開反射彈", "Space shoots the marked mirror; move to dodge reflections"],
+  "crazyHint_pride-crown-up": ["避開波紋或 空白鍵 跳；鏡亮時可反攻", "Dodge shockwaves or jump with Space; counter glowing mirrors"],
+  "crazyHint_pride-red-survival": ["自動射擊、拾道具；空白鍵 集火，C／Shift 精準", "Auto-fire and collect power-ups; Space bursts, C / Shift precision"],
+
+  prideMirrorName: ['鏡之化身', 'Mirror Incarnation'], sinPride: ['傲慢', 'Pride'], prideIntro: ['鏡宮之王', 'King of the mirror palace'],
+  prideDefeated: ['傲慢擊破！', 'Pride defeated!'], prideCleared: ['傲慢已通關', 'Pride cleared'],
+  prideRetry: ['鏡中對決重試 · Boss 鎖血', 'Mirror duel retry · Boss locked'],
+  prideDuelFailed: ['鏡中對決失敗 · 扣 80 HP', 'Mirror duel failed · 80 HP penalty'],
+  prideWrongCrown: ['假皇冠！', 'False crown!'], prideAttackHit: ['王權攻擊！', 'Royal strike!'],
+  'crazyMode_pride-mirror-match': ['鏡像配對', 'Mirror match'],
+  'crazyMode_pride-crown-choice': ['加冕抉擇', 'Crown choice'],
+  'crazyMode_pride-lianliankan': ['連連看', 'Tile connect'],
+  'crazyMode_pride-gaze': ['王之蔑視', 'Royal contempt'],
+  'crazyMode_pride-mirror': ['鏡像反射', 'Mirror reflection'],
+  'crazyMode_pride-crown-shock': ['加冕衝擊', 'Coronation shock'],
+  'crazyMode_pride-mirror-duel': ['鏡中對決', 'Mirror duel'],
+  'crazyHint_pride-mirror-match': ['左右各揀一張，配對相同圖案', 'Match a card from each side'],
+  'crazyHint_pride-crown-choice': ['比較原石，揀寶石闊度相同的皇冠', 'Choose the crown whose gem matches the reference'],
+  'crazyHint_pride-lianliankan': ['連接相同圖案，路徑最多兩彎', 'Connect matching tiles with at most two turns'],
+  'crazyHint_pride-gaze': ['避開雙眼掃射；方向鍵／拖曳移動', 'Move with arrows or drag to dodge the gaze'],
+  'crazyHint_pride-mirror': ['空白鍵 射擊指定鏡；避開反射彈幕', 'SPACE shoots the marked mirror; dodge reflected bullets'],
+  'crazyHint_pride-crown-shock': ['空白鍵 跳躍；避開落點及衝擊波', 'SPACE jumps; avoid crown landings and shockwaves'],
+  'crazyHint_pride-mirror-duel': ['踩亮鏡座 → 離開 → 空白鍵封住延遲鏡像', 'Charge a seal, leave, then press Space to catch your delayed mirror'],
+};
+
 export function translate(lang, key) {
+  if (PRIDE_TEXT[key]) return PRIDE_TEXT[key][lang?.startsWith("zh") ? 0 : 1];
   if (VAULT_TEXT[key]) return VAULT_TEXT[key];
   return (TEXT[lang] || TEXT["zh-Hant"])[key] ?? TEXT.en[key] ?? key;
 }
