@@ -2,6 +2,8 @@
 
 修改前先讀 [Crazy 關卡製作必讀](CRAZY_MUST_READ.md)。使用者已批准合併至正式 1.2.25；獨立 Preview 保留在 GitHub，主遊戲不提供試玩入口。來源更新包與所有修改保留。
 
+畫面、血條、文字與按鈕同步遵守 [Boss 畫面與操作必讀規範](BOSS_UI_MUST_READ.md)，包含紅眼、三軌及逃塔例外與修改後驗收表。
+
 ## 開始試玩
 
 直接開啟 GitHub Pages 的 `bridge/pride-preview.html`；建置後亦可開啟離線 `crazy-pride-playable.html`。共有 26 個入口，含完整挑戰、三面鏡／兩面鏡／一面紅鏡的 Bridge、半血巴別塔與 100 層逃塔。新增「敗北 → 崩塔 → 逃離」可直接檢視完整過場。☰ 可以重試或換關。Normal／Hard 分開選擇；試玩不寫正式解鎖或排行榜。

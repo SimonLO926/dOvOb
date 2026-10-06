@@ -1,5 +1,7 @@
 # 傲慢鏡宮背景美術
 
+生成或修改前先讀 [Boss 畫面與操作必讀規範：圖片生成與參考](BOSS_UI_MUST_READ.md#8-圖片生成參考與交付)，再使用本檔的用途及提示詞。
+
 素材：`../source-assets/pride/images/pride-palace.png` 是生成原圖；`assets/pride-palace.webp` 是相同圖片的壓縮格式，用於遊戲與單檔試玩。此圖只作獨立場景背景，不能改成 Boss 概念圖。
 
 ## 提示詞
