@@ -97,7 +97,7 @@ test('Red hearts restore 7 Hard HP and the same 12 Normal HP, without changing p
  }
 });
 
-test('The enraged red eye stays below its bar and above player movement, with static reduced effects',async()=>{
+test('The enraged crowned mirror stays below its bar and above player movement, with static reduced effects',async()=>{
  const {drawRedBoss}=await import('./pride-red.mjs');
  const render=(clock)=>{const points=[],shadows=[];
   const c=new Proxy({}, {get:(o,k)=>['moveTo','lineTo'].includes(k)?(x,y)=>points.push([x,y]):o[k]??(()=>{}),set:(o,k,v)=>{o[k]=v;if(k==='shadowBlur')shadows.push(v);return true;}});

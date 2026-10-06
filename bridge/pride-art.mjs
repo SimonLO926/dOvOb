@@ -1,4 +1,5 @@
-import { drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.25';
+import { drawRedCrownMirror } from './pride-red-art.mjs';
+import { drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.26';
 import { drawPrideBackdrop } from './pride-theme.mjs';
 // Runtime WebP portraits; byte-identical PNG sources live in source-assets/pride.
 // Canvas artwork remains available when an image cannot be loaded.
@@ -64,7 +65,7 @@ export function drawPrideCinematic(c, s, t, reduced = false) {
 }
 
 // Pixel head / mirror core is part of the enclosing body, not a concept portrait.
-export function drawPrideBossHead(c,s,{bridge=false}={}) {
+export function drawPrideBossHead(c,s,{bridge=false,reducedMotion=false}={}) {
  const alive=s.mirrorWorld?.mirrors.filter(v=>!v.broken)||[{color:'#ff5369'},{color:'#53baff'},{color:'#bb71ff'}];
  const count=alive.length,red=s.form===2&&count===1,fractured=s.form===2&&count===2;
  // The collar physically reaches the top of the playfield; keep its centre clear for the HUD.
@@ -82,12 +83,9 @@ export function drawPrideBossHead(c,s,{bridge=false}={}) {
  }else{
   shape([[-28,31],[-18,18],[0,23],[18,18],[28,31]],red?'#853848':'#5e3c72','#ddb774');
   if(red){
-    shape([[-22,2],[-13,-15],[0,-20],[13,-15],[22,2],[13,22],[0,31],[-13,22]],'#6d182d','#f4ad88');
-    shape([[-20,6],[-11,-4],[0,-8],[11,-4],[20,6],[11,15],[0,19],[-11,15]],'#ff647e','#ffe4b1');
-    c.fillStyle='#321222';c.fillRect(-3,-5,6,21);c.fillStyle='#fff4d3';c.fillRect(-2,-3,2,6);
-    shape([[-32,-13],[-37,-32],[-22,-27],[-25,-10]],'#d2ad62','#fff2bc');
-    shape([[-10,-22],[0,-37],[10,-22],[0,-27]],'#d2ad62','#fff2bc');
-    shape([[25,-10],[22,-27],[37,-32],[32,-13]],'#d2ad62','#fff2bc');
+    c.save(); c.scale(.9,.9);
+    drawRedCrownMirror(c,0,0,s.elapsed||0,reducedMotion);
+    c.restore();
   }else if(fractured){
     shape([[-3,-12],[-20,0],[-15,23],[-2,30],[4,10],[-6,4]],'#694a88','#f3dba2');
     shape([[5,-9],[23,3],[17,27],[5,33],[9,13],[0,6]],'#aa608d','#e8bb98');
@@ -157,10 +155,10 @@ export function drawPrideFrame(c, height, s = {}, reduced = false) {
       c.fillStyle='#d6ad67';c.fillRect(90,height-46,46,3);c.fillStyle='#f2d598';c.fillRect(97,height-42,38,1);
     }else{
       if(red){
-        // A single burning eye with blade wings and long talons: a different silhouette.
+        // A crowned red mirror with blade wings and long talons: a different silhouette.
         shape([[138,83],[111,52],[101,92],[66,114],[79,148],[42,198],[66,239],[49,306],[77,height-149],[55,height-97],[112,height-43],[139,height-27],[133,height-141],[139,159]],'#49202f','#d59c68');
         shape([[121,119],[90,128],[66,207],[87,258],[68,height-130],[115,height-63],[130,height-97]],'#872b43','#f2bd91');
-        jewel(113,108,17,31,'#ae3b54');c.fillStyle='#ffd9b0';c.fillRect(100,106,26,4);c.fillStyle='#431124';c.fillRect(111,94,4,28);
+        jewel(113,108,17,31,'#ae3b54');shape([[101,111],[115,83],[122,98],[108,125]],'#ffd9b055');
         const wy=height*.43+pulse;
         for(let i=0;i<4;i++){const y=wy+i*26;shape([[76,y-28],[121,y-11],[139,y+4],[129,y+48],[121,y+24],[116,y+4],[58,y-2]],'#bd5262','#eac292');}
         for(let i=0;i<5;i++)jewel(77+i%2*18,height-100-i*45,4,10,'#ed839b');

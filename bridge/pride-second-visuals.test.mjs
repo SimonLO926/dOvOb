@@ -26,8 +26,20 @@ test('Red shooter shows its independent proportional bar and visible hit target 
  s.mini.shots=[{x:boss.x,y:245,vy:-440,damage:4}];updatePrideSecond(s,16,{hit(){}});assert.equal(s.mini.bossHp,hp-4);
  const {c,calls}=canvas();drawPrideSecond(c,s);assert.ok(calls.some(v=>v[0]==='fillText'&&v[1]==='命中紅鏡'));
  assert.ok(calls.some(v=>v[0]==='lineTo'&&v[1]===26&&v[2]===18),'Expanded red mirror frame');
- assert.ok(calls.some(v=>v[0]==='moveTo'&&v[1]===-20&&v[2]===-3),'Visible single red eye');
+ assert.ok(calls.some(v=>v[0]==='moveTo'&&v[1]===-12&&v[2]===10),'Visible reflected crown');
  assert.ok(calls.some(v=>v[0]==='strokeRect'&&v[1]===redBossPosition(s.mini).x-25&&v[3]===50),'Hit feedback outlines the active mirror');
  assert.ok(calls.some(v=>v[0]==='fillRect'&&v[1]===34&&v[2]===178&&v[3]===212*(hp-4)/hp));
  assert.ok(!calls.some(v=>v[0]==='fillText'&&v[1].includes('/3')));
+});
+
+
+test('Red form head shares crowned-mirror artwork with the shooter and reduced motion removes its pulse',async()=>{
+ const {drawPrideBossHead}=await import('./pride-art.mjs');
+ const s={form:2,elapsed:7777,mirrorWorld:{mirrors:[{broken:false,color:'#ff5369'}]}};
+ for(const bridge of [false,true]){
+  const {c,calls}=canvas();drawPrideBossHead(c,s,{bridge,reducedMotion:true});
+  assert.ok(calls.some(v=>v[0]==='moveTo'&&v[1]===-12&&v[2]===10),'Crown reflection in the enclosing head');
+  assert.ok(!calls.some(v=>v[0]==='fillRect'&&v[1]===-3&&v[2]===-5&&v[3]===6&&v[4]===21),'Old eye pupil removed');
+  assert.ok(calls.filter(v=>v[0]==='shadowBlur').every(v=>v[1]===0),'Reduced motion has no glow pulse');
+ }
 });
