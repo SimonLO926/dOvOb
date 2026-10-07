@@ -1161,6 +1161,7 @@ const PRIDE_TEXT = {
   "crazyHint_pride-red-survival": ["自動射擊、拾道具；空白鍵 集火，C／Shift 精準", "Auto-fire and collect power-ups; Space bursts, C / Shift precision"],
 
   prideMirrorName: ['鏡之化身', 'Mirror Incarnation'], sinPride: ['傲慢', 'Pride'], prideIntro: ['鏡宮之王', 'King of the mirror palace'],
+  prideLore: ['鏡宮之王俯視一切。挑戰他的傲慢王權。', 'The king looks down upon all. Challenge his arrogant rule.'],
   prideDefeated: ['傲慢擊破！', 'Pride defeated!'], prideCleared: ['傲慢已通關', 'Pride cleared'],
   prideRetry: ['鏡中對決重試 · Boss 鎖血', 'Mirror duel retry · Boss locked'],
   prideDuelFailed: ['鏡中對決失敗 · 扣 80 HP', 'Mirror duel failed · 80 HP penalty'],

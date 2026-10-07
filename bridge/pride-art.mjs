@@ -1,5 +1,5 @@
 import { drawRedCrownMirror } from './pride-red-art.mjs';
-import { drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.26';
+import { drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.27';
 import { drawPrideBackdrop } from './pride-theme.mjs';
 // Runtime WebP portraits; byte-identical PNG sources live in source-assets/pride.
 // Canvas artwork remains available when an image cannot be loaded.
