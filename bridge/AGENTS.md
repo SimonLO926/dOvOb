@@ -1,5 +1,7 @@
 # Bridge / Crazy 工作指引
 
+**每個新 Boss 先交付試玩，等使用者明確確認該 Boss「OK」，才推送正式整合、建立及合併 PR（pull）。** 不得以測試通過或前一個 Boss 的批准代替本關確認；依 [CRAZY_MUST_READ.md](CRAZY_MUST_READ.md#每個新-boss-的交付流程) 執行。
+
 修改 Crazy、七大罪 Boss、美術、遊戲框、HUD、觸控或試玩交付時，先依序閱讀：
 
 1. [BOSS_UI_MUST_READ.md](BOSS_UI_MUST_READ.md)：貪婪與傲慢各型態的畫面／操作規範、圖片生成與已採用參考、例外及修改後驗收表。

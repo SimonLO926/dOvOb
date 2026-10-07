@@ -2,6 +2,8 @@
 
 ## Bridge / Crazy / Boss 畫面必讀
 
+**每個新 Boss 必須先交付試玩，取得使用者對該 Boss 的明確「OK」後，才推送正式整合、建立及合併 PR（使用者所稱的 pull）。** 前一個 Boss 的批准不能沿用到下一個；測試通過也不等於使用者已確認。完整流程見 [Crazy 關卡製作必讀](bridge/CRAZY_MUST_READ.md#每個新-boss-的交付流程)。
+
 任務涉及 `bridge/`、Crazy、七大罪 Boss，或其 `source-assets/` 素材時，修改前依序閱讀：
 
 1. [Boss 畫面與操作必讀規範](bridge/BOSS_UI_MUST_READ.md)：貪婪、傲慢各型態的遊戲框、血條、按鈕、文字、特效、圖片生成／參考與驗收要求；下一個 Boss 同樣沿用共用規則。
