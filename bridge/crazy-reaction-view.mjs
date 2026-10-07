@@ -1,5 +1,5 @@
-import { pusherFront, PUSHER_STEP } from './crazy-reactions.mjs?v=1.2.27';
-import { GREED_ATTACKS, ROULETTE_LASER_WIDTH } from './crazy-reactions.mjs?v=1.2.27';
+import { pusherFront, PUSHER_STEP } from './crazy-reactions.mjs?v=1.2.28';
+import { GREED_ATTACKS, ROULETTE_LASER_WIDTH } from './crazy-reactions.mjs?v=1.2.28';
 const label = (c, value, x, y, size = 13, color = '#ffe7a3') => { c.fillStyle = color; c.font = `bold ${size}px "Pixel Latin", "Pixel Hant", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(value, x, y, 248); };
 export function pixelCore(c, x, y, color) {
   const pixels = ['.XX.XX.', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..', '...X...'];

@@ -5,7 +5,7 @@ export function loadGreedArt() {
   [['first', 'greed-first.webp'], ['firstSprite', 'greed-first-sprite.webp'], ['second', 'greed-second.webp'], ['defeated', 'greed-defeated.webp']].map(([key, file]) => new Promise(resolve => {
     const img = new Image(); greedImages[key] = img;
     img.onload = () => resolve(true); img.onerror = () => resolve(false);
-    img.src = new URL(`./assets/${file}?v=1.2.27`, import.meta.url).href;
+    img.src = new URL(`./assets/${file}?v=1.2.28`, import.meta.url).href;
   }))
   );
 }
