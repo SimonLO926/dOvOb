@@ -1,3 +1,4 @@
+import { drawRedCrownMirror } from './pride-red-art.mjs';
 import { avatar, path } from './pride-visuals.mjs';
 import { prideHud, beginPrideArena, prideWorldY } from './pride-layout.mjs';
 import { drawPrideBackdrop } from './pride-theme.mjs';
@@ -24,28 +25,9 @@ function fire(m, burst = false) {
 function sparks(m,x,y,color,count=10){for(let i=0;i<count;i++){const a=i*2.399;m.particles.push({x,y,vx:Math.cos(a)*(30+i*3),vy:Math.sin(a)*(30+i*3),life:400,color});}m.particles=m.particles.slice(-180);}
 function drop(m,kind,x,y){m.items.push({kind,x:clamp(x,30,250),y,vy:55,age:0});}
 export function redBossPosition(m) { return { x: 140 + Math.sin(m.clock * .0013) * 64, y: 218 }; }
-// Keep the central 52×54 shot target; broken wings and crown are ornaments.
+// Shared crowned-mirror art also supplies the enclosing red-form head.
 export function drawRedBoss(c, x, y, clock = 0, reduced = false) {
-  c.save(); c.translate(x, y); c.lineWidth = 2;
-  const pulse = reduced ? 0 : Math.sin(clock * .009);
-  c.shadowColor = '#ff244f'; c.shadowBlur = reduced ? 0 : 8 + pulse * 2;
-  for (const side of [-1, 1]) {
-    path(c, [[side*22,-15],[side*40,-25],[side*34,-7],[side*44,4],[side*29,13],[side*37,28],[side*20,21]], '#54152e', '#dd6472');
-    path(c, [[side*29,-10],[side*36,-17],[side*30,2],[side*39,5],[side*25,11]], '#b9304c', '#ffba9a');
-    path(c, [[side*24,23],[side*32,31],[side*23,36]], '#79243e', '#d69b70');
-  }
-  path(c, [[-24,-19],[-18,-27],[18,-27],[24,-19],[26,18],[16,27],[-16,27],[-26,18]], '#9c3547', '#ffd08b');
-  path(c, [[-19,-16],[-14,-21],[14,-21],[19,-16],[20,16],[12,22],[-12,22],[-20,16]], '#351020', '#e95365');
-  path(c, [[-19,-23],[-23,-32],[-10,-27],[-4,-33],[0,-25],[10,-32],[16,-25],[23,-29],[19,-22]], '#b66c3d', '#ffe0a0');
-  c.shadowBlur = 0;
-  // An angry single eye and slit pupil. Rage stays local, with no screen shake.
-  path(c, [[-20,-3],[-11,-10],[0,-6],[11,-10],[20,-3],[11,7],[0,10],[-11,7]], '#ff4162', '#ffcfaa');
-  path(c, [[-16,-3],[-8,-5],[0,-3],[8,-5],[16,-3],[8,4],[0,6],[-8,4]], '#ffa286');
-  path(c, [[0,-6],[4,-1],[2,6],[0,9],[-2,6],[-4,-1]], '#260718');
-  c.fillStyle = '#fff1c9'; c.fillRect(-7,-3,3,2);
-  for (const side of [-1,1]) path(c, [[side*17,10],[side*9,14],[side*14,19],[side*5,22]], null, '#f48c90');
-  path(c, [[-13,-16],[-5,-12],[-8,-7]], null, '#ff887f');
-  c.restore();
+  drawRedCrownMirror(c, x, y, clock, reduced);
 }
 function volley(m, hard) {
   const boss = redBossPosition(m), late = m.clock >= 20000;

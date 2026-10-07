@@ -5,12 +5,12 @@ import { PRIDE_ATTACKS, drawPrideAttack } from './pride-attacks.mjs';
 import { drawMirrorDuel } from './pride-finisher.mjs';
 import { drawPridePalace, drawPrideFrame, drawPrideBossHead } from './pride-art.mjs';
 import { drawPrideBackdrop } from './pride-theme.mjs';
-import { drawVault } from './crazy-vault.mjs?v=1.2.25';
-import { drawFineDealer, drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.25';
-import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.25';
-import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.25';
-import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.25';
-import { drawSession } from './arcade.mjs?v=1.2.25';
+import { drawVault } from './crazy-vault.mjs?v=1.2.26';
+import { drawFineDealer, drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.26';
+import { GREED_ATTACKS } from './crazy-reactions.mjs?v=1.2.26';
+import { drawReaction, drawPusher } from './crazy-reaction-view.mjs?v=1.2.26';
+import { COLS, ROWS, SAND_SCALE, SAND_HEX, cellsOf, ghostY, sandPaintsFor } from './logic.mjs?v=1.2.26';
+import { drawSession } from './arcade.mjs?v=1.2.26';
 export const CRAZY_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 356 });
 export const CRAZY_BLOCK_ARENA = Object.freeze({ x: 12, y: 152, w: 256, h: 512 });
 export function crazyCanvasHeight(mode) { return mode === 'bridge' || mode === 'sand' ? 720 : 560; }
@@ -23,7 +23,7 @@ const catPhoto = typeof Image === 'undefined' ? null : new Image();
 export const catImageReady = catPhoto ? new Promise(resolve => {
   catPhoto.onload = () => resolve(true);
   catPhoto.onerror = () => resolve(false);
-  catPhoto.src = new URL('./assets/mischief-cat.webp?v=1.2.25', import.meta.url).href;
+  catPhoto.src = new URL('./assets/mischief-cat.webp?v=1.2.26', import.meta.url).href;
 }) : Promise.resolve(false);
 const COLORS = { I: '#64d2ff', O: '#ffd60a', T: '#bf5af2', S: '#30d158', Z: '#ff453a', J: '#0a84ff', L: '#ff9f0a', B: '#9da4b9' };
 const SYMBOLS = ['★', '♥', '7', '♠'];
@@ -314,7 +314,7 @@ export function drawCrazy(c, s, t, { reducedMotion = false, screenShake = true, 
   else if (GREED_ATTACKS.includes(s.mode)) drawReaction(c, s, t, reducedMotion);
   else if (s.mode === 'pusher') drawPusher(c, s, t, reducedMotion);
   else miniBoard(c, s, t, reducedMotion);
-  if(s.config.id==='pride' && s.mode!==PRIDE_ESCAPE_ID)drawPrideBossHead(c,s,{bridge:!prideGame});
+  if(s.config.id==='pride' && s.mode!==PRIDE_ESCAPE_ID)drawPrideBossHead(c,s,{bridge:!prideGame,reducedMotion});
   if(s.config.id==='pride' && s.mode!==PRIDE_ESCAPE_ID)bar(c,prideGame?90:64,prideGame?84:116,prideGame?100:152,s.bossHp/s.bossMaxHp,s.form===2&&s.mirrorWorld?.red?'#ff476f':'#c49be8');
   if(s.config.id==='pride'&& !prideGame && s.form===2)text(c,s.mirrorWorld.red?'紅鏡 · 狂暴':`${s.mirrorWorld.mirrors.filter(v=>!v.broken).length} 面鏡`,140,126,11,'#f2d596');
   if (!prideGame) text(c, `${SECOND_NAMES[s.mode] || t('crazyMode_' + s.mode)} · ${Math.ceil(Math.max(0, s.timeLeft) / 1000)}s`, 140, 141, 12, '#ffc7d6');
