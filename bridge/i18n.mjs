@@ -1182,7 +1182,92 @@ const PRIDE_TEXT = {
   'crazyHint_pride-mirror-duel': ['踩亮鏡座 → 離開 → 空白鍵封住延遲鏡像', 'Charge a seal, leave, then press Space to catch your delayed mirror'],
 };
 
+const CONTROLS_TEXT = {
+  "controlsGuide": [
+    "控制按鈕說明",
+    "控制按钮说明",
+    "Controls",
+    "操作説明",
+    "조작 안내",
+    "Controlos",
+    "Controles"
+  ],
+  "controlsMove": [
+    "移動／選擇",
+    "移动／选择",
+    "Move / select",
+    "移動／選択",
+    "이동 / 선택",
+    "Mover / selecionar",
+    "Mover / seleccionar"
+  ],
+  "controlsUp": [
+    "旋轉／向上",
+    "旋转／向上",
+    "Rotate / up",
+    "回転／上",
+    "회전 / 위",
+    "Rodar / cima",
+    "Girar / arriba"
+  ],
+  "controlsRotate": [
+    "方塊右旋／左旋",
+    "方块右旋／左旋",
+    "Blocks: rotate right / left",
+    "ブロック：右回転／左回転",
+    "블록: 오른쪽 / 왼쪽 회전",
+    "Blocos: rodar à direita / esquerda",
+    "Bloques: girar a la derecha / izquierda"
+  ],
+  "controlsDown": [
+    "緩降／向下",
+    "缓降／向下",
+    "Soft drop / down",
+    "ソフトドロップ／下",
+    "소프트 드롭 / 아래",
+    "Descida suave / baixo",
+    "Caída suave / abajo"
+  ],
+  "controlsMain": [
+    "下落／主動作",
+    "下落／主动作",
+    "Drop / main action",
+    "落下／主操作",
+    "낙하 / 주 동작",
+    "Largar / ação principal",
+    "Caer / acción principal"
+  ],
+  "controlsAlt": [
+    "保留／副動作",
+    "保留／副动作",
+    "Hold / secondary action",
+    "ホールド／副操作",
+    "홀드 / 보조 동작",
+    "Reservar / ação secundária",
+    "Reservar / acción secundaria"
+  ],
+  "controlsOpenMenu": [
+    "開啟菜單",
+    "打开菜单",
+    "Open menu",
+    "メニューを開く",
+    "메뉴 열기",
+    "Abrir menu",
+    "Abrir menú"
+  ],
+  "controlsTouch": [
+    "觸控按鈕功能相同；小遊戲以按鈕當前名稱為準。",
+    "触控按钮功能相同；小游戏以按钮当前名称为准。",
+    "Touch buttons have the same functions; follow the current labels in minigames.",
+    "タッチボタンも同じ機能。ミニゲームでは現在のボタン表示に従ってください。",
+    "터치 버튼도 같은 기능입니다. 미니게임에서는 현재 버튼 표시를 따르세요.",
+    "Os botões no ecrã têm as mesmas funções; nos minijogos, siga as etiquetas atuais.",
+    "Los botones táctiles tienen las mismas funciones; en minijuegos, sigue las etiquetas actuales."
+  ]
+};
+
 export function translate(lang, key) {
+  if (CONTROLS_TEXT[key]) return CONTROLS_TEXT[key][Math.max(0, LANGS.indexOf(lang))];
   if (PRIDE_TEXT[key]) return PRIDE_TEXT[key][lang?.startsWith("zh") ? 0 : 1];
   if (VAULT_TEXT[key]) return VAULT_TEXT[key];
   return (TEXT[lang] || TEXT["zh-Hant"])[key] ?? TEXT.en[key] ?? key;
