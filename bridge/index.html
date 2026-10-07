@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
-  <link rel="preload" type="image/webp" href="./assets/mischief-cat.webp?v=1.2.28" as="image">
-  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.28" as="font" type="font/woff" crossorigin>
+  <link rel="preload" type="image/webp" href="./assets/mischief-cat.webp?v=1.2.29" as="image">
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.29" as="font" type="font/woff" crossorigin>
   <style>
     #pride-preview { position: fixed; inset: 0; z-index: 160; display: flex; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; background: linear-gradient(#160b29bb, #160b29ed), url('./assets/pride-palace.webp') center / cover; }
     .pride-preview-card { flex: none; width: min(440px, 100%); margin: auto; padding: 28px; border: 1px solid #dabb78; border-radius: 24px; text-align: left; color: #f8edda; background: #241833ed; box-shadow: 0 18px 60px #0007; }
@@ -30,7 +30,7 @@
     /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
     @font-face {
       font-family: "Fever Brush";
-      src: url("./fonts/fever-brush.woff?v=1.2.28") format("woff");
+      src: url("./fonts/fever-brush.woff?v=1.2.29") format("woff");
       font-weight: 400;
       font-display: swap;
     }
@@ -871,6 +871,11 @@
     html.touch body { touch-action: manipulation; }
     html.touch button, html.touch a, html.touch input, html.touch select { touch-action: manipulation; }
     html.touch .pad button { touch-action: none; }
+    html.touch #menu {
+      height: calc(100svh - 28px); min-height: 0;
+      align-content: start; align-content: safe center; overflow-y: auto; touch-action: pan-y;
+      -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+    }
     html.touch .settings-wrap {
       height: calc(100svh - 28px);
       min-height: 0;
@@ -1145,7 +1150,7 @@
     #game #game-menu { width: 44px; height: 40px; padding: 0; border-radius: 12px; font-size: 21px; line-height: 1; }
     html.touch #game .nav { min-height: 40px; margin-bottom: 4px; }
     html.touch #game .nav .logo { width: 130px; height: 28px; }
-    #play-menu { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 20px; overflow: auto; touch-action: pan-y; background: #080912a8; }
+    #play-menu, #controls-dialog { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 20px; overflow: auto; touch-action: pan-y; background: #080912a8; }
     .play-menu-card { width: min(380px, 100%); max-height: calc(100svh - 40px); overflow-y: auto; touch-action: pan-y; padding: 24px; background: var(--md-container); color: var(--ink); border: 1px solid var(--md-outline); border-radius: 18px; box-shadow: 0 12px 70px #0007; }
     .play-menu-card h2 { font-size: 24px; margin: 0 0 12px; }
     .play-menu-card p { font-size: 13px; line-height: 1.6; }
@@ -1155,6 +1160,17 @@
     .danger-effects { flex-wrap: wrap; }
     .play-menu-card .danger-effects button { margin: 0; }
     .play-menu-card .game-danger-settings { margin: 18px 0; }
+    .controls-guide { font-size: 13px; line-height: 1.65; text-align: left; }
+    .controls-guide dl { display: grid; grid-template-columns: max-content 1fr; gap: 10px 16px; margin: 12px 0; }
+    .controls-guide dt { font-weight: bold; }
+    .controls-guide dd { margin: 0; overflow-wrap: anywhere; }
+    .controls-guide summary, .controls-entry { min-height: 44px; cursor: pointer; padding: 10px 0; font-size: 14px; touch-action: manipulation; }
+    .controls-guide summary:focus-visible, .controls-entry:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .controls-guide p { margin: 8px 0 14px; overflow-wrap: anywhere; }
+    #controls-dialog .play-menu-card { display: flex; flex-direction: column; overflow: hidden; }
+    #controls-dialog h2 { flex: none; }
+    #main-controls-guide { min-height: 0; overflow-y: auto; touch-action: pan-y; }
+    .controls-return { flex: none; padding: 8px 0 0; background: var(--md-container); }
     body.crazy-active #play-menu { background: #08091266; }
     @media (prefers-reduced-motion: reduce) { .greed-first-art { transition: none; } }
   </style>
@@ -1287,6 +1303,7 @@
         <div class="menu-links">
           <button id="go-boards" class="chip" type="button" data-i18n="boards">Ranks</button>
           <button id="go-settings" class="chip" type="button" data-i18n="settings">Settings</button>
+          <button id="go-controls" class="chip" type="button" data-i18n="controlsGuide" aria-haspopup="dialog">Controls</button>
         </div>
       </div>
     </section>
@@ -1314,8 +1331,8 @@
           <button data-sin="wrath" type="button" disabled><svg class="sin-lock" viewBox="0 0 24 28" aria-hidden="true"><path d="M6 12 V8 A6 6 0 0 1 18 8 V12"/><rect x="3" y="12" width="18" height="14" rx="2"/><path d="M12 18 V22"/><circle cx="12" cy="18" r="1"/></svg><svg class="sin-emblem" hidden aria-hidden="true"><use href="#sin-icon-wrath"/></svg><span hidden data-i18n="sinWrath">Wrath</span><small hidden data-i18n="crazyLocked">Locked</small></button>
         </div>
         <div class="greed-preview" data-sin="greed" aria-labelledby="boss-preview-title">
-          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.webp?v=1.2.28" onerror="this.onerror=null;this.hidden=true" alt="" aria-hidden="true">
-          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.webp?v=1.2.28" onerror="this.onerror=null;this.hidden=true" alt="The Mad Dealer">
+          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.webp?v=1.2.29" onerror="this.onerror=null;this.hidden=true" alt="" aria-hidden="true">
+          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.webp?v=1.2.29" onerror="this.onerror=null;this.hidden=true" alt="The Mad Dealer">
           <div class="greed-caption"><div aria-live="polite"><h2 id="boss-preview-title" data-i18n="crazyDealer">The Mad Dealer</h2><p id="boss-preview-lore" data-i18n="crazyGreedLore">The house wants everything. Challenge the dealer's greed.</p></div><button id="boss-challenge" type="button" data-i18n="crazyChallenge">Challenge</button></div>
         </div>
       </div>
@@ -1628,6 +1645,7 @@
     <div class="play-menu-card">
       <h2 id="play-menu-title"></h2><p id="play-menu-note"></p>
       <div id="play-menu-options">
+        <details id="play-controls"><summary class="controls-entry" data-i18n="controlsGuide">Controls</summary><div id="play-controls-guide" class="controls-guide"></div></details>
         <label><span data-i18n="bgmVolume">BGM</span><output id="bgm-level"></output><input id="play-bgm" type="range" min="0" max="100" step="1" aria-label="BGM"></label>
         <label><span data-i18n="sfxVolume">Sound effects</span><output id="sfx-level"></output><input id="play-sfx" type="range" min="0" max="100" step="1" aria-label="Sound effects"></label>
         <div class="game-danger-settings">
@@ -1643,11 +1661,18 @@
       <div id="play-menu-confirm" hidden><p data-i18n="quitConfirm">Exit this game? Your current run will end.</p><button id="play-menu-cancel" type="button" data-i18n="cancel">Cancel</button><button id="play-menu-exit" type="button" data-i18n="confirmExit">Exit</button></div>
     </div>
   </div>
+  <div id="controls-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="controls-title">
+    <div class="play-menu-card">
+      <h2 id="controls-title" data-i18n="controlsGuide">Controls</h2>
+      <div id="main-controls-guide" class="controls-guide"></div>
+      <div class="controls-return"><button id="controls-close" type="button" data-i18n="close">Back</button></div>
+    </div>
+  </div>
   <div id="crazy-cinematic" hidden role="dialog" aria-modal="true" aria-label="Boss cinematic">
     <canvas id="cinematic-canvas" aria-hidden="true"></canvas><div class="cinematic-controls"><button id="cinematic-pause" type="button" data-i18n="paused">Pause</button><button id="cinematic-skip" type="button" data-i18n="crazySkip">Skip</button></div>
   </div>
   <div id="crazy-result" hidden role="dialog" aria-modal="true" aria-labelledby="result-title">
-    <img class="result-art" loading="lazy" src="./assets/greed-defeated.webp?v=1.2.28" onerror="this.onerror=null;this.hidden=true" alt="Defeated Greed surrounded by spilled coins">
+    <img class="result-art" loading="lazy" src="./assets/greed-defeated.webp?v=1.2.29" onerror="this.onerror=null;this.hidden=true" alt="Defeated Greed surrounded by spilled coins">
     <div class="result-content"><small>GREED · CLEARED</small><h1 id="result-title" data-i18n="crazyGreedBroken">Greed defeated</h1><div class="result-score" id="result-score"></div><div class="result-stats" id="result-stats"></div><p data-i18n="crazyClearUnlock">Gilded Devourer silhouette unlocked</p><div class="result-buttons"><button id="result-retry" type="button" data-i18n="again">Again</button><button id="result-bosses" type="button" data-i18n="crazySevenSins">Seven Deadly Sins</button></div></div>
   </div>
   <div id="fever-aura" hidden aria-hidden="true">
@@ -1665,27 +1690,28 @@
     <i style="--x:83%;--y:97%;--delay:-1.87s"></i>
   </div>
   <script type="module">
-    import { createPridePreview, mountPridePreview, prideControls } from "./pride-preview.mjs?v=1.2.28";
-    import { BRIDGE_REPEAT } from "./bridge-controls.mjs?v=1.2.28";
-    import { sinProgress, crazyLeaderboardKey, recordSinClear } from "./crazy-sins.mjs?v=1.2.28";
-    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.28";
-    import { drawCrazy, drawCrazyFrame, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.28";
+    import { createPridePreview, mountPridePreview, prideControls } from "./pride-preview.mjs?v=1.2.29";
+    import { BRIDGE_REPEAT } from "./bridge-controls.mjs?v=1.2.29";
+    import { sinProgress, crazyLeaderboardKey, recordSinClear } from "./crazy-sins.mjs?v=1.2.29";
+    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.29";
+    import { drawCrazy, drawCrazyFrame, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.29";
     import { drawPrideCinematic, loadPrideArt } from "./pride-art.mjs";
     import { PRIDE_ATTACKS } from "./pride-attacks.mjs";
     import { PRIDE_SECOND_MODES } from "./pride-second.mjs";
-    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.28";
-    import { drawGreedCinematic, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.28";
-    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.28";
-    import { createSound, CASINO_EFFECTS } from "./audio.mjs?v=1.2.28";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.28";
-    import { translate } from "./i18n.mjs?v=1.2.28";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.28";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.28";
-    import { VERSION } from "./version.mjs?v=1.2.28";
+    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.29";
+    import { drawGreedCinematic, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.29";
+    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.29";
+    import { createSound, CASINO_EFFECTS } from "./audio.mjs?v=1.2.29";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.29";
+    import { translate } from "./i18n.mjs?v=1.2.29";
+    import { renderControlsGuide } from "./controls-guide.mjs?v=1.2.29";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.29";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.29";
+    import { VERSION } from "./version.mjs?v=1.2.29";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SAND_HEX, SHAPES, activateFever, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.2.28";
+    } from "./logic.mjs?v=1.2.29";
 
     const pridePreview = new URLSearchParams(location.search).get("preview") === "pride" || document.body.hasAttribute("data-pride-preview");
     let previewScenario = "full", previewDifficulty = "normal", previewLauncher = null;
@@ -2172,10 +2198,10 @@
       preview.classList.add("previewing");
       preview.classList.toggle("cleared", boss.cleared);
       const shadow = preview.querySelector(".greed-shadow");
-      shadow.src = `./assets/${pride ? "pride" : "greed"}-second.webp?v=1.2.28`;
+      shadow.src = `./assets/${pride ? "pride" : "greed"}-second.webp?v=1.2.29`;
       shadow.hidden = !boss.cleared;
       const art = preview.querySelector(".greed-first-art");
-      art.src = `./assets/${pride ? "pride" : "greed"}-first.webp?v=1.2.28`;
+      art.src = `./assets/${pride ? "pride" : "greed"}-first.webp?v=1.2.29`;
       art.alt = t(pride ? "prideIntro" : "crazyDealer");
       for (const [id, key] of [["boss-preview-title", pride ? "prideIntro" : "crazyDealer"], ["boss-preview-lore", pride ? "prideLore" : "crazyGreedLore"]]) {
         const el = document.getElementById(id);
@@ -2344,6 +2370,21 @@
         document.querySelector(`#${output}`).textContent = `${level}%`;
       }
     }
+    function syncControlsGuide() {
+      renderControlsGuide(document.querySelector('#play-controls-guide'), t);
+    }
+    function closeControlsGuide() {
+      document.querySelector('#controls-dialog').hidden = true;
+      document.querySelector('#menu').inert = false;
+      document.querySelector('#go-controls').focus({ preventScroll: true });
+    }
+    document.querySelector('#go-controls').addEventListener('click', () => {
+      renderControlsGuide(document.querySelector('#main-controls-guide'), t);
+      document.querySelector('#controls-dialog').hidden = false;
+      document.querySelector('#menu').inert = true;
+      document.querySelector('#controls-close').focus({ preventScroll: true });
+    });
+    document.querySelector('#controls-close').addEventListener('click', closeControlsGuide);
     function openGameMenu() {
       if (document.querySelector("#game").hidden || gameMenuOpen) return;
       menuPauseStart = crazy ? 0 : performance.now();
@@ -2359,6 +2400,7 @@
       document.querySelector("#play-menu-close").textContent = t(crazy ? "close" : "resume");
       document.querySelector("#game").inert = true;
       syncGameMenuAudio();
+      syncControlsGuide();
       document.querySelector("#play-menu-close").focus({ preventScroll: true });
     }
     function closeGameMenu(focus = true) {
@@ -2431,10 +2473,20 @@
 
     window.addEventListener("keydown", (event) => {
       const key = event.key;
+      if (!document.querySelector('#controls-dialog').hidden) {
+        if (key === 'Escape') { event.preventDefault(); closeControlsGuide(); }
+        else if (key === 'Tab') {
+          const controls = [...document.querySelectorAll('#controls-dialog button, #controls-dialog summary')].filter(el => el.getClientRects().length);
+          const first = controls[0], last = controls.at(-1);
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+        return;
+      }
       if (gameMenuOpen) {
         if (key === "Escape") { event.preventDefault(); closeGameMenu(); }
         else if (key === "Tab") {
-          const controls = [...document.querySelectorAll("#play-menu button, #play-menu input")].filter(el => el.getClientRects().length && !el.disabled);
+          const controls = [...document.querySelectorAll("#play-menu button, #play-menu input, #play-menu summary")].filter(el => el.getClientRects().length && !el.disabled);
           const first = controls[0], last = controls.at(-1);
           if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
           else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
@@ -3616,7 +3668,7 @@
     }
     document.addEventListener("touchmove", (event) => {
       if (!document.documentElement.classList.contains("touch")) return;
-      if (event.target.closest(".settings-wrap, #pride-preview, #bosses, #crazy-result, #play-menu, input, select, .settings-card")) return;
+      if (event.target.closest("#menu, .settings-wrap, #pride-preview, #bosses, #crazy-result, #play-menu, #controls-dialog, input, select, .settings-card")) return;
       event.preventDefault();
     }, { passive: false });
 
