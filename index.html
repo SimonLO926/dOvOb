@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Simon Lo 的個人網站，收錄互動實驗、實用工具與旅行紀錄。">
+  <meta data-i18n-content="description" name="description" content="Simon Lo 的個人網站，收錄互動實驗、實用工具與旅行紀錄。">
   <title>Simon Lo — Web playground</title>
   <style>
     :root {
@@ -37,11 +37,15 @@
       align-items: center;
       justify-content: space-between;
       min-height: 84px;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 18px 0;
       border-bottom: 1px solid var(--line);
     }
 
     .brand {
       display: flex;
+      flex-shrink: 0;
       align-items: center;
       gap: 12px;
       font-weight: 800;
@@ -60,7 +64,10 @@
       font-size: 12px;
     }
 
-    nav { display: flex; gap: 28px; }
+    nav { display: flex; flex-wrap: wrap; gap: 28px; margin-left: auto; }
+    .language-switcher { display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 13px; font-weight: 700; }
+    .language-switcher select { max-width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: var(--paper); font: inherit; }
+    .language-switcher select:focus-visible { outline: 3px solid #42695a; outline-offset: 3px; }
     nav a { font-size: 13px; font-weight: 700; text-decoration: none; }
     nav a:hover { text-decoration: underline; text-underline-offset: 5px; }
 
@@ -305,8 +312,10 @@
       .shell { width: min(100% - 24px, 1180px); }
       header { min-height: 68px; }
       nav { gap: 16px; }
+      .language-switcher { flex-basis: 100%; }
+      .section-heading { flex-wrap: wrap; gap: 8px; }
       .hero { grid-template-columns: 1fr; gap: 40px; padding: 72px 0 68px; }
-      h1 { font-size: clamp(58px, 22vw, 94px); }
+      h1 { font-size: clamp(38px, 13.7vw, 94px); }
       h1 span { margin-left: .12em; }
       .intro { max-width: 430px; }
       .project-grid { grid-template-columns: 1fr; }
@@ -325,202 +334,220 @@
 <body>
   <div class="shell">
     <header>
-      <a class="brand" href="#top" aria-label="回到頁首">
+      <a class="brand" href="#top" data-i18n-aria-label="backToTop" aria-label="回到頁首">
         <span class="brand-mark">SL</span>
         Simon Lo
       </a>
-      <nav aria-label="主要導覽">
-        <a href="#projects">作品</a>
+      <nav data-i18n-aria-label="navigation" aria-label="主要導覽">
+        <a href="#projects" data-i18n="projects">作品</a>
         <a href="https://twitter.com" target="_blank" rel="noreferrer">Twitter ↗</a>
+        <a href="https://ko-fi.com/simonlogan" target="_blank" rel="noopener" data-i18n="donate">贊助 ☕</a>
       </nav>
+      <label class="language-switcher" for="site-language">
+        <span data-i18n="language">語言</span>
+        <select id="site-language" name="language">
+          <option value="zh-Hant" lang="zh-Hant">繁體中文</option>
+          <option value="zh-Hans" lang="zh-Hans">简体中文</option>
+          <option value="en" lang="en">English</option>
+          <option value="ja" lang="ja">日本語</option>
+        </select>
+      </label>
     </header>
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
         <div>
-          <p class="eyebrow">Hello, internet</p>
+          <p class="eyebrow" data-i18n="greeting">Hello, internet</p>
           <h1 id="hero-title">Simon’s<br><span>playground.</span></h1>
         </div>
         <div>
-          <p class="intro">嗨，我是 <strong>Simon Lo</strong>。這裡收藏我的網頁練習、小工具，還有一些旅途中的靈感。</p>
-          <a class="scroll-note" href="#projects">看看我的作品</a>
+          <p class="intro"><span data-i18n="introBeforeName">嗨，我是 </span><strong>Simon Lo</strong><span data-i18n="introAfterName">。這裡收藏我的網頁練習、小工具，還有一些旅途中的靈感。</span></p>
+          <a class="scroll-note" href="#projects" data-i18n="viewProjects">看看我的作品</a>
         </div>
       </section>
 
       <section class="projects" id="projects" aria-labelledby="projects-title">
         <div class="section-heading">
-          <h2 id="projects-title">Selected works / 精選作品</h2>
-          <span id="project-count">2018—2026</span>
+          <h2 id="projects-title" data-i18n="selectedWorks">Selected works / 精選作品</h2>
+          <span id="project-count" aria-live="polite" aria-atomic="true">2018—2026</span>
         </div>
-        <div class="filters" role="toolbar" aria-label="篩選作品">
-          <button type="button" data-filter="all" aria-pressed="true">全部</button>
-          <button type="button" data-filter="game">遊戲</button>
-          <button type="button" data-filter="interactive">互動</button>
-          <button type="button" data-filter="experiment">實驗</button>
-          <button type="button" data-filter="tool">工具</button>
-          <button type="button" data-filter="record">紀錄</button>
+        <div class="filters" role="toolbar" data-i18n-aria-label="filterProjects" aria-label="篩選作品">
+          <button type="button" data-filter="all" data-i18n="all" aria-pressed="true">全部</button>
+          <button type="button" data-filter="game" data-i18n="game">遊戲</button>
+          <button type="button" data-filter="interactive" data-i18n="interactive">互動</button>
+          <button type="button" data-filter="experiment" data-i18n="experiment">實驗</button>
+          <button type="button" data-filter="tool" data-i18n="tool">工具</button>
+          <button type="button" data-filter="record" data-i18n="record">紀錄</button>
         </div>
         <div class="project-grid">
           <a class="project" href="./beyblade-x.html" data-kind="game">
             <div class="project-preview" aria-hidden="true" inert>
-              <iframe src="./beyblade-x.html" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
+              <iframe src="./beyblade-x.html" data-i18n-title="previewTitle" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
             </div>
             <div class="project-top">
-              <span class="project-no">GAME / 09</span>
+              <span class="project-no"><span data-i18n="categoryGame">GAME</span> / 09</span>
               <span class="project-arrow" aria-hidden="true">↗</span>
             </div>
             <div class="project-info">
-              <h3>爆旋陀螺 X</h3>
-              <p>自訂刃、棘輪、軸心。游標分兩次鎖傾斜，連點決定拉力。</p>
+              <h3 data-i18n="beybladeTitle">爆旋陀螺 X</h3>
+              <p data-i18n="beybladeDescription">自訂刃、棘輪、軸心。游標分兩次鎖傾斜，連點決定拉力。</p>
             </div>
           </a>
           <a class="project" href="./bridge/index.html" data-kind="game">
             <div class="project-preview" aria-hidden="true" inert>
-              <iframe src="./bridge/index.html" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
+              <iframe src="./bridge/index.html" data-i18n-title="previewTitle" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
             </div>
             <div class="project-top">
-              <span class="project-no">GAME / 08</span>
+              <span class="project-no"><span data-i18n="categoryGame">GAME</span> / 08</span>
               <span class="project-arrow" aria-hidden="true">↗</span>
             </div>
             <div class="project-info">
-              <h3>架塊</h3>
-              <p>馬拉松與 40 行競速。方塊可以架在空洞上。</p>
+              <h3 data-i18n="bridgeTitle">架塊</h3>
+              <p data-i18n="bridgeDescription">馬拉松與 40 行競速。方塊可以架在空洞上。</p>
             </div>
           </a>
           <a class="project" href="./dynamic-answer-book/index.html" data-kind="interactive">
             <div class="project-preview" aria-hidden="true" inert>
-              <iframe src="./dynamic-answer-book/index.html" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
+              <iframe src="./dynamic-answer-book/index.html" data-i18n-title="previewTitle" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
             </div>
             <div class="project-top">
-              <span class="project-no">INTERACTIVE / 08</span>
+              <span class="project-no"><span data-i18n="categoryInteractive">INTERACTIVE</span> / 08</span>
               <span class="project-arrow" aria-hidden="true">↗</span>
             </div>
             <div class="project-info">
-              <h3>答案之書</h3>
-            <p>默問、翻書、抽籤，讓一頁回應心裡的問題</p>
+              <h3 data-i18n="answerTitle">答案之書</h3>
+            <p data-i18n="answerDescription">默問、翻書、抽籤，讓一頁回應心裡的問題</p>
             </div>
           </a>
           <a class="project" href="./chengwen/" data-kind="record">
             <div class="project-preview" aria-hidden="true" inert>
-              <iframe src="./chengwen/" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
+              <iframe src="./chengwen/" data-i18n-title="previewTitle" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
             </div>
             <div class="project-top">
               <span class="project-no">SANCTUM / 00</span>
               <span class="project-arrow" aria-hidden="true">↗</span>
             </div>
             <div class="project-info">
-              <h3>承問</h3>
-            <p>靈籤、塔羅、八字羅盤、七政、黃曆、紫微</p>
+              <h3 data-i18n="chengwenTitle">承問</h3>
+            <p data-i18n="chengwenDescription">靈籤、塔羅、八字羅盤、七政、黃曆、紫微</p>
             </div>
           </a>
           <a class="project" href="./tokyo/tokyo_index.html" data-kind="record">
             <div class="project-preview" aria-hidden="true" inert>
-              <iframe src="./tokyo/tokyo_index.html" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
+              <iframe src="./tokyo/tokyo_index.html" data-i18n-title="previewTitle" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
             </div>
             <div class="project-top">
-              <span class="project-no">PROJECT / 01</span>
+              <span class="project-no"><span data-i18n="categoryProject">PROJECT</span> / 01</span>
               <span class="project-arrow" aria-hidden="true">↗</span>
             </div>
             <div class="project-info">
               <h3>Tokyo 2026</h3>
-            <p>七天東京聖地巡禮</p>
+            <p data-i18n="tokyoDescription">七天東京聖地巡禮</p>
             </div>
           </a>
           <a class="project" href="./filter.html" data-kind="experiment">
             <div class="project-preview" aria-hidden="true" inert>
-              <iframe src="./filter.html" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
+              <iframe src="./filter.html" data-i18n-title="previewTitle" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
             </div>
             <div class="project-top">
-              <span class="project-no">EXPERIMENT / 02</span>
+              <span class="project-no"><span data-i18n="categoryExperiment">EXPERIMENT</span> / 02</span>
               <span class="project-arrow" aria-hidden="true">↗</span>
             </div>
             <div class="project-info">
-              <h3>Image Filter</h3>
-            <p>即時調色、風格預設與原圖對比</p>
+              <h3 data-i18n="filterTitle">Image Filter</h3>
+            <p data-i18n="filterDescription">即時調色、風格預設與原圖對比</p>
             </div>
           </a>
           <a class="project" href="./齒輪教學實驗室.html" data-kind="experiment">
             <div class="project-preview" aria-hidden="true" inert>
-              <iframe src="./齒輪教學實驗室.html" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
+              <iframe src="./齒輪教學實驗室.html" data-i18n-title="previewTitle" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
             </div>
             <div class="project-top">
-              <span class="project-no">EXPERIMENT / 03</span>
+              <span class="project-no"><span data-i18n="categoryExperiment">EXPERIMENT</span> / 03</span>
               <span class="project-arrow" aria-hidden="true">↗</span>
             </div>
             <div class="project-info">
-              <h3>齒輪教學實驗室</h3>
-            <p>探索齒輪運轉的互動教學</p>
+              <h3 data-i18n="gearsTitle">齒輪教學實驗室</h3>
+            <p data-i18n="gearsDescription">探索齒輪運轉的互動教學</p>
             </div>
           </a>
           <a class="project" href="./anything.html" data-kind="experiment">
             <div class="project-preview" aria-hidden="true" inert>
-              <iframe src="./anything.html" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
+              <iframe src="./anything.html" data-i18n-title="previewTitle" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
             </div>
             <div class="project-top">
-              <span class="project-no">EXPERIMENT / 04</span>
+              <span class="project-no"><span data-i18n="categoryExperiment">EXPERIMENT</span> / 04</span>
               <span class="project-arrow" aria-hidden="true">↗</span>
             </div>
             <div class="project-info">
-              <h3>無窮珍奇櫃</h3>
-            <p>探索無窮珍奇櫃的互動世界</p>
+              <h3 data-i18n="cabinetTitle">無窮珍奇櫃</h3>
+            <p data-i18n="cabinetDescription">探索無窮珍奇櫃的互動世界</p>
             </div>
           </a>
           <a class="project" href="./marksix-3d-simulator.html" data-kind="game">
             <div class="project-preview" aria-hidden="true" inert>
-              <iframe src="./marksix-3d-simulator.html" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
+              <iframe src="./marksix-3d-simulator.html" data-i18n-title="previewTitle" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
             </div>
             <div class="project-top">
-              <span class="project-no">SIMULATOR / 05</span>
+              <span class="project-no"><span data-i18n="categorySimulator">SIMULATOR</span> / 05</span>
               <span class="project-arrow" aria-hidden="true">↗</span>
             </div>
             <div class="project-info">
-              <h3>3D六合彩攪珠機</h3>
-            <p>立體攪珠與開獎模擬</p>
+              <h3 data-i18n="lotteryTitle">3D六合彩攪珠機</h3>
+            <p data-i18n="lotteryDescription">立體攪珠與開獎模擬</p>
             </div>
           </a>
           <a class="project" href="./PDF 獎狀生成器.html" data-kind="tool">
             <div class="project-preview" aria-hidden="true" inert>
-              <iframe src="./PDF 獎狀生成器.html" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
+              <iframe src="./PDF 獎狀生成器.html" data-i18n-title="previewTitle" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
             </div>
             <div class="project-top">
-              <span class="project-no">TOOL / 06</span>
+              <span class="project-no"><span data-i18n="categoryTool">TOOL</span> / 06</span>
               <span class="project-arrow" aria-hidden="true">↗</span>
             </div>
             <div class="project-info">
-              <h3>PDF 獎狀生成器</h3>
-            <p>製作與輸出 PDF 獎狀</p>
+              <h3 data-i18n="certificateTitle">PDF 獎狀生成器</h3>
+            <p data-i18n="certificateDescription">製作與輸出 PDF 獎狀</p>
             </div>
           </a>
           <a class="project" href="./Test.html.html" data-kind="tool">
             <div class="project-preview" aria-hidden="true" inert>
-              <iframe src="./Test.html.html" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
+              <iframe src="./Test.html.html" data-i18n-title="previewTitle" title="網站首頁預覽" loading="lazy" tabindex="-1" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>
             </div>
             <div class="project-top">
-              <span class="project-no">TOOL / 07</span>
+              <span class="project-no"><span data-i18n="categoryTool">TOOL</span> / 07</span>
               <span class="project-arrow" aria-hidden="true">↗</span>
             </div>
             <div class="project-info">
-              <h3>比賽計分器</h3>
-            <p>簡潔直覺的比賽計分工具</p>
+              <h3 data-i18n="scoreboardTitle">比賽計分器</h3>
+            <p data-i18n="scoreboardDescription">簡潔直覺的比賽計分工具</p>
             </div>
           </a>
         </div>
-        <p class="filter-empty" hidden>這個分類還沒有作品。</p>
+        <p class="filter-empty" data-i18n="empty" hidden>這個分類還沒有作品。</p>
       </section>
     </main>
 
     <footer>
-      <p>© 2026 Simon Lo. Built with curiosity.</p>
-      <p>Hosted on <a href="https://pages.github.com/" target="_blank" rel="noreferrer">GitHub Pages ↗</a></p>
+      <p>© 2026 Simon Lo. <span data-i18n="curiosity">Built with curiosity.</span></p>
+      <p><span data-i18n="hosted">Hosted on </span><a href="https://pages.github.com/" target="_blank" rel="noreferrer">GitHub Pages ↗</a></p>
     </footer>
   </div>
-  <script>
+  <script type="module">
+    import { TEXT, chooseLanguage, projectCountText } from './homepage-i18n.mjs';
+
+    const languageSelect = document.querySelector('#site-language');
+    let savedLanguage;
+    try { savedLanguage = localStorage.getItem('homepage-language'); } catch { /* Storage may be blocked. */ }
+    let language = chooseLanguage(savedLanguage, navigator.languages || [navigator.language]);
+    let activeFilter = 'all';
     const cards = document.querySelectorAll('.project');
     const filterButtons = document.querySelectorAll('.filters button');
     const filterEmpty = document.querySelector('.filter-empty');
     const projectCount = document.querySelector('#project-count');
 
     function applyFilter(kind) {
+      activeFilter = kind;
       let shown = 0;
       cards.forEach((card) => {
         const match = kind === 'all' || card.dataset.kind === kind;
@@ -528,7 +555,7 @@
         if (match) shown += 1;
       });
       filterEmpty.hidden = shown !== 0;
-      projectCount.textContent = `2018—2026 · ${shown}`;
+      projectCount.textContent = projectCountText(language, shown);
     }
 
     filterButtons.forEach((button) => {
@@ -537,7 +564,27 @@
         applyFilter(button.dataset.filter);
       });
     });
-    applyFilter('all');
+    function applyLanguage(nextLanguage) {
+      if (!Object.hasOwn(TEXT, nextLanguage)) return;
+      language = nextLanguage;
+      document.documentElement.lang = language;
+      languageSelect.value = language;
+      const messages = TEXT[language];
+      for (const element of document.querySelectorAll('[data-i18n]')) {
+        element.textContent = messages[element.dataset.i18n];
+      }
+      for (const attribute of ['aria-label', 'title', 'content']) {
+        for (const element of document.querySelectorAll(`[data-i18n-${attribute}]`)) {
+          element.setAttribute(attribute, messages[element.getAttribute(`data-i18n-${attribute}`)]);
+        }
+      }
+      applyFilter(activeFilter);
+    }
+    languageSelect.addEventListener('change', () => {
+      applyLanguage(languageSelect.value);
+      try { localStorage.setItem('homepage-language', language); } catch { /* Switching still works without storage. */ }
+    });
+    applyLanguage(language);
     // Match a desktop homepage to each card without adding horizontal overflow.
     const resizePreviews = new ResizeObserver(entries => {
       for (const { target, contentRect } of entries) {
