@@ -3,12 +3,12 @@ import { PRIDE_SECOND_RULES, PRIDE_SECOND_ATTACKS, UPGRADED_BASES, PRIDE_ROTATIN
 import { PRIDE_MINIGAMES } from './minigames/index.mjs';
 import { PRIDE_ATTACKS, createPrideAttack, prideInput, pridePoint, updatePrideAttack } from './pride-attacks.mjs';
 import { startPrideFinisher, finishPrideFinisher, retryPrideFinisher, updateMirrorDuel, mirrorDuelPoint, mirrorDuelInput } from './pride-finisher.mjs';
-import { SIN_BOSSES } from './crazy-sins.mjs?v=1.2.26';
-import { VAULT_RULES, createVault, updateVault, vaultPoint } from './crazy-vault.mjs?v=1.2.26';
-import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.26';
-import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.26';
-import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.26';
-import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.26';
+import { SIN_BOSSES } from './crazy-sins.mjs?v=1.2.27';
+import { VAULT_RULES, createVault, updateVault, vaultPoint } from './crazy-vault.mjs?v=1.2.27';
+import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.27';
+import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.27';
+import { COLS, ROWS, SAND_SCALE, createGame, startGame, fits, tryMove, tryRotate, hold, hardDrop, lockActive, pump, beginSand, finishSand, flipGrid, sandFallStep, feverActive, penaltyCells, activateFever, applyNoHoldCurse } from './logic.mjs?v=1.2.27';
+import { brickWall, createSession, updateSession } from './arcade.mjs?v=1.2.27';
 
 export const FIRST_BOSS = Object.freeze({ id: 'mad-dealer', name: 'crazyDealer', hp: 900, secondHp: 1200, limit: 720000 });
 export const PRIDE_BOSS = Object.freeze({ id: 'pride', name: 'sinPride', hp: 1000, limit: 720000 });

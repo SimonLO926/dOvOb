@@ -39,7 +39,7 @@ import {createCrazy, hitCrazyBoss, updateCrazy, inputCrazy, pointCrazy} from './
 import {drawCrazy, drawCrazyFrame} from './crazy-view.mjs';
 import {createCrazyMusic,crazyTrack} from './crazy-music.mjs';
 import {translate} from './i18n.mjs';
-import {VAULT_RULES} from './crazy-vault.mjs?v=1.2.26';
+import {VAULT_RULES} from './crazy-vault.mjs?v=1.2.27';
 const $=s=>document.querySelector(s),c=$('#board').getContext('2d'),t=k=>translate('zh-Hant',k);
 let s=null,paused=false,started=false,previous=performance.now(),resultSeen=null,viewCrop=0;
 const music=createCrazyMusic(()=>Number($('#volume').value));

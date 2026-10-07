@@ -1,4 +1,4 @@
-import { createCrazy, advanceCrazy, hitCrazyBoss, skipCrazyCinematic, startPrideEscape } from './crazy.mjs?v=1.2.26';
+import { createCrazy, advanceCrazy, hitCrazyBoss, skipCrazyCinematic, startPrideEscape } from './crazy.mjs?v=1.2.27';
 import { PRIDE_MINIGAME_IDS } from './minigames/index.mjs';
 import { PRIDE_ATTACKS } from './pride-attacks.mjs';
 import { PRIDE_SECOND_ATTACKS, PRIDE_ROTATING_GAMES } from './pride-second.mjs';
