@@ -1,0 +1,179 @@
+{
+  "revision": "r10",
+  "status": "preview awaiting user feedback",
+  "images": [
+    {
+      "name": "swamp",
+      "original": "source-assets/envy/images/envy-swamp.png",
+      "sha256": "6b769d3c83d063f85e7e67c65421f496b6a9272282483212324b45fdcea784fd",
+      "runtime": "bridge/assets/envy-swamp.webp",
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "runtimeBytes": 431046
+    },
+    {
+      "name": "sar",
+      "original": "source-assets/envy/images/envy-sar.png",
+      "sha256": "9526bd2ac63a7b8522a0b6779addc33f4196136221bc5c8251fec7168ea41a28",
+      "runtime": "bridge/assets/envy-sar.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB",
+      "runtimeBytes": 648052,
+      "usage": "Original dragon identity / transformation reference preserved; r6 secret-card drawing uses secret-atlas-r6"
+    },
+    {
+      "name": "worm",
+      "original": "source-assets/envy/images/envy-worm.png",
+      "sha256": "ce9ad516d6d584000ec7743ddbf9e9f74a0f9f6697ce0fa61b6b64fb9680b18c",
+      "runtime": "bridge/assets/envy-worm.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "runtimeBytes": 435638
+    },
+    {
+      "name": "heads",
+      "original": "source-assets/envy/images/envy-heads.png",
+      "sha256": "9b32d3ff5acb5e8c46771b0b9f310896a815ad3a59444a01baf02bb8f3a162a6",
+      "runtime": "bridge/assets/envy-heads.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "runtimeBytes": 2362576,
+      "usage": "Preserved concept reference; not loaded by r3 battle rendering"
+    },
+    {
+      "name": "tarot-atlas-r2",
+      "original": "source-assets/envy/images/envy-tarot-atlas-r2.png",
+      "sha256": "2017f659809b359081df90a85b627a20ffac02ce617becbaf306d830dcec1bec",
+      "runtime": "bridge/assets/envy-tarot.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "runtimeBytes": 691736,
+      "usage": "Historical r2–r5 tarot art preserved; r6 draws from tarot-atlas-r6"
+    },
+    {
+      "name": "tarot-atlas-r6",
+      "original": "source-assets/envy/images/envy-tarot-atlas-r6.png",
+      "sha256": "0cd356e86ed1a9a80dc0d06321c48325a01da51b61f06968b2f0e35e323c7115",
+      "runtime": "bridge/assets/envy-tarot-r6.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "runtimeBytes": 482886,
+      "atlas": {
+        "columns": 3,
+        "rows": 2,
+        "rowMajorOrder": [
+          "moon",
+          "sword",
+          "jester",
+          "eye",
+          "death",
+          "back"
+        ]
+      },
+      "usage": "r6 independent preview; refined subjects, distinct non-green background palettes"
+    },
+    {
+      "name": "secret-atlas-r6",
+      "original": "source-assets/envy/images/envy-secret-atlas-r6.png",
+      "sha256": "f75db1ca5ae2390c8c3c30db3d2785a64edcb121a727716b5382a74b81ad2b33",
+      "runtime": "bridge/assets/envy-secret-r6.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB",
+      "runtimeBytes": 592664,
+      "atlas": {
+        "columns": 3,
+        "rows": 2,
+        "rowMajorOrder": [
+          "C",
+          "U",
+          "R",
+          "SR",
+          "back",
+          "SAR"
+        ]
+      },
+      "usage": "r6 independent preview; refined subjects, distinct non-green background palettes"
+    },
+    {
+      "name": "windows-r7",
+      "original": "source-assets/envy/images/envy-windows-r7.png",
+      "sha256": "fe4714128cc84390a7480a1d3e4fe9618d9f75e1d8b7f389029639efac105b7d",
+      "runtime": "bridge/assets/envy-windows-r7.webp",
+      "size": [
+        1536,
+        1024
+      ],
+      "runtimeBytes": 400946,
+      "prompt": "source-assets/envy/r7-prompts.md",
+      "usage": "Preview minigame atlas; provisional lore slots 4–6"
+    },
+    {
+      "name": "room-r7",
+      "original": "source-assets/envy/images/envy-room-r7.png",
+      "sha256": "8853a1a976bbd7f9d3dca2badbb93dd698a045109b734f756ba0b85864851539",
+      "runtime": "bridge/assets/envy-room-r7.webp",
+      "size": [
+        1254,
+        1254
+      ],
+      "runtimeBytes": 416324,
+      "prompt": "source-assets/envy/r7-prompts.md",
+      "usage": "Preview minigame atlas; provisional lore slots 4–6"
+    },
+    {
+      "name": "endings-atlas-r9",
+      "original": "source-assets/envy/images/envy-endings-atlas-r9.png",
+      "sha256": "0015db162106894e182798ba0916e61f16e7f4dbb67ac279a41a55053485ff5c",
+      "runtime": "bridge/assets/envy-endings-r9.webp",
+      "runtimeBytes": 644412,
+      "size": [
+        1536,
+        1024
+      ],
+      "atlas": {
+        "columns": 3,
+        "rows": 2,
+        "rowMajorOrder": [
+          "first-defeat",
+          "dragon-defeat",
+          "worm-reveal",
+          "captured-victory",
+          "uncaptured-victory",
+          "lost"
+        ]
+      },
+      "prompt": "source-assets/envy/r9-prompts.md",
+      "usage": "r9 illustration atlas preserved; r10 ending screen covers viewport with aspect-preserving crop within one panel"
+    }
+  ],
+  "unselectedDraft": "images/drafts/envy-worm-reference-draft-not-selected.png",
+  "battleHead": {
+    "source": "bridge/envy/art.mjs#drawBattleHead",
+    "styleReferences": [
+      "bridge/crazy-boss-art.mjs#drawFineDealer",
+      "bridge/pride-art.mjs#drawPrideBossHead"
+    ],
+    "method": "Canvas pixel geometry; no portrait cropping"
+  }
+}

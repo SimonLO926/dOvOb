@@ -1,6 +1,7 @@
 import { createPrideEscape, updatePrideEscape, prideEscapeInput, prideEscapePoint, PRIDE_ESCAPE_ID } from './pride-escape.mjs';
 import { PRIDE_SECOND_RULES, PRIDE_SECOND_ATTACKS, UPGRADED_BASES, PRIDE_ROTATING_GAMES, PRIDE_SECOND_GAMES, PRIDE_SECOND_MODES, initPrideSecond, createPrideSecondRound, prideSecondInput, prideSecondPoint, updatePrideSecond, prideSecondThresholds, breakPrideMirror } from './pride-second.mjs';
 import { PRIDE_MINIGAMES } from './minigames/index.mjs';
+import { CRAZY_COUNTDOWN_PUZZLES, countdownCue } from './puzzle-countdown.mjs';
 import { PRIDE_ATTACKS, createPrideAttack, prideInput, pridePoint, updatePrideAttack } from './pride-attacks.mjs';
 import { startPrideFinisher, finishPrideFinisher, retryPrideFinisher, updateMirrorDuel, mirrorDuelPoint, mirrorDuelInput } from './pride-finisher.mjs';
 import { SIN_BOSSES } from './crazy-sins.mjs?v=1.2.28';
@@ -294,6 +295,7 @@ function choose(s, index) {
     m.streak = (m.streak || 0) + 1;
     hitCrazyBoss(s, (s.mode === 'cards' ? 22 : 16) + Math.min(8, (m.streak - 1) * 2)); healCrazy(s, 2);
     m.roundLeft = m.roundTime;
+    m.countdownStarted = false;
     if (s.mode === 'mahjong') {
       m.removed.push(a, b); m.selected = []; s.cooldown = 350;
       const available = m.items.filter((_, i) => !m.removed.includes(i));
@@ -363,9 +365,9 @@ export function inputCrazy(s, action, down = true, source = 'keyboard') {
   if (s.mode === 'pride-mirror-duel') { mirrorDuelInput(s.mini, action); return; }
   if(s.mode===PRIDE_ESCAPE_ID){prideEscapeInput(s.mini,action);return;}
   if (action === 'action' && !s.actionReady) return;
-  if (s.form === 2 && PRIDE_SECOND_MODES.includes(s.mode)) { prideSecondInput(s, action); return; }
+  if (s.form === 2 && PRIDE_SECOND_MODES.includes(s.mode)) { pridePuzzleAction(s, () => prideSecondInput(s, action)); return; }
   if (PRIDE_ATTACKS.includes(s.mode)) { prideInput(s, action); return; }
-  if (PRIDE_MINIGAMES[s.mode]) { PRIDE_MINIGAMES[s.mode].input(s.mini, action); return; }
+  if (PRIDE_MINIGAMES[s.mode]) { pridePuzzleAction(s, () => PRIDE_MINIGAMES[s.mode].input(s.mini, action)); return; }
   if (s.arcade) {
     if (action === 'left' || action === 'right') { s.arcade[action] = true; if (s.mode === 'pinball') notify(s, 'crazyFlipperSound'); }
     if (action === 'action') { s.arcade.fire = true; if (s.arcade.aiming || !s.arcade.launched) notify(s, 'crazyLaunchSound'); }
@@ -390,9 +392,9 @@ export function pointCrazy(s, x, y) {
   if(s.mode===PRIDE_ESCAPE_ID){if(!s.over&&!s.cutscene)prideEscapePoint(s.mini,x);return;}
   if (s.over || s.cutscene || !s.actionReady || s.catBlock > 0) return;
   if (s.mode === 'pride-mirror-duel') { mirrorDuelPoint(s.mini, x, y); return; }
-  if (s.form === 2 && PRIDE_SECOND_MODES.includes(s.mode)) { prideSecondPoint(s, x, y); return; }
+  if (s.form === 2 && PRIDE_SECOND_MODES.includes(s.mode)) { pridePuzzleAction(s, () => prideSecondPoint(s, x, y)); return; }
   if (PRIDE_ATTACKS.includes(s.mode)) { pridePoint(s, x, y); return; }
-  if (PRIDE_MINIGAMES[s.mode]) { PRIDE_MINIGAMES[s.mode].point(s.mini, x, y); return; }
+  if (PRIDE_MINIGAMES[s.mode]) { pridePuzzleAction(s, () => PRIDE_MINIGAMES[s.mode].point(s.mini, x, y)); return; }
   if (s.mode === 'vault') { vaultPoint(s.mini, x, y); return; }
   if (GREED_ATTACKS.includes(s.mode)) { reactionPoint(s, x, y); return; }
   if (s.mode === 'pusher') { s.mini.aim = Math.max(30, Math.min(250, x)); return; }
@@ -427,10 +429,29 @@ function updateTiger(s, dt) {
     else { casinoSound(s, 'crazySlotMissSound'); hurtCrazy(s, 6, 'crazyMiss'); s.cooldown = 650; }
   }
 }
+function puzzleCountdown(s, beforeMs, afterMs, completed = false, starting = false) {
+  if (!CRAZY_COUNTDOWN_PUZZLES.includes(s.mode)) return;
+  const cue = countdownCue(beforeMs, afterMs, completed, starting);
+  if (cue) s.events.push({key: 'crazyPuzzleCountdown', cue});
+}
+function pridePuzzleAction(s, action) {
+  if (!CRAZY_COUNTDOWN_PUZZLES.includes(s.mode)) { action(); return; }
+  // Wrong matches / hints may shorten a deadline between animation frames.
+  const mini = s.mini, ownTimer = PRIDE_MINIGAMES[s.mode];
+  const before = ownTimer ? mini.timeLeft : s.timeLeft;
+  action();
+  if (!s.over && !s.cutscene && s.mini === mini) {
+    puzzleCountdown(s, before, ownTimer ? mini.timeLeft : s.timeLeft,
+      mini.status === 'won' || mini.finished || mini.hp <= 0);
+  }
+}
 function updatePairs(s, dt) {
   const m = s.mini;
-  if (s.cooldown > 0 || m.roundLeft == null || s.catBlock > 0) return;
+  if (dt <= 0 || s.cooldown > 0 || m.roundLeft == null || s.catBlock > 0) return;
+  const before = m.roundLeft;
   m.roundLeft -= dt;
+  puzzleCountdown(s, before, m.roundLeft, false, !m.countdownStarted);
+  m.countdownStarted = true;
   if (m.roundLeft <= 0) {
     m.streak = 0; hurtCrazy(s, 5, 'crazyPairTimeout'); deal(s); s.cooldown = 250;
   }
@@ -697,7 +718,12 @@ export function updateCrazy(s, elapsed) {
   if (s.over || s.cutscene || s.mode === 'pride-mirror-duel') return s;
   if (s.form === 2 && PRIDE_SECOND_MODES.includes(s.mode)) {
     const mode = s.mode, mini = s.mini, w = s.mirrorWorld;
+    const phasePuzzle = mode === 'pride-kaleidoscope' || mode === 'pride-nested';
+    const deadline = phasePuzzle && ['search', 'plan'].includes(mini.phase) ? mini.phaseUntil : null;
+    const before = phasePuzzle ? deadline == null ? null : Math.min(s.timeLeft + dt, deadline - mini.clock) : s.timeLeft + dt;
     updatePrideSecond(s, dt, reactionApi);
+    const after = deadline == null ? s.timeLeft : Math.min(s.timeLeft, deadline - mini.clock);
+    if (!s.over && !s.cutscene && s.mode === mode) puzzleCountdown(s, before, after, mini.finished);
     if (PRIDE_SECOND_GAMES.includes(mode)) { const gain = mini.score - (mini.appliedScore || 0); if (gain > 0) { s.score += gain; mini.appliedScore = mini.score; } }
     if (s.over || s.cutscene || s.mode !== mode) return s;
     if (mode === 'pride-tower') prideRecovery(s, mini, Math.floor(mini.floors / 3), 5);
@@ -742,7 +768,9 @@ export function updateCrazy(s, elapsed) {
     }
   } else if (PRIDE_MINIGAMES[s.mode]) {
     const game = PRIDE_MINIGAMES[s.mode], mini = s.mini;
+    const before = mini.timeLeft;
     game.update(mini, dt); s.timeLeft = mini.timeLeft;
+    puzzleCountdown(s, before, mini.timeLeft, mini.status === 'won' || mini.hp <= 0);
     const loss = 100 - mini.hp - (mini.appliedDamage || 0);
     if (loss > 0) { hurtCrazy(s, loss, 'prideWrongCrown'); mini.appliedDamage = 100 - mini.hp; }
     const gain = mini.score - (mini.appliedScore || 0);

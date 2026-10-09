@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Crazy Envy · 嫉妒試玩 r13</title>
+  <style>
+    @font-face{font-family:"Pixel Hant";src:url('./fonts/fusion-pixel-zh-hant.woff2') format('woff2');font-display:swap}
+    @font-face{font-family:"Pixel Latin";src:url('./fonts/fusion-pixel-latin.woff2') format('woff2');font-display:swap}
+    @font-face{font-family:"Fever Brush";src:url('./fonts/fever-brush.woff') format('woff');font-display:swap}
+    *{box-sizing:border-box} [hidden]{display:none!important}
+    html,body{margin:0;height:100%;overflow:hidden;background:#061510;color:#e2edc8;font-family:"Pixel Hant",sans-serif;overscroll-behavior:none}
+    body{background:linear-gradient(#06221935,#06171375),url('./assets/envy-swamp.webp') center/cover fixed}
+    button,select,input{font:inherit}button{min-width:44px;min-height:44px;cursor:pointer;color:#e5edc8;background:#17372bdc;border:1px solid #89a969;border-radius:12px;padding:9px 14px;touch-action:manipulation}
+    button:hover,button:focus-visible{outline:2px solid #e5efb8;outline-offset:2px;background:#31513a}button:disabled{opacity:.38;cursor:default}
+    .nav{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;position:relative;z-index:5;background:#05161088;font-size:13px}.nav small{color:#aac19a;margin-left:12px;font-size:10px}
+    #menu-button{width:44px;padding:0;font-size:24px}
+    .stage{display:flex;align-items:center;justify-content:center;height:calc(100svh - 254px);position:relative}
+    #board-wrap{position:relative;flex:none;isolation:isolate}.canvas-board{position:absolute;inset:0;width:100%;height:100%;z-index:2;touch-action:none;image-rendering:pixelated}
+    #boss-frame{position:absolute;left:-50%;top:0;width:200%;height:100%;pointer-events:none;z-index:1;image-rendering:pixelated}
+    #board-wrap.danger:after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 16px #eb635a;outline:2px solid #e66a63;pointer-events:none;z-index:3}
+    #board-wrap.shake{animation:shake .2s infinite}@keyframes shake{0%,100%{translate:0 0}25%{translate:2px -1px}75%{translate:-2px 1px}}
+    .pads{height:210px;display:flex;justify-content:space-between;gap:10px;padding:48px 12px max(12px,env(safe-area-inset-bottom));max-width:610px;margin:auto;position:relative;z-index:4;touch-action:none}
+    .move-pads{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:150px;height:150px;position:relative;flex:none}.move-pads button{flex:1;font-size:36px;background:#27382ce8}
+    .action-pads{display:grid;width:150px;height:150px;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:6px}
+    #up{grid-column:2;grid-row:1}#alt{grid-column:1;grid-row:2}#action{grid-column:3;grid-row:2;background:#9db768;color:#0b2115;border-color:#e1e9a7}#down{grid-column:2;grid-row:3}.action-pads button{padding:4px;font-size:11px;min-width:0;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:18px}.action-pads svg{width:22px;height:22px}.move-pads svg{width:36px;height:36px}.move-pads button{min-width:0;padding:4px;border-radius:18px}#rotate-left{position:absolute;left:0;bottom:calc(100% + 6px);width:58px;height:44px;min-width:0;min-height:44px;padding:3px;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}#rotate-left svg{width:20px;height:20px}
+    .veil{position:fixed;inset:0;z-index:20;padding:16px;display:flex;overflow:auto;touch-action:pan-y;background:#02100be0;backdrop-filter:blur(5px)}
+    .card{width:min(440px,100%);margin:auto;padding:24px;background:linear-gradient(145deg,#203e30f5,#0d251ff5);border:1px solid #9ab671;border-radius:20px;box-shadow:0 12px 70px #0008;max-height:calc(100svh - 32px);overflow:auto;touch-action:pan-y}
+    .card h1{font-size:28px;color:#e9efb5;margin:12px 0}.card h2{font-size:21px;margin:10px 0 18px}.card p{font-size:13px;color:#bccfaf;line-height:1.65;margin:8px 0 14px}.card small{font-size:11px;color:#9fc894;letter-spacing:2px}
+    .card label{display:block;font-size:14px;margin:16px 0}.card select{display:block;width:100%;margin-top:8px;padding:12px;background:#0d251b;color:#eef1d3;border:1px solid #87a365;border-radius:8px;min-height:44px}
+    .card .check{display:flex;align-items:center;gap:12px}.card .check input{width:22px;height:22px;accent-color:#b3d17d;flex:none}.card .buttons{display:grid;gap:10px;margin-top:16px}
+    #start{width:100%;background:#adc47d;color:#142c20}.card .muted{font-size:11px;color:#94b491}.return-row{position:sticky;bottom:-24px;background:#17362cf5;padding:12px 0 0;margin-top:18px}
+    #scene-actions{position:absolute;left:0;right:0;bottom:12px;z-index:7;display:flex;gap:7px;justify-content:center;flex-wrap:wrap}#scene-actions button{font-size:12px;background:#233d2bf5;padding:8px 12px}
+    #envy-cat{position:fixed;z-index:6;pointer-events:none;margin:0;line-height:0;filter:drop-shadow(0 3px 5px #0009)}
+    #envy-cat img{display:block;width:100%;height:auto;image-rendering:auto}
+    #cat-fish{position:absolute;right:4px;top:4px;width:36px;height:18px;display:none;filter:drop-shadow(0 0 5px #ffedb4)}
+    #envy-cat.gift img{filter:drop-shadow(0 0 9px #ffdc83)}#envy-cat.gift #cat-fish{display:block}
+    #ending-screen{position:fixed;inset:0;z-index:10;overflow:hidden;background:#061510;isolation:isolate}
+    #ending-art{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;image-rendering:pixelated}
+    #ending-title{position:absolute;inset:0 0 auto;margin:0;padding:max(22px,env(safe-area-inset-top)) 16px 42px;text-align:center;font-size:clamp(22px,4vw,36px);color:#fff0c8;text-shadow:0 2px 5px #000;background:linear-gradient(#03120be8,#03120b00);line-height:1.5}
+    #ending-footer{position:absolute;inset:auto 0 0;padding:24px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom));text-align:center;background:linear-gradient(#03120b00,#03120bee 30%);max-height:48%;overflow:auto;touch-action:pan-y;z-index:2}
+    #ending-caption{font-size:16px;line-height:1.6;margin:0 auto 12px;color:#f0edce;text-shadow:0 1px 3px #000}
+    #ending-footer #scene-actions{position:static;gap:10px;max-width:620px;margin:auto}
+    #ending-footer #scene-actions button{font-size:16px;min-height:48px;min-width:88px;padding:10px 16px;background:#193326ee}
+    body.ending-page .stage,body.ending-page .pads,body.ending-page .nav{visibility:hidden}
+    body.ending-page #envy-cat{z-index:11}
+    .wide .nav{position:absolute;inset:0 0 auto;height:44px;background:none;pointer-events:none}.wide .nav button{pointer-events:auto}.wide .nav small{display:none}
+    .wide .stage{height:100svh}.wide .pads{height:0;padding:0;position:static}.wide .move-pads{position:fixed;left:12px;bottom:12px;width:150px;height:150px;z-index:5}.wide .action-pads{position:fixed;right:12px;bottom:12px;z-index:5;grid-template-columns:repeat(3,1fr)}
+    .wide #scene-actions{bottom:4px}.wide #scene-actions button{padding:4px 7px;min-height:44px;font-size:10px}
+    @media(max-width:350px){.move-pads{width:calc(100vw - 178px)}.action-pads{width:144px}}
+    @media(prefers-reduced-motion:reduce){#board-wrap.shake{animation:none}}
+  </style>
+</head>
+<body data-theme="dark">
+  <header class="nav"><div>BRIDGE <small>CRAZY · ENVY · r13</small></div><button id="menu-button" aria-label="開啟試玩選單" type="button">☰</button></header>
+  <main class="stage"><div id="board-wrap"><canvas id="boss-frame" width="560" height="720" aria-hidden="true"></canvas><canvas id="envy-board" class="canvas-board" width="280" height="720" aria-label="嫉妒遊戲框"></canvas><div id="scene-actions" hidden><button id="scene-continue" type="button">繼續</button><button id="scene-finish" type="button" hidden>直接結算</button><button id="scene-retry" type="button">重試</button><button id="scene-pick" type="button">換關</button></div></div></main>
+  <div class="pads" aria-label="遊戲操作">
+    <div class="move-pads"><button id="rotate-left" type="button" aria-label="反向旋轉"><svg viewBox="0 0 24 24" aria-hidden="true" style="transform: scaleX(-1)"><path d="M19.4 12a7.4 7.4 0 1 1-2.1-5.2M19.4 4.2V8.8H14.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>左旋</span></button><button id="left" type="button" aria-label="向左"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 L7 12 L14.5 18.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="right" type="button" aria-label="向右"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 L17 12 L9.5 18.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    <div class="action-pads"><button id="up" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 12a7.4 7.4 0 1 1-2.1-5.2M19.4 4.2V8.8H14.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="pad-label">右旋</span></button><button id="alt" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.2" y="4.2" width="15.6" height="15.6" rx="3" fill="none" stroke="currentColor" stroke-width="2.4"/><rect x="8.3" y="8.3" width="7.4" height="7.4" rx="1.4" fill="currentColor"/></svg><span class="pad-label">留</span></button><button id="action" type="button"><svg class="drop-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 V15 M7.5 11 L12 16.5 L16.5 11 M5 20.5 H19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="pad-label">落</span></button><button id="down" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9 L12 15 L17.5 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="pad-label">降</span></button></div>
+  </div>
+  <figure id="envy-cat" hidden aria-label="原有貓咪"><img src="./assets/mischief-cat.webp" alt="貓咪"><svg id="cat-fish" viewBox="0 0 36 18" aria-hidden="true"><path d="M11 9 23 2 34 9 23 16Z M11 9 2 2 2 16Z" fill="#edc579"/><rect x="29" y="7" width="2" height="2" fill="#fff7c9"/></svg></figure>
+  <section id="ending-screen" hidden tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="ending-title" aria-describedby="ending-caption"><canvas id="ending-art" aria-hidden="true"></canvas><h1 id="ending-title"></h1><div id="ending-footer"><p id="ending-caption"></p></div></section>
+  <section id="launcher" class="veil" aria-labelledby="launcher-title"><form class="card" id="launch-form"><small>CRAZY · ENVY</small><h1 id="launcher-title">嫉妒試玩</h1><p>幽林裡的眼睛，正在窺視你。</p><label>試玩內容<select id="scenario"></select></label><label>難度<select id="difficulty"><option value="normal">Normal</option><option value="hard">Hard</option></select></label><button id="start" type="submit">開始試玩</button><p class="muted">☰ 可重試／換關。已接入七首嫉妒專屬音樂。</p></form></section>
+  <section id="menu" class="veil" hidden aria-labelledby="menu-title"><div class="card"><h2 id="menu-title">試玩已暫停</h2><p>方向鍵：移動／選擇<br>空白鍵：主要動作<br>C：保留／撤回／衝刺／返回</p><div class="buttons"><button id="resume" type="button">繼續遊玩</button><button id="retry" type="button">重試這一關</button><button id="pick" type="button">換一關</button><button id="album" type="button">秘藏收藏</button><button id="bonus-finish" type="button" hidden>略過捕蟲 · 結算</button></div><label>危險效果<select id="danger"><option value="warning">紅色 Warning · 不抖動</option><option value="shake">抖動</option></select></label><label class="check"><input id="reduce" type="checkbox">減少動態效果</label><label>音樂 <output id="music-level">70%</output><input id="music-volume" type="range" min="0" max="100" value="70" step="1" aria-label="音樂音量" style="display:block;width:100%;min-height:44px;margin-top:8px"></label><label class="check"><input id="sound" type="checkbox" checked>音效</label><div class="return-row"><button id="menu-return" type="button">返回遊戲</button></div></div></section>
+  <section id="album-panel" class="veil" hidden><div class="card"><h2>秘藏收藏</h2><p id="album-content"></p><p class="muted">只保留本次試玩取得的卡片。</p><button id="album-back" type="button">返回</button></div></section>
+  <script type="module" src="./envy/app.mjs"></script>
+</body>
+</html>
