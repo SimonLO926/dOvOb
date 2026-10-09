@@ -1,4 +1,4 @@
-# 宣傳片拍攝與正式關卡（1.2.32）
+# 宣傳片拍攝與正式關卡（1.2.33）
 
 先讀 [Boss 畫面規範](BOSS_UI_MUST_READ.md)及 [Crazy 必讀](CRAZY_MUST_READ.md)。
 
@@ -37,6 +37,8 @@ await page.goto('https://simonlo926.github.io/dOvOb/bridge/index.html?bosses=1')
 - 正式嫉妒為 [envy.html](envy.html)，只接受完整挑戰，不能用 scenario 參數跳過前半。直接網址也會核對傲慢通關或拍攝旗標；主選關不連到測試 Preview。
 
 ## 正式接線及維護
+
+1.2.33 嫉妒完整英文介面沿用主遊戲語言，選單 Language 可切換；拍攝時可在主頁選英文或獨立 Preview 使用 `?lang=en`。六張過場／結算改用獨立細緻像素繪畫並滿頁顯示，風格及提示詞見 source-assets/envy/r16-story-prompts.md。
 
 1.2.32嫉妒正式與試玩均沿用主遊戲觸控自動／開／關；電腦自動隱藏觸控區，鍵盤操作保留。選關改用帶背景的窺視之子概念圖；此圖不作戰鬥背景或頭部。
 

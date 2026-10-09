@@ -1,11 +1,12 @@
 import { endStroke } from './lore-games.mjs';
+import { t, setEnvyLanguage, envyLanguage, captureInterface } from './i18n.mjs';
 import { touchControlsEnabled } from '../touch-controls.mjs?v=1.2.32';
 import { createEnvy, SCENARIOS, envyInput, envyPoint, updateEnvy, continueScene, retryCapture, finishEnvy } from './engine.mjs?v=1.2.31';
 import { createCampaignRecorder, envyUnlocked } from './campaign.mjs?v=1.2.31';
 import { filmingEnabled } from '../filming.mjs?v=1.2.31';
-import { canvasHeight, drawEnvy } from './view.mjs';
-import { drawFrame, loadArt, images } from './art.mjs';
-import { endingPresentation, drawEndingPage } from './ending.mjs';
+import { canvasHeight, drawEnvy } from './view.mjs?v=1.2.33';
+import { drawFrame, loadArt, images } from './art.mjs?v=1.2.33';
+import { endingPresentation, drawEndingPage } from './ending.mjs?v=1.2.33';
 import { puzzleCountdownCue, playCountdownTone } from './countdown.mjs';
 import { createEnvyMusic, envyTrack } from './music.mjs';
 import { ATTACKS, gridLayout } from './rounds.mjs';
@@ -24,6 +25,7 @@ let endingKey='',catLayoutKey='';
 const preferences={danger:'warning',reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,sound:true,music:.7};
 let mainSettings={};try{mainSettings=JSON.parse(campaignStorage?.getItem('bridge-settings')||'{}')||{};}catch{}
 preferences.touch=mainSettings.touch||'auto';
+setEnvyLanguage(new URLSearchParams(location.search).get('lang')||mainSettings.lang||'en');
 let sfxVolume=1;
 if(campaign){
   const saved=mainSettings;
@@ -34,11 +36,12 @@ if(campaign){
   const requested=new URLSearchParams(location.search).get('difficulty');
   difficulty=(requested??saved.crazyDifficulty)==='hard'?'hard':'normal';
 }
-function savePreferences(){
+function savePreferences({languageChanged=false}={}){
   if(!campaign||filmingEnabled())return;
   try{
     const saved=JSON.parse(localStorage.getItem('bridge-settings')||'{}');
     Object.assign(saved,{dangerEffect:preferences.danger,bgmVolume:preferences.music,sfxVolume:preferences.sound?sfxVolume:0,crazyDifficulty:difficulty});
+    if(languageChanged)saved.lang=envyLanguage();
     localStorage.setItem('bridge-settings',JSON.stringify(saved));
   }catch{}
 }
@@ -49,6 +52,19 @@ $('#music-volume').value=Math.round(preferences.music*100);$('#music-level').tex
 Object.defineProperty(window,campaign?'envyGame':'envyPreview',{get:()=>encounter});
 const select=$('#scenario');
 for(const option of SCENARIOS){const el=document.createElement('option');el.value=option.id;el.textContent=option.label;select.append(el);}
+const translateInterface=captureInterface(document.body);
+function applyLanguage(){
+  const lang=envyLanguage();document.documentElement.lang=lang;
+  document.body.style.fontFamily=lang==='en'?'"Pixel Latin", sans-serif':'"Pixel Hant", sans-serif';
+  document.title=campaign?'Crazy Envy':`Crazy Envy · ${t('嫉妒試玩')} r16`;
+  translateInterface();$('#envy-language').value=lang;
+  renderCollection();
+  controls();endingKey='';catLayoutKey='';
+  if(encounter)drawEnvy(context,encounter,{reduced:preferences.reduced});
+  presentation();
+}
+$('#envy-language').addEventListener('change',event=>{setEnvyLanguage(event.target.value);applyLanguage();savePreferences({languageChanged:true});});
+applyLanguage();
 function tone(frequency=180,duration=.12,type='sine',volume=.045){
   if(!preferences.sound||!audio)return;
   const oscillator=audio.createOscillator(),gain=audio.createGain(),time=audio.currentTime;
@@ -78,15 +94,15 @@ function controls(){
   const mode=encounter.mode,bridge=mode==='bridge';
   const modal=encounter.round.modal;
   const labels={window:encounter.round.reveal?'下一窗':'擦拭','eye-room':({code:'開盒',mask:'放入',painting:'轉畫',clue:'返回'})[modal]||'查看',difference:'選擇',tarot:encounter.round.revealed?'收牌':'翻牌',pack:encounter.round.revealed?'收牌':'拆包',territory:'衝刺',capture:'捕捉',chase:'跳躍',steal:'打斷','steal-up':'打斷',net:'擊碎'};
-  $('#action .pad-label').textContent=bridge?'落':labels[mode]||'—';$('#action').disabled=!bridge&&!labels[mode]||!!encounter.scene;
-  $('#alt .pad-label').textContent=bridge?'留':mode==='rolling'?'回一步':mode==='capture'?'衝刺':mode==='eye-room'?'返回':'—';$('#alt').disabled=(!bridge&&!['rolling','capture','eye-room'].includes(mode))||!!encounter.scene;
-  $('#up .pad-label').textContent=bridge?'右旋':'上移';$('#up svg').style.display=bridge?'':'none';$('#rotate-left').hidden=!bridge;$('#up').setAttribute('aria-label',bridge?'旋轉':'向上');$('#down .pad-label').textContent=bridge?'降':'下移';
+  $('#action .pad-label').textContent=t(bridge?'落':labels[mode]||'—');$('#action').disabled=!bridge&&!labels[mode]||!!encounter.scene;
+  $('#alt .pad-label').textContent=t(bridge?'留':mode==='rolling'?'回一步':mode==='capture'?'衝刺':mode==='eye-room'?'返回':'—');$('#alt').disabled=(!bridge&&!['rolling','capture','eye-room'].includes(mode))||!!encounter.scene;
+  $('#up .pad-label').textContent=t(bridge?'右旋':'上移');$('#up svg').style.display=bridge?'':'none';$('#rotate-left').hidden=!bridge;$('#up').setAttribute('aria-label',t(bridge?'旋轉':'向上'));$('#down .pad-label').textContent=t(bridge?'降':'下移');
   if(mode==='eye-room'){
-    $('#up .pad-label').textContent=modal==='code'?'加數':modal==='mask'?'選眼':'選物';
-    $('#down .pad-label').textContent=modal==='code'?'減數':modal==='mask'?'選眼':'選物';
+    $('#up .pad-label').textContent=t(modal==='code'?'加數':modal==='mask'?'選眼':'選物');
+    $('#down .pad-label').textContent=t(modal==='code'?'減數':modal==='mask'?'選眼':'選物');
     $('#up').setAttribute('aria-label',$('#up .pad-label').textContent);
     $('#down').setAttribute('aria-label',$('#down .pad-label').textContent);
-  }else $('#down').setAttribute('aria-label',bridge?'緩降':'向下');
+  }else $('#down').setAttribute('aria-label',t(bridge?'緩降':'向下'));
   for(const id of['left','right','up','down','rotate-left'])$('#'+id).disabled=!!encounter.scene||['tarot','pack'].includes(mode);
 }
 function presentation(){
@@ -101,11 +117,12 @@ function presentation(){
   if(ending){
     const w=innerWidth,h=window.visualViewport?.height||innerHeight,dpr=Math.min(2,devicePixelRatio||1);
     screen.style.height=`${h}px`;
-    const art=$('#ending-art'),key=`${encounter.scene.kind}:${ending.index}:${w}:${h}:${dpr}:${images.endings?.naturalWidth||0}`;
+    const image=images[`ending${ending.index}`];
+    const art=$('#ending-art'),key=`${encounter.scene.kind}:${ending.index}:${w}:${h}:${dpr}:${image?.naturalWidth||0}`;
     $('#ending-title').textContent=ending.title;$('#ending-caption').textContent=ending.caption;
     if(key!==endingKey){
       endingKey=key;art.width=Math.round(w*dpr);art.height=Math.round(h*dpr);
-      const c=art.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);drawEndingPage(c,images.endings,ending.index,w,h);
+      const c=art.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);drawEndingPage(c,image,w,h);
     }
   }else endingKey='';
   const cat=$('#envy-cat');cat.hidden=!visible;cat.classList.toggle('gift',encounter?.catTime>0);
@@ -148,10 +165,12 @@ function choose(){stopHeld();paused=true;music.pause();if(campaign){returnToBoss
 $('#menu-button').addEventListener('click',openMenu);$('#resume').addEventListener('click',resume);$('#menu-return').addEventListener('click',resume);$('#retry').addEventListener('click',start);$('#pick').addEventListener('click',choose);
 $('#danger').addEventListener('change',event=>{preferences.danger=event.target.value;savePreferences();});$('#reduce').addEventListener('change',event=>preferences.reduced=event.target.checked);$('#sound').addEventListener('change',event=>{preferences.sound=event.target.checked;if(preferences.sound){if(!sfxVolume)sfxVolume=.7;unlockAudio();}savePreferences();});
 $('#music-volume').addEventListener('input',event=>{preferences.music=Number(event.target.value)/100;$('#music-level').textContent=event.target.value+'%';if(preferences.music>0)unlockAudio();savePreferences();});
-$('#album').addEventListener('click',()=>{
-  $('#menu').hidden=true;$('#album-panel').hidden=false;
+function renderCollection(){
   const collection=encounter?.collection||[];
-  $('#album-content').textContent=collection.length?['C','U','R','SR','SAR'].map(r=>`${r} · ${collection.filter(c=>c.rarity===r).length} 張`).join('　／　'):'還沒有秘藏，試試多眼龍的卡包回合。';
+  $('#album-content').textContent=t(collection.length?['C','U','R','SR','SAR'].map(r=>`${r} · ${collection.filter(c=>c.rarity===r).length} 張`).join('　／　'):'還沒有秘藏，試試多眼龍的卡包回合。');
+}
+$('#album').addEventListener('click',()=>{
+  $('#menu').hidden=true;$('#album-panel').hidden=false;renderCollection();
 });$('#album-back').addEventListener('click',()=>{$('#album-panel').hidden=true;$('#menu').hidden=false;});
 $('#scene-pick').addEventListener('click',choose);$('#scene-retry').addEventListener('click',()=>{if(encounter?.scene?.kind==='capture-retry'){retryCapture(encounter);fit();}else start();});
 $('#scene-continue').addEventListener('click',()=>{unlockAudio();continueScene(encounter);fit();controls();});
@@ -186,7 +205,7 @@ window.addEventListener('resize',fit);window.visualViewport?.addEventListener('r
 for(const query of ['(pointer: coarse)','(hover: none)'])matchMedia(query).addEventListener('change',fit);
 window.addEventListener('storage',event=>{
   if(event.key!=='bridge-settings')return;
-  try{preferences.touch=JSON.parse(event.newValue||'{}')?.touch||'auto';fit();}catch{}
+  try{const saved=JSON.parse(event.newValue||'{}')||{};preferences.touch=saved.touch||'auto';setEnvyLanguage(saved.lang||'en');applyLanguage();fit();}catch{}
 });
 loadArt().then(()=>fit());document.fonts?.ready.then(()=>{catLayoutKey='';});fit();
 function tick(now){
@@ -218,7 +237,7 @@ function tick(now){
     $('#scene-actions').hidden=!kind;$('#scene-continue').hidden=!canContinue;$('#scene-continue').disabled=encounter.scene?.time<700;
     $('#scene-retry').hidden=!['victory','lost','round-result','capture-retry'].includes(kind);
     $('#scene-finish').hidden=!['worm-reveal','capture-retry'].includes(kind);$('#bonus-finish').hidden=!encounter.bossDefeated||encounter.over;
-    $('#scene-continue').textContent=kind==='round-result'?'繼續挑戰':'繼續';
+    $('#scene-continue').textContent=t(kind==='round-result'?'繼續挑戰':'繼續');
     presentation();
   }
   requestAnimationFrame(tick);

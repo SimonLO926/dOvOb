@@ -1,0 +1,170 @@
+{
+  "tool": "image_gen",
+  "references": [
+    "source-assets/greed/images/greed-defeated.png",
+    "source-assets/pride/images/pride-mirror-defeated.png",
+    "source-assets/pride/images/pride-tower-ruins.png",
+    "source-assets/envy/images/envy-heads.png",
+    "source-assets/envy/images/envy-worm.png"
+  ],
+  "records": [
+    {
+      "scene": "first-defeat",
+      "prompt": "Create ONE complete landscape cinematic boss-story illustration, 1536x1024, for Envy in the same dark fantasy PIXEL PAINTING series as the first three reference images (Greed defeated, Pride shattered mirrors and tower ruins). Match their refined dense small pixel strokes, dramatic layered ruins, metallic edge highlights, rich material textures, atmospheric depth and restrained sparkling particles. Do not use chunky enlarged sprite pixels, flat children's-book art, smooth anime art, 3D render, chibi proportions, or a montage/atlas. The fourth reference is Envy identity only: hooded dark-haired child (top left), bronze-root emerald dragon (top right), cyclops/rage (bottom). Fifth reference is the ORIGINAL Envy worm identity: olive segmented plates, freckles, one pale round eye, three small feet, leaf-tipped tail, anxious expression. Keep these identities, do not copy any franchise. Full opaque original forest-ruin SCENE with indigo moonlight, tarnished bronze/gold, restrained emerald and warm amber accents; no casino, mirrors, Pride crowns, text, UI, cats, humans other than specified child, logos or watermarks. Compose all essential story action within the central 40% width and central 55% height so both phone portrait cover-crop and widescreen show it; outer edges elaborate scene extension, top 12% and bottom 16% quieter for externally rendered title and buttons. The large subject should belong to the environment, not a portrait placed on a generic backdrop. STORY: The Watching Child has actually fallen: moss-and-leaf hooded child kneeling exhausted on a flooded ancient stone stair, head lowered and eyes closed, six collected eye amulets around him visibly extinguished and cracked. Monumental twisted forest columns, broken eye ornament, tarnished filigree, violet shadows and moonlit wet stone. Warm glimmer leaking from deep under the empty hood suggests transformation; dramatic defeat, no gore. Depict vulnerable defeated child, not triumphant standing boss.",
+      "files": [
+        {
+          "path": "source-assets/envy/images/envy-first-defeat-r16.png",
+          "size_bytes": 3636885,
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "5ee46fb95f1bf8ee30f581638583d0e026c99a41832eb346c4f4fb80c29b2d92"
+        },
+        {
+          "path": "bridge/assets/envy-first-defeat-r16.webp",
+          "size_bytes": 633988,
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "1603514796102056924bbe3b499018c7e6c8156e77167e34c131902914ca6fc2"
+        }
+      ]
+    },
+    {
+      "scene": "dragon-defeat",
+      "prompt": "Create ONE complete landscape cinematic boss-story illustration, 1536x1024, for Envy in the same dark fantasy PIXEL PAINTING series as the first three reference images (Greed defeated, Pride shattered mirrors and tower ruins). Match their refined dense small pixel strokes, dramatic layered ruins, metallic edge highlights, rich material textures, atmospheric depth and restrained sparkling particles. Do not use chunky enlarged sprite pixels, flat children's-book art, smooth anime art, 3D render, chibi proportions, or a montage/atlas. The fourth reference is Envy identity only: hooded dark-haired child (top left), bronze-root emerald dragon (top right), cyclops/rage (bottom). Fifth reference is the ORIGINAL Envy worm identity: olive segmented plates, freckles, one pale round eye, three small feet, leaf-tipped tail, anxious expression. Keep these identities, do not copy any franchise. Full opaque original forest-ruin SCENE with indigo moonlight, tarnished bronze/gold, restrained emerald and warm amber accents; no casino, mirrors, Pride crowns, text, UI, cats, humans other than specified child, logos or watermarks. Compose all essential story action within the central 40% width and central 55% height so both phone portrait cover-crop and widescreen show it; outer edges elaborate scene extension, top 12% and bottom 16% quieter for externally rendered title and buttons. The large subject should belong to the environment, not a portrait placed on a generic backdrop. STORY: The FINAL enraged giant eye incarnation is actually destroyed: colossal emerald slit-eye shell shattered open with a dark EMPTY core, ALL small stolen eyes dark and fractured, bronze thorn roots snapped and scattered across drowned ruins. Ornate overlapping green scale plates falling amid mist and pale light, dramatic collapse and reflective water, depth comparable to Pride broken-mirror defeat. No intact living pupil, no standing dragon, no victory worm yet.",
+      "files": [
+        {
+          "path": "source-assets/envy/images/envy-dragon-defeat-r16.png",
+          "size_bytes": 3621676,
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "ac9baffccf9a7d1557a4ab00731b6cf319d013f2e38e34a40f05cb9ae99d10e5"
+        },
+        {
+          "path": "bridge/assets/envy-dragon-defeat-r16.webp",
+          "size_bytes": 620516,
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "0f394a6d06dd8e44798d7f15b92c816bc43130bb7c97c4ade0dc87c0c232d668"
+        }
+      ]
+    },
+    {
+      "scene": "worm-reveal",
+      "prompt": "Create ONE complete landscape cinematic boss-story illustration, 1536x1024, for Envy in the same dark fantasy PIXEL PAINTING series as the first three reference images (Greed defeated, Pride shattered mirrors and tower ruins). Match their refined dense small pixel strokes, dramatic layered ruins, metallic edge highlights, rich material textures, atmospheric depth and restrained sparkling particles. Do not use chunky enlarged sprite pixels, flat children's-book art, smooth anime art, 3D render, chibi proportions, or a montage/atlas. The fourth reference is Envy identity only: hooded dark-haired child (top left), bronze-root emerald dragon (top right), cyclops/rage (bottom). Fifth reference is the ORIGINAL Envy worm identity: olive segmented plates, freckles, one pale round eye, three small feet, leaf-tipped tail, anxious expression. Keep these identities, do not copy any franchise. Full opaque original forest-ruin SCENE with indigo moonlight, tarnished bronze/gold, restrained emerald and warm amber accents; no casino, mirrors, Pride crowns, text, UI, cats, humans other than specified child, logos or watermarks. Compose all essential story action within the central 40% width and central 55% height so both phone portrait cover-crop and widescreen show it; outer edges elaborate scene extension, top 12% and bottom 16% quieter for externally rendered title and buttons. The large subject should belong to the environment, not a portrait placed on a generic backdrop. STORY: The fragile ORIGINAL olive single-eyed segmented worm emerges from under an enormous dead split eye shell resting in wet forest ruins. Contrast very small true body with huge broken bronze-root and emerald scale husk surrounding it. Anxious one pale round eye, moss brow, freckles, tiny feet and leaf tail match worm reference. Faint amber pool reflection guides focus onto worm in center. Eerie revelation, not cute garden; no flowers, globe or living giant eye.",
+      "files": [
+        {
+          "path": "source-assets/envy/images/envy-worm-reveal-r16.png",
+          "size_bytes": 3375399,
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "bbc112bf01a0928f8fca56eb596f18cee9af80dc95763c23d052bc9deeef5629"
+        },
+        {
+          "path": "bridge/assets/envy-worm-reveal-r16.webp",
+          "size_bytes": 567430,
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "221f0b25f273efa1b8c65c0aec33b8591ef2267463461cad31ebcb1ea4a073f3"
+        }
+      ]
+    },
+    {
+      "scene": "victory-captured",
+      "prompt": "Create ONE complete landscape cinematic boss-story illustration, 1536x1024, for Envy in the same dark fantasy PIXEL PAINTING series as the first three reference images (Greed defeated, Pride shattered mirrors and tower ruins). Match their refined dense small pixel strokes, dramatic layered ruins, metallic edge highlights, rich material textures, atmospheric depth and restrained sparkling particles. Do not use chunky enlarged sprite pixels, flat children's-book art, smooth anime art, 3D render, chibi proportions, or a montage/atlas. The fourth reference is Envy identity only: hooded dark-haired child (top left), bronze-root emerald dragon (top right), cyclops/rage (bottom). Fifth reference is the ORIGINAL Envy worm identity: olive segmented plates, freckles, one pale round eye, three small feet, leaf-tipped tail, anxious expression. Keep these identities, do not copy any franchise. Full opaque original forest-ruin SCENE with indigo moonlight, tarnished bronze/gold, restrained emerald and warm amber accents; no casino, mirrors, Pride crowns, text, UI, cats, humans other than specified child, logos or watermarks. Compose all essential story action within the central 40% width and central 55% height so both phone portrait cover-crop and widescreen show it; outer edges elaborate scene extension, top 12% and bottom 16% quieter for externally rendered title and buttons. The large subject should belong to the environment, not a portrait placed on a generic backdrop. STORY: Successful final capture: the same original olive worm is safely enclosed inside a subtle transparent AMBER magical ring on a low ancient wet stone altar, nervous original face and segmented plates. Destroyed empty giant-eye shell fragments and extinguished collected eyes scattered in foreground; forest ruins calm after battle, distant blue dawn, bronze roots and wet reflections, cinematic serious victory in same rich atmosphere as Pride tower ruins. Ring fine and restrained, not big decorative cartoon bubble; no cheerful flower garden.",
+      "files": [
+        {
+          "path": "source-assets/envy/images/envy-victory-captured-r16.png",
+          "size_bytes": 3521721,
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "9a9de6caea7a952db6f139fb1b1a698cb80a0b15b74cd20637412945a1e782f2"
+        },
+        {
+          "path": "bridge/assets/envy-victory-captured-r16.webp",
+          "size_bytes": 616246,
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "96cb0ec4e9ee7b91bc14e61ab8703fa67c4bc29575501ca91f944b9762f074a9"
+        }
+      ]
+    },
+    {
+      "scene": "victory-escaped",
+      "prompt": "Create ONE complete landscape cinematic boss-story illustration, 1536x1024, for Envy in the same dark fantasy PIXEL PAINTING series as the first three reference images (Greed defeated, Pride shattered mirrors and tower ruins). Match their refined dense small pixel strokes, dramatic layered ruins, metallic edge highlights, rich material textures, atmospheric depth and restrained sparkling particles. Do not use chunky enlarged sprite pixels, flat children's-book art, smooth anime art, 3D render, chibi proportions, or a montage/atlas. The fourth reference is Envy identity only: hooded dark-haired child (top left), bronze-root emerald dragon (top right), cyclops/rage (bottom). Fifth reference is the ORIGINAL Envy worm identity: olive segmented plates, freckles, one pale round eye, three small feet, leaf-tipped tail, anxious expression. Keep these identities, do not copy any franchise. Full opaque original forest-ruin SCENE with indigo moonlight, tarnished bronze/gold, restrained emerald and warm amber accents; no casino, mirrors, Pride crowns, text, UI, cats, humans other than specified child, logos or watermarks. Compose all essential story action within the central 40% width and central 55% height so both phone portrait cover-crop and widescreen show it; outer edges elaborate scene extension, top 12% and bottom 16% quieter for externally rendered title and buttons. The large subject should belong to the environment, not a portrait placed on a generic backdrop. STORY: Boss defeated but TRUE BODY escaped: huge cracked EMPTY giant-eye shell and snapped bronze-root scale armor in foreground of drowned forest ruin; the original tiny olive worm visibly fleeing away on central broken stone causeway, luminous tiny footprints into indigo mist. Moon and distant amber neighbor-house windows beyond twisted trunks, melancholic relief, rich ruined setting. Essential worm and empty shell remain in narrow middle crop; no intact living eye and no standing incarnation.",
+      "files": [
+        {
+          "path": "source-assets/envy/images/envy-victory-escaped-r16.png",
+          "size_bytes": 3234628,
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "b128c4fa76783b4a20dd3f7e39d41ec9244b4146616a7697e179faf0bfb9281d"
+        },
+        {
+          "path": "bridge/assets/envy-victory-escaped-r16.webp",
+          "size_bytes": 521304,
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "ee48ad0c97cf036c06dd05ec9b62b6799c9d4826a1d4638a11eed09a3ddc0e84"
+        }
+      ],
+      "edit_prompt": "Edit this Envy escaped ending illustration, preserving its refined dark fantasy pixel painting style, ruins, lighting, broken empty shell, overall landscape and all original details. Reposition ONLY the tiny original olive single-eyed worm and its luminous footprint trail from the right side to the CENTRAL stone causeway, centered around 52% of image width and 56% of image height. It is fleeing away into the forest. Keep its ORIGINAL design, segmented olive plates, one pale round eye, freckles, small feet and leaf-tipped tail. The worm's complete body and pale eye MUST be entirely within the middle 35% of image width so phone portrait center cropping clearly shows it alongside some destroyed giant-eye armor. Remove its old right-hand copy: exactly ONE worm in the whole image. Do not make the worm oversized or centered like a portrait. No text, cats, UI, logos or watermark. Maintain full opaque landscape aspect ratio. This is boss defeated but true body escaped, no intact living giant eye.",
+      "edit_reference": "source-assets/envy/images/envy-victory-escaped-r16-draft.png"
+    },
+    {
+      "scene": "lost",
+      "prompt": "Create ONE complete landscape cinematic boss-story illustration, 1536x1024, for Envy in the same dark fantasy PIXEL PAINTING series as the first three reference images (Greed defeated, Pride shattered mirrors and tower ruins). Match their refined dense small pixel strokes, dramatic layered ruins, metallic edge highlights, rich material textures, atmospheric depth and restrained sparkling particles. Do not use chunky enlarged sprite pixels, flat children's-book art, smooth anime art, 3D render, chibi proportions, or a montage/atlas. The fourth reference is Envy identity only: hooded dark-haired child (top left), bronze-root emerald dragon (top right), cyclops/rage (bottom). Fifth reference is the ORIGINAL Envy worm identity: olive segmented plates, freckles, one pale round eye, three small feet, leaf-tipped tail, anxious expression. Keep these identities, do not copy any franchise. Full opaque original forest-ruin SCENE with indigo moonlight, tarnished bronze/gold, restrained emerald and warm amber accents; no casino, mirrors, Pride crowns, text, UI, cats, humans other than specified child, logos or watermarks. Compose all essential story action within the central 40% width and central 55% height so both phone portrait cover-crop and widescreen show it; outer edges elaborate scene extension, top 12% and bottom 16% quieter for externally rendered title and buttons. The large subject should belong to the environment, not a portrait placed on a generic backdrop. STORY: Player defeat: monumental LIVING enraged emerald slit eye set in jagged thorn-bronze armor looming in upper-center over a ruined forest bridge, oppressive root arches, drowned lanterns, deep purple-black mist and cold wet stone. The victorious giant eye is intact and visibly threatening with spiked leafy crown-like ROOTS (not Pride royal crown); six glints watch from shadows. No gore, no fallen human/player or cat, no cheerful worm. Detailed atmospheric loss screen matching Greed/Pride dramatic fine pixel paintings.",
+      "files": [
+        {
+          "path": "source-assets/envy/images/envy-lost-r16.png",
+          "size_bytes": 3576185,
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "8583710b65110b8d59e6fcea703a55fc0c06bdcafe25593488fe54c6cceae592"
+        },
+        {
+          "path": "bridge/assets/envy-lost-r16.webp",
+          "size_bytes": 628206,
+          "dimensions": [
+            1536,
+            1024
+          ],
+          "sha256": "0db9e9335ea38593a99c89449e91cdb055f7f761290a84ca36f59575df3b8f5d"
+        }
+      ]
+    }
+  ],
+  "unused_drafts": [
+    {
+      "path": "source-assets/envy/images/envy-victory-escaped-r16-draft.png",
+      "size_bytes": 3594962,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "c89bb1d3474744f399eb3861f5c5d1c02e1ab34560b21feb914f557a4142776f",
+      "reason": "Worm too far right for portrait crop"
+    }
+  ]
+}
