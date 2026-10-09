@@ -1,11 +1,12 @@
-import { drawLoreGame, drawLoreSecret } from './lore-view.mjs';
+import { drawLoreGame, drawLoreSecret } from './lore-view.mjs?v=1.2.33';
 import { WINDOW } from './lore-games.mjs';
 import { cellsOf, ghostY } from '../logic.mjs';
 import { configureBridgePaint, drawGridCells, paintPiece } from './bridge-paint.mjs';
 import { appearance, bossName, CURSE_NAMES } from './engine.mjs';
 import { NAMES, HINTS, ATTACKS, eyeRect, gridLayout, LASER_EYES, laserEyePosition, laserRules, describeCard } from './rounds.mjs';
 import { keyOf, blockCells, clamp, segmentHitsRect } from './geometry.mjs';
-import { text, path, box, eye, heart, drawCard, drawWorm, backdrop, images } from './art.mjs';
+import { text, path, box, eye, heart, drawCard, drawWorm, backdrop, images } from './art.mjs?v=1.2.33';
+import { drawEndingPage } from './ending.mjs?v=1.2.33';
 
 export const canvasHeight = s => s?.mode==='bridge'?720:560;
 function bar(c,x,y,w,ratio,color){box(c,x,y,w,5,'#142720',null,2);box(c,x,y,w*Math.max(0,Math.min(1,ratio)),5,color,null,2);}
@@ -38,8 +39,8 @@ function bridge(c,s,reduced){
   }
   c.restore();
   // Original Crazy preview positions: labels y=37, hold y=53, three next slots.
-  text(c,g.noHoldLeft>0?'封印':'留',40,37,10,'#bdcda8');
-  text(c,'下一個',240,37,10,'#bdcda8');
+  text(c,g.noHoldLeft>0?'封印':'留',40,37,10,'#bdcda8',58);
+  text(c,'下一個',240,37,10,'#bdcda8',58);
   const preview=(piece,x,y)=>{
     if(!piece)return;
     const cells=cellsOf(piece.type,0,0,0),minX=Math.min(...cells.map(([x])=>x)),minY=Math.min(...cells.map(([,y])=>y));
@@ -217,13 +218,10 @@ function scene(c,s,reduced){
   const gradient=c.createRadialGradient(140,h*.42,5,140,h*.42,155);gradient.addColorStop(0,'#6b95553b');gradient.addColorStop(1,'#081d1700');c.fillStyle=gradient;c.fillRect(0,0,280,h);
   text(c,titles[kind]||'嫉妒',140,112,20,'#e2edb9');
   const endingIndex={'first-defeat':0,'dragon-defeat':1,'worm-reveal':2,victory:s.captured?3:4,lost:5,'capture-retry':4}[kind];
-  const ending=images.endings;
+  const ending=images[`ending${endingIndex}`];
   if(endingIndex!==undefined&&ending?.complete&&ending.naturalWidth){
-    const sw=ending.naturalWidth/3,sh=ending.naturalHeight/2;
-    const y=Math.round(h*.29),w=244;
-    c.drawImage(ending,endingIndex%3*sw,Math.floor(endingIndex/3)*sh,sw,sh,18,y,w,w);
-    const captions={'first-defeat':'眼球深處，有東西正在甦醒。','dragon-defeat':'眾目熄滅，只剩逃跑的身影。','worm-reveal':'追進幽林，抓住它。',victory:s.captured?'擊破化身，捕獲嫉妒本體。':'巨瞳散去，本體逃入幽林。',lost:'換個節奏，再試一次。','capture-retry':'本體仍藏在幽林深處。'};
-    text(c,captions[kind],140,y+w+24,11,'#bdcead');return;
+    // The DOM owns title/actions; never draw a miniature ending card underneath it.
+    drawEndingPage(c,ending,280,h);return;
   }
   if(kind==='room-secret'){
     drawLoreSecret(c,time,reduced);

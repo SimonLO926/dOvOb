@@ -1,4 +1,5 @@
 // Ending art owns the viewport; battle geometry and controls keep their native layout.
+import { t } from './i18n.mjs';
 export function endingPresentation(s){
   const kind=s?.scene?.kind;
   const endings={
@@ -9,15 +10,15 @@ export function endingPresentation(s){
     lost:[5,'被嫉妒吞沒','換個節奏，再試一次。'],
     'capture-retry':[4,'本體溜走了','本體仍藏在幽林深處。'],
   };
-  const value=endings[kind];return value?{index:value[0],title:value[1],caption:value[2]}:null;
+  const value=endings[kind];return value?{index:value[0],title:t(value[1]),caption:t(value[2])}:null;
 }
-export function drawEndingPage(c,image,index,w,h){
+export function drawEndingPage(c,image,w,h){
   c.clearRect(0,0,w,h);c.fillStyle='#061510';c.fillRect(0,0,w,h);
   if(!image?.complete||!image.naturalWidth)return false;
-  const sw=image.naturalWidth/3,sh=image.naturalHeight/2;
+  const sw=image.naturalWidth,sh=image.naturalHeight;
   const scale=Math.max(w/sw,h/sh),cw=w/scale,ch=h/scale;
-  // Crop within one panel, retaining aspect ratio and never showing adjacent endings.
+  // Each scene is a full-resolution original; cover-crop without distorting it.
   c.imageSmoothingEnabled=false;
-  c.drawImage(image,(index%3)*sw+(sw-cw)/2,Math.floor(index/3)*sh+(sh-ch)/2,cw,ch,0,0,w,h);
+  c.drawImage(image,(sw-cw)/2,(sh-ch)/2,cw,ch,0,0,w,h);
   return true;
 }

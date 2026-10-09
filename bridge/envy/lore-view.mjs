@@ -1,5 +1,5 @@
 import { LIVES, WINDOW, ROOM_NAMES, ROOM_TARGETS } from './lore-games.mjs';
-import { text, box, eye, images } from './art.mjs';
+import { text, box, eye, images } from './art.mjs?v=1.2.33';
 function atlas(c,img,index,cols,rows,x,y,w,h){
   if(img?.complete&&img.naturalWidth){
     const pw=img.naturalWidth/cols,ph=img.naturalHeight/rows,sw=Math.min(pw,ph*w/h),sh=Math.min(ph,pw*h/w);
@@ -50,7 +50,7 @@ function furniture(c,m,r){
   if(r.id==='painting'){text(c,'★',r.x+r.w/2,r.y+30,30,'#e3c66b');text(c,'↓',r.x+r.w/2,r.y+54,16,'#f2b9b1');}
   if(r.id==='curtain')for(let k=0;k<5;k++)box(c,r.x+4+k*17,r.y+5,13,53,'#8f648a');
   if(r.id==='clue')text(c,'? ? ?',140,r.y+25,24,'#e9ddb6');
-  text(c,taken?'已找到':r.label,r.x+r.w/2,r.y+r.h-14,11,'#fff0d5');
+  text(c,taken?'已找到':r.label,r.x+r.w/2,r.y+r.h-14,11,'#fff0d5',r.w-8);
   if(r.id==='mask'){
     box(c,r.x+19,r.y+8,r.w-38,r.h-40,'#b8a68a','#e6d5ae',30);
     for(let i=0;i<6;i++)token(c,i,r.x+48+i%2*84,r.y+32+Math.floor(i/2)*43,34);
@@ -83,7 +83,7 @@ function roomGame(c,m){
     c.save();c.translate(140,318);c.rotate(Math.PI+m.turns*Math.PI/2);box(c,-64,-66,128,132,'#45486b','#d2b98b');text(c,'★',0,-21,55,'#f4dc8d');text(c,'↑',0,43,25,'#e7dfcb');c.restore();
     text(c,'點畫／空白鍵 · 轉動',140,439,12);
   }else if(m.modal==='mask'){
-    text(c,'眼洞對上偷來的人生',124,193,12,'#efd6a9');
+    text(c,'眼洞對上偷來的人生',124,193,12,'#efd6a9',182);
     for(let i=0;i<6;i++){const x=37+i%3*70,y=217+Math.floor(i/3)*58;box(c,x,y,66,54,'#473e53','#b7a087');if(m.maskSlots[i]>=0)token(c,m.maskSlots[i],x+33,y+24,38);else text(c,LIVES[m.order[i]].symbol,x+33,y+25,22,LIVES[m.order[i]].color);if(i===m.slot)selected(c,x,y,66,54);}
     for(let i=0;i<6;i++){const x=31+i*220/6;c.save();c.globalAlpha=m.eyes.has(i)||i===5?1:.2;token(c,i,x+17,370,27);c.restore();if(i===m.choice)selected(c,x,348,33,45);}
     text(c,LIVES[m.choice].name,140,401,11,LIVES[m.choice].color);
