@@ -1,5 +1,7 @@
 # Bridge / Crazy 工作指引
 
+**先讀 [使用者要求總表](USER_REQUIREMENTS_MUST_READ.md)。** 完整對話要求已彙整，最新修正優先。滿頁插圖實際參照貪婪／傲慢細緻像素繪畫；戰鬥頭部維持原精靈風格。不能只寫泛泛「pixel art」或套用舊六格結算圖集。
+
 **1.2.31：使用者已明確要求「接好他」，嫉妒正式開放。傲慢既有通關紀錄直接解鎖嫉妒；正式入口與獨立 Preview 分開。宣傳片 agent 使用 sessionStorage 暫時解鎖已推出的三位 Boss，不能偽造／覆寫通關旗標；拍攝戰鬥不寫正式紀錄。** 詳見 [正式接線與拍攝指南](FILMING_GUIDE.md)。
 
 **1.2.33：嫉妒六張滿頁過場／結算改用獨立高解析圖，直接對照貪婪／傲慢的細緻像素繪畫風格；全部介面支援英文／繁體中文並沿用主遊戲語言。原圖、提示詞及裁切修正保存，語言不能改戰鬥狀態。**
@@ -14,9 +16,10 @@
 
 修改 Crazy、七大罪 Boss、美術、遊戲框、HUD、觸控或試玩交付時，先依序閱讀：
 
-1. [BOSS_UI_MUST_READ.md](BOSS_UI_MUST_READ.md)：貪婪與傲慢各型態的畫面／操作規範、圖片生成與已採用參考、例外及修改後驗收表。
-2. [CRAZY_MUST_READ.md](CRAZY_MUST_READ.md)：使用者確認的世界觀、美術、玩法、操作與交付規則。
-3. [FILMING_GUIDE.md](FILMING_GUIDE.md)：正式接線、通關條件及宣傳片暫時解鎖；不可把測試入口當正式入口。
+1. [USER_REQUIREMENTS_MUST_READ.md](USER_REQUIREMENTS_MUST_READ.md)：完整對話的現行要求、來源／試作差異與已取代設定。
+2. [BOSS_UI_MUST_READ.md](BOSS_UI_MUST_READ.md)：三位 Boss 的畫面／操作規範、圖片生成與已採用參考、例外及修改後驗收表。
+3. [CRAZY_MUST_READ.md](CRAZY_MUST_READ.md)：世界觀、美術、玩法、操作與交付規則。
+4. [FILMING_GUIDE.md](FILMING_GUIDE.md)：正式接線、通關條件及宣傳片暫時解鎖；不可把測試入口當正式入口。
 
 新增 Boss 或小遊戲也必須沿用共用畫面規則。不要從舊說明還原已取消的頂部立繪、Boss HP 數字、A／B 按鍵、SAFE 圓圈或遮擋遊戲的成功動畫。實作與文件不一致時，記錄差異；使用者最新明確要求優先。
 
