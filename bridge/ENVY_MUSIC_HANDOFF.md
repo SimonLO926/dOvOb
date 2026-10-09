@@ -1,4 +1,6 @@
-# 嫉妒音樂交接（r13，GitHub 獨立試玩）
+# 嫉妒音樂交接（1.2.31，正式及獨立試玩共用）
+
+1.2.31正式嫉妒與獨立試玩共用同一音樂路由，正式繼承主遊戲BGM／音效音量；拍攝解鎖不改歌曲。接線見 [FILMING_GUIDE.md](FILMING_GUIDE.md)。
 
 2026-10-09 已收到 `envy-bgm-7tracks.zip` 的七首 MP3，依使用者列出的用途接入嫉妒獨立試玩。原檔保存在 [來源目錄](../source-assets/envy/music/)，逐檔 SHA-256、原始大小及實測時長記於 [sources.json](../source-assets/envy/music/sources.json)。遊戲使用 [envy-music](assets/envy-music/) 完整時長 128 kbps 副本，不裁短／覆寫原曲，不挪用貪婪或傲慢素材。來源目錄維持 Jekyll 排除。
 

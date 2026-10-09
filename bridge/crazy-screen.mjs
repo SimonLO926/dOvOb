@@ -13,7 +13,7 @@ export function readGreedClear(storage) {
   try { return storage.getItem('bridge-greed-cleared') === '1'; } catch { return false; }
 }
 export function recordGreedClear(storage, s) {
-  if (!s.won || s.form !== 2 || s.bossHp !== 0) return false;
+  if (s.preview || s.filming || !s.won || s.form !== 2 || s.bossHp !== 0) return false;
   try { storage.setItem('bridge-greed-cleared', '1'); return true; } catch { return false; }
 }
 const text = (c, value, x, y, size, color = '#ffe7ae') => { c.font = `bold ${size}px "Pixel Latin", "Pixel Hant", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = color; c.fillText(value, x, y, c.canvas.width * .9); };

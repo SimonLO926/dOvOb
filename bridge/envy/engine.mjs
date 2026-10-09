@@ -28,11 +28,12 @@ export function appearance(s) {
 }
 export function bossName(s) { return s.form===1?'窺視之子':appearance(s)==='worm'?'嫉妒本體':'嫉妒化身'; }
 function newBridge(random) { const game=createGame({mode:'marathon',random});startGame(game,'marathon');return game; }
-export function createEnvy({ scenario='full', difficulty='normal', random=Math.random }={}) {
+export function createEnvy({ scenario='full', difficulty='normal', random=Math.random, preview=true, filming=false }={}) {
+  if(!preview&&scenario!=='full')throw new RangeError('Envy campaign requires the full encounter');
   const pick=SCENARIOS.find(value=>value.id===scenario);
   if(!pick)throw new RangeError('Unknown Envy preview: '+scenario);
   const max=pick.form===1?1000:difficulty==='hard'?1750:1300;
-  const s={preview:true,scenario:pick,random,difficulty:difficulty==='hard'?'hard':'normal',form:pick.form,
+  const s={sin:'envy',preview,filming,scenario:pick,random,difficulty:difficulty==='hard'?'hard':'normal',form:pick.form,
     hp:100,maxHp:100,bossHp:max*(pick.ratio??1),bossMaxHp:max,mode:'bridge',round:null,bridge:newBridge(random),
     elapsed:0,held:new Set(),notice:'',noticeTime:0,events:[],rounds:0,bag:[],attackBag:[],cycle:0,
     scene:scenario==='full'?{kind:'intro',time:0,duration:2300}:null,over:false,won:false,collection:[],
