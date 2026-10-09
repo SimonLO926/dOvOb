@@ -1,0 +1,29 @@
+{
+  "tool": "image_gen",
+  "use": "Boss selection preview, first-form Watching Child, full opaque scene",
+  "references": [
+    "source-assets/envy/images/envy-heads.png (top-left child identity only)",
+    "source-assets/greed/images/greed-first.png (pixel painting/style only)",
+    "source-assets/pride/images/pride-first.png (pixel painting/style only)"
+  ],
+  "files": [
+    {
+      "path": "source-assets/envy/images/envy-first-concept-r15.png",
+      "size_bytes": 2916136,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "cbe51ab776675ab3b59b7c4d313f1c670a6ed6046cc740c84f283915e995389e"
+    },
+    {
+      "path": "bridge/assets/envy-first.webp",
+      "size_bytes": 433218,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "8e3a0b9655ec284b5968589bf67c8f29315d874f4296d2748e4ff264b40fc2c8"
+    }
+  ]
+}
