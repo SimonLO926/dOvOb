@@ -6,7 +6,7 @@ const point = (p, height) => p && Number.isFinite(p.x) && Number.isFinite(p.y)
   ? { x: clamp(p.x, 18, 262), y: clamp(p.y, 158, height - 64) } : null;
 
 export function combatLayout(s, { player, height: visibleHeight } = {}) {
-  const envy = s?.preview === true && !s?.config, sin = envy ? 'envy' : s?.config?.id;
+  const envy = s?.sin === 'envy' || s?.preview === true && !s?.config, sin = envy ? 'envy' : s?.config?.id;
   const blocks = ['bridge', 'sand'].includes(s?.mode);
   const height = Number.isFinite(visibleHeight) && visibleHeight > 0 ? visibleHeight : blocks ? 720 : 560;
   const plain = s?.mode === 'pride-escape' || envy && ['capture', 'chase'].includes(s?.mode);

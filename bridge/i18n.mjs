@@ -1148,6 +1148,8 @@ const TEXT = {
 const VAULT_TEXT = { crazyMode_vault:'金庫跑跳', crazyVaultStart:'60 秒：跑跳撿幣，帶回銀行存入 360', crazyVaultCleared:'金庫破解！Boss 解除鎖血', crazyVaultFailed:'金庫失敗 · 扣 80 HP', crazyVaultMove:'移動' };
 
 const PRIDE_TEXT = {
+  envyIntro: ['窺視之子', 'The Watching Child'],
+  envyLore: ['幽林裡的孩子，窺視著不屬於自己的幸福。', 'A child in the dark woods watches happiness that belongs to others.'],
   "pridePuzzleFailed": ["巴別塔失敗", "Tower challenge failed"],
   "prideRedFailed": ["紅鏡挑戰失敗", "Red mirror challenge failed"],
   "prideShardHit": ["碎鏡命中", "Mirror shard hit"],

@@ -1,5 +1,6 @@
 import { PRIDE_MINIGAME_IDS } from './minigames/index.mjs';
 import { readGreedClear } from './crazy-screen.mjs?v=1.2.28';
+import { filmingEnabled } from './filming.mjs?v=1.2.31';
 
 // Add a playable encounter and mark it developed when each future boss ships.
 export const SIN_BOSSES = Object.freeze([
@@ -9,20 +10,20 @@ export const SIN_BOSSES = Object.freeze([
     attacks: ['jump', 'coins', 'motion', 'vortex', 'roulette'], finisher: 'vault', arcadePool: ['breakout', 'pinball', 'bbtan', 'sand'],
     recovery: ['cards', 'mahjong', 'slots'], label: 'crazyGreed', developed: true },
   { id: 'pride', name: '傲慢', icon: '👑', minigames: PRIDE_MINIGAME_IDS, attacks: ['pride-gaze', 'pride-mirror', 'pride-crown-shock'], finisher: 'pride-mirror-duel', arcadePool: ['breakout', 'pinball', 'bbtan', 'sand'], recovery: PRIDE_MINIGAME_IDS, label: 'sinPride', developed: true },
-  { id: 'envy', name: '嫉妒', icon: '👁', minigames: [], attacks: [], finisher: null, arcadePool: [], recovery: [], label: 'sinEnvy', developed: false },
+  { id: 'envy', name: '嫉妒', icon: '👁', entry: 'envy.html', minigames: ['difference', 'tarot', 'rolling', 'window', 'pack', 'territory', 'pellets', 'eye-room'], attacks: ['laser', 'steal', 'gaze', 'net', 'breath', 'pupil', 'laser-up', 'steal-up', 'gaze-up'], finisher: 'chase', arcadePool: [], recovery: ['tarot', 'pack', 'territory', 'pellets'], label: 'sinEnvy', developed: true },
   { id: 'lust', name: '色慾', icon: '💘', minigames: [], attacks: [], finisher: null, arcadePool: [], recovery: [], label: 'sinLust', developed: false },
   { id: 'gluttony', name: '暴食', icon: '🍔', minigames: [], attacks: [], finisher: null, arcadePool: [], recovery: [], label: 'sinGluttony', developed: false },
   { id: 'sloth', name: '怠惰', icon: '😴', minigames: [], attacks: [], finisher: null, arcadePool: [], recovery: [], label: 'sinSloth', developed: false },
   { id: 'wrath', name: '憤怒', icon: '🔥', minigames: [], attacks: [], finisher: null, arcadePool: [], recovery: [], label: 'sinWrath', developed: false },
 ].map(boss => Object.freeze({ ...boss, minigames: Object.freeze(boss.minigames), attacks: Object.freeze(boss.attacks), arcadePool: Object.freeze(boss.arcadePool), recovery: Object.freeze(boss.recovery) })));
 
-export function sinProgress(storage, bosses = SIN_BOSSES) {
+export function sinProgress(storage, bosses = SIN_BOSSES, { filming = filmingEnabled() } = {}) {
   const cleared = id => {
     if (id === 'greed') return readGreedClear(storage);
     try { return storage.getItem(`bridge-crazy-cleared-${id}`) === '1'; } catch { return false; }
   };
   return bosses.map((boss, index) => ({ ...boss, cleared: cleared(boss.id),
-    unlocked: boss.developed && (index === 0 || cleared(bosses[index - 1].id)) }));
+    unlocked: boss.developed && (filming || index === 0 || cleared(bosses[index - 1].id)) }));
 }
 
 export function crazyLeaderboardKey(sin = 'greed', difficulty = 'hard') {
@@ -30,6 +31,8 @@ export function crazyLeaderboardKey(sin = 'greed', difficulty = 'hard') {
   return base + (difficulty === 'normal' ? '-normal' : '');
 }
 export function recordSinClear(storage, s) {
-  if (s.config?.id !== 'pride' || !s.won || s.bossHp !== 0 || !s.prideDuelCleared) return false;
-  try { storage.setItem('bridge-crazy-cleared-pride', '1'); return true; } catch { return false; }
+  if (s.preview || s.filming || s.bossHp !== 0 || s.form !== 2) return false;
+  const id = s.sin ?? s.config?.id;
+  if (id === 'pride' ? !s.won || !s.prideDuelCleared : id !== 'envy' || !s.bossDefeated || !s.chaseCleared) return false;
+  try { storage.setItem(`bridge-crazy-cleared-${id}`, '1'); return true; } catch { return false; }
 }

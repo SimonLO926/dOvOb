@@ -15,7 +15,7 @@ test('Pride unlock and separate Normal/Hard records use established storage', ()
   assert.equal(crazyLeaderboardKey('greed', 'hard'), 'bridge-best-crazy');
   assert.equal(crazyLeaderboardKey('greed', 'normal'), 'bridge-best-crazy-normal');
   const s = pride(); s.won = true; s.bossHp = 0; assert.equal(recordSinClear(save, s), false);
-  s.prideDuelCleared = true; assert.equal(recordSinClear(save, s), true); assert.equal(sinProgress(save)[1].cleared, true);
+  s.prideDuelCleared = true; s.form = 2; assert.equal(recordSinClear(save, s), true); assert.equal(sinProgress(save)[1].cleared, true);
 });
 test('Pride samples two distinct arcades per fight and visits every registered mode', () => {
   for (const difficulty of ['normal', 'hard']) {

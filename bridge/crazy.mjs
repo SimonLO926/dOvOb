@@ -4,7 +4,7 @@ import { PRIDE_MINIGAMES } from './minigames/index.mjs';
 import { CRAZY_COUNTDOWN_PUZZLES, countdownCue } from './puzzle-countdown.mjs';
 import { PRIDE_ATTACKS, createPrideAttack, prideInput, pridePoint, updatePrideAttack } from './pride-attacks.mjs';
 import { startPrideFinisher, finishPrideFinisher, retryPrideFinisher, updateMirrorDuel, mirrorDuelPoint, mirrorDuelInput } from './pride-finisher.mjs';
-import { SIN_BOSSES } from './crazy-sins.mjs?v=1.2.28';
+import { SIN_BOSSES } from './crazy-sins.mjs?v=1.2.31';
 import { VAULT_RULES, createVault, updateVault, vaultPoint } from './crazy-vault.mjs?v=1.2.28';
 import { BRIDGE_REPEAT } from './bridge-controls.mjs?v=1.2.28';
 import { GREED_ATTACKS, FLYING_ATTACKS, createReaction, reactionInput, reactionPoint, updateReaction, createPusher, pusherAction, updatePusher } from './crazy-reactions.mjs?v=1.2.28';
@@ -45,6 +45,7 @@ export function crazyRoundDuration(mode, form, phase, random = Math.random) {
 export function createCrazy({ random = Math.random, boss = FIRST_BOSS, difficulty = 'hard', sin = 'greed' } = {}) {
   const config = SIN_BOSSES.find(config => config.id === sin && config.developed);
   if (!config) throw new RangeError(`Undeveloped sin: ${sin}`);
+  if (config.entry) throw new RangeError(`Use the dedicated encounter: ${config.entry}`);
   if (sin === 'pride' && boss === FIRST_BOSS) boss = PRIDE_BOSS;
   const arcadeModes = sin === 'pride' ? shuffled(config.arcadePool, random).slice(0, 2) : [];
   const bridge = createGame({ mode: 'marathon', random });

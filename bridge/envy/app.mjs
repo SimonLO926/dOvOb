@@ -1,30 +1,55 @@
 import { endStroke } from './lore-games.mjs';
-import { createEnvy, SCENARIOS, envyInput, envyPoint, updateEnvy, continueScene, retryCapture, finishEnvy } from './engine.mjs';
+import { createEnvy, SCENARIOS, envyInput, envyPoint, updateEnvy, continueScene, retryCapture, finishEnvy } from './engine.mjs?v=1.2.31';
+import { createCampaignRecorder, envyUnlocked } from './campaign.mjs?v=1.2.31';
+import { filmingEnabled } from '../filming.mjs?v=1.2.31';
 import { canvasHeight, drawEnvy } from './view.mjs';
 import { drawFrame, loadArt, images } from './art.mjs';
 import { endingPresentation, drawEndingPage } from './ending.mjs';
 import { puzzleCountdownCue, playCountdownTone } from './countdown.mjs';
 import { createEnvyMusic, envyTrack } from './music.mjs';
 import { ATTACKS, gridLayout } from './rounds.mjs';
-import { createCombatEffects, resetCombatEffects, updateCombatEffects, drawCombatEffects, createCombatOverlay, combatLayout } from '../combat-effects.mjs';
+import { createCombatEffects, resetCombatEffects, updateCombatEffects, drawCombatEffects, createCombatOverlay, combatLayout } from '../combat-effects.mjs?v=1.2.31';
 
 const $=selector=>document.querySelector(selector);
+const campaign=document.body.dataset.envyCampaign==='true';
+let campaignStorage;try{campaignStorage=localStorage;}catch{}
+const recordCampaign=createCampaignRecorder(campaignStorage);
+function returnToBosses(){location.assign(new URL('./index.html?bosses=1&sin=envy',location.href));}
 const board=$('#envy-board'),context=board.getContext('2d'),frame=$('#boss-frame'),frameContext=frame.getContext('2d'),wrap=$('#board-wrap');
 const combatEffects=createCombatEffects(),combatOverlay=createCombatOverlay(board,'envy-combat-effects'),combatContext=combatOverlay.getContext('2d');
 let encounter=null,paused=true,last=performance.now(),hitTime=0,lastHp=100,boardPointer=null;
 let selected='full',difficulty='normal',audio=null,lastMode='';
 let endingKey='',catLayoutKey='';
 const preferences={danger:'warning',reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,sound:true,music:.7};
+let sfxVolume=1;
+if(campaign){
+  let saved={};try{saved=JSON.parse(localStorage.getItem('bridge-settings')||'{}');}catch{}
+  const volume=(value,fallback=.7)=>Number.isFinite(Number(value))?Math.max(0,Math.min(1,Number(value))):fallback;
+  preferences.danger=saved.dangerEffect==='shake'?'shake':'warning';
+  preferences.music=volume(saved.bgmVolume??saved.volume??.7);
+  sfxVolume=volume(saved.sfxVolume??saved.volume??.7);preferences.sound=sfxVolume>0;
+  const requested=new URLSearchParams(location.search).get('difficulty');
+  difficulty=(requested??saved.crazyDifficulty)==='hard'?'hard':'normal';
+}
+function savePreferences(){
+  if(!campaign||filmingEnabled())return;
+  try{
+    const saved=JSON.parse(localStorage.getItem('bridge-settings')||'{}');
+    Object.assign(saved,{dangerEffect:preferences.danger,bgmVolume:preferences.music,sfxVolume:preferences.sound?sfxVolume:0,crazyDifficulty:difficulty});
+    localStorage.setItem('bridge-settings',JSON.stringify(saved));
+  }catch{}
+}
 const music=createEnvyMusic(()=>preferences.music);
 $('#reduce').checked=preferences.reduced;
-// Read-only diagnostics; no writes to official save keys, records, or unlocks.
-Object.defineProperty(window,'envyPreview',{get:()=>encounter});
+$('#danger').value=preferences.danger;$('#sound').checked=preferences.sound;
+$('#music-volume').value=Math.round(preferences.music*100);$('#music-level').textContent=$('#music-volume').value+'%';
+Object.defineProperty(window,campaign?'envyGame':'envyPreview',{get:()=>encounter});
 const select=$('#scenario');
 for(const option of SCENARIOS){const el=document.createElement('option');el.value=option.id;el.textContent=option.label;select.append(el);}
 function tone(frequency=180,duration=.12,type='sine',volume=.045){
   if(!preferences.sound||!audio)return;
   const oscillator=audio.createOscillator(),gain=audio.createGain(),time=audio.currentTime;
-  oscillator.type=type;oscillator.frequency.setValueAtTime(frequency,time);gain.gain.setValueAtTime(.001,time);gain.gain.exponentialRampToValueAtTime(volume,time+.025);gain.gain.exponentialRampToValueAtTime(.001,time+duration);
+  oscillator.type=type;oscillator.frequency.setValueAtTime(frequency,time);gain.gain.setValueAtTime(.001,time);gain.gain.exponentialRampToValueAtTime(Math.max(.001,volume*sfxVolume),time+.025);gain.gain.exponentialRampToValueAtTime(.001,time+duration);
   oscillator.connect(gain);gain.connect(audio.destination);oscillator.start(time);oscillator.stop(time+duration+.025);
 }
 function unlockAudio(){
@@ -102,24 +127,25 @@ function presentation(){
   cat.style.top=`${Math.max(48,Math.min(h-width/ratio-4,y))}px`;
 }
 function start(){
-  music.reset();unlockAudio();encounter=createEnvy({scenario:selected,difficulty});lastHp=100;hitTime=0;lastMode='';paused=false;last=performance.now();
+  if(campaign&&!envyUnlocked(campaignStorage)){returnToBosses();return;}
+  music.reset();unlockAudio();encounter=createEnvy({scenario:campaign?'full':selected,difficulty,preview:!campaign,filming:campaign&&filmingEnabled()});lastHp=100;hitTime=0;lastMode='';paused=false;last=performance.now();
   resetCombatEffects(combatEffects,encounter);
   for(const id of['launcher','menu','album-panel'])$('#'+id).hidden=true;fit();controls();
 }
 $('#launch-form').addEventListener('submit',event=>{event.preventDefault();selected=select.value;difficulty=$('#difficulty').value;start();});
 function openMenu(){if(!encounter)return;paused=true;music.pause();stopHeld();$('#menu').hidden=false;}
 function resume(){unlockAudio();paused=false;$('#menu').hidden=true;$('#album-panel').hidden=true;last=performance.now();}
-function choose(){stopHeld();paused=true;music.pause();$('#menu').hidden=true;$('#album-panel').hidden=true;$('#launcher').hidden=false;}
+function choose(){stopHeld();paused=true;music.pause();if(campaign){returnToBosses();return;}$('#menu').hidden=true;$('#album-panel').hidden=true;$('#launcher').hidden=false;}
 $('#menu-button').addEventListener('click',openMenu);$('#resume').addEventListener('click',resume);$('#menu-return').addEventListener('click',resume);$('#retry').addEventListener('click',start);$('#pick').addEventListener('click',choose);
-$('#danger').addEventListener('change',event=>preferences.danger=event.target.value);$('#reduce').addEventListener('change',event=>preferences.reduced=event.target.checked);$('#sound').addEventListener('change',event=>{preferences.sound=event.target.checked;if(preferences.sound)unlockAudio();});
-$('#music-volume').addEventListener('input',event=>{preferences.music=Number(event.target.value)/100;$('#music-level').textContent=event.target.value+'%';if(preferences.music>0)unlockAudio();});
+$('#danger').addEventListener('change',event=>{preferences.danger=event.target.value;savePreferences();});$('#reduce').addEventListener('change',event=>preferences.reduced=event.target.checked);$('#sound').addEventListener('change',event=>{preferences.sound=event.target.checked;if(preferences.sound){if(!sfxVolume)sfxVolume=.7;unlockAudio();}savePreferences();});
+$('#music-volume').addEventListener('input',event=>{preferences.music=Number(event.target.value)/100;$('#music-level').textContent=event.target.value+'%';if(preferences.music>0)unlockAudio();savePreferences();});
 $('#album').addEventListener('click',()=>{
   $('#menu').hidden=true;$('#album-panel').hidden=false;
   const collection=encounter?.collection||[];
   $('#album-content').textContent=collection.length?['C','U','R','SR','SAR'].map(r=>`${r} · ${collection.filter(c=>c.rarity===r).length} 張`).join('　／　'):'還沒有秘藏，試試多眼龍的卡包回合。';
 });$('#album-back').addEventListener('click',()=>{$('#album-panel').hidden=true;$('#menu').hidden=false;});
 $('#scene-pick').addEventListener('click',choose);$('#scene-retry').addEventListener('click',()=>{if(encounter?.scene?.kind==='capture-retry'){retryCapture(encounter);fit();}else start();});
-$('#scene-continue').addEventListener('click',()=>{continueScene(encounter);fit();controls();});
+$('#scene-continue').addEventListener('click',()=>{unlockAudio();continueScene(encounter);fit();controls();});
 $('#scene-finish').addEventListener('click',()=>finishEnvy(encounter));$('#bonus-finish').addEventListener('click',()=>{finishEnvy(encounter);resume();});
 const actions={left:'left',right:'right',up:'up',down:'down',alt:'alt',action:'action','rotate-left':'rotateLeft'};
 for(const[id,action]of Object.entries(actions)){
@@ -142,7 +168,7 @@ window.addEventListener('keydown',event=>{
 });window.addEventListener('keyup',event=>{if(encounter&&keys[event.key])envyInput(encounter,keys[event.key],false);});
 window.addEventListener('blur',()=>{stopHeld();if(encounter&&!encounter.over)openMenu();});document.addEventListener('visibilitychange',()=>{if(document.hidden){stopHeld();if(encounter&&!encounter.over)openMenu();}});
 function point(event){const r=board.getBoundingClientRect();envyPoint(encounter,(event.clientX-r.left)*280/r.width,(event.clientY-r.top)*board.height/r.height);}
-board.addEventListener('pointerdown',event=>{if(paused||!encounter||boardPointer!==null)return;event.preventDefault();boardPointer=event.pointerId;board.setPointerCapture(event.pointerId);point(event);});
+board.addEventListener('pointerdown',event=>{if(paused||!encounter||boardPointer!==null)return;event.preventDefault();unlockAudio();boardPointer=event.pointerId;board.setPointerCapture(event.pointerId);point(event);});
 board.addEventListener('pointermove',event=>{if(paused||!encounter||boardPointer!==event.pointerId)return;event.preventDefault();if(ATTACKS.includes(encounter.mode)||['territory','pellets','capture','window'].includes(encounter.mode))point(event);});
 for(const type of ['pointerup','pointercancel','lostpointercapture'])board.addEventListener(type,event=>{if(boardPointer===event.pointerId){boardPointer=null;endStroke(encounter?.round);}});
 board.addEventListener('dblclick',event=>event.preventDefault());for(const type of['gesturestart','gesturechange','gestureend'])document.addEventListener(type,event=>{if(!paused)event.preventDefault();},{passive:false});
@@ -156,10 +182,11 @@ function tick(now){
       const timedRound=encounter.round,beforeClock=timedRound?.clock;
       updateEnvy(encounter,dt);if(encounter.hp<lastHp){hitTime=350;tone(80,.13,'triangle');}else if(encounter.hp>lastHp)tone(580,.15);
       const cue=puzzleCountdownCue(timedRound,beforeClock);
-      if(cue&&preferences.sound&&audio)playCountdownTone(audio,audio.destination,cue);
+      if(cue&&preferences.sound&&audio){const gain=audio.createGain();gain.gain.value=sfxVolume;gain.connect(audio.destination);playCountdownTone(audio,gain,cue);setTimeout(()=>gain.disconnect(),1000);}
       lastHp=encounter.hp;hitTime=Math.max(0,hitTime-dt);
       music.select(envyTrack(encounter));music.tick(dt);
     }
+    if(campaign)recordCampaign(encounter);
     let player;
     const m=encounter.round;
     if(['territory','pellets','pupil','capture'].includes(encounter.mode)){
@@ -183,3 +210,4 @@ function tick(now){
   requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);
+if(campaign)start();
