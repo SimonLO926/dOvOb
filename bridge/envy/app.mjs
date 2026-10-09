@@ -1,4 +1,5 @@
 import { endStroke } from './lore-games.mjs';
+import { touchControlsEnabled } from '../touch-controls.mjs?v=1.2.32';
 import { createEnvy, SCENARIOS, envyInput, envyPoint, updateEnvy, continueScene, retryCapture, finishEnvy } from './engine.mjs?v=1.2.31';
 import { createCampaignRecorder, envyUnlocked } from './campaign.mjs?v=1.2.31';
 import { filmingEnabled } from '../filming.mjs?v=1.2.31';
@@ -21,9 +22,11 @@ let encounter=null,paused=true,last=performance.now(),hitTime=0,lastHp=100,board
 let selected='full',difficulty='normal',audio=null,lastMode='';
 let endingKey='',catLayoutKey='';
 const preferences={danger:'warning',reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,sound:true,music:.7};
+let mainSettings={};try{mainSettings=JSON.parse(campaignStorage?.getItem('bridge-settings')||'{}')||{};}catch{}
+preferences.touch=mainSettings.touch||'auto';
 let sfxVolume=1;
 if(campaign){
-  let saved={};try{saved=JSON.parse(localStorage.getItem('bridge-settings')||'{}');}catch{}
+  const saved=mainSettings;
   const volume=(value,fallback=.7)=>Number.isFinite(Number(value))?Math.max(0,Math.min(1,Number(value))):fallback;
   preferences.danger=saved.dangerEffect==='shake'?'shake':'warning';
   preferences.music=volume(saved.bgmVolume??saved.volume??.7);
@@ -59,9 +62,12 @@ function unlockAudio(){
 }
 function stopHeld(){if(encounter){for(const action of [...encounter.held])envyInput(encounter,action,false);endStroke(encounter.round);}boardPointer=null;}
 function fit(){
+  const touch=touchControlsEnabled(preferences.touch),pads=$('.pads');
+  if(pads.hidden===touch)stopHeld();
+  pads.hidden=!touch;document.body.classList.toggle('touch',touch);document.body.classList.toggle('desktop',!touch);
   const w=innerWidth,h=window.visualViewport?.height||innerHeight,wide=w>h&&h<620;
   document.body.classList.toggle('wide',wide);
-  const world=canvasHeight(encounter),available=wide?h-6:h-254;
+  const world=canvasHeight(encounter),available=wide?h-6:!touch?h-152:h-254;
   const maxWidth=wide?Math.min(310,w*.43):Math.min(310,w-62);
   const height=Math.max(100,Math.min(available,maxWidth*world/280));
   wrap.style.width=`${height*280/world}px`;wrap.style.height=`${height}px`;
@@ -105,11 +111,14 @@ function presentation(){
   const cat=$('#envy-cat');cat.hidden=!visible;cat.classList.toggle('gift',encounter?.catTime>0);
   if(!visible){catLayoutKey='';return;}
   const w=innerWidth,h=window.visualViewport?.height||innerHeight,ratio=images.cat?.naturalWidth/images.cat?.naturalHeight||1.8;
-  const layoutKey=`${w}:${h}:${encounter.mode}:${ending?.index??''}:${ratio}`;
+  const touch=document.body.classList.contains('touch');
+  const layoutKey=`${w}:${h}:${touch}:${encounter.mode}:${ending?.index??''}:${ratio}`;
   if(layoutKey===catLayoutKey)return;catLayoutKey=layoutKey;
   let width=w<620?110:130,x,y;
   if(ending){
     width=w<620?110:130;x=16;y=$('#ending-footer').getBoundingClientRect().top-width/ratio-12;
+  }else if(!touch){
+    x=document.body.classList.contains('wide')?20:(w-width)/2;y=h-width/ratio-12;
   }else if(document.body.classList.contains('wide')){
     const top=Math.min(...[...document.querySelectorAll('.move-pads button')].filter(b=>!b.hidden).map(b=>b.getBoundingClientRect().top));
     width=120;x=20;y=top-width/ratio-26;
@@ -174,6 +183,11 @@ for(const type of ['pointerup','pointercancel','lostpointercapture'])board.addEv
 board.addEventListener('dblclick',event=>event.preventDefault());for(const type of['gesturestart','gesturechange','gestureend'])document.addEventListener(type,event=>{if(!paused)event.preventDefault();},{passive:false});
 for(const target of[board,$('.pads')])target.addEventListener('touchstart',event=>{if(event.touches.length>1)event.preventDefault();},{passive:false});
 window.addEventListener('resize',fit);window.visualViewport?.addEventListener('resize',fit);
+for(const query of ['(pointer: coarse)','(hover: none)'])matchMedia(query).addEventListener('change',fit);
+window.addEventListener('storage',event=>{
+  if(event.key!=='bridge-settings')return;
+  try{preferences.touch=JSON.parse(event.newValue||'{}')?.touch||'auto';fit();}catch{}
+});
 loadArt().then(()=>fit());document.fonts?.ready.then(()=>{catLayoutKey='';});fit();
 function tick(now){
   const dt=Math.min(50,Math.max(0,now-last));last=now;
