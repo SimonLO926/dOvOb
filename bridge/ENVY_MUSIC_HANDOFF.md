@@ -25,4 +25,4 @@
 - 20%鎖血逃離 → 10% Bridge反攻 → 0敗北／本體揭露 → 捕捉。狂暴曲持續到化身敗北、本體揭露、捕捉及捕捉重試，不在逃離成功時提前宣布勝利。
 - 使用者 r13 要求捕捉本體及捕捉重試也延續第七首狂暴英文歌詞曲，不重設進度、不切回第一條血特殊曲；最終勝敗將當前曲淡出。獨立 `envy_capture.mp3` 或 `envy_result.mp3` 仍為**選用**，目前七首主要曲目已齊，不列為必須補交。
 
-路由／播放器實作及回歸測試見 [envy/music.mjs](envy/music.mjs)、[envy/music.test.mjs](envy/music.test.mjs)。r13 使用者已明確授權「ok弄好直接推上github我再測試」，本次發布獨立試玩及共用回饋修改；主遊戲不新增嫉妒測試入口，收到素材本身不等於其他新 Boss 的發布授權。
+路由／播放器實作及回歸測試見 [envy/music.mjs](envy/music.mjs)、[envy/music.test.mjs](envy/music.test.mjs)。r13 獨立試玩發布是歷史狀態，1.2.31 已按「接好他」正式整合；七首與上述路由適用正式及試玩。主遊戲不新增獨立測試入口，收到素材本身不等於其他新 Boss 的發布授權。完整要求見 [使用者總表](USER_REQUIREMENTS_MUST_READ.md)。

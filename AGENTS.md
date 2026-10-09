@@ -2,6 +2,8 @@
 
 ## Bridge / Crazy / Boss 畫面必讀
 
+**先讀 [使用者要求總表](bridge/USER_REQUIREMENTS_MUST_READ.md)。** 已按完整對話整理三位 Boss 及後續關卡的要求、最新修正、來源／試作差異與被取代的舊設定。圖片必須實際參照貪婪敗北／傲慢碎鏡及塔廢墟的細緻像素繪畫；戰鬥頭部另沿用原像素精靈，不能混用。總表列出可查看的參考圖及提示詞。
+
 **1.2.31：使用者已明確要求「接好他」，嫉妒正式開放。傲慢既有通關紀錄直接解鎖嫉妒；正式入口與獨立 Preview 分開。宣傳片 agent 使用 sessionStorage 暫時解鎖已推出的三位 Boss，不能偽造／覆寫通關旗標；拍攝戰鬥不寫正式紀錄。** 詳見 [正式接線與拍攝指南](bridge/FILMING_GUIDE.md)。
 
 **1.2.33：嫉妒六張滿頁過場／結算改用獨立高解析圖，直接對照貪婪／傲慢的細緻像素繪畫風格；全部介面支援英文／繁體中文並沿用主遊戲語言。原圖、提示詞及裁切修正保存，語言不能改戰鬥狀態。**
@@ -16,10 +18,11 @@
 
 任務涉及 `bridge/`、Crazy、七大罪 Boss，或其 `source-assets/` 素材時，修改前依序閱讀：
 
-1. [Boss 畫面與操作必讀規範](bridge/BOSS_UI_MUST_READ.md)：貪婪、傲慢各型態的遊戲框、血條、按鈕、文字、特效、圖片生成／參考與驗收要求；下一個 Boss 同樣沿用共用規則。
-2. [Crazy 關卡製作必讀](bridge/CRAZY_MUST_READ.md)：使用者已確認的世界觀、玩法、難度、音樂及交付流程。
-3. [正式接線與拍攝指南](bridge/FILMING_GUIDE.md)：正式入口、解鎖、通關紀錄與拍摄代碼。
-4. [Bridge 工作指引](bridge/AGENTS.md)，以及實際修改目錄內的其他 `AGENTS.md`。
+1. [使用者要求總表](bridge/USER_REQUIREMENTS_MUST_READ.md)：完整對話的現行要求、三位 Boss 流程及禁止還原的舊設定。
+2. [Boss 畫面與操作必讀規範](bridge/BOSS_UI_MUST_READ.md)：三位 Boss 的遊戲框、血條、按鈕、文字、特效、圖片生成／參考與驗收要求；下一個 Boss 同樣沿用共用規則。
+3. [Crazy 關卡製作必讀](bridge/CRAZY_MUST_READ.md)：世界觀、玩法、難度、音樂及交付流程。
+4. [正式接線與拍攝指南](bridge/FILMING_GUIDE.md)：正式入口、解鎖、通關紀錄與拍攝代碼。
+5. [Bridge 工作指引](bridge/AGENTS.md)，以及實際修改目錄內的其他 `AGENTS.md`。
 
 不能只依賴早期版本說明或更新包。畫面／操作規則以必讀文件及使用者最新明確要求為準；發現文件與實作不一致時，說明差異，不把未驗證的畫面寫成已通過。
 
