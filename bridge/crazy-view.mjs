@@ -363,7 +363,8 @@ export function drawCrazy(c, s, t, { reducedMotion = false, screenShake = true, 
   if (s.attack) text(c, `${t('crazyAttackWarning')} ${Math.ceil(s.attack.time / 1000)}`, 140, height - 10, 11, '#fff1a2');
   else if (!prideGame && s.noticeTime > 0) text(c, `${t(s.notice)}${s.noticeAmount ? ` ${s.noticeAmount > 0 ? '+' : ''}${s.noticeAmount}` : ''}`, 140, height - 10, 11, '#ffe0ab');
   if (prideGame && s.notice === 'crazyHeal' && s.noticeTime > 0) text(c, `♥ +${s.noticeAmount}`, 245, 18, 11, '#98ffe0');
-  if (s.hitFlash > 0) { c.fillStyle = `rgba(255,40,80,${s.hitFlash / 1500})`; c.fillRect(0, 0, 280, height); }
+  // Accepted player damage is marked by the shared transparent combat overlay;
+  // leave the heart, hazards and playable board free of a full-board colour wash.
   drawTransition(c, s, t, reducedMotion, height);
   c.restore();
 }

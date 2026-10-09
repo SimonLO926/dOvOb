@@ -21,12 +21,12 @@ export function crazyTrack(s) {
   return `${form}-${part}`;
 }
 // Each boss's persistent players retain independent playheads across mode switches.
-export function createCrazyMusic(getVolume, { audioFactory = url => new Audio(url) } = {}) {
+export function createCrazyMusic(getVolume, { audioFactory = url => new Audio(url), resolveUrl = null, unlockTracks = null } = {}) {
   const tracks = new Map(), primed = new Set(); let wanted = null, blocked = false;
   function get(key) {
     if (!tracks.has(key)) {
       const pride = key.startsWith('pride-');
-      const audio = audioFactory(new URL(`./assets/${pride ? 'pride' : 'greed'}-music/${pride ? key.slice(6) : key}.mp3`, import.meta.url).href);
+      const audio = audioFactory(resolveUrl ? resolveUrl(key) : new URL(`./assets/${pride ? 'pride' : 'greed'}-music/${pride ? key.slice(6) : key}.mp3`, import.meta.url).href);
       audio.loop = true; audio.preload = 'metadata'; audio.volume = 0;
       tracks.set(key, { audio, level: 0, target: 0, failed: false, priming: false });
     }
@@ -41,7 +41,7 @@ export function createCrazyMusic(getVolume, { audioFactory = url => new Audio(ur
     // Prime on the explicit boss-selection gesture for mobile playback permission.
     if (primed.has(sin) && !blocked) return;
     primed.add(sin); blocked = false;
-    for (const key of sin === 'pride' ? PRIDE_TRACKS : GREED_TRACKS) {
+    for (const key of unlockTracks || (sin === 'pride' ? PRIDE_TRACKS : GREED_TRACKS)) {
       const track = get(key); track.priming = true; track.audio.muted = true;
       const result = track.audio.play();
       result?.then(() => {

@@ -1,3 +1,5 @@
+import { COUNTDOWN_TONES, playCountdownTone } from './puzzle-countdown.mjs';
+
 export const TEMPO = 112;
 export const STEP = 60 / TEMPO / 2;
 
@@ -100,6 +102,13 @@ export function createSound(getVolume, { music: getMusic = () => 1, sfx: getSfx 
   function blip(freq, dur = 0.05) {
     if (!ensure()) return;
     beep(freq, ctx.currentTime, dur, "square", MIX.blip, sfxGain);
+  }
+
+  function playPuzzleCountdown(kind) {
+    if (kind !== 'tick' && kind !== 'end') return;
+    const tone = COUNTDOWN_TONES[kind];
+    if (!tone || getSfx() <= 0 || !ensure()) return;
+    playCountdownTone(ctx, sfxGain, tone);
   }
 
   function playClear(rows) {
@@ -248,5 +257,5 @@ export function createSound(getVolume, { music: getMusic = () => 1, sfx: getSfx 
     }
   }
 
-  return { setVolume, playCasino, blip, playClear, playBoom, playTspin, playCombo, playSand, start, restart, stop, tick, get playing() { return playing; } };
+  return { setVolume, playCasino, playPuzzleCountdown, blip, playClear, playBoom, playTspin, playCombo, playSand, start, restart, stop, tick, get playing() { return playing; } };
 }

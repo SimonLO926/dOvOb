@@ -2,6 +2,10 @@
 
 ## Bridge / Crazy / Boss 畫面必讀
 
+**UI 維持原版，只改 Boss 主題；玩家 HP、Bridge 預覽、原方塊及按鈕排位依 [畫面必讀](bridge/BOSS_UI_MUST_READ.md#0-原版-ui-是固定基準)。**
+
+**所有 Boss 沿用共用戰鬥回饋：真實扣血由遊戲區飛向頂部頭部並顯示命中；玩家受擊清楚可辨、不遮玩法；益智最後三秒的柔和倒數在 BGM 下也須可聽見。** 實作與驗收依畫面必讀第 3、6 節，不能只改新 Boss 而漏掉貪婪／傲慢。
+
 **每個新 Boss 必須先交付試玩，取得使用者對該 Boss 的明確「OK」後，才推送正式整合、建立及合併 PR（使用者所稱的 pull）。** 前一個 Boss 的批准不能沿用到下一個；測試通過也不等於使用者已確認。完整流程見 [Crazy 關卡製作必讀](bridge/CRAZY_MUST_READ.md#每個新-boss-的交付流程)。
 
 任務涉及 `bridge/`、Crazy、七大罪 Boss，或其 `source-assets/` 素材時，修改前依序閱讀：

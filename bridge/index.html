@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
-  <link rel="preload" type="image/webp" href="./assets/mischief-cat.webp?v=1.2.29" as="image">
-  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.29" as="font" type="font/woff" crossorigin>
+  <link rel="preload" type="image/webp" href="./assets/mischief-cat.webp?v=1.2.30" as="image">
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.30" as="font" type="font/woff" crossorigin>
   <style>
     #pride-preview { position: fixed; inset: 0; z-index: 160; display: flex; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; background: linear-gradient(#160b29bb, #160b29ed), url('./assets/pride-palace.webp') center / cover; }
     .pride-preview-card { flex: none; width: min(440px, 100%); margin: auto; padding: 28px; border: 1px solid #dabb78; border-radius: 24px; text-align: left; color: #f8edda; background: #241833ed; box-shadow: 0 18px 60px #0007; }
@@ -30,7 +30,7 @@
     /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
     @font-face {
       font-family: "Fever Brush";
-      src: url("./fonts/fever-brush.woff?v=1.2.29") format("woff");
+      src: url("./fonts/fever-brush.woff?v=1.2.30") format("woff");
       font-weight: 400;
       font-display: swap;
     }
@@ -1333,8 +1333,8 @@
           <button data-sin="wrath" type="button" disabled><svg class="sin-lock" viewBox="0 0 24 28" aria-hidden="true"><path d="M6 12 V8 A6 6 0 0 1 18 8 V12"/><rect x="3" y="12" width="18" height="14" rx="2"/><path d="M12 18 V22"/><circle cx="12" cy="18" r="1"/></svg><svg class="sin-emblem" hidden aria-hidden="true"><use href="#sin-icon-wrath"/></svg><span hidden data-i18n="sinWrath">Wrath</span><small hidden data-i18n="crazyLocked">Locked</small></button>
         </div>
         <div class="greed-preview" data-sin="greed" aria-labelledby="boss-preview-title">
-          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.webp?v=1.2.29" onerror="this.onerror=null;this.hidden=true" alt="" aria-hidden="true">
-          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.webp?v=1.2.29" onerror="this.onerror=null;this.hidden=true" alt="The Mad Dealer">
+          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.webp?v=1.2.30" onerror="this.onerror=null;this.hidden=true" alt="" aria-hidden="true">
+          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.webp?v=1.2.30" onerror="this.onerror=null;this.hidden=true" alt="The Mad Dealer">
           <div class="greed-caption"><div aria-live="polite"><h2 id="boss-preview-title" data-i18n="crazyDealer">The Mad Dealer</h2><p id="boss-preview-lore" data-i18n="crazyGreedLore">The house wants everything. Challenge the dealer's greed.</p></div><button id="boss-challenge" type="button" data-i18n="crazyChallenge">Challenge</button></div>
         </div>
       </div>
@@ -1674,7 +1674,7 @@
     <canvas id="cinematic-canvas" aria-hidden="true"></canvas><div class="cinematic-controls"><button id="cinematic-pause" type="button" data-i18n="paused">Pause</button><button id="cinematic-skip" type="button" data-i18n="crazySkip">Skip</button></div>
   </div>
   <div id="crazy-result" hidden role="dialog" aria-modal="true" aria-labelledby="result-title">
-    <img class="result-art" loading="lazy" src="./assets/greed-defeated.webp?v=1.2.29" onerror="this.onerror=null;this.hidden=true" alt="Defeated Greed surrounded by spilled coins">
+    <img class="result-art" loading="lazy" src="./assets/greed-defeated.webp?v=1.2.30" onerror="this.onerror=null;this.hidden=true" alt="Defeated Greed surrounded by spilled coins">
     <div class="result-content"><small>GREED · CLEARED</small><h1 id="result-title" data-i18n="crazyGreedBroken">Greed defeated</h1><div class="result-score" id="result-score"></div><div class="result-stats" id="result-stats"></div><p data-i18n="crazyClearUnlock">Gilded Devourer silhouette unlocked</p><div class="result-buttons"><button id="result-retry" type="button" data-i18n="again">Again</button><button id="result-bosses" type="button" data-i18n="crazySevenSins">Seven Deadly Sins</button></div></div>
   </div>
   <div id="fever-aura" hidden aria-hidden="true">
@@ -1692,28 +1692,29 @@
     <i style="--x:83%;--y:97%;--delay:-1.87s"></i>
   </div>
   <script type="module">
-    import { createPridePreview, mountPridePreview, prideControls } from "./pride-preview.mjs?v=1.2.29";
-    import { BRIDGE_REPEAT } from "./bridge-controls.mjs?v=1.2.29";
-    import { sinProgress, crazyLeaderboardKey, recordSinClear } from "./crazy-sins.mjs?v=1.2.29";
-    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.29";
-    import { drawCrazy, drawCrazyFrame, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.29";
+    import { createPridePreview, mountPridePreview, prideControls } from "./pride-preview.mjs?v=1.2.30";
+    import { BRIDGE_REPEAT } from "./bridge-controls.mjs?v=1.2.30";
+    import { sinProgress, crazyLeaderboardKey, recordSinClear } from "./crazy-sins.mjs?v=1.2.30";
+    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.30";
+    import { drawCrazy, drawCrazyFrame, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.30";
+    import { createCombatEffects, resetCombatEffects, updateCombatEffects, drawCombatEffects, createCombatOverlay, combatLayout } from "./combat-effects.mjs?v=1.2.30";
     import { drawPrideCinematic, loadPrideArt } from "./pride-art.mjs";
     import { PRIDE_ATTACKS } from "./pride-attacks.mjs";
     import { PRIDE_SECOND_MODES } from "./pride-second.mjs";
-    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.29";
-    import { drawGreedCinematic, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.29";
-    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.29";
-    import { createSound, CASINO_EFFECTS } from "./audio.mjs?v=1.2.29";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.29";
-    import { translate } from "./i18n.mjs?v=1.2.29";
-    import { renderControlsGuide } from "./controls-guide.mjs?v=1.2.29";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.29";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.29";
-    import { VERSION } from "./version.mjs?v=1.2.29";
+    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.30";
+    import { drawGreedCinematic, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.30";
+    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.30";
+    import { createSound, CASINO_EFFECTS } from "./audio.mjs?v=1.2.30";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.30";
+    import { translate } from "./i18n.mjs?v=1.2.30";
+    import { renderControlsGuide } from "./controls-guide.mjs?v=1.2.30";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.30";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.30";
+    import { VERSION } from "./version.mjs?v=1.2.30";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SAND_HEX, SHAPES, activateFever, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.2.29";
+    } from "./logic.mjs?v=1.2.30";
 
     const pridePreview = new URLSearchParams(location.search).get("preview") === "pride" || document.body.hasAttribute("data-pride-preview");
     let previewScenario = "full", previewDifficulty = "normal", previewLauncher = null;
@@ -1726,6 +1727,8 @@
     const holdCanvas = document.querySelector("#hold-canvas");
     const nextCanvas = document.querySelector("#next-canvas");
     const ctx = board.getContext("2d");
+    const combatEffects = createCombatEffects(), combatOverlay = createCombatOverlay(board, "crazy-combat-effects"), combatContext = combatOverlay.getContext("2d");
+    combatOverlay.hidden = true;
     const holdCtx = holdCanvas.getContext("2d");
     const nextCtx = nextCanvas.getContext("2d");
     const veil = document.querySelector("#veil");
@@ -2200,10 +2203,10 @@
       preview.classList.add("previewing");
       preview.classList.toggle("cleared", boss.cleared);
       const shadow = preview.querySelector(".greed-shadow");
-      shadow.src = `./assets/${pride ? "pride" : "greed"}-second.webp?v=1.2.29`;
+      shadow.src = `./assets/${pride ? "pride" : "greed"}-second.webp?v=1.2.30`;
       shadow.hidden = !boss.cleared;
       const art = preview.querySelector(".greed-first-art");
-      art.src = `./assets/${pride ? "pride" : "greed"}-first.webp?v=1.2.29`;
+      art.src = `./assets/${pride ? "pride" : "greed"}-first.webp?v=1.2.30`;
       art.alt = t(pride ? "prideIntro" : "crazyDealer");
       for (const [id, key] of [["boss-preview-title", pride ? "prideIntro" : "crazyDealer"], ["boss-preview-lore", pride ? "prideLore" : "crazyGreedLore"]]) {
         const el = document.getElementById(id);
@@ -2287,6 +2290,7 @@
       crazy = pridePreview && sin === "pride"
         ? createPridePreview(previewScenario, { difficulty: previewDifficulty })
         : createCrazy({ difficulty: settings.crazyDifficulty, sin });
+      resetCombatEffects(combatEffects, crazy);
       crazyMusic.reset(); crazyMusic.unlock(crazy.config.id); sound.stop();
       document.body.dataset.crazySin = sin;
       const symbols = sin === 'pride' ? ['♛', '◈', '✦', '◇', '❖', '♛', '✧', '◈'] : ['♠ ♥', '7 7 7', '中 發', '◉ · ◉', '↑ ♥ ↑', '◈ ◎ ◈', '● · ●', '↗ ◉ ↙'];
@@ -3331,6 +3335,10 @@
         const frameHeight = crazyCanvasHeight(crazy.mode);
         if (bossFrame.height !== frameHeight) bossFrame.height = frameHeight;
         drawCrazyFrame(bossFrame.getContext("2d"), crazy, { reducedMotion: paused || reducedMotion.matches });
+        const combatHeight = Math.max(1, Math.round(board.height * 280 / board.width));
+        if (combatOverlay.height !== combatHeight) combatOverlay.height = combatHeight;
+        if (combatOverlay.width !== 280) combatOverlay.width = 280;
+        drawCombatEffects(combatContext, combatEffects, { reducedMotion: reducedMotion.matches });
         const controls = crazy.config.id === "pride" ? prideControls(crazy.mode) : null;
         const blocks = ["bridge", "sand"].includes(crazy.mode);
         const flying = crazy.mode.startsWith("pride-") || ["dodge", "vault"].includes(crazy.mode) || FLYING_ATTACKS.includes(crazy.mode);
@@ -3435,12 +3443,14 @@
     function frame(now) {
       const dt = Math.min(34, now - last);
       last = now;
+      combatOverlay.hidden = !crazy;
       if (crazy) {
         if (!paused && !document.querySelector("#game").hidden) {
           updateCrazy(crazy, dt);
           for (const event of crazy.events.splice(0)) {
             const effect = CASINO_EFFECTS[event.key];
-            if (effect) sound.playCasino(effect, event.amount);
+            if (event.key === "crazyPuzzleCountdown") sound.playPuzzleCountdown(event.cue);
+            else if (effect) sound.playCasino(effect, event.amount);
             else if (event.key === "prideMirrorBreakSound") { sound.playCasino("hit", 30); sound.blip(1400, .12); }
             else if (event.key === "crazyHit") sound.playCasino("hit", event.amount);
             else if (event.amount < 0) sound.blip(120, .08);
@@ -3455,10 +3465,13 @@
           }
         }
         sound.stop();
+        updateCombatEffects(combatEffects, crazy, dt, { paused, visible: !document.querySelector("#game").hidden, reducedMotion: reducedMotion.matches,
+          layout: combatLayout(crazy, { height: Math.round(board.height * 280 / board.width) }) });
         if (!paused && !document.querySelector("#game").hidden) { crazyMusic.select(crazyTrack(crazy)); crazyMusic.tick(dt); }
         else crazyMusic.pause();
         fitBoard(); draw(); requestAnimationFrame(frame); return;
       }
+      if (combatEffects.encounter) resetCombatEffects(combatEffects);
       if (puzzle?.over && game.phase !== "over") {
         game.phase = "over";
         remember(puzzle.score);

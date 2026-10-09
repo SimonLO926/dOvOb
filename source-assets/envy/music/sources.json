@@ -1,0 +1,217 @@
+{
+  "date": "2026-10-09",
+  "attachment": "envy-bgm-7tracks.zip",
+  "archiveSha256": "1d4ef3dfc05b0c8de3e06583e6c0c662024cb61bd6089933b5a905d2d15e6d09",
+  "tracks": {
+    "01_first_bridge.mp3": {
+      "sha256": "d1c9fcf1a5faae98e1720ebd56af5df0d886c8871b449b9b5031ebceafa655cd",
+      "bytes": 6633315,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "44100",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "207.229388",
+          "bit_rate": "256076"
+        }
+      },
+      "runtime": {
+        "path": "bridge/assets/envy-music/01_first_bridge.mp3",
+        "sha256": "85da1a88a71d7b67d66ed850f6724c59b94212b45720066bdcfe02251e8cb00c",
+        "bytes": 3317644,
+        "duration": 207.25551,
+        "bitrate": 128000,
+        "codec": "mp3",
+        "sampleRate": 44100,
+        "channels": 2,
+        "formatBitrate": 128060
+      }
+    },
+    "02_first_special.mp3": {
+      "sha256": "7cc2bb691d2ffc8b211b322e211890f30a184c179744a0f588d3800ffb93b4ce",
+      "bytes": 363927,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "44100",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "11.311020",
+          "bit_rate": "257396"
+        }
+      },
+      "runtime": {
+        "path": "bridge/assets/envy-music/02_first_special.mp3",
+        "sha256": "0dd2a83cc4225853fc4b3c542e36878a05e29faa357dfffc971d53fde31a4a4b",
+        "bytes": 182950,
+        "duration": 11.337143,
+        "bitrate": 128000,
+        "codec": "mp3",
+        "sampleRate": 44100,
+        "channels": 2,
+        "formatBitrate": 129097
+      }
+    },
+    "03_first_last.mp3": {
+      "sha256": "772bbca25d65d7baafd5e0a8c15645e5d3d601b0e50fb467e6665df11b2593d6",
+      "bytes": 3484410,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "44100",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "108.826122",
+          "bit_rate": "256145"
+        }
+      },
+      "runtime": {
+        "path": "bridge/assets/envy-music/03_first_last.mp3",
+        "sha256": "299f1ff574d0d65a11e9e554f943e805211e589860f29d70503bf0f8acdfab45",
+        "bytes": 1743191,
+        "duration": 108.852245,
+        "bitrate": 128000,
+        "codec": "mp3",
+        "sampleRate": 44100,
+        "channels": 2,
+        "formatBitrate": 128114
+      }
+    },
+    "04_second_bridge.mp3": {
+      "sha256": "1652803c763eede87ac2c2b7ba014f7a9ef8ce497260bfbd717b09a2740c9af4",
+      "bytes": 1759075,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "44100",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "54.909388",
+          "bit_rate": "256287"
+        }
+      },
+      "runtime": {
+        "path": "bridge/assets/envy-music/04_second_bridge.mp3",
+        "sha256": "c8b3115475557ee31e89c19ddea9c5f50de3bcfa8393394a037319a63e604ffe",
+        "bytes": 880524,
+        "duration": 54.93551,
+        "bitrate": 128000,
+        "codec": "mp3",
+        "sampleRate": 44100,
+        "channels": 2,
+        "formatBitrate": 128226
+      }
+    },
+    "05_second_special.mp3": {
+      "sha256": "efe592849d18ee6d28da07b054e685564c19979d54a4aafc90f10f2e788aa61d",
+      "bytes": 3699242,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "44100",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "115.539592",
+          "bit_rate": "256136"
+        }
+      },
+      "runtime": {
+        "path": "bridge/assets/envy-music/05_second_special.mp3",
+        "sha256": "b85939b7fce3a56ef476248d903403f89ed5e72e0c56e3c984f1757e8a91feb3",
+        "bytes": 1850607,
+        "duration": 115.565714,
+        "bitrate": 128000,
+        "codec": "mp3",
+        "sampleRate": 44100,
+        "channels": 2,
+        "formatBitrate": 128107
+      }
+    },
+    "06_second_mid.mp3": {
+      "sha256": "769c3f74c6dd734a6ea3b07e43dbee802ceff505cb2ec5d33261a5460a3a1bf6",
+      "bytes": 3164254,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "44100",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "98.821224",
+          "bit_rate": "256159"
+        }
+      },
+      "runtime": {
+        "path": "bridge/assets/envy-music/06_second_mid.mp3",
+        "sha256": "414902d5e9bbdf46f289135056b2a5e0c6461a6e88d13f6fa802cb9fd50b1284",
+        "bytes": 1583113,
+        "duration": 98.847347,
+        "bitrate": 128000,
+        "codec": "mp3",
+        "sampleRate": 44100,
+        "channels": 2,
+        "formatBitrate": 128125
+      }
+    },
+    "07_second_last_vocal_en.mp3": {
+      "sha256": "7633406af9a9d8e33f7c21cd7eb13fd984940f5bb95b2239a992749e1bd971de",
+      "bytes": 3333109,
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "44100",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "104.097959",
+          "bit_rate": "256151"
+        }
+      },
+      "runtime": {
+        "path": "bridge/assets/envy-music/07_second_last_vocal_en.mp3",
+        "sha256": "92e72f5bbd313ed1316991567e1af4e9e1dc26f009364d16f9e518c0541e4908",
+        "bytes": 1667541,
+        "duration": 104.124082,
+        "bitrate": 128000,
+        "codec": "mp3",
+        "sampleRate": 44100,
+        "channels": 2,
+        "formatBitrate": 128119
+      }
+    }
+  }
+}
