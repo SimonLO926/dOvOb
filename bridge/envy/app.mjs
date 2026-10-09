@@ -1,7 +1,7 @@
 import { endStroke } from './lore-games.mjs';
 import { t, setEnvyLanguage, envyLanguage, captureInterface } from './i18n.mjs';
 import { touchControlsEnabled } from '../touch-controls.mjs?v=1.2.32';
-import { createEnvy, SCENARIOS, envyInput, envyPoint, updateEnvy, continueScene, retryCapture, finishEnvy } from './engine.mjs?v=1.2.31';
+import { createEnvy, SCENARIOS, envyInput, envyPoint, updateEnvy, continueScene, retryCapture, finishEnvy } from './engine.mjs?v=1.2.34';
 import { createCampaignRecorder, envyUnlocked } from './campaign.mjs?v=1.2.31';
 import { filmingEnabled } from '../filming.mjs?v=1.2.31';
 import { canvasHeight, drawEnvy } from './view.mjs?v=1.2.33';
@@ -56,7 +56,7 @@ const translateInterface=captureInterface(document.body);
 function applyLanguage(){
   const lang=envyLanguage();document.documentElement.lang=lang;
   document.body.style.fontFamily=lang==='en'?'"Pixel Latin", sans-serif':'"Pixel Hant", sans-serif';
-  document.title=campaign?'Crazy Envy':`Crazy Envy · ${t('嫉妒試玩')} r16`;
+  document.title=campaign?'Crazy Envy':`Crazy Envy · ${t('嫉妒試玩')} r17`;
   translateInterface();$('#envy-language').value=lang;
   renderCollection();
   controls();endingKey='';catLayoutKey='';
@@ -234,9 +234,11 @@ function tick(now){
     if(combatOverlay.width!==board.width)combatOverlay.width=board.width;
     drawCombatEffects(combatContext,combatEffects,{reducedMotion:preferences.reduced});
     const kind=encounter.scene?.kind,canContinue=kind&&!['victory','lost','capture-retry'].includes(kind);
+    $('#menu-button').hidden=!!canContinue;
     $('#scene-actions').hidden=!kind;$('#scene-continue').hidden=!canContinue;$('#scene-continue').disabled=encounter.scene?.time<700;
-    $('#scene-retry').hidden=!['victory','lost','round-result','capture-retry'].includes(kind);
-    $('#scene-finish').hidden=!['worm-reveal','capture-retry'].includes(kind);$('#bonus-finish').hidden=!encounter.bossDefeated||encounter.over;
+    $('#scene-pick').hidden=!['victory','lost'].includes(kind);
+    $('#scene-retry').hidden=!['victory','lost','capture-retry'].includes(kind);
+    $('#scene-finish').hidden=kind!=='capture-retry';$('#bonus-finish').hidden=!encounter.bossDefeated||encounter.over;
     $('#scene-continue').textContent=t(kind==='round-result'?'繼續挑戰':'繼續');
     presentation();
   }

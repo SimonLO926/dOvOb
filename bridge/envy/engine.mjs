@@ -64,9 +64,9 @@ export function hitBoss(s,amount){
   const floor=s.form===2&&!s.chaseCleared?s.bossMaxHp*.2:0;
   const damage=Math.min(Math.round(amount*s.vulnerable),Math.max(0,s.bossHp-floor));
   s.bossHp=Math.max(floor,s.bossHp-damage);s.stats.damage+=damage;if(damage)notice(s,'反攻成功');
-  if(s.form===1&&s.bossHp<=0){s.scene={kind:'first-defeat',time:0};s.held.clear();}
+  if(s.form===1&&s.bossHp<=0){s.scene={kind:'first-defeat',time:0,duration:4000};s.held.clear();}
   else if(s.form===2&&s.chaseCleared&&s.bossHp<=0){
-    s.bossDefeated=true;s.finalBridge=false;s.scene={kind:'dragon-defeat',time:0};s.held.clear();
+    s.bossDefeated=true;s.finalBridge=false;s.scene={kind:'dragon-defeat',time:0,duration:4000};s.held.clear();
   }
   else if(s.form===2&&s.bossHp<=floor&&!s.chaseEntered){
     s.chaseEntered=true;s.scene={kind:'rage',time:0,duration:1900};s.held.clear();
@@ -221,8 +221,8 @@ export function updateEnvy(s,dt){
   drainEffects(s,m);
   if(s.scene||s.over||s.round!==m||!m.done)return;
   s.stats.rounds++;s.stats.counters+=m.counters||0;s.lastResult={id:m.id,success:m.success,time:m.clock};
-  if(m.id==='eye-room'&&m.success){s.scene={kind:'room-secret',time:0};s.held.clear();}
-  else if(s.scenario.single){s.scene={kind:'round-result',time:0};s.held.clear();}
+  if(m.id==='eye-room'&&m.success){s.scene={kind:'room-secret',time:0,duration:4000};s.held.clear();}
+  else if(s.scenario.single){s.scene={kind:'round-result',time:0,duration:4000};s.held.clear();}
   else if(s.mode==='capture'){s.scene={kind:'capture-retry',time:0};s.held.clear();}
   else nextRound(s);
 }
