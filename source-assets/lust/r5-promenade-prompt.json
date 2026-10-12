@@ -1,0 +1,11 @@
+{
+  "id": "promenade",
+  "prompt": "Create ONE original environment-only side-scrolling promenade background for a female fantasy street-charm minigame. Wide panoramic 3:1 composition. Long continuous moonlit seaside festival market on a floating cloud island, exquisitely painted small-pixel materials and ordered PC-98 dithering matching the FIRST supplied retro shore background reference. Warm amber hanging lanterns, ivory fabric stall awnings, teal shop windows, blue-and-purple tiled roofs, feather garlands and loose golden bowstring lamps, a glimpse of ocean and distant cloud islands. No pillars or monumental columns, casino, crown mirrors, forest props, text, readable signage, hearts, UI, people, characters, statues, cats or watermarks. The lower 30 percent is a broad unobstructed straight walking pavement, dark enough for brightly outlined native pixel women and pink eye beams. Upper two-thirds richly detailed scenic depth; use cobalt/teal/ivory and amber with restrained rose accents, not all pink. Left and right pavement edges match naturally for repeating environment. The last three adopted series images are supplied for fantasy texture/material richness only; do not copy their props or architecture. This is a playable environmental backdrop, never a boss concept portrait. Preserve crisp pixel clusters; no smooth anime gradients or 3D render.",
+  "referenced_image_paths": [
+    "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+    "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+    "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+    "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+  ],
+  "transparent_background": false
+}

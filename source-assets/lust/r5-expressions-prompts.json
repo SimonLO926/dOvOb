@@ -1,0 +1,197 @@
+{
+  "purpose": "Latest user request: twelve unique chapter scenes plus event expression variants. Authored prototype; PC-98 style.",
+  "jobs": [
+    {
+      "id": "expr-rain-warm",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a small relieved trusting smile, gently lifted brows and softened attentive eyes; no tears. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-e8c20ceb-ec12-447b-9c9e-0bc434b74a54.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-rain-hurt",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a subdued disappointed worried expression, slightly lowered brows, lips gently pressed, eyes turned down; small restrained tear shimmer, no exaggerated comedy. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-e8c20ceb-ec12-447b-9c9e-0bc434b74a54.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-rest-warm",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a small relieved trusting smile, gently lifted brows and softened attentive eyes; no tears. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-7431f6e8-8c6a-4dd6-9d56-22ff79e9c6c4.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-rest-hurt",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a subdued disappointed worried expression, slightly lowered brows, lips gently pressed, eyes turned down; small restrained tear shimmer, no exaggerated comedy. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-7431f6e8-8c6a-4dd6-9d56-22ff79e9c6c4.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-gift-warm",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a small relieved trusting smile, gently lifted brows and softened attentive eyes; no tears. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-c23babac-811c-47f3-84c0-8c1f4c374c0d.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-gift-hurt",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a subdued disappointed worried expression, slightly lowered brows, lips gently pressed, eyes turned down; small restrained tear shimmer, no exaggerated comedy. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-c23babac-811c-47f3-84c0-8c1f4c374c0d.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-name-warm",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a small relieved trusting smile, gently lifted brows and softened attentive eyes; no tears. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-2bb55ef5-73f7-47c5-9ac7-a50ad027f37c.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-name-hurt",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a subdued disappointed worried expression, slightly lowered brows, lips gently pressed, eyes turned down; small restrained tear shimmer, no exaggerated comedy. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-2bb55ef5-73f7-47c5-9ac7-a50ad027f37c.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-tears-warm",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a small relieved trusting smile, gently lifted brows and softened attentive eyes; no tears. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-59679981-8754-4db5-b22a-f179b534041f.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-tears-hurt",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a subdued disappointed worried expression, slightly lowered brows, lips gently pressed, eyes turned down; small restrained tear shimmer, no exaggerated comedy. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-59679981-8754-4db5-b22a-f179b534041f.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-mending-warm",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a small relieved trusting smile, gently lifted brows and softened attentive eyes; no tears. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-24f5ff34-47a1-4585-a18a-f5e06acb92b2.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-mending-hurt",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a subdued disappointed worried expression, slightly lowered brows, lips gently pressed, eyes turned down; small restrained tear shimmer, no exaggerated comedy. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-24f5ff34-47a1-4585-a18a-f5e06acb92b2.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-distance-warm",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a small relieved trusting smile, gently lifted brows and softened attentive eyes; no tears. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-ede1c943-c129-4e69-9c8c-acc654afcc09.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-distance-hurt",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a subdued disappointed worried expression, slightly lowered brows, lips gently pressed, eyes turned down; small restrained tear shimmer, no exaggerated comedy. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-ede1c943-c129-4e69-9c8c-acc654afcc09.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-tomorrow-warm",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a small relieved trusting smile, gently lifted brows and softened attentive eyes; no tears. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-f140e852-0c27-4cc6-b931-4a7504331e3c.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-tomorrow-hurt",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a subdued disappointed worried expression, slightly lowered brows, lips gently pressed, eyes turned down; small restrained tear shimmer, no exaggerated comedy. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-f140e852-0c27-4cc6-b931-4a7504331e3c.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-fear-warm",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a small relieved trusting smile, gently lifted brows and softened attentive eyes; no tears. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-71f9451e-5130-42c0-972d-9cf2643dade9.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-fear-hurt",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a subdued disappointed worried expression, slightly lowered brows, lips gently pressed, eyes turned down; small restrained tear shimmer, no exaggerated comedy. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-71f9451e-5130-42c0-972d-9cf2643dade9.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-freedom-warm",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a small relieved trusting smile, gently lifted brows and softened attentive eyes; no tears. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-907f88db-fd6b-430c-9781-7d795127a075.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-freedom-hurt",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a subdued disappointed worried expression, slightly lowered brows, lips gently pressed, eyes turned down; small restrained tear shimmer, no exaggerated comedy. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-907f88db-fd6b-430c-9781-7d795127a075.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-arrow-warm",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a small relieved trusting smile, gently lifted brows and softened attentive eyes; no tears. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-1df1abcd-a6fd-45c7-b3ec-8ee591eed1d7.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-arrow-hurt",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a subdued disappointed worried expression, slightly lowered brows, lips gently pressed, eyes turned down; small restrained tear shimmer, no exaggerated comedy. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-1df1abcd-a6fd-45c7-b3ec-8ee591eed1d7.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-dawn-warm",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a small relieved trusting smile, gently lifted brows and softened attentive eyes; no tears. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-52592784-d358-4943-8f32-aac7ac08c693.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "expr-dawn-hurt",
+      "prompt": "Edit ONLY the facial expression of the attached adult-female PC-98 Galgame event portrait. Keep the exact SAME adult woman, pose, hands, event prop, outfit, hair, wings if present, jewelry, proportions, pixel rendering, image composition and size. Expression variant: a subdued disappointed worried expression, slightly lowered brows, lips gently pressed, eyes turned down; small restrained tear shimmer, no exaggerated comedy. Do not change body or props or costume. This must be an expression difference of the same event illustration, not a redesigned portrait. Preserve true transparent background and clean pixel silhouette; remove any diffuse brown glow from the transparent exterior, do not add any opaque background, scene, people, text or UI.",
+      "referenced_image_paths": [
+        "/workspace/generated_images/exec-52592784-d358-4943-8f32-aac7ac08c693.png"
+      ],
+      "transparent_background": true
+    }
+  ]
+}

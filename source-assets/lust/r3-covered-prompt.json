@@ -1,0 +1,12 @@
+{
+  "originalAttempt": "r3-monster-prompt.json",
+  "result": "Image tool rejected original input: moderation_blocked / sexual; no original image produced.",
+  "fallbackDifference": "Head and body fully opaque fabric covered; keeps compact adult female three-head-height silhouette. This is a provisional coverage difference.",
+  "prompt": "Create a NON-EXPLICIT, fully clothed adult female fantasy monster for a videogame. Replace the character in the last reference; the first three adopted series references supply finely detailed pixel painting technique and layered scene materials ONLY. A compact ADULT WOMAN monster with feminine rounded hips, slender waist and soft curved arms, approximately THREE HEAD-HEIGHTS TALL, NOT male muscular anatomy and NOT a child. The creature has NO conventional human head or face: its sole head is two rounded domes side by side, COMPLETELY ENCLOSED by opaque burgundy petal fabric and gold bindings, no skin visible on its head and no anatomical detail showing through clothing. Two smooth rounded domes, NOT a pointed heart or skeletal mask. Fully clothed ivory/crimson bodice, hip wrap and leggings, delicate hands holding a broken golden bow near center. Short torso and short legs, full figure including feet, grand dark teal feather wings. One character only. Preserve original independent blue/teal cloud archipelago, feather islands, bowstring suspension paths, drifting rose petals, no pillars/towers/architecture. Complete lush finely detailed pixel-painted scene, gold daylight, cool cloud ocean. Landscape 1536x1024, compact character centered in central 28% width, head at 36% height, hands at 50%, feet at 74% for phone crop. No text or UI.",
+  "refs": [
+    "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+    "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+    "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png",
+    "/workspace/dOvOb/source-assets/lust/images/lust-monster-r2.png"
+  ]
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "id": "cafe",
+    "generated": "/workspace/generated_images/exec-82d65a8c-246f-467b-bb0c-1a418fe4bfb6.png",
+    "original": "source-assets/lust/images/lust-vn-cafe-r4.png",
+    "runtime": "source-assets/lust/drafts/webp/lust-vn-cafe-r4.webp",
+    "size": [
+      1448,
+      1086
+    ],
+    "mode": "RGB",
+    "originalBytes": 3456812,
+    "runtimeBytes": 597398,
+    "sha256": "9ce8897c3bf398aa956a08ea1cd55ce870cf2cf3cce7c3bf9b95548b0966c76d",
+    "adopted": false,
+    "reason": "Superseded by latest PC-98 galgame style instruction; source and first WebP draft retained."
+  },
+  {
+    "id": "shore",
+    "generated": "/workspace/generated_images/exec-290f551e-cae1-4504-8032-edef024505bf.png",
+    "original": "source-assets/lust/images/lust-vn-shore-r4.png",
+    "runtime": "source-assets/lust/drafts/webp/lust-vn-shore-r4.webp",
+    "size": [
+      1448,
+      1086
+    ],
+    "mode": "RGB",
+    "originalBytes": 3409593,
+    "runtimeBytes": 576306,
+    "sha256": "73ca1a062c1c01dcf255e47172c031b3cf43e9bba00fa6a7c48b657c5da5185b",
+    "adopted": false,
+    "reason": "Superseded by latest PC-98 galgame style instruction; source and first WebP draft retained."
+  },
+  {
+    "id": "dawn",
+    "generated": "/workspace/generated_images/exec-83ab08f2-d64a-4121-a286-715a7515b38a.png",
+    "original": "source-assets/lust/images/lust-vn-dawn-r4.png",
+    "runtime": "source-assets/lust/drafts/webp/lust-vn-dawn-r4.webp",
+    "size": [
+      1448,
+      1086
+    ],
+    "mode": "RGB",
+    "originalBytes": 3419466,
+    "runtimeBytes": 573174,
+    "sha256": "cddc615f74b31910ee893a070fd8bd32900f9d1626e697a5b319a0489982489a",
+    "adopted": false,
+    "reason": "Superseded by latest PC-98 galgame style instruction; source and first WebP draft retained."
+  },
+  {
+    "id": "shadow",
+    "generated": "/workspace/generated_images/exec-bf51115c-32e7-486f-bbdd-e238defcf79e.png",
+    "original": "source-assets/lust/images/lust-vn-shadow-r4.png",
+    "runtime": "source-assets/lust/drafts/webp/lust-vn-shadow-r4.webp",
+    "size": [
+      1024,
+      1536
+    ],
+    "mode": "RGBA",
+    "originalBytes": 2994887,
+    "runtimeBytes": 550776,
+    "sha256": "f5c0ff7c8ce3a68ecc26ac187883b82481b1689ee980801315be74e0e321b3b6",
+    "adopted": false,
+    "reason": "Superseded by latest PC-98 galgame style instruction; source and first WebP draft retained."
+  },
+  {
+    "id": "cupid-portrait",
+    "generated": "/workspace/generated_images/exec-8467bc0f-21cf-4a32-b602-617557d332b0.png",
+    "original": "source-assets/lust/images/lust-vn-cupid-portrait-r4.png",
+    "runtime": "source-assets/lust/drafts/webp/lust-vn-cupid-portrait-r4.webp",
+    "size": [
+      1024,
+      1536
+    ],
+    "mode": "RGBA",
+    "originalBytes": 3311982,
+    "runtimeBytes": 689034,
+    "sha256": "f634c7243f176b54acf0ea6b9a0fcf0e1f87fe9f53d8cad5baa517c9845eaa73",
+    "adopted": false,
+    "reason": "Superseded by latest PC-98 galgame style instruction; source and first WebP draft retained."
+  }
+]

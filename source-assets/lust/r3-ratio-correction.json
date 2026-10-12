@@ -1,0 +1,10 @@
+{
+  "prompt": "Edit the LAST image: preserve the ADULT FEMALE fully clothed paired-dome-headed monster, fabric-covered domes, gold binding, broken bow, teal wings, cloud/feather archipelago and finely detailed pixel painting technique of the first 3 style references. Fix body proportion precisely: the ENTIRE standing woman monster including her feet must be EXACTLY THREE HEAD-HEIGHTS TALL. Her one large paired dome head takes the UPPER THIRD of the entire character height, short narrow torso with rounded hips takes the MIDDLE THIRD, short thighs/calves/feet combined take the LOWER THIRD. Enlarge the head substantially and SHORTEN LEGS dramatically. This is a compact broad-hipped adult monster, not a tall fashion figure. Full figure vertical extent y220 to y880 in a 1024-high landscape image: paired dome head y220-440 (220px high), compact torso/hips y440-660 (220px high), short legs/feet y660-880 (220px high). NO long thin legs. Female waist and wide rounded hips. Head domes are entirely hidden under opaque burgundy fabric with gold cords. No human face anywhere. No second prominent chest under the giant domes: small smooth fully dressed corset torso. No skin/anatomical detail on head, fully clothed hips and legs. Single adult creature, NOT child, not male. Place her hands and broken bow beside her waist at image center. No text, no UI, no columns/architecture. Complete rich blue cloud scene with amber light.",
+  "refs": [
+    "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+    "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+    "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png",
+    "/workspace/dOvOb/source-assets/lust/images/lust-monster-r3-long-leg-draft.png"
+  ],
+  "reason": "Initial covered output had long legs (~4 head-heights) and is retained as a draft, not adopted."
+}
