@@ -1,4 +1,4 @@
-import { sinProgress, recordSinClear, crazyLeaderboardKey } from '../crazy-sins.mjs?v=1.2.31';
+import { sinProgress, recordSinClear, crazyLeaderboardKey } from '../crazy-sins.mjs?v=1.2.36';
 import { rememberScore } from '../ranks.mjs';
 
 export function envyUnlocked(storage, options) {

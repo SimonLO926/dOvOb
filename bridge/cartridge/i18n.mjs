@@ -2,6 +2,11 @@ import {LANGS,translate} from '../i18n.mjs';
 export {LANGS};
 export const LANGUAGE_NAMES=['繁體中文','简体中文','English','日本語','한국어','Português','Español'];
 export const rows={
+ cleared:['已通關','已通关','Cleared','クリア済み','클리어','Concluído','Completado'],
+ campaignSettings:['設定','设置','Settings','設定','설정','Definições','Ajustes'],
+ campaignNote:['沿用主遊戲設定，依序挑戰七大罪。','沿用主游戏设置，依序挑战七大罪。','Use your game settings and challenge the sins in order.','本編の設定を使い、七つの大罪に順に挑みます。','게임 설정을 사용하여 대죄에 차례로 도전하세요.','Use as definições do jogo e desafie os pecados por ordem.','Usa los ajustes del juego y desafía a los pecados en orden.'],
+ mainMenu:['返回主選單','返回主菜单','Main menu','メニューへ','메인 메뉴','Menu principal','Menú principal'],
+ ranks:['排行榜','排行榜','Rankings','ランキング','순위','Classificações','Clasificaciones'],
  quality:['渲染品質','渲染质量','Rendering quality','描画品質','렌더링 품질','Qualidade gráfica','Calidad gráfica'],
  qualityAuto:['自動','自动','Auto','自動','자동','Automático','Automático'],
  qualityStandard:['標準','标准','Standard','標準','표준','Normal','Estándar'],

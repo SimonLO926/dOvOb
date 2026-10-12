@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bridge</title>
-  <link rel="preload" type="image/webp" href="./assets/mischief-cat.webp?v=1.2.34" as="image">
-  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.34" as="font" type="font/woff" crossorigin>
+  <link rel="preload" type="image/webp" href="./assets/mischief-cat.webp?v=1.2.36" as="image">
+  <link rel="preload" href="./fonts/fever-brush.woff?v=1.2.36" as="font" type="font/woff" crossorigin>
   <style>
     #pride-preview { position: fixed; inset: 0; z-index: 160; display: flex; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; background: linear-gradient(#160b29bb, #160b29ed), url('./assets/pride-palace.webp') center / cover; }
     .pride-preview-card { flex: none; width: min(440px, 100%); margin: auto; padding: 28px; border: 1px solid #dabb78; border-radius: 24px; text-align: left; color: #f8edda; background: #241833ed; box-shadow: 0 18px 60px #0007; }
@@ -30,7 +30,7 @@
     /* Ma Shan Zheng subset; SIL OFL license in fonts/fever-brush-OFL.txt. */
     @font-face {
       font-family: "Fever Brush";
-      src: url("./fonts/fever-brush.woff?v=1.2.34") format("woff");
+      src: url("./fonts/fever-brush.woff?v=1.2.36") format("woff");
       font-weight: 400;
       font-display: swap;
     }
@@ -1044,10 +1044,12 @@
     body.crazy-active #game .pad #btn-rot-left { bottom: calc(100% + 6px); height: 44px; }
     @media (max-width: 760px) { body.crazy-active #game .pad { position: relative; left: auto; right: auto; bottom: auto; flex: 0 0 var(--pad-size); margin-top: 52px; } }
     @media (orientation: landscape) and (max-height: 540px) {
-      html.touch body.crazy-active[data-crazy-sin="pride"] #game .stage { position: absolute; top: 48px; bottom: 8px; left: calc(var(--pad-size) + 24px); right: calc(var(--pad-size) + 24px); }
-      html.touch body.crazy-active[data-crazy-sin="pride"] #game .pad { position: absolute; left: 8px; right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); height: var(--pad-size); margin-top: 0; pointer-events: none; }
-      html.touch body.crazy-active[data-crazy-sin="pride"] #game .pad .hand { pointer-events: auto; }
-      html.touch body.crazy-active[data-crazy-sin="pride"] #crazy-help { position: absolute; top: 56px; left: 8px; width: calc(var(--pad-size) + 8px); margin: 0; padding: 8px; font-size: 11px; text-align: left; }
+      html.touch body.crazy-active #game .stage { position: absolute; top: 48px; bottom: 8px; left: calc(var(--pad-size) + 24px); right: calc(var(--pad-size) + 24px); }
+      html.touch body.crazy-active #game .pad { position: absolute; left: 8px; right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); height: var(--pad-size); margin-top: 0; pointer-events: none; }
+      html.touch body.crazy-active #game .pad .hand,
+      html.touch body.crazy-active #game .pad > button { pointer-events: auto; }
+      html.touch body.crazy-active #crazy-help { position: absolute; top: 56px; right: 8px; width: calc(var(--pad-size) + 8px); margin: 0; padding: 8px; font-size: 11px; text-align: left; }
+      html.touch body.crazy-active #crazy-preview-cat { top: 68px; bottom: auto; left: 12px; width: 144px; transform: none; opacity: .9; }
     }
     @keyframes crazy-orbit { to { transform: rotate(360deg); } }
     html.touch body.crazy-active[data-crazy-controls="rhythm"] #game .pad,
@@ -1337,8 +1339,8 @@
           <button data-sin="wrath" type="button" disabled><svg class="sin-lock" viewBox="0 0 24 28" aria-hidden="true"><path d="M6 12 V8 A6 6 0 0 1 18 8 V12"/><rect x="3" y="12" width="18" height="14" rx="2"/><path d="M12 18 V22"/><circle cx="12" cy="18" r="1"/></svg><svg class="sin-emblem" hidden aria-hidden="true"><use href="#sin-icon-wrath"/></svg><span hidden data-i18n="sinWrath">Wrath</span><small hidden data-i18n="crazyLocked">Locked</small></button>
         </div>
         <div class="greed-preview" data-sin="greed" aria-labelledby="boss-preview-title">
-          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.webp?v=1.2.34" onerror="this.onerror=null;this.hidden=true" alt="" aria-hidden="true">
-          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.webp?v=1.2.34" onerror="this.onerror=null;this.hidden=true" alt="The Mad Dealer">
+          <img class="greed-shadow" loading="lazy" src="./assets/greed-second.webp?v=1.2.36" onerror="this.onerror=null;this.hidden=true" alt="" aria-hidden="true">
+          <img class="greed-first-art" loading="lazy" src="./assets/greed-first.webp?v=1.2.36" onerror="this.onerror=null;this.hidden=true" alt="The Mad Dealer">
           <canvas id="envy-preview-shadow" class="greed-shadow" width="540" height="760" hidden aria-hidden="true"></canvas>
           <div class="greed-caption"><div aria-live="polite"><h2 id="boss-preview-title" data-i18n="crazyDealer">The Mad Dealer</h2><p id="boss-preview-lore" data-i18n="crazyGreedLore">The house wants everything. Challenge the dealer's greed.</p></div><button id="boss-challenge" type="button" data-i18n="crazyChallenge">Challenge</button></div>
         </div>
@@ -1679,7 +1681,7 @@
     <canvas id="cinematic-canvas" aria-hidden="true"></canvas><div class="cinematic-controls"><button id="cinematic-skip" type="button" data-i18n="crazyContinue">Continue</button></div>
   </div>
   <div id="crazy-result" hidden role="dialog" aria-modal="true" aria-labelledby="result-title">
-    <img class="result-art" loading="lazy" src="./assets/greed-defeated.webp?v=1.2.34" onerror="this.onerror=null;this.hidden=true" alt="Defeated Greed surrounded by spilled coins">
+    <img class="result-art" loading="lazy" src="./assets/greed-defeated.webp?v=1.2.36" onerror="this.onerror=null;this.hidden=true" alt="Defeated Greed surrounded by spilled coins">
     <div class="result-content"><small>GREED · CLEARED</small><h1 id="result-title" data-i18n="crazyGreedBroken">Greed defeated</h1><div class="result-score" id="result-score"></div><div class="result-stats" id="result-stats"></div><p data-i18n="crazyClearUnlock">Gilded Devourer silhouette unlocked</p><div class="result-buttons"><button id="result-retry" type="button" data-i18n="again">Again</button><button id="result-bosses" type="button" data-i18n="crazySevenSins">Seven Deadly Sins</button></div></div>
   </div>
   <div id="fever-aura" hidden aria-hidden="true">
@@ -1697,31 +1699,31 @@
     <i style="--x:83%;--y:97%;--delay:-1.87s"></i>
   </div>
   <script type="module">
-    import { createPridePreview, mountPridePreview, prideControls } from "./pride-preview.mjs?v=1.2.34";
-    import { touchControlsEnabled } from "./touch-controls.mjs?v=1.2.34";
-    import { BRIDGE_REPEAT } from "./bridge-controls.mjs?v=1.2.34";
-    import { filmingEnabled } from "./filming.mjs?v=1.2.34";
-    import { sinProgress, crazyLeaderboardKey, recordSinClear } from "./crazy-sins.mjs?v=1.2.34";
-    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.34";
-    import { drawCrazy, drawCrazyFrame, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.34";
-    import { createCombatEffects, resetCombatEffects, updateCombatEffects, drawCombatEffects, createCombatOverlay, combatLayout } from "./combat-effects.mjs?v=1.2.34";
+    import { createPridePreview, mountPridePreview, prideControls } from "./pride-preview.mjs?v=1.2.36";
+    import { touchControlsEnabled } from "./touch-controls.mjs?v=1.2.36";
+    import { BRIDGE_REPEAT } from "./bridge-controls.mjs?v=1.2.36";
+    import { filmingEnabled } from "./filming.mjs?v=1.2.36";
+    import { sinProgress, crazyLeaderboardKey, recordSinClear } from "./crazy-sins.mjs?v=1.2.36";
+    import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.36";
+    import { drawCrazy, drawCrazyFrame, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.36";
+    import { createCombatEffects, resetCombatEffects, updateCombatEffects, drawCombatEffects, createCombatOverlay, combatLayout } from "./combat-effects.mjs?v=1.2.36";
     import { drawPrideCinematic, loadPrideArt } from "./pride-art.mjs";
     import { PRIDE_ATTACKS } from "./pride-attacks.mjs";
     import { PRIDE_SECOND_MODES } from "./pride-second.mjs";
-    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.34";
-    import { drawGreedCinematic, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.34";
-    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.34";
-    import { createSound, CASINO_EFFECTS } from "./audio.mjs?v=1.2.34";
-    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.34";
-    import { translate } from "./i18n.mjs?v=1.2.34";
-    import { renderControlsGuide } from "./controls-guide.mjs?v=1.2.34";
-    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.34";
-    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.34";
-    import { VERSION } from "./version.mjs?v=1.2.35";
+    import { createCrazyMusic, crazyTrack } from "./crazy-music.mjs?v=1.2.36";
+    import { drawGreedCinematic, recordGreedClear, loadGreedArt } from "./crazy-screen.mjs?v=1.2.36";
+    import { FLYING_ATTACKS, GREED_ATTACKS } from "./crazy-reactions.mjs?v=1.2.36";
+    import { createSound, CASINO_EFFECTS } from "./audio.mjs?v=1.2.36";
+    import { brickWall, createSession, drawSession, updateSession } from "./arcade.mjs?v=1.2.36";
+    import { translate } from "./i18n.mjs?v=1.2.36";
+    import { renderControlsGuide } from "./controls-guide.mjs?v=1.2.36";
+    import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.36";
+    import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.36";
+    import { VERSION } from "./version.mjs?v=1.2.36";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SAND_HEX, SHAPES, activateFever, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
-    } from "./logic.mjs?v=1.2.34";
+    } from "./logic.mjs?v=1.2.36";
 
     const pridePreview = new URLSearchParams(location.search).get("preview") === "pride" || document.body.hasAttribute("data-pride-preview");
     let previewScenario = "full", previewDifficulty = "normal", previewLauncher = null;
@@ -1751,7 +1753,7 @@
     ];
     const game = createGame();
     const settings = loadSettings();
-    let crazy = null;
+    let cartridgeEncounter=null;let crazy = null;Object.defineProperty(window,"crazyGame",{get:()=>crazy});
     let selectedBoss = "greed";
     let puzzle = null;
     let paused = false;
@@ -2088,6 +2090,7 @@
     }
 
     function backToMenu() {
+      if(cartridgeEncounter){crazyMusic.pause();sound.stop();location.assign(new URL('./cartridge.html?sin='+cartridgeEncounter,location.href));return;}
       closeGameMenu(false);
       crazy = null;
       crazyMusic.pause();
@@ -2176,6 +2179,7 @@
       saveSettings(); syncCrazyDifficulty();
     });
     function showBossSelection() {
+      if(!pridePreview&&!window.__cartridgeReadOnly){crazyMusic.pause();sound.stop();const url=new URL('./cartridge.html',location.href);url.searchParams.set('sin',crazy?.config?.id||selectedBoss);location.assign(url);return;}
       loadGreedArt();
       crazyMusic.pause(); sound.stop(); crazy = null; paused = false; game.phase = "ready";
       showScreen("bosses");
@@ -2206,7 +2210,7 @@
       if (!envyPreviewArt) {
         envyPreviewArt = new Image();
         envyPreviewArt.onload = drawEnvyPreviewShadow;
-        envyPreviewArt.src = "./assets/envy-heads.webp?v=1.2.34";
+        envyPreviewArt.src = "./assets/envy-heads.webp?v=1.2.36";
       }
       if (!envyPreviewArt.naturalWidth) return;
       const sw = envyPreviewArt.naturalWidth / 2, sh = envyPreviewArt.naturalHeight / 2;
@@ -2227,12 +2231,12 @@
       preview.classList.add("previewing");
       preview.classList.toggle("cleared", boss.cleared);
       const shadow = preview.querySelector(".greed-shadow");
-      shadow.src = `./assets/${pride ? "pride" : "greed"}-second.webp?v=1.2.34`;
+      shadow.src = `./assets/${pride ? "pride" : "greed"}-second.webp?v=1.2.36`;
       shadow.hidden = envy || !boss.cleared;
       document.getElementById("envy-preview-shadow").hidden = !envy || !boss.cleared;
       if (envy) drawEnvyPreviewShadow();
       const art = preview.querySelector(".greed-first-art");
-      art.src = `./assets/${envy ? "envy" : pride ? "pride" : "greed"}-first.webp?v=1.2.34`;
+      art.src = `./assets/${envy ? "envy" : pride ? "pride" : "greed"}-first.webp?v=1.2.36`;
       art.hidden = false;
       art.alt = t(envy ? "envyIntro" : pride ? "prideIntro" : "crazyDealer");
       for (const [id, key] of [["boss-preview-title", envy ? "envyIntro" : pride ? "prideIntro" : "crazyDealer"], ["boss-preview-lore", envy ? "envyLore" : pride ? "prideLore" : "crazyGreedLore"]]) {
@@ -2270,7 +2274,7 @@
     document.querySelector("#bosses-back").addEventListener("click", backToMenu);
     document.querySelector("#result-retry").addEventListener("click", () => beginCrazy());
     document.querySelector("#result-bosses").addEventListener("click", () => pridePreview ? backToMenu() : showBossSelection());
-    document.querySelector("#cinematic-skip").addEventListener("click", () => { if (crazy && !paused) skipCrazyCinematic(crazy); });
+    document.querySelector("#cinematic-skip").addEventListener("click", () => { if (crazy && !paused) {skipCrazyCinematic(crazy);requestAnimationFrame(()=>{if(crazy&&!crazy.cutscene&&!crazy.won){document.getElementById("game").inert=false;board.focus({preventScroll:true});}});} });
     function renderCrazyPresentation() {
       const overlay = document.querySelector("#crazy-cinematic"), result = document.querySelector("#crazy-result");
       const cinematic = !!crazy?.cutscene, won = !!crazy?.won && !cinematic;
@@ -2310,7 +2314,7 @@
     }
     let selectedSin = "greed";
     function beginCrazy(sin = selectedSin) {
-      if (sin === "envy") {
+      if (sin === "envy" || sin === "lust") {
         const boss = sinProgress(localStorage).find(value => value.id === sin);
         if (!boss?.unlocked) return;
         crazyMusic.pause(); sound.stop();
@@ -2318,7 +2322,8 @@
         url.searchParams.set("difficulty", settings.crazyDifficulty);
         location.assign(url); return;
       }
-      selectedSin = sin;
+      selectedSin = sin;selectedBoss=sin;
+      if(!pridePreview&&!sinProgress(localStorage).find(b=>b.id===sin)?.unlocked){showBossSelection();return;}
       if (sin === "pride") loadPrideArt(); else loadGreedArt();
       begin("crazy");
       crazy = pridePreview && sin === "pride"
@@ -3694,9 +3699,7 @@
       const availH = Math.max(crazy ? 32 : 120, baseH - 4);
       const availW = Math.max(96, stage.clientWidth - railW);
       const logicalHeight = crazy ? crazyCanvasHeight(crazy.mode) : ROWS * CELL;
-      // Compress the tall Bridge presentation in short landscape viewports.
-      // Pointer routing still maps to the full logical canvas, so all rows remain usable.
-      const displayHeight = crazy?.config.id === "pride" && docked && window.innerWidth > window.innerHeight && window.innerHeight <= 540 ? Math.min(logicalHeight, 560) : logicalHeight;
+      const displayHeight = logicalHeight;
       const fit = Math.min(availH / displayHeight, availW / (COLS * CELL));
       const scale = docked || crazy ? fit : Math.max(0.7, fit);
       const width = Math.round(COLS * CELL * scale);
@@ -3749,9 +3752,13 @@
         closeGameMenu(false); beginCrazy("pride");
       }, backToMenu);
     }
-    if (!pridePreview && new URLSearchParams(location.search).get("bosses") === "1") {
+    const campaignSin=new URLSearchParams(location.search).get('campaign');
+    if(!pridePreview&&!window.__cartridgeReadOnly&&['greed','pride'].includes(campaignSin)){
+      const requestedDifficulty=new URLSearchParams(location.search).get('difficulty');if(requestedDifficulty)settings.crazyDifficulty=requestedDifficulty==='hard'?'hard':'normal';
+      cartridgeEncounter=campaignSin;beginCrazy(campaignSin);history.replaceState(null,"",new URL("./index.html",location.href));
+    } else if (!pridePreview && new URLSearchParams(location.search).get("bosses") === "1") {
       const requested = new URLSearchParams(location.search).get("sin");
-      selectedBoss = ["greed", "pride", "envy"].includes(requested) ? requested : "greed";
+      selectedBoss = ["greed", "pride", "envy", "lust"].includes(requested) ? requested : "greed";
       showBossSelection();
     }
     requestAnimationFrame(frame);
