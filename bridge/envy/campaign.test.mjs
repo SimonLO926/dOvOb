@@ -33,7 +33,7 @@ test('filming unlocks only released bosses and preserves real clears', () => {
   assert.equal(filmingEnabled({ getItem() { throw Error('blocked'); } }), false);
   const save = storage();
   const states = sinProgress(save, undefined, { filming: true });
-  assert.deepEqual(states.filter(boss => boss.unlocked).map(boss => boss.id), ['greed', 'pride', 'envy']);
+  assert.deepEqual(states.filter(boss => boss.unlocked).map(boss => boss.id), ['greed', 'pride', 'envy', 'lust']);
   assert.ok(states.every(boss => !boss.cleared)); assert.equal(save.data.size, 0);
 });
 test('campaign cannot launch a partial preview and retains full encounter difficulty and feedback', () => {
@@ -65,7 +65,7 @@ test('actual final counterattack records clear and separate Normal/Hard scores o
     assert.equal(record(state), false); assert.deepEqual(JSON.parse(save.getItem(key)), [10200]);
   }
   assert.equal(save.getItem('bridge-crazy-cleared-envy'), '1');
-  assert.equal(sinProgress(save).find(boss => boss.id === 'lust').unlocked, false);
+  assert.equal(sinProgress(save).find(boss => boss.id === 'lust').unlocked, true);
 });
 test('independent full/partial previews and filming never write official clears or scores', () => {
   const save = storage(), record = createCampaignRecorder(save);

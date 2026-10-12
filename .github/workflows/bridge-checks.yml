@@ -28,6 +28,8 @@ jobs:
           site=Path('_site')
           assert (site/'bridge/lust-preview.html').is_file()
           assert (site/'bridge/cartridge-preview.html').is_file()
+          assert (site/'bridge/lust.html').is_file()
+          assert (site/'bridge/cartridge.html').is_file()
           assert not (site/'source-assets').exists()
           assert not (site/'bridge/tools').exists()
           for p in site.rglob('*'):

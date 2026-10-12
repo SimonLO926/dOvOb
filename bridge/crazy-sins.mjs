@@ -11,7 +11,7 @@ export const SIN_BOSSES = Object.freeze([
     recovery: ['cards', 'mahjong', 'slots'], label: 'crazyGreed', developed: true },
   { id: 'pride', name: '傲慢', icon: '👑', minigames: PRIDE_MINIGAME_IDS, attacks: ['pride-gaze', 'pride-mirror', 'pride-crown-shock'], finisher: 'pride-mirror-duel', arcadePool: ['breakout', 'pinball', 'bbtan', 'sand'], recovery: PRIDE_MINIGAME_IDS, label: 'sinPride', developed: true },
   { id: 'envy', name: '嫉妒', icon: '👁', entry: 'envy.html', minigames: ['difference', 'tarot', 'rolling', 'window', 'pack', 'territory', 'pellets', 'eye-room'], attacks: ['laser', 'steal', 'gaze', 'net', 'breath', 'pupil', 'laser-up', 'steal-up', 'gaze-up'], finisher: 'chase', arcadePool: [], recovery: ['tarot', 'pack', 'territory', 'pellets'], label: 'sinEnvy', developed: true },
-  { id: 'lust', name: '色慾', icon: '💘', minigames: [], attacks: [], finisher: null, arcadePool: [], recovery: [], label: 'sinLust', developed: false },
+  { id: 'lust', name: '色慾', icon: '💘', entry:'lust.html', minigames: ['archery','piano','claw','tennis','feeding','cinema','wheel','volley','haunted','dance'], attacks: ['wave','bomb','arrows','wave-up','bomb-up','arrows-up','ribbon','echo','shatter'], finisher: 'dating', arcadePool: [], recovery: ['archery','piano','claw','tennis','feeding','cinema','wheel','volley','haunted','dance'], label: 'sinLust', developed: true },
   { id: 'gluttony', name: '暴食', icon: '🍔', minigames: [], attacks: [], finisher: null, arcadePool: [], recovery: [], label: 'sinGluttony', developed: false },
   { id: 'sloth', name: '怠惰', icon: '😴', minigames: [], attacks: [], finisher: null, arcadePool: [], recovery: [], label: 'sinSloth', developed: false },
   { id: 'wrath', name: '憤怒', icon: '🔥', minigames: [], attacks: [], finisher: null, arcadePool: [], recovery: [], label: 'sinWrath', developed: false },
@@ -33,6 +33,7 @@ export function crazyLeaderboardKey(sin = 'greed', difficulty = 'hard') {
 export function recordSinClear(storage, s) {
   if (s.preview || s.filming || s.bossHp !== 0 || s.form !== 2) return false;
   const id = s.sin ?? s.config?.id;
-  if (id === 'pride' ? !s.won || !s.prideDuelCleared : id !== 'envy' || !s.bossDefeated || !s.chaseCleared) return false;
+  const valid=id==='pride'?s.won&&s.prideDuelCleared:id==='envy'?s.bossDefeated&&s.chaseCleared:id==='lust'?s.won&&s.over&&s.lustCleared&&s.scenario?.id==='full':false;
+  if(!valid)return false;
   try { storage.setItem(`bridge-crazy-cleared-${id}`, '1'); return true; } catch { return false; }
 }

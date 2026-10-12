@@ -2,7 +2,7 @@ import { endStroke } from './lore-games.mjs';
 import { t, setEnvyLanguage, envyLanguage, captureInterface } from './i18n.mjs';
 import { touchControlsEnabled } from '../touch-controls.mjs?v=1.2.32';
 import { createEnvy, SCENARIOS, envyInput, envyPoint, updateEnvy, continueScene, retryCapture, finishEnvy } from './engine.mjs?v=1.2.34';
-import { createCampaignRecorder, envyUnlocked } from './campaign.mjs?v=1.2.31';
+import { createCampaignRecorder, envyUnlocked } from './campaign.mjs?v=1.2.36';
 import { filmingEnabled } from '../filming.mjs?v=1.2.31';
 import { canvasHeight, drawEnvy } from './view.mjs?v=1.2.33';
 import { drawFrame, loadArt, images } from './art.mjs?v=1.2.33';
@@ -16,7 +16,7 @@ const $=selector=>document.querySelector(selector);
 const campaign=document.body.dataset.envyCampaign==='true';
 let campaignStorage;try{campaignStorage=localStorage;}catch{}
 const recordCampaign=createCampaignRecorder(campaignStorage);
-function returnToBosses(){location.assign(new URL('./index.html?bosses=1&sin=envy',location.href));}
+function returnToBosses(){location.assign(new URL('./cartridge.html?sin=envy',location.href));}
 const board=$('#envy-board'),context=board.getContext('2d'),frame=$('#boss-frame'),frameContext=frame.getContext('2d'),wrap=$('#board-wrap');
 const combatEffects=createCombatEffects(),combatOverlay=createCombatOverlay(board,'envy-combat-effects'),combatContext=combatOverlay.getContext('2d');
 let encounter=null,paused=true,last=performance.now(),hitTime=0,lastHp=100,boardPointer=null;
