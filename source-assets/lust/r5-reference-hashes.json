@@ -1,0 +1,112 @@
+{
+  "actualReferenceFiles": {
+    "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-pc98-r4.png": {
+      "sha256": "2fda283390c05507eb038a5bb0291a7d3cadfdb5f117ebfd063d0642b7ad2c31",
+      "preservedSource": "source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+      "bytes": 3076723
+    },
+    "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png": {
+      "sha256": "5cd4bec81d0fd777e11ffbc30eb1746d73dffe7517a65318f906f3cccb33e0f2",
+      "preservedSource": "source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+      "bytes": 3305691
+    },
+    "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png": {
+      "sha256": "1605ab811f6b34ae7b2df49147ec115cb825323d941fbc2eed41e5003a89f0d5",
+      "preservedSource": "source-assets/greed/images/greed-defeated.png",
+      "bytes": 3016384
+    },
+    "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png": {
+      "sha256": "4db43125e4ff0342803c682c0b81972111fcde1d8a770ba64d91f5539a856655",
+      "preservedSource": "source-assets/pride/images/pride-mirror-defeated.png",
+      "bytes": 3460994
+    },
+    "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png": {
+      "sha256": "b4ec6db504b26c9145434c8c6ad80c478e822d2ad170edfacaab06e049232a9d",
+      "preservedSource": "source-assets/pride/images/pride-tower-ruins.png",
+      "bytes": 3066791
+    },
+    "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-pc98-r4.png": {
+      "sha256": "19f89af594bd0f04be622cf5b332e4dfcb879f5c8064be1b151daebdfee66bd3",
+      "preservedSource": "source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+      "bytes": 4052169
+    },
+    "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png": {
+      "sha256": "65c42cacb4e6335994fd567093f8d92a4957d9c547ae3c9ca588ef5c1f6a9e0e",
+      "preservedSource": "source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+      "bytes": 3373324
+    },
+    "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-pc98-r4.png": {
+      "sha256": "f48975d304abc518cdf1b6bc1058a5d2d36913680b8441a239493df5754f86c8",
+      "preservedSource": "source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+      "bytes": 3886110
+    },
+    "/workspace/generated_images/exec-e8c20ceb-ec12-447b-9c9e-0bc434b74a54.png": {
+      "sha256": "0abd8bc4a6e0d2d0f95bafccc79dc045c9ec451f4ee7f697a459692ec556a1b7",
+      "preservedSource": "source-assets/lust/images/lust-vn-event-rain-pc98-r5.png",
+      "bytes": 3385695
+    },
+    "/workspace/generated_images/exec-7431f6e8-8c6a-4dd6-9d56-22ff79e9c6c4.png": {
+      "sha256": "02b89f64b4962d0272d120483268d8eeda6312171f1562171cb266cb13b6be20",
+      "preservedSource": "source-assets/lust/images/lust-vn-event-rest-pc98-r5.png",
+      "bytes": 3460714
+    },
+    "/workspace/generated_images/exec-c23babac-811c-47f3-84c0-8c1f4c374c0d.png": {
+      "sha256": "7c40a1c814dac53edadf85367d8666772a54fc9eed591391028c5ac268ab7565",
+      "preservedSource": "source-assets/lust/images/lust-vn-event-gift-pc98-r5.png",
+      "bytes": 3727822
+    },
+    "/workspace/generated_images/exec-2bb55ef5-73f7-47c5-9ac7-a50ad027f37c.png": {
+      "sha256": "9c8fde567c11c6700aee227302baf1fca8f6c29df47789b1e900d28c8db3aad6",
+      "preservedSource": "source-assets/lust/images/lust-vn-event-name-pc98-r5.png",
+      "bytes": 3492963
+    },
+    "/workspace/generated_images/exec-59679981-8754-4db5-b22a-f179b534041f.png": {
+      "sha256": "86e57dacaecc43a52d1a68851274b0467852343782e73e0af8ab66af14234e5f",
+      "preservedSource": "source-assets/lust/images/lust-vn-event-tears-pc98-r5.png",
+      "bytes": 3642035
+    },
+    "/workspace/generated_images/exec-24f5ff34-47a1-4585-a18a-f5e06acb92b2.png": {
+      "sha256": "c867a79b60c47216469c69753de25d42e4717e2366d0c8bc58f9628b9960c46c",
+      "preservedSource": "source-assets/lust/images/lust-vn-event-mending-pc98-r5.png",
+      "bytes": 3846341
+    },
+    "/workspace/generated_images/exec-ede1c943-c129-4e69-9c8c-acc654afcc09.png": {
+      "sha256": "651861490661bd3175441830af660a9c029f50893bd1e88abfa9ba611917f9bd",
+      "preservedSource": "source-assets/lust/images/lust-vn-event-distance-pc98-r5.png",
+      "bytes": 3689213
+    },
+    "/workspace/generated_images/exec-f140e852-0c27-4cc6-b931-4a7504331e3c.png": {
+      "sha256": "65685c8175dd294bd67eab156b6ba3587acd269118d31e4abd43bd4372ace424",
+      "preservedSource": "source-assets/lust/images/lust-vn-event-tomorrow-pc98-r5.png",
+      "bytes": 3723794
+    },
+    "/workspace/generated_images/exec-71f9451e-5130-42c0-972d-9cf2643dade9.png": {
+      "sha256": "f1c75830e5b70e3c88378923e8c4a12ceb2a4d376aabf0b9dc6ac80ba8829f8e",
+      "preservedSource": "source-assets/lust/images/lust-vn-event-fear-pc98-r5.png",
+      "bytes": 3630833
+    },
+    "/workspace/generated_images/exec-907f88db-fd6b-430c-9781-7d795127a075.png": {
+      "sha256": "11cb85dc6a83490af21171cd10bf843edc22c9c1e3ed952cb8b725d472c7c6fa",
+      "preservedSource": "source-assets/lust/images/lust-vn-event-freedom-pc98-r5.png",
+      "bytes": 3722573
+    },
+    "/workspace/generated_images/exec-1df1abcd-a6fd-45c7-b3ec-8ee591eed1d7.png": {
+      "sha256": "376c62bd42df7be447c1f4b6126c2ca3ffd1dd108754f143b00f84e73ede3e8c",
+      "preservedSource": "source-assets/lust/images/lust-vn-event-arrow-pc98-r5.png",
+      "bytes": 3866711
+    },
+    "/workspace/generated_images/exec-52592784-d358-4943-8f32-aac7ac08c693.png": {
+      "sha256": "2c457d512902a5202df57a7770d6b5cf14e43f71f27e9ea7957fe8d0d5f8808e",
+      "preservedSource": "source-assets/lust/images/lust-vn-event-dawn-pc98-r5.png",
+      "bytes": 3635212
+    },
+    "/workspace/generated_images/exec-6aa581e9-3066-41d7-8bfc-f7006badc909.png": {
+      "sha256": "2ec55ebf921df03c7599fad590ab53d2b53efc7e283e873d9ab475c0a59c8bb4",
+      "preservedSource": "source-assets/lust/images/lust-vn-event-freedom-warm-pc98-r5.png",
+      "bytes": 3380239
+    }
+  },
+  "inspectEvidence": "Original series and previous PC-98 images individually viewed before generation; 12 base event portraits individually viewed before expression edits; all 48 final story assets visually reviewed in browser galleries and real chapter screenshots.",
+  "parameterRejectedDraft": "r5-scenes-initial-parameter-rejected.json is an unexecuted six-reference parameter request. Final scene jobs use five references.",
+  "expressionReplacement": "expr-freedom-hurt uses r5-expression-moderation-correction.json after the original output refusal; fully opaque blouse/shawl added."
+}

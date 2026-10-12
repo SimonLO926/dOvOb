@@ -1,0 +1,174 @@
+{
+  "adopted": [
+    {
+      "id": "rain",
+      "original": "source-assets/lust/images/lust-vn-event-rain-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-rain-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "transparent": true,
+      "sourceBytes": 3385695,
+      "runtimeBytes": 652574,
+      "sourceSHA256": "0abd8bc4a6e0d2d0f95bafccc79dc045c9ec451f4ee7f697a459692ec556a1b7",
+      "runtimeSHA256": "fde9dfdcadac17a9ba64af2cc33fc3e7077a118f6409c6e00172c24eef6c44e9"
+    },
+    {
+      "id": "rest",
+      "original": "source-assets/lust/images/lust-vn-event-rest-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-rest-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "transparent": true,
+      "sourceBytes": 3460714,
+      "runtimeBytes": 653666,
+      "sourceSHA256": "02b89f64b4962d0272d120483268d8eeda6312171f1562171cb266cb13b6be20",
+      "runtimeSHA256": "990346a678853f5b453801e515422e74562d8448ff8effc3496c0b36fa728b86"
+    },
+    {
+      "id": "gift",
+      "original": "source-assets/lust/images/lust-vn-event-gift-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-gift-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "transparent": true,
+      "sourceBytes": 3727822,
+      "runtimeBytes": 746664,
+      "sourceSHA256": "7c40a1c814dac53edadf85367d8666772a54fc9eed591391028c5ac268ab7565",
+      "runtimeSHA256": "adaa79aea483f514f83f8c91175f2aeafb26e064fb4929c0e3282aa67b9449c6"
+    },
+    {
+      "id": "name",
+      "original": "source-assets/lust/images/lust-vn-event-name-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-name-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "transparent": true,
+      "sourceBytes": 3492963,
+      "runtimeBytes": 678412,
+      "sourceSHA256": "9c8fde567c11c6700aee227302baf1fca8f6c29df47789b1e900d28c8db3aad6",
+      "runtimeSHA256": "82e3bf24866643bfee0e64c7333b7d41cab3397efbd2d8acef06cbdf272b5a03"
+    },
+    {
+      "id": "tears",
+      "original": "source-assets/lust/images/lust-vn-event-tears-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-tears-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "transparent": true,
+      "sourceBytes": 3642035,
+      "runtimeBytes": 714214,
+      "sourceSHA256": "86e57dacaecc43a52d1a68851274b0467852343782e73e0af8ab66af14234e5f",
+      "runtimeSHA256": "0898f28f217b91096010c6b10c35fdb0cc6752ecb9d5697968a426dc11e3e683"
+    },
+    {
+      "id": "mending",
+      "original": "source-assets/lust/images/lust-vn-event-mending-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-mending-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "transparent": true,
+      "sourceBytes": 3846341,
+      "runtimeBytes": 785192,
+      "sourceSHA256": "c867a79b60c47216469c69753de25d42e4717e2366d0c8bc58f9628b9960c46c",
+      "runtimeSHA256": "fa46adab32f46d5ab513bb3278a19f0ffbf248176dfedff0285779e6f25295fd"
+    },
+    {
+      "id": "distance",
+      "original": "source-assets/lust/images/lust-vn-event-distance-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-distance-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "transparent": true,
+      "sourceBytes": 3689213,
+      "runtimeBytes": 731882,
+      "sourceSHA256": "651861490661bd3175441830af660a9c029f50893bd1e88abfa9ba611917f9bd",
+      "runtimeSHA256": "dcc3c5747851cdb1f9d9ee166d43030aaa8b738c400165326b0caf036ebcf906"
+    },
+    {
+      "id": "tomorrow",
+      "original": "source-assets/lust/images/lust-vn-event-tomorrow-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-tomorrow-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "transparent": true,
+      "sourceBytes": 3723794,
+      "runtimeBytes": 755516,
+      "sourceSHA256": "65685c8175dd294bd67eab156b6ba3587acd269118d31e4abd43bd4372ace424",
+      "runtimeSHA256": "4889b198db2f1679eb0164ccf4334ef3d6e2430383d872638d978132beaf8d17"
+    },
+    {
+      "id": "fear",
+      "original": "source-assets/lust/images/lust-vn-event-fear-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-fear-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "transparent": true,
+      "sourceBytes": 3630833,
+      "runtimeBytes": 708710,
+      "sourceSHA256": "f1c75830e5b70e3c88378923e8c4a12ceb2a4d376aabf0b9dc6ac80ba8829f8e",
+      "runtimeSHA256": "0acccfcfaf6b938934a9582e35e6343c5cad278a77deba733a3ede44f0a2e31b"
+    },
+    {
+      "id": "freedom",
+      "original": "source-assets/lust/images/lust-vn-event-freedom-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-freedom-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "transparent": true,
+      "sourceBytes": 3722573,
+      "runtimeBytes": 754330,
+      "sourceSHA256": "11cb85dc6a83490af21171cd10bf843edc22c9c1e3ed952cb8b725d472c7c6fa",
+      "runtimeSHA256": "bf2510ec09e054eb4f04a84960c7b3a720b360680a937eaf19dae3e90fa3fcf7"
+    },
+    {
+      "id": "arrow",
+      "original": "source-assets/lust/images/lust-vn-event-arrow-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-arrow-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "transparent": true,
+      "sourceBytes": 3866711,
+      "runtimeBytes": 774026,
+      "sourceSHA256": "376c62bd42df7be447c1f4b6126c2ca3ffd1dd108754f143b00f84e73ede3e8c",
+      "runtimeSHA256": "ba716e8b63a3cd2df05cba670e52c4caf164eb6735e02847e7781d987780045e"
+    },
+    {
+      "id": "dawn",
+      "original": "source-assets/lust/images/lust-vn-event-dawn-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-dawn-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "transparent": true,
+      "sourceBytes": 3635212,
+      "runtimeBytes": 701418,
+      "sourceSHA256": "2c457d512902a5202df57a7770d6b5cf14e43f71f27e9ea7957fe8d0d5f8808e",
+      "runtimeSHA256": "82fc838a111a06c6bd94332989478dd196a50846571ee7415309e37170dd9b81"
+    }
+  ],
+  "prompts": "r5-event-prompts.json",
+  "generated": "r5-event-outputs.json"
+}

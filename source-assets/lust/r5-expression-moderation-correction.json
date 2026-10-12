@@ -1,0 +1,11 @@
+{
+  "initialFailure": "Chapter 10 disappointed-expression output was rejected by image tool (sexual output moderation). Other 23 variants succeeded. The replacement adds a fully opaque high-collar blouse and shawl; therefore it is an expression + modest wardrobe variant, not solely a facial edit.",
+  "job": {
+    "id": "expr-freedom-hurt",
+    "prompt": "Create a modestly clothed PC-98 retro visual-novel expression variant of the SAME adult brown-haired woman in the attached portrait. Preserve her face identity, hair ornament, standing gesture with one lifted open hand, loose gold decorative ribbon, and ivory/teal skirt. Give her a subdued disappointed expression with eyes looking down and gently pressed lips. Add a fully opaque ivory-and-teal woven shawl across her shoulders and upper chest, covering the neckline completely; a high-collar cloth blouse underneath, no cleavage, no exposed torso. This is a quiet story conversation portrait with an ordinary worried facial expression. Keep crisp pixel clusters, ordered dithering and retro palette; transparent background, no diffuse background glow, no scene, no text, no other people. Portrait from head to knees, hands remain visible. Safe fully clothed adult character, no suggestive pose or sensual framing.",
+    "referenced_image_paths": [
+      "/workspace/generated_images/exec-6aa581e9-3066-41d7-8bfc-f7006badc909.png"
+    ],
+    "transparent_background": true
+  }
+}

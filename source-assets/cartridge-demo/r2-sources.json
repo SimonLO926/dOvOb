@@ -1,0 +1,67 @@
+{
+  "reference_url": "https://x.com/ann_nnng/status/2109257723246501895?s=20",
+  "reference_viewed": false,
+  "reference_access_result": "403 Forbidden",
+  "new_generated_images": false,
+  "external_3d_models": false,
+  "three_version": "0.180.0",
+  "license": "THREE-LICENSE.txt",
+  "sources": [
+    {
+      "path": "bridge/assets/greed-first.webp",
+      "bytes": 379958,
+      "sha256": "9f92a2d25471f623c1a2d4d0c6f571dabb24f7c10ab490225a7b414055195001"
+    },
+    {
+      "path": "bridge/assets/pride-first.webp",
+      "bytes": 446764,
+      "sha256": "10c8b66b05aa99350b30d16eb3f7e6ff1ebbd95fc4d0253bb0de3ef3b842fc6f"
+    },
+    {
+      "path": "bridge/assets/envy-first.webp",
+      "bytes": 433218,
+      "sha256": "8e3a0b9655ec284b5968589bf67c8f29315d874f4296d2748e4ff264b40fc2c8"
+    },
+    {
+      "path": "bridge/assets/lust-cupid-r2.webp",
+      "bytes": 551290,
+      "sha256": "3286ce6ce8a05dc0981a0e57b06898e78b29ece0af6c03cf1fcda594766e36c2"
+    },
+    {
+      "path": "bridge/assets/mischief-cat.webp",
+      "bytes": 459684,
+      "sha256": "26491d162bd1aa69fe7817b9d0ce476c3a1545c4afcb6d5a7c45716709d2e44c"
+    },
+    {
+      "path": "bridge/fonts/fusion-pixel-ja.woff2",
+      "bytes": 674872,
+      "sha256": "7346d5a1f370db34dece0e30bebc081d374ffb6259ca9dbc6c5f21f437692fcb"
+    },
+    {
+      "path": "bridge/fonts/fusion-pixel-ko.woff2",
+      "bytes": 672564,
+      "sha256": "c5dbe5a0332cb565c979d4dfd7446a8b252257a29fa1f4cc2345ee811ffa62d6"
+    },
+    {
+      "path": "bridge/fonts/fusion-pixel-latin.woff2",
+      "bytes": 667320,
+      "sha256": "4fd6e3018dd2cbb3aa026f4589ce6aef7fbb2cc90b40ad89ae8ce512dba20cb0"
+    },
+    {
+      "path": "bridge/fonts/fusion-pixel-zh-hans.woff2",
+      "bytes": 666264,
+      "sha256": "0ebd99e6f1e9b650a793a3f759c1c3dfa99f0c5b6502e78569b48ddb43767e40"
+    },
+    {
+      "path": "bridge/fonts/fusion-pixel-zh-hant.woff2",
+      "bytes": 674292,
+      "sha256": "b945152ac31b82649f036793e94fba4918b4afaf62033683bba78dd753bb4242"
+    }
+  ],
+  "design_decisions": "Current Crazy concept/lore panels plus larger procedural handheld/cards; light/dark from main prefs, seven pixel-font languages, zoom/pinch, single aperture-star shader, actual isolated Boss routes.",
+  "version": "r2",
+  "generated_prompts": "None: reused adopted art; hardware and shader effects are source-code geometry.",
+  "preserved_r1": "drafts/r1/",
+  "formal_files_changed": false,
+  "translations": "Faithful new selector translations for ja/ko/pt/es; existing Boss gameplay retains current language support."
+}

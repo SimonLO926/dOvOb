@@ -1,0 +1,42 @@
+{
+  "reference_url": "https://x.com/ann_nnng/status/2109257723246501895?s=20",
+  "reference_viewed": false,
+  "reference_access_result": "403 Forbidden",
+  "new_generated_images": false,
+  "external_3d_models": false,
+  "three_version": "0.180.0",
+  "license": "THREE-LICENSE.txt",
+  "sources": [
+    {
+      "path": "bridge/assets/greed-first.webp",
+      "bytes": 379958,
+      "sha256": "9f92a2d25471f623c1a2d4d0c6f571dabb24f7c10ab490225a7b414055195001"
+    },
+    {
+      "path": "bridge/assets/pride-first.webp",
+      "bytes": 446764,
+      "sha256": "10c8b66b05aa99350b30d16eb3f7e6ff1ebbd95fc4d0253bb0de3ef3b842fc6f"
+    },
+    {
+      "path": "bridge/assets/envy-first.webp",
+      "bytes": 433218,
+      "sha256": "8e3a0b9655ec284b5968589bf67c8f29315d874f4296d2748e4ff264b40fc2c8"
+    },
+    {
+      "path": "bridge/assets/lust-cupid-r2.webp",
+      "bytes": 551290,
+      "sha256": "3286ce6ce8a05dc0981a0e57b06898e78b29ece0af6c03cf1fcda594766e36c2"
+    },
+    {
+      "path": "bridge/assets/mischief-cat.webp",
+      "bytes": 459684,
+      "sha256": "26491d162bd1aa69fe7817b9d0ce476c3a1545c4afcb6d5a7c45716709d2e44c"
+    },
+    {
+      "path": "bridge/fonts/fusion-pixel-zh-hant.woff2",
+      "bytes": 674292,
+      "sha256": "b945152ac31b82649f036793e94fba4918b4afaf62033683bba78dd753bb4242"
+    }
+  ],
+  "design_decisions": "Procedural ivory handheld, draggable grey cartridges, reuse adopted Boss art, view-dependent foil and static LCD scanlines. Standalone original Bridge sample only."
+}

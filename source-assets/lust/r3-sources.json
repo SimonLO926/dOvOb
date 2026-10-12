@@ -1,0 +1,137 @@
+{
+  "base": "f3eb15f",
+  "version": "1.2.34",
+  "status": "local unapproved preview r3",
+  "userCorrection": "女性來的，怪物3頭身，胸部是頭，都為女性",
+  "coverageDifference": "First direct-anatomy prompt rejected by image tool (sexual moderation). Adopted head fully opaque petal covered; no ordinary human face. One initial covered long-leg output retained as unadopted draft.",
+  "references": [
+    {
+      "path": "source-assets/greed/images/greed-defeated.png",
+      "sha256": "1605ab811f6b34ae7b2df49147ec115cb825323d941fbc2eed41e5003a89f0d5"
+    },
+    {
+      "path": "source-assets/pride/images/pride-mirror-defeated.png",
+      "sha256": "4db43125e4ff0342803c682c0b81972111fcde1d8a770ba64d91f5539a856655"
+    },
+    {
+      "path": "source-assets/pride/images/pride-tower-ruins.png",
+      "sha256": "b4ec6db504b26c9145434c8c6ad80c478e822d2ad170edfacaab06e049232a9d"
+    }
+  ],
+  "design": {
+    "path": "source-assets/lust/design/lust-design-original.md",
+    "bytes": 3990,
+    "sha256": "4968d027d8e1f59a19ef6c9c38a2a445b6e7bc245f40ef9be7f80c9e22be4f64"
+  },
+  "images": [
+    {
+      "path": "source-assets/lust/images/lust-bad-r3.png",
+      "bytes": 3803465,
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "5b0353d6ff465722af44acf70eb1c54de20b8405818eab49ae5e8ba96af1e928",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-bad-r3.webp",
+        "bytes": 689972,
+        "size": [
+          1536,
+          1024
+        ],
+        "quality": 88,
+        "sha256": "949f4c429d7bd4cab7b741fe7648aff9899f5046f947f94e6cad54d7b4b73ac7"
+      }
+    },
+    {
+      "path": "source-assets/lust/images/lust-lost-r3.png",
+      "bytes": 3809460,
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "f5109be8d7f65e17b93cd0cacbfa03dd63b3c267f67d9f310aa685ddafa25c62",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-lost-r3.webp",
+        "bytes": 709534,
+        "size": [
+          1536,
+          1024
+        ],
+        "quality": 88,
+        "sha256": "97061b8f55659ad64ff22bf035a10361fe4452be1d2cbe871db609ea89084ce0"
+      }
+    },
+    {
+      "path": "source-assets/lust/images/lust-monster-r3-long-leg-draft.png",
+      "bytes": 3610925,
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "cfbbd2ddd6c38ccdfa47c02346b5d5d18c0ead626649682167935f3e78cf2670",
+      "adopted": false
+    },
+    {
+      "path": "source-assets/lust/images/lust-monster-r3.png",
+      "bytes": 3679164,
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "d7f8983488b825240ffbf3c47f599e1f7aa735ab3f6a07ce9003348be3a1e86e",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-monster-r3.webp",
+        "bytes": 679692,
+        "size": [
+          1536,
+          1024
+        ],
+        "quality": 88,
+        "sha256": "3c6642111e49ca37c50b924896f56c6825b9da90aea8d5642d499297208cf044"
+      }
+    },
+    {
+      "path": "source-assets/lust/images/lust-rage-r3.png",
+      "bytes": 3722379,
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "1a2d593e17afe1691f52b3881f55413d63f093dfaea5bc7af16a9601da47a78c",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-rage-r3.webp",
+        "bytes": 689650,
+        "size": [
+          1536,
+          1024
+        ],
+        "quality": 88,
+        "sha256": "abf8bf2ba6b60dcb5feb4320076f49591271322be63ad17422fa4a9d0f499e98"
+      }
+    }
+  ],
+  "unchangedRuntime": [
+    "intro-r2",
+    "cupid-r2",
+    "transform-r2",
+    "body-r2",
+    "good-r2",
+    "clouds-r2"
+  ],
+  "historyRetained": [
+    "sources.json",
+    "r2-sources.json"
+  ],
+  "prompts": [
+    "r3-variant-prompts.json",
+    "r3-ratio-correction.json",
+    "r3-covered-prompt.json",
+    "r3-monster-prompt.json",
+    "r3-generation-outputs.json"
+  ]
+}

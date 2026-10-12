@@ -1,0 +1,42 @@
+[
+  {
+    "status": "fulfilled",
+    "value": {
+      "id": "cafe",
+      "path": "/workspace/generated_images/exec-cd6fb315-4498-4931-bdea-58625da24aeb.png",
+      "hint": "Generated images are saved to /workspace/generated_images as /workspace/generated_images/exec-cd6fb315-4498-4931-bdea-58625da24aeb.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "id": "shore",
+      "path": "/workspace/generated_images/exec-f93464c0-8765-43ad-85ec-fe6979ae133d.png",
+      "hint": "Generated images are saved to /workspace/generated_images as /workspace/generated_images/exec-f93464c0-8765-43ad-85ec-fe6979ae133d.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "id": "dawn",
+      "path": "/workspace/generated_images/exec-1659e401-a82f-4e7c-8905-8c3d65bf0c30.png",
+      "hint": "Generated images are saved to /workspace/generated_images as /workspace/generated_images/exec-1659e401-a82f-4e7c-8905-8c3d65bf0c30.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "id": "shadow",
+      "path": "/workspace/generated_images/exec-0498766c-c5db-4974-a476-e0b29ebc85a3.png",
+      "hint": "Generated images are saved to /workspace/generated_images as /workspace/generated_images/exec-0498766c-c5db-4974-a476-e0b29ebc85a3.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "id": "cupid-portrait",
+      "path": "/workspace/generated_images/exec-b20d9a12-e6c9-414b-afe7-f44543a40b8d.png",
+      "hint": "Generated images are saved to /workspace/generated_images as /workspace/generated_images/exec-b20d9a12-e6c9-414b-afe7-f44543a40b8d.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+    }
+  }
+]

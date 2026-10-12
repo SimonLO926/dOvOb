@@ -1,0 +1,60 @@
+{
+  "reason": "Latest user instruction: retain dating design, adopt PC-98 classic pixel / retro galgame.",
+  "jobs": [
+    {
+      "id": "cafe",
+      "transparent_background": false,
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-r4.png"
+      ],
+      "prompt": "Edit ONLY the final reference into a CLASSIC JAPANESE PC-98 ERA GALGAME pixel graphic, keeping its scene or single adult female character identity, pose, dress and composition. The earlier references establish this game's world and color mood only. Target PC-98 1990s adventure art: clearly visible deliberate pixel clusters, hard pixel edges, 16-color limited palette, iconic ordered checkerboard dithering, 1-bit hatch shadowing, clean 2-pixel anime outlines, flat cel shading with 2 to 3 tonal levels, beautiful expressive retro anime face. NO continuous gradient, NO realistic painted texture, NO photo, NO smooth brush strokes, NO anti-aliasing, NO text or interface. Think native 640x400 PC-98 art adapted to a 4:3 visual novel frame, beautifully composed and finely drawn but visibly RETRO pixel art. Deep indigo, slate blue, teal, ivory, amber and small rose accents. Landscape 4:3 environment ONLY, no characters. Keep all essential scene elements, foreground depth and empty space for dialogue from final reference. No columns, crowns, mirrors, casino or forest."
+    },
+    {
+      "id": "shore",
+      "transparent_background": false,
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-r4.png"
+      ],
+      "prompt": "Edit ONLY the final reference into a CLASSIC JAPANESE PC-98 ERA GALGAME pixel graphic, keeping its scene or single adult female character identity, pose, dress and composition. The earlier references establish this game's world and color mood only. Target PC-98 1990s adventure art: clearly visible deliberate pixel clusters, hard pixel edges, 16-color limited palette, iconic ordered checkerboard dithering, 1-bit hatch shadowing, clean 2-pixel anime outlines, flat cel shading with 2 to 3 tonal levels, beautiful expressive retro anime face. NO continuous gradient, NO realistic painted texture, NO photo, NO smooth brush strokes, NO anti-aliasing, NO text or interface. Think native 640x400 PC-98 art adapted to a 4:3 visual novel frame, beautifully composed and finely drawn but visibly RETRO pixel art. Deep indigo, slate blue, teal, ivory, amber and small rose accents. Landscape 4:3 environment ONLY, no characters. Keep all essential scene elements, foreground depth and empty space for dialogue from final reference. No columns, crowns, mirrors, casino or forest."
+    },
+    {
+      "id": "dawn",
+      "transparent_background": false,
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-r4.png"
+      ],
+      "prompt": "Edit ONLY the final reference into a CLASSIC JAPANESE PC-98 ERA GALGAME pixel graphic, keeping its scene or single adult female character identity, pose, dress and composition. The earlier references establish this game's world and color mood only. Target PC-98 1990s adventure art: clearly visible deliberate pixel clusters, hard pixel edges, 16-color limited palette, iconic ordered checkerboard dithering, 1-bit hatch shadowing, clean 2-pixel anime outlines, flat cel shading with 2 to 3 tonal levels, beautiful expressive retro anime face. NO continuous gradient, NO realistic painted texture, NO photo, NO smooth brush strokes, NO anti-aliasing, NO text or interface. Think native 640x400 PC-98 art adapted to a 4:3 visual novel frame, beautifully composed and finely drawn but visibly RETRO pixel art. Deep indigo, slate blue, teal, ivory, amber and small rose accents. Landscape 4:3 environment ONLY, no characters. Keep all essential scene elements, foreground depth and empty space for dialogue from final reference. No columns, crowns, mirrors, casino or forest."
+    },
+    {
+      "id": "shadow",
+      "transparent_background": true,
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-r4.png"
+      ],
+      "prompt": "Edit ONLY the final reference into a CLASSIC JAPANESE PC-98 ERA GALGAME pixel graphic, keeping its scene or single adult female character identity, pose, dress and composition. The earlier references establish this game's world and color mood only. Target PC-98 1990s adventure art: clearly visible deliberate pixel clusters, hard pixel edges, 16-color limited palette, iconic ordered checkerboard dithering, 1-bit hatch shadowing, clean 2-pixel anime outlines, flat cel shading with 2 to 3 tonal levels, beautiful expressive retro anime face. NO continuous gradient, NO realistic painted texture, NO photo, NO smooth brush strokes, NO anti-aliasing, NO text or interface. Think native 640x400 PC-98 art adapted to a 4:3 visual novel frame, beautifully composed and finely drawn but visibly RETRO pixel art. Deep indigo, slate blue, teal, ivory, amber and small rose accents. Single clearly adult FEMALE full-body standing sprite ONLY on transparent background, complete silhouette, no scenery, no second person. Keep the last reference's modest opaque dress and wings if any."
+    },
+    {
+      "id": "cupid-portrait",
+      "transparent_background": true,
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-r4.png"
+      ],
+      "prompt": "Edit ONLY the final reference into a CLASSIC JAPANESE PC-98 ERA GALGAME pixel graphic, keeping its scene or single adult female character identity, pose, dress and composition. The earlier references establish this game's world and color mood only. Target PC-98 1990s adventure art: clearly visible deliberate pixel clusters, hard pixel edges, 16-color limited palette, iconic ordered checkerboard dithering, 1-bit hatch shadowing, clean 2-pixel anime outlines, flat cel shading with 2 to 3 tonal levels, beautiful expressive retro anime face. NO continuous gradient, NO realistic painted texture, NO photo, NO smooth brush strokes, NO anti-aliasing, NO text or interface. Think native 640x400 PC-98 art adapted to a 4:3 visual novel frame, beautifully composed and finely drawn but visibly RETRO pixel art. Deep indigo, slate blue, teal, ivory, amber and small rose accents. Single clearly adult FEMALE full-body standing sprite ONLY on transparent background, complete silhouette, no scenery, no second person. Keep the last reference's modest opaque dress and wings if any."
+    }
+  ]
+}

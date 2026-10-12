@@ -1,0 +1,173 @@
+{
+  "purpose": "Twelve chapter-specific PC-98 female event portraits; story and poses authored as prototype, not supplied formal lore.",
+  "jobs": [
+    {
+      "id": "rain",
+      "chapter": 1,
+      "who": "shadow",
+      "prompt": "Create ONE transparent-background event-specific character standing illustration for chapter 1 of an original adult-female PC-98-era retro Galgame. This is a new POSE of the SAME adult brown-haired woman in reference 1, with the identical ivory-and-teal gold-trimmed dress, rose hair ornament and facial identity. All depicted people are adult women. Only ONE person, no duplicates, no other people, no scene, no panels, no text. Rain at the tea room. She holds a ceramic cup with both hands close to her chest, damp wavy brown hair, a quiet hesitant expression. A few rain beads on her cuffs. Draw from head down to knees with generous safe margins, both hands and the event prop fully visible. Narrow portrait image, transparent exterior, coherent anatomy, elegant slender face, expressive body acting. The first two actual references define the PC-98 limited-palette pixel/dither rendering and character identities: crisp small pixel clusters, intentional ordered dithering, dark outlined edges, retro hand-drawn visual-novel portrait shading. Do not use smooth anime gradients or photo-realism. The last three actual adopted series paintings supply only fantasy material-color richness; DO NOT borrow their casino, crown mirrors or architecture, and do not replace the first two references' PC-98 style with the last three's detailed painting style. This portrait will stand on the right side of an existing 4:3 story screen, so its face, hands and props must all read clearly above the lower dialogue box. Transparent background; no UI, lettering, logos or watermarks.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "rest",
+      "chapter": 2,
+      "who": "shadow",
+      "prompt": "Create ONE transparent-background event-specific character standing illustration for chapter 2 of an original adult-female PC-98-era retro Galgame. This is a new POSE of the SAME adult brown-haired woman in reference 1, with the identical ivory-and-teal gold-trimmed dress, rose hair ornament and facial identity. All depicted people are adult women. Only ONE person, no duplicates, no other people, no scene, no panels, no text. Quiet rest. She sits on a small wooden stool, holding two unused paper admission tickets in her lap, tired eyes, relaxed shoulders, asking for a peaceful evening. Draw from head down to knees with generous safe margins, both hands and the event prop fully visible. Narrow portrait image, transparent exterior, coherent anatomy, elegant slender face, expressive body acting. The first two actual references define the PC-98 limited-palette pixel/dither rendering and character identities: crisp small pixel clusters, intentional ordered dithering, dark outlined edges, retro hand-drawn visual-novel portrait shading. Do not use smooth anime gradients or photo-realism. The last three actual adopted series paintings supply only fantasy material-color richness; DO NOT borrow their casino, crown mirrors or architecture, and do not replace the first two references' PC-98 style with the last three's detailed painting style. This portrait will stand on the right side of an existing 4:3 story screen, so its face, hands and props must all read clearly above the lower dialogue box. Transparent background; no UI, lettering, logos or watermarks.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "gift",
+      "chapter": 3,
+      "who": "cupid",
+      "prompt": "Create ONE transparent-background event-specific character standing illustration for chapter 3 of an original adult-female PC-98-era retro Galgame. This is a new POSE of the SAME adult rose-haired female Cupid in reference 2, with the identical ivory-and-gold outfit, rose hair, delicate white wings and facial identity. All depicted people are adult women. Only ONE person, no duplicates, no other people, no scene, no panels, no text. A gift without a price. She holds a tiny ornate golden pendant in one open hand and a simple feather bookmark in the other, looking thoughtfully toward the bookmark. Draw from head down to knees with generous safe margins, both hands and the event prop fully visible. Narrow portrait image, transparent exterior, coherent anatomy, elegant slender face, expressive body acting. The first two actual references define the PC-98 limited-palette pixel/dither rendering and character identities: crisp small pixel clusters, intentional ordered dithering, dark outlined edges, retro hand-drawn visual-novel portrait shading. Do not use smooth anime gradients or photo-realism. The last three actual adopted series paintings supply only fantasy material-color richness; DO NOT borrow their casino, crown mirrors or architecture, and do not replace the first two references' PC-98 style with the last three's detailed painting style. This portrait will stand on the right side of an existing 4:3 story screen, so its face, hands and props must all read clearly above the lower dialogue box. Transparent background; no UI, lettering, logos or watermarks.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "name",
+      "chapter": 4,
+      "who": "shadow",
+      "prompt": "Create ONE transparent-background event-specific character standing illustration for chapter 4 of an original adult-female PC-98-era retro Galgame. This is a new POSE of the SAME adult brown-haired woman in reference 1, with the identical ivory-and-teal gold-trimmed dress, rose hair ornament and facial identity. All depicted people are adult women. Only ONE person, no duplicates, no other people, no scene, no panels, no text. A name of her own. She kneels slightly, one hand holding a short stick for drawing a name in sand, the other guarding a small folded blank note. Determined shy expression. No readable writing. Draw from head down to knees with generous safe margins, both hands and the event prop fully visible. Narrow portrait image, transparent exterior, coherent anatomy, elegant slender face, expressive body acting. The first two actual references define the PC-98 limited-palette pixel/dither rendering and character identities: crisp small pixel clusters, intentional ordered dithering, dark outlined edges, retro hand-drawn visual-novel portrait shading. Do not use smooth anime gradients or photo-realism. The last three actual adopted series paintings supply only fantasy material-color richness; DO NOT borrow their casino, crown mirrors or architecture, and do not replace the first two references' PC-98 style with the last three's detailed painting style. This portrait will stand on the right side of an existing 4:3 story screen, so its face, hands and props must all read clearly above the lower dialogue box. Transparent background; no UI, lettering, logos or watermarks.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "tears",
+      "chapter": 5,
+      "who": "shadow",
+      "prompt": "Create ONE transparent-background event-specific character standing illustration for chapter 5 of an original adult-female PC-98-era retro Galgame. This is a new POSE of the SAME adult brown-haired woman in reference 1, with the identical ivory-and-teal gold-trimmed dress, rose hair ornament and facial identity. All depicted people are adult women. Only ONE person, no duplicates, no other people, no scene, no panels, no text. Tears beside the tide. She gently dabs her eyes with a white handkerchief, one visible tear, a vulnerable yet dignified adult expression. Draw from head down to knees with generous safe margins, both hands and the event prop fully visible. Narrow portrait image, transparent exterior, coherent anatomy, elegant slender face, expressive body acting. The first two actual references define the PC-98 limited-palette pixel/dither rendering and character identities: crisp small pixel clusters, intentional ordered dithering, dark outlined edges, retro hand-drawn visual-novel portrait shading. Do not use smooth anime gradients or photo-realism. The last three actual adopted series paintings supply only fantasy material-color richness; DO NOT borrow their casino, crown mirrors or architecture, and do not replace the first two references' PC-98 style with the last three's detailed painting style. This portrait will stand on the right side of an existing 4:3 story screen, so its face, hands and props must all read clearly above the lower dialogue box. Transparent background; no UI, lettering, logos or watermarks.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "mending",
+      "chapter": 6,
+      "who": "cupid",
+      "prompt": "Create ONE transparent-background event-specific character standing illustration for chapter 6 of an original adult-female PC-98-era retro Galgame. This is a new POSE of the SAME adult rose-haired female Cupid in reference 2, with the identical ivory-and-gold outfit, rose hair, delicate white wings and facial identity. All depicted people are adult women. Only ONE person, no duplicates, no other people, no scene, no panels, no text. Mending a broken bow. She carefully wraps thread around a SMALL broken golden bow held horizontally, sewing tools tucked into a cloth pouch. Concentrated gentle expression, wings relaxed. Draw from head down to knees with generous safe margins, both hands and the event prop fully visible. Narrow portrait image, transparent exterior, coherent anatomy, elegant slender face, expressive body acting. The first two actual references define the PC-98 limited-palette pixel/dither rendering and character identities: crisp small pixel clusters, intentional ordered dithering, dark outlined edges, retro hand-drawn visual-novel portrait shading. Do not use smooth anime gradients or photo-realism. The last three actual adopted series paintings supply only fantasy material-color richness; DO NOT borrow their casino, crown mirrors or architecture, and do not replace the first two references' PC-98 style with the last three's detailed painting style. This portrait will stand on the right side of an existing 4:3 story screen, so its face, hands and props must all read clearly above the lower dialogue box. Transparent background; no UI, lettering, logos or watermarks.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "distance",
+      "chapter": 7,
+      "who": "shadow",
+      "prompt": "Create ONE transparent-background event-specific character standing illustration for chapter 7 of an original adult-female PC-98-era retro Galgame. This is a new POSE of the SAME adult brown-haired woman in reference 1, with the identical ivory-and-teal gold-trimmed dress, rose hair ornament and facial identity. All depicted people are adult women. Only ONE person, no duplicates, no other people, no scene, no panels, no text. A little space. Seen in three-quarter view looking back over one shoulder, one hand raised in a reassuring goodbye wave, windy hair and flowing ivory and teal skirt. Draw from head down to knees with generous safe margins, both hands and the event prop fully visible. Narrow portrait image, transparent exterior, coherent anatomy, elegant slender face, expressive body acting. The first two actual references define the PC-98 limited-palette pixel/dither rendering and character identities: crisp small pixel clusters, intentional ordered dithering, dark outlined edges, retro hand-drawn visual-novel portrait shading. Do not use smooth anime gradients or photo-realism. The last three actual adopted series paintings supply only fantasy material-color richness; DO NOT borrow their casino, crown mirrors or architecture, and do not replace the first two references' PC-98 style with the last three's detailed painting style. This portrait will stand on the right side of an existing 4:3 story screen, so its face, hands and props must all read clearly above the lower dialogue box. Transparent background; no UI, lettering, logos or watermarks.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "tomorrow",
+      "chapter": 8,
+      "who": "shadow",
+      "prompt": "Create ONE transparent-background event-specific character standing illustration for chapter 8 of an original adult-female PC-98-era retro Galgame. This is a new POSE of the SAME adult brown-haired woman in reference 1, with the identical ivory-and-teal gold-trimmed dress, rose hair ornament and facial identity. All depicted people are adult women. Only ONE person, no duplicates, no other people, no scene, no panels, no text. Different tomorrows. She holds a small sketchbook with simple non-text line sketches of a seaside tea room, pencil in hand, enthusiastic but nervous smile. Draw from head down to knees with generous safe margins, both hands and the event prop fully visible. Narrow portrait image, transparent exterior, coherent anatomy, elegant slender face, expressive body acting. The first two actual references define the PC-98 limited-palette pixel/dither rendering and character identities: crisp small pixel clusters, intentional ordered dithering, dark outlined edges, retro hand-drawn visual-novel portrait shading. Do not use smooth anime gradients or photo-realism. The last three actual adopted series paintings supply only fantasy material-color richness; DO NOT borrow their casino, crown mirrors or architecture, and do not replace the first two references' PC-98 style with the last three's detailed painting style. This portrait will stand on the right side of an existing 4:3 story screen, so its face, hands and props must all read clearly above the lower dialogue box. Transparent background; no UI, lettering, logos or watermarks.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "fear",
+      "chapter": 9,
+      "who": "cupid",
+      "prompt": "Create ONE transparent-background event-specific character standing illustration for chapter 9 of an original adult-female PC-98-era retro Galgame. This is a new POSE of the SAME adult rose-haired female Cupid in reference 2, with the identical ivory-and-gold outfit, rose hair, delicate white wings and facial identity. All depicted people are adult women. Only ONE person, no duplicates, no other people, no scene, no panels, no text. Afraid of being forgotten. She holds a warm glass lantern low in one hand, the other hand over her heart, lowered wings, honest worried expression, no tears or violent imagery. Draw from head down to knees with generous safe margins, both hands and the event prop fully visible. Narrow portrait image, transparent exterior, coherent anatomy, elegant slender face, expressive body acting. The first two actual references define the PC-98 limited-palette pixel/dither rendering and character identities: crisp small pixel clusters, intentional ordered dithering, dark outlined edges, retro hand-drawn visual-novel portrait shading. Do not use smooth anime gradients or photo-realism. The last three actual adopted series paintings supply only fantasy material-color richness; DO NOT borrow their casino, crown mirrors or architecture, and do not replace the first two references' PC-98 style with the last three's detailed painting style. This portrait will stand on the right side of an existing 4:3 story screen, so its face, hands and props must all read clearly above the lower dialogue box. Transparent background; no UI, lettering, logos or watermarks.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "freedom",
+      "chapter": 10,
+      "who": "shadow",
+      "prompt": "Create ONE transparent-background event-specific character standing illustration for chapter 10 of an original adult-female PC-98-era retro Galgame. This is a new POSE of the SAME adult brown-haired woman in reference 1, with the identical ivory-and-teal gold-trimmed dress, rose hair ornament and facial identity. All depicted people are adult women. Only ONE person, no duplicates, no other people, no scene, no panels, no text. Love without orders. She lifts one wrist with a LOOSE nonrestrictive golden ribbon slipping away, open palm, confident gentle eye contact. The ribbon is decorative magic, no restraint pose. Draw from head down to knees with generous safe margins, both hands and the event prop fully visible. Narrow portrait image, transparent exterior, coherent anatomy, elegant slender face, expressive body acting. The first two actual references define the PC-98 limited-palette pixel/dither rendering and character identities: crisp small pixel clusters, intentional ordered dithering, dark outlined edges, retro hand-drawn visual-novel portrait shading. Do not use smooth anime gradients or photo-realism. The last three actual adopted series paintings supply only fantasy material-color richness; DO NOT borrow their casino, crown mirrors or architecture, and do not replace the first two references' PC-98 style with the last three's detailed painting style. This portrait will stand on the right side of an existing 4:3 story screen, so its face, hands and props must all read clearly above the lower dialogue box. Transparent background; no UI, lettering, logos or watermarks.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "arrow",
+      "chapter": 11,
+      "who": "cupid",
+      "prompt": "Create ONE transparent-background event-specific character standing illustration for chapter 11 of an original adult-female PC-98-era retro Galgame. This is a new POSE of the SAME adult rose-haired female Cupid in reference 2, with the identical ivory-and-gold outfit, rose hair, delicate white wings and facial identity. All depicted people are adult women. Only ONE person, no duplicates, no other people, no scene, no panels, no text. The last golden arrow. She lowers a single golden arrow vertically away from every person, empty other hand open, resolute expression. Small bent golden bow at her side, relaxed wings. Draw from head down to knees with generous safe margins, both hands and the event prop fully visible. Narrow portrait image, transparent exterior, coherent anatomy, elegant slender face, expressive body acting. The first two actual references define the PC-98 limited-palette pixel/dither rendering and character identities: crisp small pixel clusters, intentional ordered dithering, dark outlined edges, retro hand-drawn visual-novel portrait shading. Do not use smooth anime gradients or photo-realism. The last three actual adopted series paintings supply only fantasy material-color richness; DO NOT borrow their casino, crown mirrors or architecture, and do not replace the first two references' PC-98 style with the last three's detailed painting style. This portrait will stand on the right side of an existing 4:3 story screen, so its face, hands and props must all read clearly above the lower dialogue box. Transparent background; no UI, lettering, logos or watermarks.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": true
+    },
+    {
+      "id": "dawn",
+      "chapter": 12,
+      "who": "shadow",
+      "prompt": "Create ONE transparent-background event-specific character standing illustration for chapter 12 of an original adult-female PC-98-era retro Galgame. This is a new POSE of the SAME adult brown-haired woman in reference 1, with the identical ivory-and-teal gold-trimmed dress, rose hair ornament and facial identity. All depicted people are adult women. Only ONE person, no duplicates, no other people, no scene, no panels, no text. Toward the dawn. She faces the viewer with a calm hopeful smile, one open hand extended invitingly, the other holding the feather bookmark, freely choosing her next step. Draw from head down to knees with generous safe margins, both hands and the event prop fully visible. Narrow portrait image, transparent exterior, coherent anatomy, elegant slender face, expressive body acting. The first two actual references define the PC-98 limited-palette pixel/dither rendering and character identities: crisp small pixel clusters, intentional ordered dithering, dark outlined edges, retro hand-drawn visual-novel portrait shading. Do not use smooth anime gradients or photo-realism. The last three actual adopted series paintings supply only fantasy material-color richness; DO NOT borrow their casino, crown mirrors or architecture, and do not replace the first two references' PC-98 style with the last three's detailed painting style. This portrait will stand on the right side of an existing 4:3 story screen, so its face, hands and props must all read clearly above the lower dialogue box. Transparent background; no UI, lettering, logos or watermarks.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": true
+    }
+  ]
+}

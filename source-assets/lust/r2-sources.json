@@ -1,0 +1,244 @@
+{
+  "base": "f3eb15f",
+  "version": "1.2.34",
+  "status": "local unapproved preview r2",
+  "remoteVerifiedVia": "GitHub REST branch/master (git fetch credentials unavailable this turn)",
+  "remoteHead": "f3eb15f4c224641c80443d948bc2d92dc8078fc2",
+  "references": [
+    {
+      "path": "source-assets/greed/images/greed-defeated.png",
+      "sha256": "1605ab811f6b34ae7b2df49147ec115cb825323d941fbc2eed41e5003a89f0d5"
+    },
+    {
+      "path": "source-assets/pride/images/pride-mirror-defeated.png",
+      "sha256": "4db43125e4ff0342803c682c0b81972111fcde1d8a770ba64d91f5539a856655"
+    },
+    {
+      "path": "source-assets/pride/images/pride-tower-ruins.png",
+      "sha256": "b4ec6db504b26c9145434c8c6ad80c478e822d2ad170edfacaab06e049232a9d"
+    }
+  ],
+  "design": {
+    "path": "source-assets/lust/design/lust-design-original.md",
+    "bytes": 3990,
+    "sha256": "4968d027d8e1f59a19ef6c9c38a2a445b6e7bc245f40ef9be7f80c9e22be4f64"
+  },
+  "images": [
+    {
+      "path": "source-assets/lust/images/lust-bad-r2.png",
+      "bytes": 3517343,
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "3eb5cba9b6ce1ecf7fad3a29d7cd90f772d79ecd5fb513cfab07712f93ecdd63",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-bad-r2.webp",
+        "size": [
+          1672,
+          941
+        ],
+        "bytes": 588814,
+        "sha256": "f8822475028147bb6dc1975228258db8c6a2e9d3cca24702a0068c268d85aaa4",
+        "quality": 88
+      }
+    },
+    {
+      "path": "source-assets/lust/images/lust-body-r2.png",
+      "bytes": 3356894,
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "24942243cb2185847dbe423e4d640c0d2d09c2f0196eb7f0acbd6479fd9c5fd5",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-body-r2.webp",
+        "size": [
+          1672,
+          941
+        ],
+        "bytes": 555106,
+        "sha256": "a8f6470ae219fb771ac8e29a7e193e44b54f59a2fcb54dc019852aced2e80ab9",
+        "quality": 88
+      }
+    },
+    {
+      "path": "source-assets/lust/images/lust-clouds-r2.png",
+      "bytes": 3306541,
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "e5c3e75a285a792bb14ce874e452712818f6e69b2c5e922b5b9e2756fbd5e2c0",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-clouds-r2.webp",
+        "size": [
+          1536,
+          1024
+        ],
+        "bytes": 557294,
+        "sha256": "a433df3b37d6fecf38c72c96613a85b65ca24958dc6a29987d7f538967cb6546",
+        "quality": 88
+      }
+    },
+    {
+      "path": "source-assets/lust/images/lust-cupid-r2.png",
+      "bytes": 3350197,
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "8acd6bf1cef2282ba79056d73c3c16dc213f3081568cf6a9384f873bac161c5d",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-cupid-r2.webp",
+        "size": [
+          1536,
+          1024
+        ],
+        "bytes": 551290,
+        "sha256": "3286ce6ce8a05dc0981a0e57b06898e78b29ece0af6c03cf1fcda594766e36c2",
+        "quality": 88
+      }
+    },
+    {
+      "path": "source-assets/lust/images/lust-good-r2.png",
+      "bytes": 3415958,
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "064d8635db72cc8e82b2195c9b7042c1c37354b8243171bb49375d61d51af72f",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-good-r2.webp",
+        "size": [
+          1536,
+          1024
+        ],
+        "bytes": 563884,
+        "sha256": "6466bbbfd735fed121bb5485ddfd104944de9fdcbb378a0a59c1e19e3519f280",
+        "quality": 88
+      }
+    },
+    {
+      "path": "source-assets/lust/images/lust-intro-r2-male-draft.png",
+      "bytes": 3334299,
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "fdb4f066f0ee6c2936ffafc593bd187f37d0e778f23f62a1440003c18186af91",
+      "adopted": false
+    },
+    {
+      "path": "source-assets/lust/images/lust-intro-r2.png",
+      "bytes": 3468462,
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "ff62c0d9da23890f445c469adcfb7e8ba5ad61c091e479852d3f415bd28c6670",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-intro-r2.webp",
+        "size": [
+          1672,
+          941
+        ],
+        "bytes": 592020,
+        "sha256": "de401097582cd43fb591288031f0205266e6dce6a87e1291b6eae94661e73c66",
+        "quality": 88
+      }
+    },
+    {
+      "path": "source-assets/lust/images/lust-lost-r2.png",
+      "bytes": 3533551,
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "edf403fdc3d93c814afed4f96fdb638bce3563f39bb1ae4b784e8160eb773b53",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-lost-r2.webp",
+        "size": [
+          1536,
+          1024
+        ],
+        "bytes": 606774,
+        "sha256": "252bd17587c1d2a3d9944d85b44901d34d1fac3e8d09f908c6b37806d97f119f",
+        "quality": 88
+      }
+    },
+    {
+      "path": "source-assets/lust/images/lust-monster-r2.png",
+      "bytes": 3533024,
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "2a7f29ba9c3ece1bbde7720d0fc83abf9529314fa69e0237e3b1654d218579b8",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-monster-r2.webp",
+        "size": [
+          1672,
+          941
+        ],
+        "bytes": 579082,
+        "sha256": "f2f53bfba34fe21ffc59b2b0e9ea07f80b52cf8e6cbe3da7dece3d9d97d8fa4c",
+        "quality": 88
+      }
+    },
+    {
+      "path": "source-assets/lust/images/lust-rage-r2.png",
+      "bytes": 3415073,
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "d8cf050b26cbb67093d28b982a66d1a17230cf4e13037ef386f8cae954a85d32",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-rage-r2.webp",
+        "size": [
+          1672,
+          941
+        ],
+        "bytes": 578504,
+        "sha256": "1285c1998dc3cfdd2cf7208a78fe5118abdd06164371bb0703ac0609aafbf39f",
+        "quality": 88
+      }
+    },
+    {
+      "path": "source-assets/lust/images/lust-transform-r2.png",
+      "bytes": 3621239,
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "b3437a3559ffc7bbedd8536c9ab0d68d4dd59ea0be88b09ad9a603716f2b1e54",
+      "adopted": true,
+      "runtime": {
+        "path": "bridge/assets/lust-transform-r2.webp",
+        "size": [
+          1672,
+          941
+        ],
+        "bytes": 617544,
+        "sha256": "1e70d6e645a29c3e05c70e778030f1f9684fc300e84ed877057d4cc5fdda601b",
+        "quality": 88
+      }
+    }
+  ],
+  "r1Retained": "sources.json",
+  "prompts": [
+    "r2-generation.json",
+    "r2-generation-outputs.json",
+    "r2-intro-correction.json"
+  ]
+}

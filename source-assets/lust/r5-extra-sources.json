@@ -1,0 +1,529 @@
+{
+  "adopted": [
+    {
+      "id": "scene-rain",
+      "original": "source-assets/lust/images/lust-vn-scene-rain-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-scene-rain-pc98-r5.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "alphaPreserved": false,
+      "sourceBytes": 3977163,
+      "runtimeBytes": 804540,
+      "sourceSHA256": "e185a6ed06361546df65c865e831a15126a4dd3fc98248687c9b862ad1fffabf",
+      "runtimeSHA256": "28b0846ded9c01cc68825fec909e23f9ecb2389782860345b273dd44079275da"
+    },
+    {
+      "id": "scene-rest",
+      "original": "source-assets/lust/images/lust-vn-scene-rest-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-scene-rest-pc98-r5.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "alphaPreserved": false,
+      "sourceBytes": 3943957,
+      "runtimeBytes": 768044,
+      "sourceSHA256": "cf606afd3bbea5983074cde47c26aeeb9740252ac1f0c5ab81cf5ea3b87de781",
+      "runtimeSHA256": "040e8efc2a17a41c3f5c472eb638fa8947b3df17d4527fbf8b4c3509e27ef87d"
+    },
+    {
+      "id": "scene-gift",
+      "original": "source-assets/lust/images/lust-vn-scene-gift-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-scene-gift-pc98-r5.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "alphaPreserved": false,
+      "sourceBytes": 3850697,
+      "runtimeBytes": 768852,
+      "sourceSHA256": "fd7800f8de535faaf371b98ece8382a074390f417edf62e512c2c55bb00cb8c2",
+      "runtimeSHA256": "dc3aa5f460a98ac004d47a9ebd286596f6179453d0bade4cf59fbe0b4e74bd33"
+    },
+    {
+      "id": "scene-name",
+      "original": "source-assets/lust/images/lust-vn-scene-name-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-scene-name-pc98-r5.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "alphaPreserved": false,
+      "sourceBytes": 3805772,
+      "runtimeBytes": 744298,
+      "sourceSHA256": "d62453accda53a7a55f8879408b7e545696d31a4b0149a47a147ea961d368832",
+      "runtimeSHA256": "c3a435e40945f69fc627b01b826a49433f9f619bb9ae5b083579818f4a481931"
+    },
+    {
+      "id": "scene-tears",
+      "original": "source-assets/lust/images/lust-vn-scene-tears-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-scene-tears-pc98-r5.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "alphaPreserved": false,
+      "sourceBytes": 3855589,
+      "runtimeBytes": 742604,
+      "sourceSHA256": "7f9b29a0435f36c1c1b7f5cd834386dbb2e53afe3a0f7bbfde77b2fe0a40d316",
+      "runtimeSHA256": "8981e3b90276f0a30db33c1d4d18ddd52682988b89ba1f8a3ee4f4c54e8cf84b"
+    },
+    {
+      "id": "scene-mending",
+      "original": "source-assets/lust/images/lust-vn-scene-mending-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-scene-mending-pc98-r5.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "alphaPreserved": false,
+      "sourceBytes": 3618789,
+      "runtimeBytes": 690362,
+      "sourceSHA256": "dd8883b70795999b3c95552031284594cb74e5af0f178f19012acf7511caee27",
+      "runtimeSHA256": "06cfefab39f4318e265fc0274ed08e330da40b3c0ab3ac3c32b6b53edd3104fa"
+    },
+    {
+      "id": "scene-distance",
+      "original": "source-assets/lust/images/lust-vn-scene-distance-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-scene-distance-pc98-r5.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "alphaPreserved": false,
+      "sourceBytes": 3626774,
+      "runtimeBytes": 683770,
+      "sourceSHA256": "fae36f62907f67f358c502c58b48ea90772b9d2903701a9331caee93560dc51d",
+      "runtimeSHA256": "c50cbc6bc9f0fb5cb866790f75940ac6223ca067dd3f659e20726aacf5e8cfd8"
+    },
+    {
+      "id": "scene-tomorrow",
+      "original": "source-assets/lust/images/lust-vn-scene-tomorrow-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-scene-tomorrow-pc98-r5.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "alphaPreserved": false,
+      "sourceBytes": 4094442,
+      "runtimeBytes": 838404,
+      "sourceSHA256": "38530a476b13cb0545ae14ac3d05b54f0cac068af6c31d928dc7beb35ab32826",
+      "runtimeSHA256": "dbd06959954339ac969f3695fdee766ce05ae5a12731f93339ecc163dd7fce26"
+    },
+    {
+      "id": "scene-fear",
+      "original": "source-assets/lust/images/lust-vn-scene-fear-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-scene-fear-pc98-r5.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "alphaPreserved": false,
+      "sourceBytes": 3828273,
+      "runtimeBytes": 758994,
+      "sourceSHA256": "549230908a1d0aedd4099a8f304a437dff5b300f24b3abfe664044f17edad819",
+      "runtimeSHA256": "4b83cf066737c43baa5079468f38fde6be312f73b8dda9ba915a7ce4fc00dafe"
+    },
+    {
+      "id": "scene-freedom",
+      "original": "source-assets/lust/images/lust-vn-scene-freedom-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-scene-freedom-pc98-r5.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "alphaPreserved": false,
+      "sourceBytes": 3759339,
+      "runtimeBytes": 713786,
+      "sourceSHA256": "7e7085fe332a1cec5085b061182e72867e56c4cbed7468a8f8b77cc35460f459",
+      "runtimeSHA256": "0f55d98928f05fc232c99e3dd08f58737b274b3e7afcaded6cf766b9c0d99159"
+    },
+    {
+      "id": "scene-arrow",
+      "original": "source-assets/lust/images/lust-vn-scene-arrow-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-scene-arrow-pc98-r5.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "alphaPreserved": false,
+      "sourceBytes": 3846407,
+      "runtimeBytes": 776552,
+      "sourceSHA256": "20308fa8ddf9bf43c81e07272bba21a3feaed8d3365b70886e2b001d456fb0bd",
+      "runtimeSHA256": "39e2224332ffad7e43ce4515ea4b8cc8046492e18c4883d17f9251bbaee22bed"
+    },
+    {
+      "id": "scene-dawn",
+      "original": "source-assets/lust/images/lust-vn-scene-dawn-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-scene-dawn-pc98-r5.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "alphaPreserved": false,
+      "sourceBytes": 3882603,
+      "runtimeBytes": 778076,
+      "sourceSHA256": "023b88dcea5558f42b2148e2c5179f66268527c885abf60a2a21c289854e4642",
+      "runtimeSHA256": "7549efeb4ec4f5abe06df3e28c765c0af2d2fee1c448ddb79f51c936a1296837"
+    },
+    {
+      "id": "expr-rain-warm",
+      "original": "source-assets/lust/images/lust-vn-event-rain-warm-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-rain-warm-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3132044,
+      "runtimeBytes": 473092,
+      "sourceSHA256": "91a7fd6b5343130ed8afac4d96e25bae44481f6451113b73b9826001a0d469bb",
+      "runtimeSHA256": "d7103edc73e9e598da8d9677bf7d886403e35bd9568dcf22d4d7a9b89bf48577"
+    },
+    {
+      "id": "expr-rain-hurt",
+      "original": "source-assets/lust/images/lust-vn-event-rain-hurt-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-rain-hurt-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3128973,
+      "runtimeBytes": 481834,
+      "sourceSHA256": "a27fd19b620d5028964cfa20ec9a222344d2197f8ad145c597b4fc63ae38d29b",
+      "runtimeSHA256": "c7d83319babfd1048a900bd46785a8fe5c319dc762bc2f7796d890e1cb7c0fbb"
+    },
+    {
+      "id": "expr-rest-warm",
+      "original": "source-assets/lust/images/lust-vn-event-rest-warm-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-rest-warm-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3188720,
+      "runtimeBytes": 473946,
+      "sourceSHA256": "f8422dc73004178ba960dd7794fa8bbfcce5e39887e905e9508d0bf76a01e3c8",
+      "runtimeSHA256": "5184d40a14251e03c9b3244bd5dfc6e9dd47b27f2d604e4abff7e0b8e7326208"
+    },
+    {
+      "id": "expr-rest-hurt",
+      "original": "source-assets/lust/images/lust-vn-event-rest-hurt-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-rest-hurt-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3258466,
+      "runtimeBytes": 506806,
+      "sourceSHA256": "c5f63ad49ebc3a28e32696d93323496d9ff12a2762fa6ef1e309b63b5562da87",
+      "runtimeSHA256": "7e299d00108a95b86848e077eb98bd33a084810f07adfdd4c37784f9b2767246"
+    },
+    {
+      "id": "expr-gift-warm",
+      "original": "source-assets/lust/images/lust-vn-event-gift-warm-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-gift-warm-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3448740,
+      "runtimeBytes": 552774,
+      "sourceSHA256": "c08872a8156b8ac33ab54a4737aee0a6d38ddcc59971820a8968f5c181206c01",
+      "runtimeSHA256": "8c1cb6b01d496e80f3c0a1e98bcf23b294db2e0ade856a6063b267898049fa4f"
+    },
+    {
+      "id": "expr-gift-hurt",
+      "original": "source-assets/lust/images/lust-vn-event-gift-hurt-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-gift-hurt-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3443706,
+      "runtimeBytes": 548040,
+      "sourceSHA256": "bd6ea3f4f35de49a46b10ce2e0113e8adbb0fac293f026e3b088bcd448737a11",
+      "runtimeSHA256": "1430aeb2f7ad63d31edacba789bab9705ab3be5e3d553536e129315c9f110a77"
+    },
+    {
+      "id": "expr-name-warm",
+      "original": "source-assets/lust/images/lust-vn-event-name-warm-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-name-warm-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3121583,
+      "runtimeBytes": 467786,
+      "sourceSHA256": "28204001a6d2faba29a8c8a95ed4e227af4d8d94f97fd1465a1ed397e322b971",
+      "runtimeSHA256": "eebe4277d20601644e2ece978abeb194435c38001f6338cc0f4430016ab2ddea"
+    },
+    {
+      "id": "expr-name-hurt",
+      "original": "source-assets/lust/images/lust-vn-event-name-hurt-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-name-hurt-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3240691,
+      "runtimeBytes": 503698,
+      "sourceSHA256": "a534b6b916d6aced0d81c14d8b4fbd07dbe2e700d5ee2bffd920b94d902ae074",
+      "runtimeSHA256": "cd31c6748a4637e6330c37bc49bcb5a7098befccbd18089f5bbd3d19cb2380e2"
+    },
+    {
+      "id": "expr-tears-warm",
+      "original": "source-assets/lust/images/lust-vn-event-tears-warm-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-tears-warm-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3335998,
+      "runtimeBytes": 521206,
+      "sourceSHA256": "f413be5e1a1cd4f5913464c80ed4aa600630e6c4ac58ebb085e062a4dd7622ba",
+      "runtimeSHA256": "6873b8cf79c01c0161c58c6f333df81df643e06df907036f19f66910d34bac3e"
+    },
+    {
+      "id": "expr-tears-hurt",
+      "original": "source-assets/lust/images/lust-vn-event-tears-hurt-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-tears-hurt-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3353194,
+      "runtimeBytes": 522342,
+      "sourceSHA256": "b2fd2b569ce34db1403b7ce3a7828fc0732bebb9cfa5f4e510432fbebaf7f700",
+      "runtimeSHA256": "0c3e3449741bacc48edf1cff6665fb9abedd801ed7ec466096f74a20f56705af"
+    },
+    {
+      "id": "expr-mending-warm",
+      "original": "source-assets/lust/images/lust-vn-event-mending-warm-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-mending-warm-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3498237,
+      "runtimeBytes": 555726,
+      "sourceSHA256": "8c2ea4d589db5f205d699d5ba027e1ff24dd0f3bbe41f523eaa11d7c80d24b70",
+      "runtimeSHA256": "d3cf721fab281c37e27b1de745a53bc3f8ef0787e24ad093fc018d03d118eb33"
+    },
+    {
+      "id": "expr-mending-hurt",
+      "original": "source-assets/lust/images/lust-vn-event-mending-hurt-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-mending-hurt-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3490039,
+      "runtimeBytes": 557948,
+      "sourceSHA256": "8ebb8838a4e1fa899b20eba65db65b974f01a4d9ce3f476666435b69c43c93ab",
+      "runtimeSHA256": "bd30b60cfeeacc39d861299e80cbc992619eec8bce485b1cf7205d021d37e005"
+    },
+    {
+      "id": "expr-distance-warm",
+      "original": "source-assets/lust/images/lust-vn-event-distance-warm-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-distance-warm-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3382878,
+      "runtimeBytes": 531416,
+      "sourceSHA256": "c7922c331c3d83f60e39977f41ca01fd5ca6d529e742745bc3bd775c2bacaaf0",
+      "runtimeSHA256": "632584b395da1fc8298266800995b986d90149cb5838d4f8773e8c763b477c54"
+    },
+    {
+      "id": "expr-distance-hurt",
+      "original": "source-assets/lust/images/lust-vn-event-distance-hurt-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-distance-hurt-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3400032,
+      "runtimeBytes": 539818,
+      "sourceSHA256": "5b37cc1e893ecb6d734ee43653bd882885e30eafeb379da558c0e9db223a768d",
+      "runtimeSHA256": "19914c42f618e1a701c8ebab9c9ebe42f1c161608045690e8ba3ed3d22b3e5a1"
+    },
+    {
+      "id": "expr-tomorrow-warm",
+      "original": "source-assets/lust/images/lust-vn-event-tomorrow-warm-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-tomorrow-warm-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3368384,
+      "runtimeBytes": 537306,
+      "sourceSHA256": "a7817f1a3f3c20e0301e525e3aaccec63ada74a70cbd62c0ea812c8504c1a9ae",
+      "runtimeSHA256": "60e63e2f1afe4966ff3aae2892729f09724ac593e295fdd61f1f61f8f3aa42ba"
+    },
+    {
+      "id": "expr-tomorrow-hurt",
+      "original": "source-assets/lust/images/lust-vn-event-tomorrow-hurt-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-tomorrow-hurt-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3367924,
+      "runtimeBytes": 531114,
+      "sourceSHA256": "8e763a0ff413e9114fd28cf131c12bd0f58ea38d22c8e24f2fb7fa0310ba9349",
+      "runtimeSHA256": "eb1730f58354b4fae8dd75de0a0d11b75f46537ddaf1d87c3de09fde1f12ee90"
+    },
+    {
+      "id": "expr-fear-warm",
+      "original": "source-assets/lust/images/lust-vn-event-fear-warm-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-fear-warm-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3303895,
+      "runtimeBytes": 509122,
+      "sourceSHA256": "0b2069720129580276e38ef7b1df0bc7279f454ad4a8ce6656e02a666157bdf6",
+      "runtimeSHA256": "34d88d414ddf7d361732f23ad29b3b7213e0e74dbd42da6c2b5ea0e634f9b77e"
+    },
+    {
+      "id": "expr-fear-hurt",
+      "original": "source-assets/lust/images/lust-vn-event-fear-hurt-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-fear-hurt-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3331705,
+      "runtimeBytes": 514642,
+      "sourceSHA256": "e62b9d8a768899a9c1959982f105f35c09d973beac13a083e0ddbab0d1c62368",
+      "runtimeSHA256": "5a66c912d757db2276b4d17970854713f2c6224fb4bd7d4862895f344f2df501"
+    },
+    {
+      "id": "expr-freedom-warm",
+      "original": "source-assets/lust/images/lust-vn-event-freedom-warm-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-freedom-warm-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3380239,
+      "runtimeBytes": 543522,
+      "sourceSHA256": "2ec55ebf921df03c7599fad590ab53d2b53efc7e283e873d9ab475c0a59c8bb4",
+      "runtimeSHA256": "0e6c6d9af196145296aafafb3c19e6a2ba1a03268d9a30d0d40a9132a091b892"
+    },
+    {
+      "id": "expr-arrow-warm",
+      "original": "source-assets/lust/images/lust-vn-event-arrow-warm-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-arrow-warm-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3484958,
+      "runtimeBytes": 546644,
+      "sourceSHA256": "0e8deed3d8d25cdae0aa30e2e731c822d677b9987c35d38042da53660e08dec5",
+      "runtimeSHA256": "619fc7534a1ca8204cb1cd1982adfb15f746255bffcea0a1092e268ac5530b7c"
+    },
+    {
+      "id": "expr-arrow-hurt",
+      "original": "source-assets/lust/images/lust-vn-event-arrow-hurt-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-arrow-hurt-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3490612,
+      "runtimeBytes": 551128,
+      "sourceSHA256": "6b08b8915d4c99a17229d2769cf2e0b9ff8d0f6b319af8a8b1c6394ce53d2295",
+      "runtimeSHA256": "6d661c162175d2c955d985bbfa551c2603fff944d0c50149ee804c358809f08f"
+    },
+    {
+      "id": "expr-dawn-warm",
+      "original": "source-assets/lust/images/lust-vn-event-dawn-warm-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-dawn-warm-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3318788,
+      "runtimeBytes": 506694,
+      "sourceSHA256": "b0b3b7e38fab2276d51cd95ec3eaefa60b1e3da2f0fe31c541354602f76bb1b7",
+      "runtimeSHA256": "0003604d50c9f286cecdb6c557719455c669c45fd3edb9e4ae3a1d0927faa94e"
+    },
+    {
+      "id": "expr-dawn-hurt",
+      "original": "source-assets/lust/images/lust-vn-event-dawn-hurt-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-dawn-hurt-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3336697,
+      "runtimeBytes": 508332,
+      "sourceSHA256": "dd6fe6456c61f4137252e90a19eaee1f2d20c2d48c6a64f2d930d850de2825e5",
+      "runtimeSHA256": "7feda1194a7f4becec416bc991ed4b4ae5eacca1d43f43d4cfafeaa97fad09df"
+    },
+    {
+      "id": "promenade",
+      "original": "source-assets/lust/images/lust-promenade-r5.png",
+      "runtime": "bridge/assets/lust-promenade-r5.webp",
+      "size": [
+        2172,
+        724
+      ],
+      "alphaPreserved": false,
+      "sourceBytes": 3726476,
+      "runtimeBytes": 742506,
+      "sourceSHA256": "468dbaa01ee7cf4f0bb69b19c00c422322aa9e914d127eaafaea22a5bd53e2d7",
+      "runtimeSHA256": "9ed1d3b7b8441289d2a99a50b09c6dd8787af8de6c0d5b5b2fc5e30af3d69d9d"
+    },
+    {
+      "id": "expr-freedom-hurt",
+      "original": "source-assets/lust/images/lust-vn-event-freedom-hurt-pc98-r5.png",
+      "runtime": "bridge/assets/lust-vn-event-freedom-hurt-pc98-r5.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaPreserved": true,
+      "sourceBytes": 3563651,
+      "runtimeBytes": 694814,
+      "sourceSHA256": "d258db0ddadf1b790b219b9864136f4a5aa5b3f804b5b0b0193a7d0f7c12bb48",
+      "runtimeSHA256": "037ad86d424f82a05fc023f8ae73cf416bb501556a7fd699e837392aad1b9a59"
+    }
+  ],
+  "prompts": [
+    "r5-scenes-prompts.json",
+    "r5-expressions-prompts.json",
+    "r5-promenade-prompt.json"
+  ],
+  "originalPaths": "r5-extra-outputs.json",
+  "runtimeEncoding": "WebP quality 88, source dimensions/alpha retained"
+}

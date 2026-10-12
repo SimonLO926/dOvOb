@@ -1,0 +1,194 @@
+[
+  {
+    "id": "ending_good",
+    "uploadID": "file_0000000013908206958cae6f1c23bd02",
+    "original": "source-assets/lust/audio/lust_ending_good_no-watermark.mp3",
+    "bytes": 4710703,
+    "sha256": "9ccd7ab7a96a9d0ab2dd96c07b0d4bc8624c00c905e4ff5df316c17c220a6ed8",
+    "duration": 147.147755,
+    "codec": "mp3",
+    "sampleRate": "44100",
+    "runtime": {
+      "path": "bridge/assets/lust-music/lust_ending_good.mp3",
+      "bytes": 2355243,
+      "sha256": "8a7ba0bafe21e683a0f8ba08c7b70a2318ad4329680537e6863afd9fce66a638",
+      "duration": 147.173878,
+      "bitrate": "128k"
+    },
+    "portable": {
+      "path": "audio/lust_ending_good.mp3",
+      "bytes": 1177643,
+      "sha256": "9e26518517bf0aa6d0b03ee81abe337a54943add982baaadcaaf953f055adf33",
+      "duration": 147.173878,
+      "bitrate": "64k"
+    }
+  },
+  {
+    "id": "ending_bad",
+    "uploadID": "file_000000002de48209b66c38a418e3e42a",
+    "original": "source-assets/lust/audio/lust_ending_bad_no-watermark.mp3",
+    "bytes": 5609315,
+    "sha256": "05f277061a967feafa5b87c26aa11e0de62c2fa2edefaf0d083132525fef93f9",
+    "duration": 175.229388,
+    "codec": "mp3",
+    "sampleRate": "44100",
+    "runtime": {
+      "path": "bridge/assets/lust-music/lust_ending_bad.mp3",
+      "bytes": 2804549,
+      "sha256": "3861801cf39545174ff6d230aa11ad9ba22ff6ea584cae19325aeb1eacc963b0",
+      "duration": 175.25551,
+      "bitrate": "128k"
+    },
+    "portable": {
+      "path": "audio/lust_ending_bad.mp3",
+      "bytes": 1402296,
+      "sha256": "de7c2eac46600dbc80dd06509d02e008e439ca561c6336a8827a01f39f4be6b1",
+      "duration": 175.25551,
+      "bitrate": "64k"
+    }
+  },
+  {
+    "id": "first_bridge",
+    "uploadID": "file_00000000a9c882099c83364d31845afe",
+    "original": "source-assets/lust/audio/lust_first_bridge_no-watermark.mp3",
+    "bytes": 5839193,
+    "sha256": "0d2ca4fbd2aa1d1e9fdea10944e32cad86b08b0f80438ddf959989fb5d715346",
+    "duration": 182.413061,
+    "codec": "mp3",
+    "sampleRate": "44100",
+    "runtime": {
+      "path": "bridge/assets/lust-music/lust_first_bridge.mp3",
+      "bytes": 2919487,
+      "sha256": "a584799873dc015715a45a0c2e234a5d9d6701c9e742e1bb4e25f54a56790256",
+      "duration": 182.439184,
+      "bitrate": "128k"
+    },
+    "portable": {
+      "path": "audio/lust_first_bridge.mp3",
+      "bytes": 1459765,
+      "sha256": "afcf411e42b3aafb0d5369ff927729ab896a9a0b05504a13bf50174b8239402e",
+      "duration": 182.439184,
+      "bitrate": "64k"
+    }
+  },
+  {
+    "id": "first_special",
+    "uploadID": "file_00000000bc848209a5b430faa063e065",
+    "original": "source-assets/lust/audio/lust_first_special_no-watermark.mp3",
+    "bytes": 3807911,
+    "sha256": "e61d746a64a24bf84f67694416951b32c87a4b6f2cc9201ccd2c8d381732dc92",
+    "duration": 118.93551,
+    "codec": "mp3",
+    "sampleRate": "44100",
+    "runtime": {
+      "path": "bridge/assets/lust-music/lust_first_special.mp3",
+      "bytes": 1903847,
+      "sha256": "c65b4897219d21f01a5ab02834f3617560ae55c20aeda0c82ceda36005f62158",
+      "duration": 118.961633,
+      "bitrate": "128k"
+    },
+    "portable": {
+      "path": "audio/lust_first_special.mp3",
+      "bytes": 951945,
+      "sha256": "d7468b4d16eef05f40dbd833de9c9f4df78980d75a4cbc13406b7e85cc4df7b8",
+      "duration": 118.961633,
+      "bitrate": "64k"
+    }
+  },
+  {
+    "id": "first_last",
+    "uploadID": "file_0000000072f482099aa80f13f0e98dd5",
+    "original": "source-assets/lust/audio/lust_first_last_no-watermark.mp3",
+    "bytes": 2551526,
+    "sha256": "b67e5f6e6d030fc1410da3d81a7a440e33a361ad71684fe123ff157295fbaa72",
+    "duration": 79.673469,
+    "codec": "mp3",
+    "sampleRate": "44100",
+    "runtime": {
+      "path": "bridge/assets/lust-music/lust_first_last.mp3",
+      "bytes": 1275654,
+      "sha256": "3f402095ed0e8ca6e41759ef6a156920b9410f4ece3a160573d9e6347e6f06a2",
+      "duration": 79.699592,
+      "bitrate": "128k"
+    },
+    "portable": {
+      "path": "audio/lust_first_last.mp3",
+      "bytes": 637848,
+      "sha256": "edfae2494453712fbab4ea16f5b8bfa68b5df9205f2cc76ec9b2fc5e0d4fa85d",
+      "duration": 79.699592,
+      "bitrate": "64k"
+    }
+  },
+  {
+    "id": "second_bridge",
+    "uploadID": "file_0000000030c08209b0f7090a884b2371",
+    "original": "source-assets/lust/audio/lust_second_bridge_no-watermark.mp3",
+    "bytes": 5235659,
+    "sha256": "40f3ad17d0b1581e74d95ec28acaaf49390c44f5b3078b475cfd44d58c0e2d50",
+    "duration": 163.552653,
+    "codec": "mp3",
+    "sampleRate": "44100",
+    "runtime": {
+      "path": "bridge/assets/lust-music/lust_second_bridge.mp3",
+      "bytes": 2617721,
+      "sha256": "0bc92fd9ca9796985e8fecaba4563d4280824b2c633777efa99bb756453b607a",
+      "duration": 163.578776,
+      "bitrate": "128k"
+    },
+    "portable": {
+      "path": "audio/lust_second_bridge.mp3",
+      "bytes": 1308882,
+      "sha256": "74865c3e1a3d04f800442e4e7662c27dbbc8dc79609812a94f66eedba61d491b",
+      "duration": 163.578776,
+      "bitrate": "64k"
+    }
+  },
+  {
+    "id": "second_last",
+    "uploadID": "file_00000000d21482099e992e3b3942f316",
+    "original": "source-assets/lust/audio/lust_second_last_no-watermark.mp3",
+    "bytes": 10140828,
+    "sha256": "1ed835d280292e93d286cac3031f488e10f59b1737ab7867261908d8864d02b1",
+    "duration": 316.839184,
+    "codec": "mp3",
+    "sampleRate": "44100",
+    "runtime": {
+      "path": "bridge/assets/lust-music/lust_second_last.mp3",
+      "bytes": 5070305,
+      "sha256": "8e78e37ce3707b30b4e33546cab25af57020c0eeda37c8f0a05e3dd528034e6a",
+      "duration": 316.865306,
+      "bitrate": "128k"
+    },
+    "portable": {
+      "path": "audio/lust_second_last.mp3",
+      "bytes": 2535174,
+      "sha256": "39368c883962ac521050bac894ef6468be96b0ae3531b04735680e904b64cedb",
+      "duration": 316.865306,
+      "bitrate": "64k"
+    }
+  },
+  {
+    "id": "second_special",
+    "uploadID": "file_00000000a5888209be0f0a8b3ce7b4e3",
+    "original": "source-assets/lust/audio/lust_second_special_no-watermark.mp3",
+    "bytes": 5667829,
+    "sha256": "5c34e1c4c8bb9971a7a74819186b0174e2bdde1aa20cab4c511f91583d23dd1b",
+    "duration": 177.057959,
+    "codec": "mp3",
+    "sampleRate": "44100",
+    "runtime": {
+      "path": "bridge/assets/lust-music/lust_second_special.mp3",
+      "bytes": 2833806,
+      "sha256": "5737598cd613cc6a028ae6f7b39ebbfb16618091e8ede69fc53fa32841497d31",
+      "duration": 177.084082,
+      "bitrate": "128k"
+    },
+    "portable": {
+      "path": "audio/lust_second_special.mp3",
+      "bytes": 1416924,
+      "sha256": "0d353822d8c961679e46c7463729ad947e199ee461d12e163058451c32c05430",
+      "duration": 177.084082,
+      "bitrate": "64k"
+    }
+  }
+]

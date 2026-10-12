@@ -1,0 +1,47 @@
+{
+  "version": "r4",
+  "references": [
+    "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+    "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+    "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+  ],
+  "jobs": [
+    {
+      "id": "cafe",
+      "transparent_background": false,
+      "prompt": "Create a polished visual novel asset for the fourth sin Lust in this same game series. Match the first three actually referenced images' exceptionally detailed fine pixel painting, layered textured material and dramatic cinematic light. Use their painting STYLE only, no pillars, palace columns, mirrors, crowns, casino props or forest. Distinct cool teal/ivory/amber palette, rose only small accents. Not coarse battle sprites, not photorealism, not vector art. No letters, labels or UI. Landscape 4:3 complete ENVIRONMENT ONLY, absolutely no characters. Intimate artisan tea room on a floating feather island, open irregular curved glass windows look over turquoise cloud ocean. Woven linen seats, small walnut table with two ceramic cups and strawberry pastry, hanging constellation lights and draped gold bowstring cables, evening amber glow and rain on glass. Asymmetrical scene depth, textured wood and fabrics. Leave central upper room calm for a standing character; bottom quarter is empty foreground for dialogue. No architectural columns."
+    },
+    {
+      "id": "shore",
+      "transparent_background": false,
+      "prompt": "Create a polished visual novel asset for the fourth sin Lust in this same game series. Match the first three actually referenced images' exceptionally detailed fine pixel painting, layered textured material and dramatic cinematic light. Use their painting STYLE only, no pillars, palace columns, mirrors, crowns, casino props or forest. Distinct cool teal/ivory/amber palette, rose only small accents. Not coarse battle sprites, not photorealism, not vector art. No letters, labels or UI. Landscape 4:3 complete ENVIRONMENT ONLY, no people. Moonlit shoreline on an island above the clouds, luminous turquoise ripples, shell steps, empty curving bench with a single folded cream shawl, festival wheel far away made of thin gold bowstrings and feather shaped cabins, deep indigo sky and copper sunset remnants. Warm little lantern near the bench. New romantic environment without vertical architecture, no pillars. Rich detail and quiet upper central space for character, clear bottom quarter for dialogue."
+    },
+    {
+      "id": "dawn",
+      "transparent_background": false,
+      "prompt": "Create a polished visual novel asset for the fourth sin Lust in this same game series. Match the first three actually referenced images' exceptionally detailed fine pixel painting, layered textured material and dramatic cinematic light. Use their painting STYLE only, no pillars, palace columns, mirrors, crowns, casino props or forest. Distinct cool teal/ivory/amber palette, rose only small accents. Not coarse battle sprites, not photorealism, not vector art. No letters, labels or UI. Landscape 4:3 complete ENVIRONMENT ONLY, no characters. Dawn at a sweeping suspended walkway braided from luminous gold bowstrings between irregular floating feather islands. Ivory clouds under a blue sky, warm sunrise at left, modest rose petals, one repaired small golden bow resting on cream fabric at a stone seat in foreground. Visual motif of an open path and a free choice, textured stone and woven fabric. No columns or ruined towers or casino. Keep sunrise/path action central upper 70 percent for responsive visual novel layout."
+    },
+    {
+      "id": "shadow",
+      "transparent_background": true,
+      "prompt": "Create a polished visual novel asset for the fourth sin Lust in this same game series. Match the first three actually referenced images' exceptionally detailed fine pixel painting, layered textured material and dramatic cinematic light. Use their painting STYLE only, no pillars, palace columns, mirrors, crowns, casino props or forest. Distinct cool teal/ivory/amber palette, rose only small accents. Not coarse battle sprites, not photorealism, not vector art. No letters, labels or UI. Single adult female visual novel standing character, transparent background, full body centered with all limbs within image, front three-quarter view, calm and gentle thoughtful expression. Same adult woman identity as the final reference: long wavy brown hair with subtle rose ends, rose floral hair pin, warm brown eyes. Ivory layered modest dress with delicate gold bowstring embroidery, covered chest and opaque skirt, arms relaxed, one hand loosely near collarbone. Clearly adult proportions, natural femininity, no extra person, no wings, no bow, no scenery. Crisp painted pixel silhouette and beautiful cloth texture.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-good-r2.png"
+      ]
+    },
+    {
+      "id": "cupid-portrait",
+      "transparent_background": true,
+      "prompt": "Create a polished visual novel asset for the fourth sin Lust in this same game series. Match the first three actually referenced images' exceptionally detailed fine pixel painting, layered textured material and dramatic cinematic light. Use their painting STYLE only, no pillars, palace columns, mirrors, crowns, casino props or forest. Distinct cool teal/ivory/amber palette, rose only small accents. Not coarse battle sprites, not photorealism, not vector art. No letters, labels or UI. Single adult female visual novel standing character, transparent background, full body all limbs and wings inside canvas, front three-quarter view. Same adult female Cupid identity as final reference: flowing rose red hair, small golden halo, white feather wings, amber eyes. Standing quietly, shy and worried rather than attacking, holds a snapped golden bow in lowered hands. Elegant opaque white and rose dress with golden detail covering chest and hips. Natural adult feminine proportions, one woman only, no monster, no extra character, no scenery, no letters.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-intro-r2.png"
+      ]
+    }
+  ]
+}

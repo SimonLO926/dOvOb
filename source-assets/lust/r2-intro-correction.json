@@ -1,0 +1,11 @@
+{
+  "prompt": "Edit the final image (the Cupid drawing a bow) to match the adult FEMALE Cupid in the fourth reference (the kneeling female Cupid). Preserve its blue cloud ocean, feather archipelago, gold bowstrings, detailed pixel painting and landscape composition. Cupid is an adult voluptuous woman with rose hair, white feather wings, ivory sleeveless tunic, exposed shoulders and arms, gold/crimson cords. Keep her actively drawing the same gold bow. Match her face and feminine body to the kneeling female Cupid, not a male angel. One character only. The first three references supply ONLY detailed pixel painting technique. No columns, pillars, arches, architecture, text or UI. Face and drawing hands centered for mobile cropping.",
+  "refs": [
+    "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+    "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+    "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png",
+    "/workspace/generated_images/exec-61d99846-dcb0-4517-b3d2-3d10514c3ee7.png",
+    "/workspace/generated_images/exec-ae2c41cf-f4c1-4c10-946c-a1c9e30a82ef.png"
+  ],
+  "output": "Generated images are saved to /workspace/generated_images as /workspace/generated_images/exec-2a899120-68b9-4f43-8411-4b722fce9b8b.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+}

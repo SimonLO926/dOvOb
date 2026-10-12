@@ -1,0 +1,161 @@
+{
+  "purpose": "Latest user request: twelve unique chapter scenes plus event expression variants. Authored prototype; PC-98 style.",
+  "jobs": [
+    {
+      "id": "scene-rain",
+      "prompt": "Create ONE complete opaque 4:3 landscape background for chapter 1 of an original PC-98 retro Galgame, with the setting in the first three actual references but a fresh chapter-specific composition. SCENE: Rainy tea room at night, close enough to see rain on the broad curved window, two steaming ceramic cups on a dark wooden table, a small fireplace at far left, feather-shaped lamps, cool cobalt rain outside and amber interior warmth. Open empty floor at right. MATCH the first three references' crisp pixel clusters, finite-palette appearance, ordered dithering, material highlights, retro pixel illustration and environmental depth. Remaining three references supply only the series fantasy material palette; do not copy any casino, crowns, mirrors or ruins. No characters, faces, statues of people, boss portraits, cats, hearts, lettering, signage, UI, logos or watermark. This is a genuine environmental illustration, not a portrait laid over a backdrop. Compose important chapter props in the LEFT half above the bottom 35% dialogue area; right half quieter for an independently layered woman. Keep the whole 4:3 scene legible on phones with no cover crop. Rich cobalt, teal, ivory, amber and restrained rose accents, not monochrome pink. Small-pixel painting, no smooth anime, vector shapes, 3D render or enlarged chunky battle sprites.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": false
+    },
+    {
+      "id": "scene-rest",
+      "prompt": "Create ONE complete opaque 4:3 landscape background for chapter 2 of an original PC-98 retro Galgame, with the setting in the first three actual references but a fresh chapter-specific composition. SCENE: Quiet morning alcove of the same seaside-cloud tea room, cushioned long bench, a folded wool blanket and two unused blank admission tickets on a side table, a stopped small brass clock, misty pale daylight through a half-open window. Blue-green and cream calm palette. MATCH the first three references' crisp pixel clusters, finite-palette appearance, ordered dithering, material highlights, retro pixel illustration and environmental depth. Remaining three references supply only the series fantasy material palette; do not copy any casino, crowns, mirrors or ruins. No characters, faces, statues of people, boss portraits, cats, hearts, lettering, signage, UI, logos or watermark. This is a genuine environmental illustration, not a portrait laid over a backdrop. Compose important chapter props in the LEFT half above the bottom 35% dialogue area; right half quieter for an independently layered woman. Keep the whole 4:3 scene legible on phones with no cover crop. Rich cobalt, teal, ivory, amber and restrained rose accents, not monochrome pink. Small-pixel painting, no smooth anime, vector shapes, 3D render or enlarged chunky battle sprites.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": false
+    },
+    {
+      "id": "scene-gift",
+      "prompt": "Create ONE complete opaque 4:3 landscape background for chapter 3 of an original PC-98 retro Galgame, with the setting in the first three actual references but a fresh chapter-specific composition. SCENE: Evening gift table in the same tea room, a small open wooden arrow box containing one golden pendant, a plain feather bookmark and a potted flower, warm lamp pool amid navy dusk. No arrows aimed anywhere. The table props placed left of center and clearly visible. MATCH the first three references' crisp pixel clusters, finite-palette appearance, ordered dithering, material highlights, retro pixel illustration and environmental depth. Remaining three references supply only the series fantasy material palette; do not copy any casino, crowns, mirrors or ruins. No characters, faces, statues of people, boss portraits, cats, hearts, lettering, signage, UI, logos or watermark. This is a genuine environmental illustration, not a portrait laid over a backdrop. Compose important chapter props in the LEFT half above the bottom 35% dialogue area; right half quieter for an independently layered woman. Keep the whole 4:3 scene legible on phones with no cover crop. Rich cobalt, teal, ivory, amber and restrained rose accents, not monochrome pink. Small-pixel painting, no smooth anime, vector shapes, 3D render or enlarged chunky battle sprites.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": false
+    },
+    {
+      "id": "scene-name",
+      "prompt": "Create ONE complete opaque 4:3 landscape background for chapter 4 of an original PC-98 retro Galgame, with the setting in the first three actual references but a fresh chapter-specific composition. SCENE: Afternoon sand beach beside the cloud-island coast, a thin twig and unfinished abstract marks in sand at left foreground, a folded blank note on a smooth rock, quiet waves, pale turquoise sea, distant floating islands. No readable letters, names or drawings. MATCH the first three references' crisp pixel clusters, finite-palette appearance, ordered dithering, material highlights, retro pixel illustration and environmental depth. Remaining three references supply only the series fantasy material palette; do not copy any casino, crowns, mirrors or ruins. No characters, faces, statues of people, boss portraits, cats, hearts, lettering, signage, UI, logos or watermark. This is a genuine environmental illustration, not a portrait laid over a backdrop. Compose important chapter props in the LEFT half above the bottom 35% dialogue area; right half quieter for an independently layered woman. Keep the whole 4:3 scene legible on phones with no cover crop. Rich cobalt, teal, ivory, amber and restrained rose accents, not monochrome pink. Small-pixel painting, no smooth anime, vector shapes, 3D render or enlarged chunky battle sprites.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": false
+    },
+    {
+      "id": "scene-tears",
+      "prompt": "Create ONE complete opaque 4:3 landscape background for chapter 5 of an original PC-98 retro Galgame, with the setting in the first three actual references but a fresh chapter-specific composition. SCENE: Post-rain tidal stone steps beside the ocean, a neatly placed white handkerchief on a bench at left, sea spray, washed wet dark stones, receding silver-blue tide under overcast violet sky. Compassionate quiet scene with no humans. MATCH the first three references' crisp pixel clusters, finite-palette appearance, ordered dithering, material highlights, retro pixel illustration and environmental depth. Remaining three references supply only the series fantasy material palette; do not copy any casino, crowns, mirrors or ruins. No characters, faces, statues of people, boss portraits, cats, hearts, lettering, signage, UI, logos or watermark. This is a genuine environmental illustration, not a portrait laid over a backdrop. Compose important chapter props in the LEFT half above the bottom 35% dialogue area; right half quieter for an independently layered woman. Keep the whole 4:3 scene legible on phones with no cover crop. Rich cobalt, teal, ivory, amber and restrained rose accents, not monochrome pink. Small-pixel painting, no smooth anime, vector shapes, 3D render or enlarged chunky battle sprites.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": false
+    },
+    {
+      "id": "scene-mending",
+      "prompt": "Create ONE complete opaque 4:3 landscape background for chapter 6 of an original PC-98 retro Galgame, with the setting in the first three actual references but a fresh chapter-specific composition. SCENE: Nighttime repair workspace in the tea room, one small broken golden bow wrapped with thread on a wooden workbench at left, wood splints, spool, sewing tools in a cloth pouch, three separate stools around the table, soft amber lamp against teal shadows. MATCH the first three references' crisp pixel clusters, finite-palette appearance, ordered dithering, material highlights, retro pixel illustration and environmental depth. Remaining three references supply only the series fantasy material palette; do not copy any casino, crowns, mirrors or ruins. No characters, faces, statues of people, boss portraits, cats, hearts, lettering, signage, UI, logos or watermark. This is a genuine environmental illustration, not a portrait laid over a backdrop. Compose important chapter props in the LEFT half above the bottom 35% dialogue area; right half quieter for an independently layered woman. Keep the whole 4:3 scene legible on phones with no cover crop. Rich cobalt, teal, ivory, amber and restrained rose accents, not monochrome pink. Small-pixel painting, no smooth anime, vector shapes, 3D render or enlarged chunky battle sprites.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": false
+    },
+    {
+      "id": "scene-distance",
+      "prompt": "Create ONE complete opaque 4:3 landscape background for chapter 7 of an original PC-98 retro Galgame, with the setting in the first three actual references but a fresh chapter-specific composition. SCENE: Long empty moonlit beach promenade, a single bench at left with one small lantern, an open path leading rightward into a quiet shore, wind-blown grasses and a visible interval of empty space, cool blue moonlight and restrained gold reflections. Do not add columns. MATCH the first three references' crisp pixel clusters, finite-palette appearance, ordered dithering, material highlights, retro pixel illustration and environmental depth. Remaining three references supply only the series fantasy material palette; do not copy any casino, crowns, mirrors or ruins. No characters, faces, statues of people, boss portraits, cats, hearts, lettering, signage, UI, logos or watermark. This is a genuine environmental illustration, not a portrait laid over a backdrop. Compose important chapter props in the LEFT half above the bottom 35% dialogue area; right half quieter for an independently layered woman. Keep the whole 4:3 scene legible on phones with no cover crop. Rich cobalt, teal, ivory, amber and restrained rose accents, not monochrome pink. Small-pixel painting, no smooth anime, vector shapes, 3D render or enlarged chunky battle sprites.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": false
+    },
+    {
+      "id": "scene-tomorrow",
+      "prompt": "Create ONE complete opaque 4:3 landscape background for chapter 8 of an original PC-98 retro Galgame, with the setting in the first three actual references but a fresh chapter-specific composition. SCENE: Seaside terrace where a future tea room could stand, a sketchbook on a low table at left showing simple non-text architectural outlines of a tea shop window, pencil and three seashells, a warm rose-gold twilight ocean, lush small wildflowers along the railing. MATCH the first three references' crisp pixel clusters, finite-palette appearance, ordered dithering, material highlights, retro pixel illustration and environmental depth. Remaining three references supply only the series fantasy material palette; do not copy any casino, crowns, mirrors or ruins. No characters, faces, statues of people, boss portraits, cats, hearts, lettering, signage, UI, logos or watermark. This is a genuine environmental illustration, not a portrait laid over a backdrop. Compose important chapter props in the LEFT half above the bottom 35% dialogue area; right half quieter for an independently layered woman. Keep the whole 4:3 scene legible on phones with no cover crop. Rich cobalt, teal, ivory, amber and restrained rose accents, not monochrome pink. Small-pixel painting, no smooth anime, vector shapes, 3D render or enlarged chunky battle sprites.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": false
+    },
+    {
+      "id": "scene-fear",
+      "prompt": "Create ONE complete opaque 4:3 landscape background for chapter 9 of an original PC-98 retro Galgame, with the setting in the first three actual references but a fresh chapter-specific composition. SCENE: Late-night tea room with only one glass lantern still lit at left foreground, repaired bow safely resting on the table, a second empty seat, deep indigo window and faint approaching dawn. Intimate amber lantern light amid blue velvet shadows. MATCH the first three references' crisp pixel clusters, finite-palette appearance, ordered dithering, material highlights, retro pixel illustration and environmental depth. Remaining three references supply only the series fantasy material palette; do not copy any casino, crowns, mirrors or ruins. No characters, faces, statues of people, boss portraits, cats, hearts, lettering, signage, UI, logos or watermark. This is a genuine environmental illustration, not a portrait laid over a backdrop. Compose important chapter props in the LEFT half above the bottom 35% dialogue area; right half quieter for an independently layered woman. Keep the whole 4:3 scene legible on phones with no cover crop. Rich cobalt, teal, ivory, amber and restrained rose accents, not monochrome pink. Small-pixel painting, no smooth anime, vector shapes, 3D render or enlarged chunky battle sprites.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": false
+    },
+    {
+      "id": "scene-freedom",
+      "prompt": "Create ONE complete opaque 4:3 landscape background for chapter 10 of an original PC-98 retro Galgame, with the setting in the first three actual references but a fresh chapter-specific composition. SCENE: Open doorway of the tea room before dawn, a loose decorative golden ribbon lying on the left railing, cool air flowing through sheer curtains, a pale blue sky beginning to turn gold, open passage and no barriers. Golden ribbon is slack, no tied wrists or people. MATCH the first three references' crisp pixel clusters, finite-palette appearance, ordered dithering, material highlights, retro pixel illustration and environmental depth. Remaining three references supply only the series fantasy material palette; do not copy any casino, crowns, mirrors or ruins. No characters, faces, statues of people, boss portraits, cats, hearts, lettering, signage, UI, logos or watermark. This is a genuine environmental illustration, not a portrait laid over a backdrop. Compose important chapter props in the LEFT half above the bottom 35% dialogue area; right half quieter for an independently layered woman. Keep the whole 4:3 scene legible on phones with no cover crop. Rich cobalt, teal, ivory, amber and restrained rose accents, not monochrome pink. Small-pixel painting, no smooth anime, vector shapes, 3D render or enlarged chunky battle sprites.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": false
+    },
+    {
+      "id": "scene-arrow",
+      "prompt": "Create ONE complete opaque 4:3 landscape background for chapter 11 of an original PC-98 retro Galgame, with the setting in the first three actual references but a fresh chapter-specific composition. SCENE: Cloud-bridge departure landing at first sunrise, repaired small golden bow resting on left stone ledge and one safely lowered arrow beside it, golden string coil, warm sun low at far left, a bridge path leading beyond clouds, dramatic controlled amber and navy. MATCH the first three references' crisp pixel clusters, finite-palette appearance, ordered dithering, material highlights, retro pixel illustration and environmental depth. Remaining three references supply only the series fantasy material palette; do not copy any casino, crowns, mirrors or ruins. No characters, faces, statues of people, boss portraits, cats, hearts, lettering, signage, UI, logos or watermark. This is a genuine environmental illustration, not a portrait laid over a backdrop. Compose important chapter props in the LEFT half above the bottom 35% dialogue area; right half quieter for an independently layered woman. Keep the whole 4:3 scene legible on phones with no cover crop. Rich cobalt, teal, ivory, amber and restrained rose accents, not monochrome pink. Small-pixel painting, no smooth anime, vector shapes, 3D render or enlarged chunky battle sprites.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": false
+    },
+    {
+      "id": "scene-dawn",
+      "prompt": "Create ONE complete opaque 4:3 landscape background for chapter 12 of an original PC-98 retro Galgame, with the setting in the first three actual references but a fresh chapter-specific composition. SCENE: Bright dawn at the far side of the cloud bridge, open seaside tea-room terrace, a third ceramic cup newly added on the left table, a feather bookmark and a blank folded notebook, softly glowing morning sea and freely open winding path beyond. Hopeful teal, ivory and gold. MATCH the first three references' crisp pixel clusters, finite-palette appearance, ordered dithering, material highlights, retro pixel illustration and environmental depth. Remaining three references supply only the series fantasy material palette; do not copy any casino, crowns, mirrors or ruins. No characters, faces, statues of people, boss portraits, cats, hearts, lettering, signage, UI, logos or watermark. This is a genuine environmental illustration, not a portrait laid over a backdrop. Compose important chapter props in the LEFT half above the bottom 35% dialogue area; right half quieter for an independently layered woman. Keep the whole 4:3 scene legible on phones with no cover crop. Rich cobalt, teal, ivory, amber and restrained rose accents, not monochrome pink. Small-pixel painting, no smooth anime, vector shapes, 3D render or enlarged chunky battle sprites.",
+      "referenced_image_paths": [
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+        "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+        "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+      ],
+      "transparent_background": false
+    }
+  ]
+}

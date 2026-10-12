@@ -1,0 +1,35 @@
+[
+  {
+    "key": "rage",
+    "prompt": "Edit the LAST scene to replace its old muscular character with the EXACT adult FEMALE compact three-head-height fully clothed monster from the FOURTH reference. The first three images supply adopted detailed pixel PAINTING technique only; do not copy architecture. Preserve fourth reference paired round dome head completely opaque crimson petal fabric wrapped, no human face, short female waist, wide rounded hips, short legs, dark teal feather wings, gold bands, broken bow. HEAD HEIGHT IS ONE THIRD OF STANDING BODY HEIGHT; no long thin legs, no male muscle torso, no ribs/six-pack, no child. A smooth simple flat corset under the huge paired head, no second prominent bust on torso. Costume opaque. One character, no extra head or human. Keep blue cloud ocean, feather islands, bowstring paths, full textured scene, no columns/towers. Landscape 1536x1024; head and hands/bow at center for phone and landscape cropping. No text or UI.\nSCENE:\nHeartbreak rage. Same female monster in a compact crouched fighting pose, huge rounded covered paired head with an AMBER LIGHT fissure BETWEEN its fabric-covered domes, no exposed anatomical details. Tangled broken bow in hands close to waist. Ivory/copper highlights and violent ultramarine/copper cloudstorm. Short female body and rounded hips fully clothed, black teal wings.",
+    "refs": [
+      "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+      "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+      "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png",
+      "/workspace/dOvOb/source-assets/lust/images/lust-monster-r3.png",
+      "/workspace/dOvOb/source-assets/lust/images/lust-rage-r2.png"
+    ]
+  },
+  {
+    "key": "bad",
+    "prompt": "Edit the LAST scene to replace its old muscular character with the EXACT adult FEMALE compact three-head-height fully clothed monster from the FOURTH reference. The first three images supply adopted detailed pixel PAINTING technique only; do not copy architecture. Preserve fourth reference paired round dome head completely opaque crimson petal fabric wrapped, no human face, short female waist, wide rounded hips, short legs, dark teal feather wings, gold bands, broken bow. HEAD HEIGHT IS ONE THIRD OF STANDING BODY HEIGHT; no long thin legs, no male muscle torso, no ribs/six-pack, no child. A smooth simple flat corset under the huge paired head, no second prominent bust on torso. Costume opaque. One character, no extra head or human. Keep blue cloud ocean, feather islands, bowstring paths, full textured scene, no columns/towers. Landscape 1536x1024; head and hands/bow at center for phone and landscape cropping. No text or UI.\nSCENE:\nFinal tragic collapse. Same compact adult female monster kneeling curled forward on a feather raft, paired domes still fully covered by torn but opaque burgundy fabric with shattered gold bands, dim light seeping through gaps between fabric layers. No skin or anatomical detail on head. Folded short legs, curved delicate hands holding broken bow at center, drooping teal wings. Cold blue clouds, copper dying embers, no gore, no tiny Cupid or extra figure.",
+    "refs": [
+      "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+      "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+      "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png",
+      "/workspace/dOvOb/source-assets/lust/images/lust-monster-r3.png",
+      "/workspace/dOvOb/source-assets/lust/images/lust-bad-r2.png"
+    ]
+  },
+  {
+    "key": "lost",
+    "prompt": "Edit the LAST scene to replace its old muscular character with the EXACT adult FEMALE compact three-head-height fully clothed monster from the FOURTH reference. The first three images supply adopted detailed pixel PAINTING technique only; do not copy architecture. Preserve fourth reference paired round dome head completely opaque crimson petal fabric wrapped, no human face, short female waist, wide rounded hips, short legs, dark teal feather wings, gold bands, broken bow. HEAD HEIGHT IS ONE THIRD OF STANDING BODY HEIGHT; no long thin legs, no male muscle torso, no ribs/six-pack, no child. A smooth simple flat corset under the huge paired head, no second prominent bust on torso. Costume opaque. One character, no extra head or human. Keep blue cloud ocean, feather islands, bowstring paths, full textured scene, no columns/towers. Landscape 1536x1024; head and hands/bow at center for phone and landscape cropping. No text or UI.\nSCENE:\nPlayer defeat. Same adult female three-head-high monster upright victorious with short adult female body, very large rounded paired fabric-enclosed dome head, short legs, broad hips, small waist, delicate hands raising a broken bow next to her waist. Fully clothed, no human face, no secondary figures. Teal wings sweep around scene, dark cobalt cloud vortex, amber lightning and rose magic.",
+    "refs": [
+      "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+      "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+      "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png",
+      "/workspace/dOvOb/source-assets/lust/images/lust-monster-r3.png",
+      "/workspace/dOvOb/source-assets/lust/images/lust-lost-r2.png"
+    ]
+  }
+]

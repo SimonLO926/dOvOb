@@ -1,0 +1,82 @@
+[
+  {
+    "id": "cafe",
+    "generated": "/workspace/generated_images/exec-cd6fb315-4498-4931-bdea-58625da24aeb.png",
+    "original": "source-assets/lust/images/lust-vn-cafe-pc98-r4.png",
+    "runtime": "bridge/assets/lust-vn-cafe-pc98-r4.webp",
+    "size": [
+      1448,
+      1086
+    ],
+    "mode": "RGB",
+    "originalBytes": 4052169,
+    "runtimeBytes": 784302,
+    "sha256": "19f89af594bd0f04be622cf5b332e4dfcb879f5c8064be1b151daebdfee66bd3",
+    "adopted": true,
+    "references": "r4-pc98-prompts.json"
+  },
+  {
+    "id": "shore",
+    "generated": "/workspace/generated_images/exec-f93464c0-8765-43ad-85ec-fe6979ae133d.png",
+    "original": "source-assets/lust/images/lust-vn-shore-pc98-r4.png",
+    "runtime": "bridge/assets/lust-vn-shore-pc98-r4.webp",
+    "size": [
+      1448,
+      1086
+    ],
+    "mode": "RGB",
+    "originalBytes": 3373324,
+    "runtimeBytes": 638514,
+    "sha256": "65c42cacb4e6335994fd567093f8d92a4957d9c547ae3c9ca588ef5c1f6a9e0e",
+    "adopted": true,
+    "references": "r4-pc98-prompts.json"
+  },
+  {
+    "id": "dawn",
+    "generated": "/workspace/generated_images/exec-1659e401-a82f-4e7c-8905-8c3d65bf0c30.png",
+    "original": "source-assets/lust/images/lust-vn-dawn-pc98-r4.png",
+    "runtime": "bridge/assets/lust-vn-dawn-pc98-r4.webp",
+    "size": [
+      1448,
+      1086
+    ],
+    "mode": "RGB",
+    "originalBytes": 3886110,
+    "runtimeBytes": 773914,
+    "sha256": "f48975d304abc518cdf1b6bc1058a5d2d36913680b8441a239493df5754f86c8",
+    "adopted": true,
+    "references": "r4-pc98-prompts.json"
+  },
+  {
+    "id": "shadow",
+    "generated": "/workspace/generated_images/exec-0498766c-c5db-4974-a476-e0b29ebc85a3.png",
+    "original": "source-assets/lust/images/lust-vn-shadow-pc98-r4.png",
+    "runtime": "bridge/assets/lust-vn-shadow-pc98-r4.webp",
+    "size": [
+      1086,
+      1448
+    ],
+    "mode": "RGBA",
+    "originalBytes": 3076723,
+    "runtimeBytes": 677742,
+    "sha256": "2fda283390c05507eb038a5bb0291a7d3cadfdb5f117ebfd063d0642b7ad2c31",
+    "adopted": true,
+    "references": "r4-pc98-prompts.json"
+  },
+  {
+    "id": "cupid-portrait",
+    "generated": "/workspace/generated_images/exec-b20d9a12-e6c9-414b-afe7-f44543a40b8d.png",
+    "original": "source-assets/lust/images/lust-vn-cupid-portrait-pc98-r4.png",
+    "runtime": "bridge/assets/lust-vn-cupid-portrait-pc98-r4.webp",
+    "size": [
+      1086,
+      1448
+    ],
+    "mode": "RGBA",
+    "originalBytes": 3305691,
+    "runtimeBytes": 805318,
+    "sha256": "5cd4bec81d0fd777e11ffbc30eb1746d73dffe7517a65318f906f3cccb33e0f2",
+    "adopted": true,
+    "references": "r4-pc98-prompts.json"
+  }
+]

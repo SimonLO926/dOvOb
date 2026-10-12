@@ -1,0 +1,1309 @@
+{
+  "version": "1.2.35",
+  "basis": "Active runtime URLs in Lust modules and preview HTML",
+  "preservation": "All PNG/MP3 originals, prompts, drafts and canonical WebPs retained in excluded source-assets.",
+  "active": [
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-bad-r3.webp",
+      "runtime": "bridge/assets/lust-bad-r3.webp",
+      "originalSize": [
+        1536,
+        1024
+      ],
+      "size": [
+        1280,
+        853
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 689972,
+      "runtimeBytes": 505686,
+      "canonicalSHA256": "949f4c429d7bd4cab7b741fe7648aff9899f5046f947f94e6cad54d7b4b73ac7",
+      "runtimeSHA256": "2ebbc8f2da982389b0b5efd454659eac37103f86ff69ea8db5f7afcfadb78b2e",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-body-r2.webp",
+      "runtime": "bridge/assets/lust-body-r2.webp",
+      "originalSize": [
+        1672,
+        941
+      ],
+      "size": [
+        1280,
+        720
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 555106,
+      "runtimeBytes": 369878,
+      "canonicalSHA256": "a8f6470ae219fb771ac8e29a7e193e44b54f59a2fcb54dc019852aced2e80ab9",
+      "runtimeSHA256": "6b30b5ea4a09793349dec14b7ff377cf17d3bf7216f65ba7f8095bc37666a37f",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-clouds-r2.webp",
+      "runtime": "bridge/assets/lust-clouds-r2.webp",
+      "originalSize": [
+        1536,
+        1024
+      ],
+      "size": [
+        1280,
+        853
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 557294,
+      "runtimeBytes": 411342,
+      "canonicalSHA256": "a433df3b37d6fecf38c72c96613a85b65ca24958dc6a29987d7f538967cb6546",
+      "runtimeSHA256": "0dc502784256a8c653ef5e8625cff4bf19959cf073ee44710e5ba2b26c8eb76a",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-cupid-r2.webp",
+      "runtime": "bridge/assets/lust-cupid-r2.webp",
+      "originalSize": [
+        1536,
+        1024
+      ],
+      "size": [
+        1280,
+        853
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 551290,
+      "runtimeBytes": 406134,
+      "canonicalSHA256": "3286ce6ce8a05dc0981a0e57b06898e78b29ece0af6c03cf1fcda594766e36c2",
+      "runtimeSHA256": "c762bf64bdc61a834a27811a553f738bdd01deda22aa99c3793f9a49dcea7291",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-good-r2.webp",
+      "runtime": "bridge/assets/lust-good-r2.webp",
+      "originalSize": [
+        1536,
+        1024
+      ],
+      "size": [
+        1280,
+        853
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 563884,
+      "runtimeBytes": 418170,
+      "canonicalSHA256": "6466bbbfd735fed121bb5485ddfd104944de9fdcbb378a0a59c1e19e3519f280",
+      "runtimeSHA256": "d316009851814a7f5365b08b44e86ac41f33370359ee90241bf771642fc47e31",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-intro-r2.webp",
+      "runtime": "bridge/assets/lust-intro-r2.webp",
+      "originalSize": [
+        1672,
+        941
+      ],
+      "size": [
+        1280,
+        720
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 592020,
+      "runtimeBytes": 396790,
+      "canonicalSHA256": "de401097582cd43fb591288031f0205266e6dce6a87e1291b6eae94661e73c66",
+      "runtimeSHA256": "355e71c9702a52bde23f11c0c45210f89f3db4e845a74b33d12692edd9a7da53",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-lost-r3.webp",
+      "runtime": "bridge/assets/lust-lost-r3.webp",
+      "originalSize": [
+        1536,
+        1024
+      ],
+      "size": [
+        1280,
+        853
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 709534,
+      "runtimeBytes": 520924,
+      "canonicalSHA256": "97061b8f55659ad64ff22bf035a10361fe4452be1d2cbe871db609ea89084ce0",
+      "runtimeSHA256": "2d44280a06496703e648839a6a4e610dab4bf9b1f8d8b99f0125086196751e22",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-monster-r3.webp",
+      "runtime": "bridge/assets/lust-monster-r3.webp",
+      "originalSize": [
+        1536,
+        1024
+      ],
+      "size": [
+        1280,
+        853
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 679692,
+      "runtimeBytes": 492000,
+      "canonicalSHA256": "3c6642111e49ca37c50b924896f56c6825b9da90aea8d5642d499297208cf044",
+      "runtimeSHA256": "8fd322024acf93014824c0abbd2ab8a383aa52f4a54fe2cdb0ac8d47c2d5cffa",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-rage-r3.webp",
+      "runtime": "bridge/assets/lust-rage-r3.webp",
+      "originalSize": [
+        1536,
+        1024
+      ],
+      "size": [
+        1280,
+        853
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 689650,
+      "runtimeBytes": 505140,
+      "canonicalSHA256": "abf8bf2ba6b60dcb5feb4320076f49591271322be63ad17422fa4a9d0f499e98",
+      "runtimeSHA256": "4a2edf7da6b81f3b8b0bef0b58a9ca79b8a557efca13f2156432975d26df4f2c",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-transform-r2.webp",
+      "runtime": "bridge/assets/lust-transform-r2.webp",
+      "originalSize": [
+        1672,
+        941
+      ],
+      "size": [
+        1280,
+        720
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 617544,
+      "runtimeBytes": 410490,
+      "canonicalSHA256": "1e70d6e645a29c3e05c70e778030f1f9684fc300e84ed877057d4cc5fdda601b",
+      "runtimeSHA256": "df2f89a3488399c8fc812b8909493be12f78fab137047ac4abd46f4f91ee391d",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-cafe-pc98-r4.webp",
+      "runtime": "bridge/assets/lust-vn-cafe-pc98-r4.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 784302,
+      "runtimeBytes": 603508,
+      "canonicalSHA256": "c7e6e83104ff48fe2e05b803096cafdb286995964921bf05d34f64b26f4a6137",
+      "runtimeSHA256": "7d0f436ed0e4e8ff5e96fb46f462fb763eff9cc31fdf0a2686cfc77c682e57ef",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-cupid-portrait-pc98-r4.webp",
+      "runtime": "bridge/assets/lust-vn-cupid-portrait-pc98-r4.webp",
+      "originalSize": [
+        1086,
+        1448
+      ],
+      "size": [
+        720,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 805318,
+      "runtimeBytes": 397808,
+      "canonicalSHA256": "49c4733010c043cc7de65445a0937ded06b38a8aaa7733fd0878e267b560688d",
+      "runtimeSHA256": "e7aab47994c3e6ca3f1eb27363e195ac2e834d1ace0a3ec8107dff369887543e",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-dawn-pc98-r4.webp",
+      "runtime": "bridge/assets/lust-vn-dawn-pc98-r4.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 773914,
+      "runtimeBytes": 597438,
+      "canonicalSHA256": "e609aa1d774c9e91df068644c5c99f3ee1e091e5d8d1fc1164ee7615a3a78147",
+      "runtimeSHA256": "20f19487c2fe5ceccfb32c80c9570584ca06a5aed9142f0e90deb385c3253955",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-arrow-hurt-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-arrow-hurt-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 551128,
+      "runtimeBytes": 256606,
+      "canonicalSHA256": "6d661c162175d2c955d985bbfa551c2603fff944d0c50149ee804c358809f08f",
+      "runtimeSHA256": "05b388df7437a344777aed5380227991f2a381046b929d018abc9870d45982fc",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-arrow-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-arrow-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 774026,
+      "runtimeBytes": 338266,
+      "canonicalSHA256": "ba716e8b63a3cd2df05cba670e52c4caf164eb6735e02847e7781d987780045e",
+      "runtimeSHA256": "7828a82fb1e0c354443acb6b7fe6908b854fe1b34cbfbd99fb6bfb1d0768a6e3",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-arrow-warm-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-arrow-warm-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 546644,
+      "runtimeBytes": 253452,
+      "canonicalSHA256": "619fc7534a1ca8204cb1cd1982adfb15f746255bffcea0a1092e268ac5530b7c",
+      "runtimeSHA256": "a229d7cf65d9810c942a5bc1ac70b76666040717e8bc631fc957c903ecf87130",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-dawn-hurt-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-dawn-hurt-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 508332,
+      "runtimeBytes": 240276,
+      "canonicalSHA256": "7feda1194a7f4becec416bc991ed4b4ae5eacca1d43f43d4cfafeaa97fad09df",
+      "runtimeSHA256": "942e44c7ac7caf272024f171b78429a946ec683b5cdb49fa012ff1c30e48f80f",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-dawn-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-dawn-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 701418,
+      "runtimeBytes": 302994,
+      "canonicalSHA256": "82fc838a111a06c6bd94332989478dd196a50846571ee7415309e37170dd9b81",
+      "runtimeSHA256": "e3d420b8e370097563c5e1ed0bb5b8211b3b17d4e5788ea0c7dda8dc582045e9",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-dawn-warm-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-dawn-warm-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 506694,
+      "runtimeBytes": 239402,
+      "canonicalSHA256": "0003604d50c9f286cecdb6c557719455c669c45fd3edb9e4ae3a1d0927faa94e",
+      "runtimeSHA256": "1dbecf4019c851d17c97cc6a916638020001ed415e0f47f353d7829c48a3955f",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-distance-hurt-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-distance-hurt-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 539818,
+      "runtimeBytes": 251690,
+      "canonicalSHA256": "19914c42f618e1a701c8ebab9c9ebe42f1c161608045690e8ba3ed3d22b3e5a1",
+      "runtimeSHA256": "e1c02309411438a2448e09df984574d132c939ecb49e6feb0d4a7410ae6775a3",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-distance-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-distance-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 731882,
+      "runtimeBytes": 318352,
+      "canonicalSHA256": "dcc3c5747851cdb1f9d9ee166d43030aaa8b738c400165326b0caf036ebcf906",
+      "runtimeSHA256": "0924e8324ee00e6dce6003c7e096abc9262aabef0c2da2fe12404fc85e1381a2",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-distance-warm-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-distance-warm-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 531416,
+      "runtimeBytes": 246840,
+      "canonicalSHA256": "632584b395da1fc8298266800995b986d90149cb5838d4f8773e8c763b477c54",
+      "runtimeSHA256": "c25ac64378289f70468ac9e3eeaf9efbf6623af336d1cc581f24f3e729ae05d9",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-fear-hurt-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-fear-hurt-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 514642,
+      "runtimeBytes": 239690,
+      "canonicalSHA256": "5a66c912d757db2276b4d17970854713f2c6224fb4bd7d4862895f344f2df501",
+      "runtimeSHA256": "54a3fb13892e638b3c0e411bb6a359b1ece321969250333031a7d6eb376945bb",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-fear-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-fear-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 708710,
+      "runtimeBytes": 306216,
+      "canonicalSHA256": "0acccfcfaf6b938934a9582e35e6343c5cad278a77deba733a3ede44f0a2e31b",
+      "runtimeSHA256": "05229309426a604bef483ba03b3b41ed2e5c95f57485b75b80ac2e6e4650089f",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-fear-warm-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-fear-warm-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 509122,
+      "runtimeBytes": 238608,
+      "canonicalSHA256": "34d88d414ddf7d361732f23ad29b3b7213e0e74dbd42da6c2b5ea0e634f9b77e",
+      "runtimeSHA256": "d96e4d991fe25f27861be1d133aa3866494ef4267f777cda96038f22c116a655",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-freedom-hurt-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-freedom-hurt-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 694814,
+      "runtimeBytes": 309760,
+      "canonicalSHA256": "037ad86d424f82a05fc023f8ae73cf416bb501556a7fd699e837392aad1b9a59",
+      "runtimeSHA256": "76434fa54f339704556d9b583b81398ae3248b0f1f6fad927f0ed2efc8491fc1",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-freedom-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-freedom-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 754330,
+      "runtimeBytes": 332486,
+      "canonicalSHA256": "bf2510ec09e054eb4f04a84960c7b3a720b360680a937eaf19dae3e90fa3fcf7",
+      "runtimeSHA256": "ac867d208ed5e64768639265aaf637130761784cc87437178c8544efe7c19eb8",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-freedom-warm-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-freedom-warm-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 543522,
+      "runtimeBytes": 254396,
+      "canonicalSHA256": "0e6c6d9af196145296aafafb3c19e6a2ba1a03268d9a30d0d40a9132a091b892",
+      "runtimeSHA256": "21c43eb35a1c817ab4a1d37de46e55c993fd8b344607cbbd225e4236453e71b4",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-gift-hurt-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-gift-hurt-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 548040,
+      "runtimeBytes": 254562,
+      "canonicalSHA256": "1430aeb2f7ad63d31edacba789bab9705ab3be5e3d553536e129315c9f110a77",
+      "runtimeSHA256": "29b8e20e9e6f8d0a14d9c21dbc96ad799bdf027b9c7d0405c328195d80aac8e4",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-gift-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-gift-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 746664,
+      "runtimeBytes": 332168,
+      "canonicalSHA256": "adaa79aea483f514f83f8c91175f2aeafb26e064fb4929c0e3282aa67b9449c6",
+      "runtimeSHA256": "ce40eec5c01b93ae7f6fa2c3c021bcef3d9f1aaa8fcb0c3e9e11e4ce1d83ff10",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-gift-warm-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-gift-warm-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 552774,
+      "runtimeBytes": 255118,
+      "canonicalSHA256": "8c1cb6b01d496e80f3c0a1e98bcf23b294db2e0ade856a6063b267898049fa4f",
+      "runtimeSHA256": "0838857bc67eb760a3228f791b3b901a743acee0824cdf9b028342aaa512e4b4",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-mending-hurt-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-mending-hurt-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 557948,
+      "runtimeBytes": 260194,
+      "canonicalSHA256": "bd30b60cfeeacc39d861299e80cbc992619eec8bce485b1cf7205d021d37e005",
+      "runtimeSHA256": "ef7b2532cc907a794fb607b68ba3f9c212f5e89f3b775f2f0ced2ddc4a140968",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-mending-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-mending-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 785192,
+      "runtimeBytes": 342686,
+      "canonicalSHA256": "fa46adab32f46d5ab513bb3278a19f0ffbf248176dfedff0285779e6f25295fd",
+      "runtimeSHA256": "c81b2f63e1a72666a60326fb91240c324967c21f47e9a71d408f5763ddaf1e2f",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-mending-warm-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-mending-warm-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 555726,
+      "runtimeBytes": 258336,
+      "canonicalSHA256": "d3cf721fab281c37e27b1de745a53bc3f8ef0787e24ad093fc018d03d118eb33",
+      "runtimeSHA256": "da175f3151a93f3bf0c7f092975e84726a11400608e5154e530f038ad73560cb",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-name-hurt-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-name-hurt-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 503698,
+      "runtimeBytes": 233534,
+      "canonicalSHA256": "cd31c6748a4637e6330c37bc49bcb5a7098befccbd18089f5bbd3d19cb2380e2",
+      "runtimeSHA256": "5746ae359072d451ec396d2d81cca9b12407768f12052e98e2166af6df7487ad",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-name-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-name-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 678412,
+      "runtimeBytes": 301642,
+      "canonicalSHA256": "82e3bf24866643bfee0e64c7333b7d41cab3397efbd2d8acef06cbdf272b5a03",
+      "runtimeSHA256": "b6073727d5bdd1c99df4a01a0c1a21096a3a928cf635f68bfb8d91cfcd73076d",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-name-warm-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-name-warm-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 467786,
+      "runtimeBytes": 220544,
+      "canonicalSHA256": "eebe4277d20601644e2ece978abeb194435c38001f6338cc0f4430016ab2ddea",
+      "runtimeSHA256": "e615fe0d6e43cb1396df0a2b2f03a9cd9e73689f44bc004269fae06af64d00b5",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-rain-hurt-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-rain-hurt-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 481834,
+      "runtimeBytes": 225786,
+      "canonicalSHA256": "c7d83319babfd1048a900bd46785a8fe5c319dc762bc2f7796d890e1cb7c0fbb",
+      "runtimeSHA256": "072d45f66d6c3c47b48bb69a7ea38e0c67cc12efca216dabc523734c36a28605",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-rain-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-rain-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 652574,
+      "runtimeBytes": 292688,
+      "canonicalSHA256": "fde9dfdcadac17a9ba64af2cc33fc3e7077a118f6409c6e00172c24eef6c44e9",
+      "runtimeSHA256": "31ad89d8c0451143c86e1eebcec4862ea4f4b176a364e87272d67c8c0a7dd252",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-rain-warm-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-rain-warm-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 473092,
+      "runtimeBytes": 224472,
+      "canonicalSHA256": "d7103edc73e9e598da8d9677bf7d886403e35bd9568dcf22d4d7a9b89bf48577",
+      "runtimeSHA256": "ddd9ff12ad57461f968e9c248085cefe545eb468267ce74be764e2869ddb7131",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-rest-hurt-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-rest-hurt-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 506806,
+      "runtimeBytes": 235060,
+      "canonicalSHA256": "7e299d00108a95b86848e077eb98bd33a084810f07adfdd4c37784f9b2767246",
+      "runtimeSHA256": "c6a554073630552d96cbfbd5d4783eea74cfb19f64581d5abbacd3973b765e02",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-rest-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-rest-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 653666,
+      "runtimeBytes": 290508,
+      "canonicalSHA256": "990346a678853f5b453801e515422e74562d8448ff8effc3496c0b36fa728b86",
+      "runtimeSHA256": "9ae5949ef27f564148fe78a0d6bfe7cc2086ba442f945787c8f51865625d237e",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-rest-warm-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-rest-warm-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 473946,
+      "runtimeBytes": 219644,
+      "canonicalSHA256": "5184d40a14251e03c9b3244bd5dfc6e9dd47b27f2d604e4abff7e0b8e7326208",
+      "runtimeSHA256": "d72412249e7f2b8a65eb01405d2772c9283a129c8306cd5eb8f4bde50613258e",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-tears-hurt-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-tears-hurt-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 522342,
+      "runtimeBytes": 243576,
+      "canonicalSHA256": "0c3e3449741bacc48edf1cff6665fb9abedd801ed7ec466096f74a20f56705af",
+      "runtimeSHA256": "45d2c89519d179eaa5faaef71b5e0353fe7f1349bc93c51102ca402c03b47e61",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-tears-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-tears-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 714214,
+      "runtimeBytes": 315724,
+      "canonicalSHA256": "0898f28f217b91096010c6b10c35fdb0cc6752ecb9d5697968a426dc11e3e683",
+      "runtimeSHA256": "a7a127c70d4a3d3cbd53e3de7e6c300bb4a98ae357e1a8f4867f5c66810b615f",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-tears-warm-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-tears-warm-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 521206,
+      "runtimeBytes": 244536,
+      "canonicalSHA256": "6873b8cf79c01c0161c58c6f333df81df643e06df907036f19f66910d34bac3e",
+      "runtimeSHA256": "f0516b651e7b32d7765b0dd4024f4404dea2b167ffd4ba87e5facd7cda8f934a",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-tomorrow-hurt-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-tomorrow-hurt-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 531114,
+      "runtimeBytes": 252100,
+      "canonicalSHA256": "eb1730f58354b4fae8dd75de0a0d11b75f46537ddaf1d87c3de09fde1f12ee90",
+      "runtimeSHA256": "2aa6e995d0a10ff8875cc85120199528ecdda2e2d5c0fb9b8879d8c73c8a1ca0",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-tomorrow-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-tomorrow-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 755516,
+      "runtimeBytes": 335326,
+      "canonicalSHA256": "4889b198db2f1679eb0164ccf4334ef3d6e2430383d872638d978132beaf8d17",
+      "runtimeSHA256": "61b7a967e01d8d000856b4b2fed376d640f14d953179fb521799f2b782a1e799",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-event-tomorrow-warm-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-event-tomorrow-warm-pc98-r5.webp",
+      "originalSize": [
+        1024,
+        1536
+      ],
+      "size": [
+        640,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 537306,
+      "runtimeBytes": 253196,
+      "canonicalSHA256": "60e63e2f1afe4966ff3aae2892729f09724ac593e295fdd61f1f61f8f3aa42ba",
+      "runtimeSHA256": "7a84c9f3fad08d9538af6284db0b0309ce4ee7961f9d3cb607c8a0f22e6c9fe5",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-scene-arrow-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-scene-arrow-pc98-r5.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 776552,
+      "runtimeBytes": 601610,
+      "canonicalSHA256": "39e2224332ffad7e43ce4515ea4b8cc8046492e18c4883d17f9251bbaee22bed",
+      "runtimeSHA256": "046f0c8bba2fc327b927387b66d9268a6c9a11f8de63120f42f81168a3c257c2",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-scene-dawn-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-scene-dawn-pc98-r5.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 778076,
+      "runtimeBytes": 611722,
+      "canonicalSHA256": "7549efeb4ec4f5abe06df3e28c765c0af2d2fee1c448ddb79f51c936a1296837",
+      "runtimeSHA256": "a6aff68a3b6cf9533a3debb3be257f9d755f6b7df85df5c30bebe4cf4549e711",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-scene-distance-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-scene-distance-pc98-r5.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 683770,
+      "runtimeBytes": 530848,
+      "canonicalSHA256": "c50cbc6bc9f0fb5cb866790f75940ac6223ca067dd3f659e20726aacf5e8cfd8",
+      "runtimeSHA256": "ce1cfd5e345825b31af89c542c4944cb9ed7cf35931388baa9cf27b50e7d6854",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-scene-fear-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-scene-fear-pc98-r5.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 758994,
+      "runtimeBytes": 591036,
+      "canonicalSHA256": "4b83cf066737c43baa5079468f38fde6be312f73b8dda9ba915a7ce4fc00dafe",
+      "runtimeSHA256": "29b24418592d94d99cb02bb17e82f81d206f5c8d0ed8f30546221c5a05e0a865",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-scene-freedom-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-scene-freedom-pc98-r5.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 713786,
+      "runtimeBytes": 558136,
+      "canonicalSHA256": "0f55d98928f05fc232c99e3dd08f58737b274b3e7afcaded6cf766b9c0d99159",
+      "runtimeSHA256": "fcbde7ccc2817c7e01f16b0ed6aac46d164009b944344fbafa5883c31a3ad440",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-scene-gift-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-scene-gift-pc98-r5.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 768852,
+      "runtimeBytes": 595800,
+      "canonicalSHA256": "dc3aa5f460a98ac004d47a9ebd286596f6179453d0bade4cf59fbe0b4e74bd33",
+      "runtimeSHA256": "7719866e5ee733c0130e26f2ef44aae9a8791a503babc060bad5f6a4635360e2",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-scene-mending-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-scene-mending-pc98-r5.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 690362,
+      "runtimeBytes": 532216,
+      "canonicalSHA256": "06cfefab39f4318e265fc0274ed08e330da40b3c0ab3ac3c32b6b53edd3104fa",
+      "runtimeSHA256": "6e6723cf927fa0f038570076fc641cc07a4d6f842610f2d6271eaec0b89d8c09",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-scene-name-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-scene-name-pc98-r5.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 744298,
+      "runtimeBytes": 578184,
+      "canonicalSHA256": "c3a435e40945f69fc627b01b826a49433f9f619bb9ae5b083579818f4a481931",
+      "runtimeSHA256": "af4cfdd947e4d348fa667540a7399e57f9b427ecbc8cd9f8f6740e094827cbf4",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-scene-rain-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-scene-rain-pc98-r5.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 804540,
+      "runtimeBytes": 619638,
+      "canonicalSHA256": "28b0846ded9c01cc68825fec909e23f9ecb2389782860345b273dd44079275da",
+      "runtimeSHA256": "7b75dfc85c2f873ed3ead8017c8894a07c73a1c84b9becab0a02d9465d82b074",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-scene-rest-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-scene-rest-pc98-r5.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 768044,
+      "runtimeBytes": 597888,
+      "canonicalSHA256": "040e8efc2a17a41c3f5c472eb638fa8947b3df17d4527fbf8b4c3509e27ef87d",
+      "runtimeSHA256": "2a52d38f68fa6a0ccfe99caf6d4438345462cdb0a4c1bee0fcb3a55b0a398fe5",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-scene-tears-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-scene-tears-pc98-r5.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 742604,
+      "runtimeBytes": 589788,
+      "canonicalSHA256": "8981e3b90276f0a30db33c1d4d18ddd52682988b89ba1f8a3ee4f4c54e8cf84b",
+      "runtimeSHA256": "3f7ba8136d44b80aaca5a611ac24a45b2186a9c7773e1c5526e8c9005dc4769a",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-scene-tomorrow-pc98-r5.webp",
+      "runtime": "bridge/assets/lust-vn-scene-tomorrow-pc98-r5.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 838404,
+      "runtimeBytes": 647174,
+      "canonicalSHA256": "dbd06959954339ac969f3695fdee766ce05ae5a12731f93339ecc163dd7fce26",
+      "runtimeSHA256": "776b86cc48df77ae0b4d6f0dd2c57141dd0de6018baf679d9de34eec5a0e3836",
+      "transparent": false
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-shadow-pc98-r4.webp",
+      "runtime": "bridge/assets/lust-vn-shadow-pc98-r4.webp",
+      "originalSize": [
+        1086,
+        1448
+      ],
+      "size": [
+        720,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 677742,
+      "runtimeBytes": 335446,
+      "canonicalSHA256": "18659d1d6fd9fe48c98f96e88d2cad6b4ba12ee62ce153e7a60e9ec7e0a9bf91",
+      "runtimeSHA256": "1681276663a9bf74f328371d0291ac91a3395dd73457d99352834e8934a3daa4",
+      "transparent": true
+    },
+    {
+      "canonical": "source-assets/lust/canonical-webp/lust-vn-shore-pc98-r4.webp",
+      "runtime": "bridge/assets/lust-vn-shore-pc98-r4.webp",
+      "originalSize": [
+        1448,
+        1086
+      ],
+      "size": [
+        1280,
+        960
+      ],
+      "quality": 88,
+      "resize": "nearest",
+      "canonicalBytes": 638514,
+      "runtimeBytes": 501000,
+      "canonicalSHA256": "c348592e847404450fd30bf4c2acbe2ae0b0579b1d8daad08c8a01aa8d04f21b",
+      "runtimeSHA256": "429d283666d1d09d17129331010268e3a90b0ef30098cf2c39d91a494dad290d",
+      "transparent": false
+    }
+  ],
+  "historicalRuntimeRelocations": [
+    {
+      "oldRuntime": "bridge/assets/lust-bad-r1.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-bad-r1.webp",
+      "bytes": 580468,
+      "sha256": "07ee9b2ad851d6c1077aaf742b68c5dc4499062d6ca84c5fe98b7c940405d06f"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-bad-r2.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-bad-r2.webp",
+      "bytes": 588814,
+      "sha256": "f8822475028147bb6dc1975228258db8c6a2e9d3cca24702a0068c268d85aaa4"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-body-r1.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-body-r1.webp",
+      "bytes": 622720,
+      "sha256": "324d566fb7a03b421ec1b775cae11f2b1feb0a4cb5265f5a921fad604641857e"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-clouds-r1.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-clouds-r1.webp",
+      "bytes": 580348,
+      "sha256": "cef398fe14ff436e6c7f392285959e0a9136b6ae4bd223072aa3c6da0102443b"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-cupid-r1.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-cupid-r1.webp",
+      "bytes": 637430,
+      "sha256": "bc181eccd27180b79a72d53d836bf6c32aa8308548283e46b0a0534b4addfb15"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-good-r1.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-good-r1.webp",
+      "bytes": 664002,
+      "sha256": "533ea8d9a15f5f78257a841e6d1fdbe7f2fe8a811255c4837785fa68bdb67c1b"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-intro-r1.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-intro-r1.webp",
+      "bytes": 667494,
+      "sha256": "1d13b886600c58db0d2582cc5d7990e749b8e7034416eeaab8a5191368cac3a5"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-lost-r1.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-lost-r1.webp",
+      "bytes": 643346,
+      "sha256": "9c79b255c451914d7d4c3d3aa3b8d2707220dcc8af74a969bce153493d69cae7"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-lost-r2.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-lost-r2.webp",
+      "bytes": 606774,
+      "sha256": "252bd17587c1d2a3d9944d85b44901d34d1fac3e8d09f908c6b37806d97f119f"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-monster-r1.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-monster-r1.webp",
+      "bytes": 592794,
+      "sha256": "aa4c0e6c5c917578074b3d32518d0b4514c0244c093d7e5a2696f078e5b7a02e"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-monster-r2.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-monster-r2.webp",
+      "bytes": 579082,
+      "sha256": "f2f53bfba34fe21ffc59b2b0e9ea07f80b52cf8e6cbe3da7dece3d9d97d8fa4c"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-promenade-r5.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-promenade-r5.webp",
+      "bytes": 742506,
+      "sha256": "9ed1d3b7b8441289d2a99a50b09c6dd8787af8de6c0d5b5b2fc5e30af3d69d9d"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-rage-r1.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-rage-r1.webp",
+      "bytes": 654154,
+      "sha256": "6a5bff28b9c8a7a315de9d2ece0c238646493f65a9820f822c3eaf2c27b8240a"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-rage-r2.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-rage-r2.webp",
+      "bytes": 578504,
+      "sha256": "1285c1998dc3cfdd2cf7208a78fe5118abdd06164371bb0703ac0609aafbf39f"
+    },
+    {
+      "oldRuntime": "bridge/assets/lust-transform-r1.webp",
+      "preserved": "source-assets/lust/canonical-webp/lust-transform-r1.webp",
+      "bytes": 670344,
+      "sha256": "4d084f09a3adfacd790ebc91207ce1d063f61032ce6be39608bda04bd6dd1e3f"
+    }
+  ],
+  "bytes": {
+    "canonicalActive": 40290412,
+    "optimizedActive": 23646228,
+    "historicalRemovedFromDeployment": 9408780
+  },
+  "encoder": {
+    "pillow": "12.3.0",
+    "libwebp": "1.6.0",
+    "quality": 88,
+    "method": 6,
+    "resize": "nearest",
+    "exactTransparentRGB": true
+  }
+}
