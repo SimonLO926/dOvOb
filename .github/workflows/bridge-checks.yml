@@ -19,6 +19,11 @@ jobs:
           node-version: '22'
       - name: Boss and shared game regression tests
         run: node --test bridge/*.test.mjs bridge/minigames/*.test.mjs bridge/envy/*.test.mjs bridge/lust/*.test.mjs bridge/cartridge/*.test.mjs
+      - name: Verify cartridge geometry, colors and pointer rays
+        run: |
+          npm install --prefix "$RUNNER_TEMP/cartridge-tools" --no-package-lock --ignore-scripts --no-audit --no-fund esbuild@0.27.0 three@0.180.0
+          NODE_PATH="$RUNNER_TEMP/cartridge-tools/node_modules" "$RUNNER_TEMP/cartridge-tools/node_modules/.bin/esbuild" bridge/tools/cartridge-batch.test-source.mjs --bundle --platform=node --format=esm --outfile="$RUNNER_TEMP/cartridge-batch.test.mjs"
+          node --test "$RUNNER_TEMP/cartridge-batch.test.mjs"
       - name: Build actual Pages output
         uses: actions/jekyll-build-pages@v1
       - name: Verify runtime pages and source exclusions
