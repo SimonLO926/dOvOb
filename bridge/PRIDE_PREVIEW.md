@@ -1,5 +1,11 @@
 # Crazy Pride 試玩版 · 1.2.26（狂暴紅色王冠鏡子）
 
+## 持久記憶工作流程（2026-10-14 使用者要求）
+
+每次開始或恢復工作前，先讀 [memory/progress.md](../memory/progress.md)、[memory/todo.md](../memory/todo.md) 及 [最新要求](../memory/notes/latest-requirements.md)，再依本文件核對遠端、分支、未提交修改及授權。重要發現、中間狀態、完成項目與驗證證據必须寫回 memory；每完成一階段更新待辦，並在 progress.md 寫「下次恢復時應從哪裡繼續」。接近限額或交接前先寫回；整理記憶不能恢復已取消設定。
+
+最新使用者要求優先，記憶不能代替讀實際檔案與驗證，亦不能保證每個 agent 自動遵守。使用者已授權把記憶及本工作流程放 GitHub；這不是第五 Boss 的 OK，也沒有授權推送其遊戲／素材、發布 Preview 或正式整合。
+
 修改前先讀 [Crazy 關卡製作必讀](CRAZY_MUST_READ.md)。使用者已批准合併至正式版；目前版本 1.2.26；獨立 Preview 保留在 GitHub，主遊戲不提供試玩入口。來源更新包與所有修改保留。
 
 畫面、血條、文字與按鈕同步遵守 [Boss 畫面與操作必讀規範](BOSS_UI_MUST_READ.md)，包含紅鏡、三軌及逃塔例外與修改後驗收表。

@@ -1,5 +1,6 @@
 theme: jekyll-theme-cayman
 exclude:
+  - memory
   - source-assets
   - bridge/tools
   - "**/*.test.mjs"
