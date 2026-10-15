@@ -1,0 +1,70 @@
+{
+  "version": "1.2.39",
+  "merge": "0bde2420ea5e600d82b8297eafb5e8c953c49c51",
+  "deployment": 38744739077,
+  "files": [
+    {
+      "path": "bridge/version.mjs",
+      "status": 200,
+      "bytes": 80,
+      "matchesLocal": true,
+      "sha256": "6213f2b0c8beaf65eaedae863480ca62cdee74c03a117d17abb66bbe8784d3cd"
+    },
+    {
+      "path": "bridge/index.html",
+      "status": 200,
+      "bytes": 216171,
+      "matchesLocal": true,
+      "sha256": "bbee0d327efa834db8fe6112ad92a4d9fa49e1185305639104e932dfcfea6c52"
+    },
+    {
+      "path": "bridge/lust.html",
+      "status": 200,
+      "bytes": 17789,
+      "matchesLocal": true,
+      "sha256": "ac6bc3445ddb8e302f760194afaace095295225f27d976b64e1f41a850f77a91"
+    },
+    {
+      "path": "bridge/lust/app.mjs",
+      "status": 200,
+      "bytes": 19432,
+      "matchesLocal": true,
+      "sha256": "2d93329d013cd2bf651a383503b0059dc04c8878fb06e0dbcdec96b4daafd3e6"
+    },
+    {
+      "path": "bridge/lust/engine.mjs",
+      "status": 200,
+      "bytes": 20560,
+      "matchesLocal": true,
+      "sha256": "6f5e76afa90716ee00419141ed149e1d788170235123504d37bb7cc1b924d969"
+    },
+    {
+      "path": "bridge/lust/arcade.mjs",
+      "status": 200,
+      "bytes": 18763,
+      "matchesLocal": true,
+      "sha256": "77ff0b6ab29b7f97ef43567b4daf97173431e1c88f99d6948855c465a615fa0b"
+    },
+    {
+      "path": "bridge/lust/charm.mjs",
+      "status": 200,
+      "bytes": 7858,
+      "matchesLocal": true,
+      "sha256": "b9542e20074f8a2dee7b0b0c5cf743ddb56b8fefa9944c48e55d3e8fac3b5be1"
+    },
+    {
+      "path": "bridge/gluttony/preview.bundle.js",
+      "status": 200,
+      "bytes": 134849,
+      "matchesLocal": true,
+      "sha256": "075a8a713d2a15b211e8e446d459143471e85121a293ce3db07347da402d1607"
+    },
+    {
+      "path": "bridge/cartridge/demo.bundle.js",
+      "status": 200,
+      "bytes": 658677,
+      "matchesLocal": true,
+      "sha256": "2410595fa72d79ad378f69ead12e9e1272c5d6948d99face41289c69c23e0fb5"
+    }
+  ]
+}

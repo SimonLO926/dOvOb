@@ -12,3 +12,9 @@
 - [x] 未玩項目優先／半血補齊／16秒Bridge／西瓜門檻保留。
 - [x] 569項Node、四比例正式bundle排程fixture、容量核對。
 - [x] 準備更新既有PR #83，交付前核對本次CI。
+
+## 使用者merge指示
+
+- [x] 最終PR CI run38741796861全部成功。
+- [x] 合併PR #83至master。
+- [x] Pages run38744739077 build／deploy成功，9檔線上逐位元核對1.2.39。

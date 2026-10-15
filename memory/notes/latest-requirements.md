@@ -1,5 +1,14 @@
 # 最新要求與不可還原設定
 
+## 2026-10-15 1.2.39 已合併並部署
+
+使用者明確指示「merge」，PR #83已合併至master，合併提交0bde2420ea5e600d82b8297eafb5e8c953c49c51。最終程式cb92094f964cb1be08e2e6e46f31dcd01a8e6667的CI run38741796861全部成功（569遊戲回歸、4卡帶幾何、bundle cmp、Jekyll／來源排除）。正式Pages run38744739077的build及deploy均成功：https://github.com/SimonLO926/dOvOb/actions/runs/38744739077 。
+
+已核實線上1.2.39：主頁、version、色慾HTML／app／engine／arcade／charm、暴食bundle及卡帶bundle共9檔HTTP200且逐位元與已驗本機版本一致，SHA在source-assets/lust/verification-1.2.39/live-verification.json。正式網址 https://simonlo926.github.io/dOvOb/bridge/ 。本次涵蓋色慾結算返回、約會節奏／電眼Normal／Hard，以及暴食未玩優先；西瓜真正處決後解鎖規則保留。下方「尚未合併部署」均為當時歷史，不能再當現況。
+
+下次恢復：從master1.2.39及使用者新回饋繼續，不重建PR #83或重做合併；原圖音樂、正式存檔／解鎖與來源排除保留。此文件紀錄提交不改部署程式。
+
+
 ## 2026-10-15 暴食也優先未玩項目（1.2.39／PR #83追加）
 
 使用者要求「同樣暴食也優先安排沒有玩過的」。普通輪替在尚有未玩項目時，原本穿插攻擊的奇數回合也改為補未玩項目；半血以下連續補齊。未齊前Bridge16秒，齊後恢復24秒與原攻擊輪替。Bridge獎勵沿用同一未玩清單。第一血僅蛇／三消／割繩／切果，真西瓜處決成功才加入普通合成；處決不算已玩普通合成，新解鎖項目亦優先。played維持當場紀錄、不在換型態重置；第三型態逃亡成功仍優先最後反攻。
