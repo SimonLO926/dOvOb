@@ -1,4 +1,4 @@
-import {woman,drawArcade,arcadeHint,FEEDBACK} from './arcade-view.mjs';
+import {woman,drawArcade,arcadeHint,FEEDBACK} from './arcade-view.mjs?v=1.2.39';
 import {cellsOf,ghostY} from '../logic.mjs';
 import {configureBridgePaint,drawGridCells,paintPiece} from '../envy/bridge-paint.mjs';
 import {heart} from '../envy/art.mjs';

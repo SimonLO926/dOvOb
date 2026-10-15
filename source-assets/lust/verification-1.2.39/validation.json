@@ -1,0 +1,19 @@
+{
+  "nodeTests": 565,
+  "geometryTests": 4,
+  "charmInputOnly": {
+    "normal": {
+      "tappingFollowers": 17,
+      "target": 10,
+      "holding": "energy failure"
+    },
+    "hard": {
+      "tappingFollowers": 17,
+      "target": 12,
+      "holding": "energy failure"
+    }
+  },
+  "coldFirstScreenHTTPBytes": 2623273,
+  "scope": "Unstarted preview, local HTTP, no transfer compression. Final return tests use explicit fixtures, not natural full clears. Chromium emulation, not physical devices.",
+  "assets": "Existing art, fonts and MP3 unchanged; source excluded from deployment."
+}

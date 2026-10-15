@@ -1,0 +1,175 @@
+{
+  "cases": [
+    {
+      "width": 390,
+      "height": 844,
+      "campaign": true,
+      "ending": "good",
+      "returned": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "campaign": true,
+      "ending": "bad",
+      "returned": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "campaign": true,
+      "ending": "lost",
+      "returned": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "campaign": false,
+      "ending": "good",
+      "returned": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "campaign": false,
+      "ending": "bad",
+      "returned": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "campaign": false,
+      "ending": "lost",
+      "returned": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "campaign": true,
+      "ending": "good",
+      "returned": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "campaign": true,
+      "ending": "bad",
+      "returned": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "campaign": true,
+      "ending": "lost",
+      "returned": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "campaign": false,
+      "ending": "good",
+      "returned": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "campaign": false,
+      "ending": "bad",
+      "returned": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "campaign": false,
+      "ending": "lost",
+      "returned": true
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "campaign": true,
+      "ending": "good",
+      "returned": true
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "campaign": true,
+      "ending": "bad",
+      "returned": true
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "campaign": true,
+      "ending": "lost",
+      "returned": true
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "campaign": false,
+      "ending": "good",
+      "returned": true
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "campaign": false,
+      "ending": "bad",
+      "returned": true
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "campaign": false,
+      "ending": "lost",
+      "returned": true
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "campaign": true,
+      "ending": "good",
+      "returned": true
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "campaign": true,
+      "ending": "bad",
+      "returned": true
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "campaign": true,
+      "ending": "lost",
+      "returned": true
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "campaign": false,
+      "ending": "good",
+      "returned": true
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "campaign": false,
+      "ending": "bad",
+      "returned": true
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "campaign": false,
+      "ending": "lost",
+      "returned": true
+    }
+  ],
+  "errors": [],
+  "fixture": "Near-final good/bad/lost state via real engine; not a natural full boss clear.",
+  "ok": true
+}

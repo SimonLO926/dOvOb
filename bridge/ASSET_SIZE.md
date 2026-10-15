@@ -201,3 +201,7 @@ r6沿用已能下載的r5輕量方式：十二背景640×480、其餘色慾插�
 ## 1.2.38 暴食正式整合與七曲
 
 原七MP3逐位元保存19,360,315 bytes；完整網站128kbps／44.1kHz／立體聲副本9,687,061 bytes，下降49.96%，每曲時長差<0.15秒。原檔SHA、兩版時長／bytes與副本SHA在source-assets/gluttony/music/manifest.json；source-assets不部署。既有34圖雜湊未變，10張運行WebP仍3,936,302 bytes，原貓／字型共用。獨立頁與正式頁引用同一音樂／bundle，不把ZIP或影片進網站。四比例截圖與JSON見verification-r4。冷快取未開始試玩首屏HTTP body1,643,563 bytes；音樂按當前曲載入，七曲總量不是進關或首屏流量。正式Jekyll產物／來源排除由PR CI檢查。
+
+## 1.2.39 色慾互動與平衡修正
+
+沒有新增／重壓／刪除任何圖、字型或MP3，原檔與部署副本全沿1.2.38。Gluttony及卡帶壓縮bundle重建為134,773／658,677 bytes；變化只來自穩定按鈕與版本標記。Lust維持既有按場景載入WebP與當前曲載入完整128kbps的策略。冷快取未開始試玩首屏2,623,273 HTTP bytes（本機Chromium／HTTP、無傳輸壓縮），不是所有音樂量。測試／工具／來源與verification由Jekyll排除，實際Pages產物排除再由PR CI驗證。

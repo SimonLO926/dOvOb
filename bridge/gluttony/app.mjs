@@ -428,7 +428,7 @@ function presentation() {
   const actions = $("scene-actions");
   actions.hidden = !show;
   if (show) {
-    $("ending-footer").append(actions);
+    if (actions.parentElement !== $("ending-footer")) $("ending-footer").append(actions);
     let p = stories[story.kind];
     if (story.kind === "result")
       p = [
@@ -687,7 +687,7 @@ function render(dt) {
   drawCombatEffects(fxc, fx, { reducedMotion: prefs.reduced });
   if (campaign) recordCampaign(s);
   const nav = document.querySelector(".nav small");
-  nav.textContent = s.hp <= 25 ? "WARNING" : "CRAZY · GLUTTONY · 1.2.38";
+  nav.textContent = s.hp <= 25 ? "WARNING" : "CRAZY · GLUTTONY · 1.2.39";
   nav.style.color = s.hp <= 25 ? "#ff5b78" : "";
   wrap.classList.toggle("danger", s.hp <= 25);
   wrap.classList.toggle(

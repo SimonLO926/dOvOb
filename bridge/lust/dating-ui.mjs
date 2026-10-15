@@ -1,5 +1,5 @@
 import {SCENE_ART,EVENT_ART} from './vn-art.mjs';
-import {DIALOGUE,advanceDating,choose} from './engine.mjs';
+import {DIALOGUE,advanceDating,choose} from './engine.mjs?v=1.2.39';
 import {datingPage,CHAPTERS} from './dating-story.mjs';
 const $=id=>document.getElementById(id);
 const backgrounds={cafe:'./assets/lust-vn-cafe-pc98-r4.webp',shore:'./assets/lust-vn-shore-pc98-r4.webp',dawn:'./assets/lust-vn-dawn-pc98-r4.webp'};

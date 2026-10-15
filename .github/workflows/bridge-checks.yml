@@ -52,11 +52,12 @@ jobs:
               assert 'node_modules' not in p.parts, p
               assert not p.name.endswith('.test.mjs'), p
           PY
-      - name: Attach Gluttony r3 validation evidence
+      - name: Attach Bridge validation evidence
         uses: actions/upload-artifact@v4
         with:
-          name: gluttony-r3-validation
+          name: bridge-validation
           path: |
             source-assets/gluttony/verification-r3/
             source-assets/gluttony/verification-r4/
             source-assets/gluttony/music/manifest.json
+            source-assets/lust/verification-1.2.39/
