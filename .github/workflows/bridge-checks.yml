@@ -5,6 +5,7 @@ on:
     paths:
       - 'bridge/**'
       - 'source-assets/lust/**'
+      - 'source-assets/gluttony/**'
       - '_config.yml'
       - '.github/workflows/bridge-checks.yml'
 permissions:
@@ -18,12 +19,17 @@ jobs:
         with:
           node-version: '22'
       - name: Boss and shared game regression tests
-        run: node --test bridge/*.test.mjs bridge/minigames/*.test.mjs bridge/envy/*.test.mjs bridge/lust/*.test.mjs bridge/cartridge/*.test.mjs
+        run: node --test bridge/*.test.mjs bridge/minigames/*.test.mjs bridge/envy/*.test.mjs bridge/lust/*.test.mjs bridge/cartridge/*.test.mjs bridge/gluttony/*.test.mjs
       - name: Verify cartridge geometry, colors and pointer rays
         run: |
           npm install --prefix "$RUNNER_TEMP/cartridge-tools" --no-package-lock --ignore-scripts --no-audit --no-fund esbuild@0.27.0 three@0.180.0
           NODE_PATH="$RUNNER_TEMP/cartridge-tools/node_modules" "$RUNNER_TEMP/cartridge-tools/node_modules/.bin/esbuild" bridge/tools/cartridge-batch.test-source.mjs --bundle --platform=node --format=esm --outfile="$RUNNER_TEMP/cartridge-batch.test.mjs"
           node --test "$RUNNER_TEMP/cartridge-batch.test.mjs"
+      - name: Verify Gluttony bundle matches maintained modules
+        run: |
+          npm install --prefix "$RUNNER_TEMP/gluttony-tools" --no-package-lock --ignore-scripts --no-audit --no-fund esbuild@0.27.0
+          "$RUNNER_TEMP/gluttony-tools/node_modules/.bin/esbuild" bridge/gluttony/app.mjs --bundle --format=esm --minify --outfile="$RUNNER_TEMP/gluttony.bundle.js"
+          cmp bridge/gluttony/preview.bundle.js "$RUNNER_TEMP/gluttony.bundle.js"
       - name: Build actual Pages output
         uses: actions/jekyll-build-pages@v1
       - name: Verify runtime pages and source exclusions
@@ -31,6 +37,9 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           site=Path('_site')
+          assert (site/'bridge/gluttony-preview.html').is_file()
+          assert (site/'bridge/gluttony/preview.bundle.js').is_file()
+          assert not (site/'memory').exists()
           assert (site/'bridge/lust-preview.html').is_file()
           assert (site/'bridge/cartridge-preview.html').is_file()
           assert (site/'bridge/lust.html').is_file()
@@ -41,3 +50,8 @@ jobs:
               assert 'node_modules' not in p.parts, p
               assert not p.name.endswith('.test.mjs'), p
           PY
+      - name: Attach Gluttony r3 validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: gluttony-r3-validation
+          path: source-assets/gluttony/verification-r3/

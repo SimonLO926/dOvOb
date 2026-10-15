@@ -1,19 +1,13 @@
 # 目前進度（恢復時先讀）
 
-更新：2026-10-14。目標：完成第五 Boss 暴食獨立 Preview r2，持久保存最新要求／進度；等待本 Boss 試玩回饋與明確 OK。
+更新：2026-10-15。第五 Boss 暴食 r3 已恢復及驗證，準備透過GitHub API保存分支及建立PR。
 
-## 現況
-
-- 原本沒有 memory；已建立 progress.md、todo.md、notes/。根及 Bridge 等11份必讀文件已加入先讀／階段寫回／交接規則。
-- 只有 memory、必讀流程與 memory 排除部署設定已保存 GitHub master：b59956a。遠端回讀核對通過；沒有第五Boss程式／素材、PR或正式整合／發布。
-- 本地 `/workspace/dOvOb` 分支 preview/gluttony-r1，HEAD仍4958f1e（master1.2.37／PR#81基準）；r1及r2成果是本地未提交內容，保留所有修改／來源。origin/master的較新提交是純記憶文件，不能把它誤讀成Boss已整合。
-- r2七項玩法修正已完成。42新版＋502既有Node通過（分次執行），128場景四比例、真CDP觸控、單檔完整HTTP及階段銜接通過；細節見 notes/r2-verification.md。
-- 試玩HTML／ZIP、原音效影片及截圖已完成，本地交付 `/workspace/artifacts/gluttony-preview-r2/`。換果圖標已從盤底移至目標行以避免擋水果，最後四比例真西瓜與觸控／可攜包已重驗。新版下載副本與81.95秒原音效影片已完成，正在交付。
-
-## 最新授權
-
-使用者明確授權 memory 與必讀工作流程放GitHub。第五Boss仍未取得明確OK；不可推送其遊戲／美術、建立／合併Boss PR、公開發布Preview或正式整合。已推出前四罪／正式存檔／卡帶1.2.37效能保留。只有音效等待使用者BGM，不生成／借曲；背景不恢復大量塔／拱門。
+- 新環境從遠端 master c354e927 clone，分支 `preview/gluttony-r3`；起步未見暴食遠端分支或 PR，保留1.2.37四Boss、卡帶及全部現有更新。
+- 使用者本次明確授權推送第五Boss遊戲／素材及建立PR，取代舊「只可memory」限制。沒有授權合併、部署、公開發布或正式接線。
+- 已先讀Drive metadata，以 include_base64=false 原檔串流恢復 r2 source-handoff 79,594,622 bytes及r3 preview ZIP 5,751,181 bytes。搜尋gluttony與r3 source-handoff未發現較新來源包。
+- 僅恢復第五關新檔與來源，不覆蓋交接包內舊共用文件。r2程式歷史另存source-assets/gluttony/drafts/r2-code；r3原bundle保留source-assets/gluttony/recovered-r3.bundle.js。
+- r3交換／退回／消除／下落／連鎖、蛇45秒繼續計分及手機隱藏控制貓位置已恢復至模組，原r3與重建bundle經lexical binding統一命名後完全相同。552項Node＋4卡帶幾何、Chromium四比例128入口及真CDP／近目標fixture操作全部通過。證據見source-assets/gluttony/verification-r3。
 
 ## 下次恢復時應從哪裡繼續
 
-先讀 todo、notes/latest-requirements.md、notes/handoff.md、notes/r2-verification.md，再核對遠端／分支／未提交修改及必讀文件。交付檔已在gluttony-preview-r2，從使用者新回饋或音樂素材繼續，**不要重做已完成修正、恢復r1目標或把舊測試當最新版批准**。每階段立即更新本檔；中間歷史另存notes，當前狀態不可混成互相矛盾的待辦。
+先讀todo及notes/latest-requirements；不要重跑已完成驗證。從本分支已完成原碼／來源／驗證紀錄繼續commit與GitHub API保存：git CLI push明確失敗 `could not read Username for https://github.com: No such device or address`，改用已連接GitHub工具。工具在工作區tooling，不提交依賴。完成容量／原圖SHA核對及實測後，commit、push此分支並建立PR，取得URL；不要merge或deploy。舊r2驗證為歷史，見notes/r2-verification.md。

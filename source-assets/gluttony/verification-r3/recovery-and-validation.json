@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-15",
+  "baseline": "c354e92708929a3d078320e819ef894eccfdf40b",
+  "recovery": [
+    {
+      "driveId": "1z1cIcjJoqKh5CsjuCyTIHBx35Pk4oK-P",
+      "file": "gluttony-r2-source-handoff.zip",
+      "bytes": 79594622,
+      "sha256": "28f71eec213e3853b0123a321cfcae0dcde38058e4fecad479d6efa593475040"
+    },
+    {
+      "driveId": "1CbM8zkFn7PTSOJHt5h5DY20Q9AeDoPVk",
+      "file": "gluttony-r3-preview.zip",
+      "bytes": 5751181,
+      "sha256": "5c6ff906b5962e0cc4e5163ab0d5c982cd99fdf78d9637b4a94a7e2a97653a55"
+    },
+    {
+      "driveId": "1h2DAyPp0h0ycVWhwR1zW-Ft6xjuTO7Mm",
+      "file": "gluttony-r3-playable.html",
+      "bytes": 7766349,
+      "sha256": "447358f04c70febd880bfa933018ceea60691d8a6bcabc368676270e5110da59"
+    }
+  ],
+  "singleHtmlReconstructedExactly": true,
+  "referenceBundleSha256": "11620c0befc0de7f6e97861b84bd6874d94365c84c02cc68c07b75641d5533ac",
+  "rebuiltBundleSha256": "83c4d171387a8f3a54df35eaf96f340cebae1fe03144e6fe32a715e7eaa4362e",
+  "canonicalASTSha256": "904362d59bbebd61b89efd1a6b9c603276b9e75ceb1a8f9d9371bde66fce376f",
+  "equivalence": "Babel parse, scope-aware renaming of all lexical bindings in declaration order, regenerate without comments: original r3 and rebuilt are exactly equal. Only identifier names differ before normalization. esbuild 0.27.0.",
+  "newTests": 8,
+  "gluttonyTests": 50,
+  "existingTests": 502,
+  "totalNodeTests": 552,
+  "additionalCartridgeGeometryTests": 4,
+  "browserScenarios": 128,
+  "browserErrors": 0,
+  "coldLocalHttpBytes": 1610250,
+  "adoptedPNGBytes": 30470738,
+  "runtimeWebPBytes": 3936302,
+  "runtimeNewFilesBytes": 4159604,
+  "offlineHtmlBytes": 7766349,
+  "offlineZipBytes": 5749978,
+  "limitations": [
+    "No physical iPad, Safari or low-end GPU test",
+    "Near-end fixtures and accelerated clock explicitly used; not natural full-Boss gameplay",
+    "No dedicated BGM supplied; original WebAudio effects only",
+    "Local source HTTP response bytes are not Pages/CDN or actual Jekyll output size; PR CI will build actual Pages output"
+  ],
+  "sourcePreservedBytes": 67708357
+}
