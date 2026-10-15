@@ -1,0 +1,39 @@
+{
+  "viewports": [
+    {
+      "width": 390,
+      "height": 844,
+      "unplayedBeforeAttack": true,
+      "halfHpConsecutive": true,
+      "watermelonGate": true,
+      "ordinaryMergeAfterUnlock": true
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "unplayedBeforeAttack": true,
+      "halfHpConsecutive": true,
+      "watermelonGate": true,
+      "ordinaryMergeAfterUnlock": true
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "unplayedBeforeAttack": true,
+      "halfHpConsecutive": true,
+      "watermelonGate": true,
+      "ordinaryMergeAfterUnlock": true
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "unplayedBeforeAttack": true,
+      "halfHpConsecutive": true,
+      "watermelonGate": true,
+      "ordinaryMergeAfterUnlock": true
+    }
+  ],
+  "errors": [],
+  "scope": "Explicit scheduling fixtures; actual bundled RAF advances rounds. Not a natural full boss clear.",
+  "ok": true
+}

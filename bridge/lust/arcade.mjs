@@ -1,5 +1,5 @@
 // Independent date mechanics. Native Bridge/attacks remain in engine.mjs.
-import {initCharm,charmInput,charmPoint,charmUpdate} from './charm.mjs';
+import {initCharm,charmInput,charmPoint,charmUpdate} from './charm.mjs?v=1.2.39';
 export const ARCADE=['archery','piano','claw','tennis','feeding','cinema','wheel','volley','haunted','dance','charm'];
 const limit=(v,a,b)=>Math.max(a,Math.min(b,v)),axis=(s,a,b)=>Number(s.held.has(b))-Number(s.held.has(a));
 export const HAUNT_WALLS=[];
@@ -13,7 +13,7 @@ export function timingState(m){
 export const rhythmWindow=s=>s.difficulty==='hard'?125:175;
 export function danceTiming(s){const step=s.round.steps.find(n=>!n.hit&&!n.miss);if(!step)return null;const delta=step.at-s.round.clock;return {step,delta,value:Math.max(0,Math.min(1,.85*(1-delta/1250))),low:.85-rhythmWindow(s)*.85/1250,high:.85+rhythmWindow(s)*.85/1250,ready:Math.abs(delta)<rhythmWindow(s)};}
 export function initArcade(s){const m=s.round;if(!ARCADE.includes(m.id))return;
- Object.assign(m,{duration:m.id==='archery'?45000:['tennis','volley'].includes(m.id)?75000:m.id==='haunted'?65000:50000,target:{archery:10,piano:24,claw:3,tennis:3,feeding:5,cinema:5,wheel:3,volley:5,haunted:3,dance:12}[m.id],lostPoints:0,charge:0,trail:[],stamina:100,player:{x:72,y:458,vy:0,jump:0,pose:0},opponent:{x:215,y:458,vy:0,pose:0},rally:0,serve:0,reset:900});
+ Object.assign(m,{duration:m.id==='archery'?30000:['tennis','volley'].includes(m.id)?50000:m.id==='haunted'?65000:40000,target:{archery:6,piano:24,claw:2,tennis:2,feeding:3,cinema:3,wheel:2,volley:3,haunted:3,dance:12}[m.id],lostPoints:0,charge:0,trail:[],stamina:100,player:{x:72,y:458,vy:0,jump:0,pose:0},opponent:{x:215,y:458,vy:0,pose:0},rally:0,serve:0,reset:900});
  if(m.id==='volley'){m.ball={x:64,y:315,vx:0,vy:0};m.x=72;m.y=458;m.lastTouch=null;m.contact=0;}
  if(m.id==='tennis'){m.x=174;m.y=438;m.partner={x:68,y:394};m.opponents=[{x:80,y:238,stamina:100},{x:205,y:264,stamina:100}];m.ball={x:m.x,y:m.y,z:12,vx:0,vy:0,vz:0,bounces:0};m.flight=null;m.serve=1;m.reset=0;}
  if(m.id==='archery'){m.arrows=[];m.wind=.2;m.charge=0;}

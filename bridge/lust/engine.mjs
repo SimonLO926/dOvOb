@@ -1,9 +1,10 @@
 import {createGame,startGame,tryMove,tryRotate,hold,hardDrop,lockActive,fits,pump,flipGrid,feverActive} from '../logic.mjs';
 import {BRIDGE_REPEAT} from '../bridge-controls.mjs';
-import {ARCADE,initArcade,arcadeInput,arcadePoint,arcadeUpdate} from './arcade.mjs';
+import {ARCADE,initArcade,arcadeInput,arcadePoint,arcadeUpdate} from './arcade.mjs?v=1.2.39';
 import {choiceStep} from './dating-story.mjs';
 export const BOSS_HP={first:1800,firstHard:2200,second:2200,secondHard:3000};
-export const datesComplete=s=>(s.form===1?GAMES1:GAMES2).every(id=>s.played[s.form].includes(id));
+export const pendingDates=s=>(s.form===1?GAMES1:GAMES2).filter(id=>!s.played[s.form].includes(id));
+export const datesComplete=s=>pendingDates(s).length===0;
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const GAMES1=['archery','piano','claw','tennis','feeding'];
 export const GAMES2=['cinema','wheel','volley','haunted','dance'];
@@ -44,7 +45,7 @@ function checkGates(s){if(s.scene||s.over)return;const floor=s.bossMaxHp*.2;
  else if(s.form===2&&!s.datingDone&&!s.midSeen&&s.bossHp<=s.bossMaxHp*.5){s.midSeen=true;scene(s,'mid');}
  else if(s.form===2&&!s.datingDone&&datesComplete(s)&&s.bossHp<=floor&&!s.retry){s.rageSeen=true;scene(s,'rage-story');}
 }
-export function startRound(s,id){s.mode=id;s.held.clear();s.round={id,clock:0,duration:id==='bridge'?24000:id==='dating'?600000:id==='archery'?45000:id==='charm'?45000:ATTACKS1.includes(id)||ATTACKS2.includes(id)?16000:30000,x:140,y:442,aim:140,score:0,target:id==='wheel'?3:id==='archery'?10:id==='charm'?6:['piano','dance'].includes(id)?16:8,cooldown:0,invincible:0,objects:[],spawn:0,done:false,success:false,feedback:'',feedbackTime:0,selected:0,chapter:0,affection:25,choiceOrder:null,fall:0,lock:0,resolve:0,horizontalDir:0,horizontalMs:0,horizontalRepeating:false,horizontalSource:'keyboard',reverse:0,phase:'move',clawY:190,cycle:-1,ball:{x:140,y:235,vx:64,vy:100},swing:0,partnerHelp:0,combo:0};
+export function startRound(s,id){s.mode=id;s.held.clear();s.round={id,clock:0,duration:id==='bridge'?(pendingDates(s).length?16000:24000):id==='dating'?600000:id==='archery'?45000:id==='charm'?45000:ATTACKS1.includes(id)||ATTACKS2.includes(id)?16000:30000,x:140,y:442,aim:140,score:0,target:id==='wheel'?3:id==='archery'?10:id==='charm'?6:['piano','dance'].includes(id)?16:8,cooldown:0,invincible:0,objects:[],spawn:0,done:false,success:false,feedback:'',feedbackTime:0,selected:0,chapter:0,affection:25,choiceOrder:null,fall:0,lock:0,resolve:0,horizontalDir:0,horizontalMs:0,horizontalRepeating:false,horizontalSource:'keyboard',reverse:0,phase:'move',clawY:190,cycle:-1,ball:{x:140,y:235,vx:64,vy:100},swing:0,partnerHelp:0,combo:0};
  if(id==='dating')Object.assign(s.round,{choiceOrder:shuffle(s),step:0,storyClock:0,epilogue:false,epilogueStep:0,history:[],forced:false});
  if(s.bad&&ATTACKS2.includes(id))s.round.duration=18000;
  initArcade(s);
@@ -62,7 +63,13 @@ export function finishRound(s,success){const m=s.round;if(m.done||s.over||s.scen
  checkGates(s);if(s.scene||s.over||s.round!==m)return;if((s.scenario.single&&!s.datingDone)||(m.id==='charm'&&!success))scene(s,'result');else nextRound(s);
 }
 function nextRound(s){s.cycle++;if(s.datingDone){if(!s.bad||s.cycle%2===0){startRound(s,'bridge');return;}if(!s.attackBag.length)s.attackBag=[...ATTACKS2];startRound(s,s.attackBag.shift());return;}
- if(s.cycle%2===0){startRound(s,'bridge');return;}const attacks=s.cycle%4===3,key=attacks?'attackBag':'bag';if(!s[key].length){const list=attacks?s.form===1?ATTACKS1:ATTACKS2:s.form===1?GAMES1:GAMES2;s[key]=shuffleList(s,list);}if(!attacks){const pending=(s.form===1?GAMES1:GAMES2).filter(id=>!s.played[s.form].includes(id));if(pending.length){const id=s[key].find(id=>pending.includes(id))||pending[0];s[key]=s[key].filter(v=>v!==id);startRound(s,id);return;}}startRound(s,s[key].shift());}
+ const pending=pendingDates(s);
+ if(pending.length){
+  if(!s.bag.length)s.bag=shuffleList(s,s.form===1?GAMES1:GAMES2);
+  const mustCatchUp=s.bossHp<=s.bossMaxHp*.5;
+  if(s.cycle%2===1||mustCatchUp){const id=s.bag.find(id=>pending.includes(id))||pending[0];s.bag=s.bag.filter(v=>v!==id);startRound(s,id);return;}
+ }
+ if(s.cycle%2===0){startRound(s,'bridge');return;}const attacks=s.cycle%4===3,key=attacks?'attackBag':'bag';if(!s[key].length){const list=attacks?s.form===1?ATTACKS1:ATTACKS2:s.form===1?GAMES1:GAMES2;s[key]=shuffleList(s,list);}startRound(s,s[key].shift());}
 function shuffleList(s,list){const a=[...list];for(let i=a.length-1;i>0;i--){const j=Math.floor(s.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 export function continueScene(s){if(!s.scene||s.scene.time<450||s.scenario.story)return;const kind=s.scene.kind;s.scene=null;if(kind==='intro')return;if(kind==='first-defeat'){s.form=2;s.bag=[];s.attackBag=[];s.cycle=0;s.bossMaxHp=BOSS_HP[s.difficulty==='hard'?'secondHard':'second'];s.bossHp=s.bossMaxHp;heal(s,18);scene(s,'transform');}else if(kind==='transform'||kind==='mid'||kind==='bond'||kind==='collapse')startRound(s,'bridge');else if(kind==='rage-story')startRound(s,'dating');else if(kind==='body'){s.over=true;s.won=true;s.lustCleared=s.scenario.id==='full'&&s.form===2&&s.bossHp===0&&s.firstTrial&&s.datingDone&&GAMES1.every(id=>s.played[1].includes(id))&&GAMES2.every(id=>s.played[2].includes(id));scene(s,s.bad?'bad':'good',0);}else if(kind==='result'){if(s.scenario.single)startRound(s,'bridge');else nextRound(s);} }
 export function input(s,key,down=true,source='keyboard'){
@@ -89,7 +96,7 @@ function bridgeUpdate(s,dt){const m=s.round,g=s.bridge;m.clock+=dt;
  if(g.phase==='over'){hurt(s,s.difficulty==='hard'?16:12);s.bridge=newBridge(s.random);return;}
  if(g.phase==='resolving'){m.resolve-=dt;if(m.resolve<=0){const e=pump(g);m.resolve=e?.type==='clear'?140:35;if(e?.type==='clear'){const n=e.rows?.length||1;hitBoss(s,26*n+Math.min(12,(e.combo||0)*2));heal(s,2+2*n);if(s.scene||s.round!==m)return;for(const cell of e.cells||[]){if(!feverActive(g)&&cell.curse&&cell.cause!=='blast'&&cell.curse in s.curses)s.curses[cell.curse]=cell.curse==='blind'?2200:6000;}
  const reward=[...(e.cells||[]),...(e.blasts||[])].find(c=>c.reward)?.reward;if(reward&&!s.datingDone)m.reward=reward;else if(reward)heal(s,6);g.pendingReward=null;}
- if(e?.type==='flip')flipGrid(g);if(e?.type==='reward'&&!s.datingDone)m.reward=e.reward;if(m.reward&&g.phase==='playing'){const choices=s.form===1?GAMES1:GAMES2;startRound(s,choices[{breakout:0,bbtan:1,pinball:2,sand:3}[m.reward]??0]);return;}}}
+ if(e?.type==='flip')flipGrid(g);if(e?.type==='reward'&&!s.datingDone)m.reward=e.reward;if(m.reward&&g.phase==='playing'){const choices=s.form===1?GAMES1:GAMES2,pending=pendingDates(s),requested=choices[{breakout:0,bbtan:1,pinball:2,sand:3}[m.reward]??0];startRound(s,pending.length?(pending.includes(requested)?requested:pending[0]):requested);return;}}}
  else if(g.active){if(m.horizontalDir&&s.held.has(m.horizontalDir<0?'left':'right')){m.horizontalMs+=dt;const interval=m.horizontalSource==='touch'?BRIDGE_REPEAT.touchInterval:m.horizontalRepeating?BRIDGE_REPEAT.keyboardInterval:BRIDGE_REPEAT.keyboardDelay;if(m.horizontalMs>=interval){m.horizontalMs-=interval;m.horizontalRepeating=true;tryMove(g,m.horizontalDir*(s.curses.reverse>0?-1:1),0);}}
  m.fall+=dt;const fall=s.held.has('down')||s.curses.rush>0?100:s.difficulty==='hard'?430:550;if(m.fall>=fall){m.fall=0;tryMove(g,0,1);}if(!fits(g.grid,g.active.type,g.active.rot,g.active.x,g.active.y+1,g)){m.lock+=dt;if(m.lock>=380){lockActive(g);m.lock=0;}}else m.lock=0;}
  if((!s.datingDone||s.bad)&&m.clock>=m.duration&&!m.reward){if(s.scenario.single&&!s.datingDone)scene(s,'result');else nextRound(s);}
