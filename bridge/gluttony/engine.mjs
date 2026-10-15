@@ -24,6 +24,7 @@ export const HP = { normal: [560, 700, 840], hard: [560, 840, 1050] };
 export const GAMES = ["snake", "match", "merge", "rope", "slice"];
 export const FIRST_GAMES = GAMES.filter((id) => id !== "merge");
 export const roundPool = (s) => s.watermelonDone ? GAMES : FIRST_GAMES;
+export const pendingGames = (s) => roundPool(s).filter((id) => !s.played.includes(id));
 export const ATTACKS = ["gravity", "ricochet", "floor"];
 export const names = {
   bridge: ["Bridge", "Bridge"],
@@ -293,7 +294,7 @@ export function startRound(s, id, execution = false) {
     id,
     execution,
     clock: 0,
-    duration: id === "bridge" ? 24000 : 16000,
+    duration: id === "bridge" ? (pendingGames(s).length ? 16000 : 24000) : 16000,
     score: 0,
     done: false,
     success: false,
@@ -313,6 +314,11 @@ function nextRound(s) {
     startRound(s, "burst");
     return;
   }
+  const pending = pendingGames(s);
+  if (pending.length && (s.cycle % 2 === 1 || s.bossHp <= s.bossMaxHp * 0.5)) {
+    startRound(s, pending[0]);
+    return;
+  }
   if (s.cycle % 2 === 0) {
     startRound(s, "bridge");
     return;
@@ -321,8 +327,8 @@ function nextRound(s) {
     startRound(s, ATTACKS[s.attackIndex++ % ATTACKS.length]);
     return;
   }
-  const pool = roundPool(s), pending = pool.filter((id) => !s.played.includes(id));
-  startRound(s, pending[0] || pool[s.gameIndex++ % pool.length]);
+  const pool = roundPool(s);
+  startRound(s, pool[s.gameIndex++ % pool.length]);
 }
 export function finishRound(s, success) {
   const m = s.round;
@@ -525,7 +531,7 @@ function bridgeUpdate(s, dt) {
       if (e?.type === "flip") flipGrid(g);
       if (e?.type === "reward") m.reward = e.reward;
       if (m.reward && g.phase === "playing") {
-        const pool = roundPool(s), pending = pool.filter((id) => !s.played.includes(id));
+        const pool = roundPool(s), pending = pendingGames(s);
         startRound(
           s,
           pending[0] ||
