@@ -1,0 +1,175 @@
+{
+  "viewports": [
+    {
+      "width": 390,
+      "height": 844,
+      "music": [
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_first_bridge.mp3",
+          "seconds": 6.316999,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_first_special.mp3",
+          "seconds": 0.705464,
+          "volume": 0.5198700000000019
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_first_last.mp3",
+          "seconds": 0.901105,
+          "volume": 0.065
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_second_bridge.mp3",
+          "seconds": 0.665763,
+          "volume": 0.26
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_second_special.mp3",
+          "seconds": 0.668748,
+          "volume": 0.065
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_second_last.mp3",
+          "seconds": 0.686915,
+          "volume": 0.32499999999999996
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_third_last.mp3",
+          "seconds": 0.676801,
+          "volume": 0.5459999999999999
+        }
+      ],
+      "recording": "one formal clear and rank, returns to selected cartridge"
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "music": [
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_first_bridge.mp3",
+          "seconds": 2.263512,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_first_special.mp3",
+          "seconds": 0.591541,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_first_last.mp3",
+          "seconds": 0.691498,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_second_bridge.mp3",
+          "seconds": 0.679591,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_second_special.mp3",
+          "seconds": 0.664436,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_second_last.mp3",
+          "seconds": 0.694001,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_third_last.mp3",
+          "seconds": 0.679559,
+          "volume": 0.5459999999999999
+        }
+      ],
+      "recording": "one formal clear and rank, returns to selected cartridge"
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "music": [
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_first_bridge.mp3",
+          "seconds": 2.424986,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_first_special.mp3",
+          "seconds": 0.725982,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_first_last.mp3",
+          "seconds": 0.66655,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_second_bridge.mp3",
+          "seconds": 0.674142,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_second_special.mp3",
+          "seconds": 0.670848,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_second_last.mp3",
+          "seconds": 0.703353,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_third_last.mp3",
+          "seconds": 0.678513,
+          "volume": 0.5459999999999999
+        }
+      ],
+      "recording": "one formal clear and rank, returns to selected cartridge"
+    },
+    {
+      "width": 1280,
+      "height": 900,
+      "music": [
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_first_bridge.mp3",
+          "seconds": 3.452054,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_first_special.mp3",
+          "seconds": 0.666771,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_first_last.mp3",
+          "seconds": 0.698492,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_second_bridge.mp3",
+          "seconds": 0.684409,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_second_special.mp3",
+          "seconds": 0.686082,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_second_last.mp3",
+          "seconds": 0.673862,
+          "volume": 0.5459999999999999
+        },
+        {
+          "src": "http://127.0.0.1:8765/bridge/assets/gluttony-music/gluttony_third_last.mp3",
+          "seconds": 0.669429,
+          "volume": 0.5459999999999999
+        }
+      ],
+      "recording": "one formal clear and rank, returns to selected cartridge"
+    }
+  ],
+  "errors": [],
+  "fixtures": "Existing Lust clear, near-execution merge, near-final damage; not a natural full boss clear.",
+  "ok": true
+}

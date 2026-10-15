@@ -197,3 +197,7 @@ r6沿用已能下載的r5輕量方式：十二背景640×480、其餘色慾插�
 ## 暴食 r3 PR 容量（2026-10-15，不部署）
 
 10採用PNG30,470,738 bytes→既有最寬1280／q88 WebP3,936,302 bytes（−87.08%）；34個原圖／草稿／參考／WebP逐一核對SHA，原貓和字型共用，不複製或重壓。本機冷快取HTTP首屏1,610,250 bytes（無傳輸壓縮、非Pages CDN），無音樂請求；離線HTML7,766,349、ZIP5,749,978 bytes，離線包不進網站。來源／歷史／驗證保存在source-assets，不部署；新增runtime輸入量另列[本次驗證JSON](../source-assets/gluttony/verification-r3/recovery-and-validation.json)，不是Jekyll產物總量。PR CI會實際Jekyll build並核對排除，沒有授權部署。
+
+## 1.2.38 暴食正式整合與七曲
+
+原七MP3逐位元保存19,360,315 bytes；完整網站128kbps／44.1kHz／立體聲副本9,687,061 bytes，下降49.96%，每曲時長差<0.15秒。原檔SHA、兩版時長／bytes與副本SHA在source-assets/gluttony/music/manifest.json；source-assets不部署。既有34圖雜湊未變，10張運行WebP仍3,936,302 bytes，原貓／字型共用。獨立頁與正式頁引用同一音樂／bundle，不把ZIP或影片進網站。四比例截圖與JSON見verification-r4。冷快取未開始試玩首屏HTTP body1,643,563 bytes；音樂按當前曲載入，七曲總量不是進關或首屏流量。正式Jekyll產物／來源排除由PR CI檢查。

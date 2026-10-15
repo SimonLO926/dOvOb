@@ -68,7 +68,8 @@ export function initGame(s, m) {
   }
   if (m.id === "merge") {
     m.duration = Infinity;
-    m.target = FRUITS.length - 1;
+    // Ordinary fusion is a shorter reprise, unlocked only after the execution.
+    m.target = m.execution ? FRUITS.length - 1 : hard ? 6 : 5;
     m.watermelon = false;
     m.fruits = [];
     m.next = Math.floor(s.random() * 3);
@@ -514,7 +515,7 @@ export function gameUpdate(s, dt, hooks) {
     );
     m.topTime = crowded ? m.topTime + dt : Math.max(0, m.topTime - dt);
     if (m.topTime > 1800) hooks.finish(false);
-    else if (m.watermelon) hooks.finish(true);
+    else if (m.fruits.some((fruit) => fruit.level >= m.target)) hooks.finish(true);
     return;
   }
   if (m.id === "rope") {

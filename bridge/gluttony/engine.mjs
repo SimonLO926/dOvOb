@@ -22,6 +22,8 @@ import {
 } from "./games.mjs";
 export const HP = { normal: [560, 700, 840], hard: [560, 840, 1050] };
 export const GAMES = ["snake", "match", "merge", "rope", "slice"];
+export const FIRST_GAMES = GAMES.filter((id) => id !== "merge");
+export const roundPool = (s) => s.watermelonDone ? GAMES : FIRST_GAMES;
 export const ATTACKS = ["gravity", "ricochet", "floor"];
 export const names = {
   bridge: ["Bridge", "Bridge"],
@@ -39,6 +41,8 @@ export const names = {
 };
 export const SCENARIOS = [
   { id: "full", label: ["完整挑戰", "Full encounter"] },
+  { id: "watermelon-execution", mode: "merge", stage: 1, ratio: 0.2,
+    execution: true, single: true, label: ["西瓜處決", "Watermelon execution"] },
   ...[1, 2, 3, 4, 5].map((phase) => ({
     id: "phase-" + phase,
     stage: phase < 3 ? 1 : phase < 5 ? 2 : 3,
@@ -124,7 +128,10 @@ export function createGluttony({
   scenario = "full",
   difficulty = "normal",
   random = Math.random,
+  preview = true,
+  filming = false,
 } = {}) {
+  if (!preview && scenario !== "full") throw new RangeError("Official Gluttony requires a full encounter");
   const pick = SCENARIOS.find((p) => p.id === scenario);
   if (!pick) throw new RangeError("Unknown Gluttony scenario");
   difficulty = difficulty === "hard" ? "hard" : "normal";
@@ -132,7 +139,8 @@ export function createGluttony({
     max = HP[difficulty][stage - 1];
   const s = {
     sin: "gluttony",
-    preview: true,
+    preview,
+    filming,
     difficulty,
     scenario: pick,
     random,
@@ -149,6 +157,7 @@ export function createGluttony({
     sceneHistory: [],
     played: [],
     completed: [],
+    watermelonDone: stage > 1,
     executionDone: pick.mode === "burst",
     escapeDone: pick.mode === "burst",
     retry: 0,
@@ -164,7 +173,7 @@ export function createGluttony({
     stats: { damage: 0, damageTaken: 0, healed: 0 },
     curses: { reverse: 0, blind: 0, rush: 0, norotate: 0 },
   };
-  startRound(s, pick.mode || "bridge");
+  startRound(s, pick.mode || "bridge", !!pick.execution);
   if (scenario === "full") scene(s, "intro");
   if (pick.story) scene(s, pick.story, 0);
   return s;
@@ -216,8 +225,8 @@ export function hurt(s, amount) {
   }
 }
 export function bossFloor(s) {
-  if (s.stage === 1 && GAMES.some((id) => !s.played.includes(id)))
-    return s.bossMaxHp * 0.08;
+  if (s.stage === 1 && (!s.watermelonDone || FIRST_GAMES.some((id) => !s.played.includes(id))))
+    return s.bossMaxHp * 0.2;
   if (s.stage === 2 && !s.executionDone) return s.bossMaxHp * 0.2;
   if (s.stage === 3 && !s.escapeDone) return s.bossMaxHp * 0.2;
   return 0;
@@ -246,6 +255,13 @@ export function hitBoss(s, amount) {
 }
 export function checkGates(s) {
   if (s.over || s.scene) return;
+  if (s.stage === 1 && !s.watermelonDone &&
+      FIRST_GAMES.every((id) => s.played.includes(id)) &&
+      s.bossHp <= s.bossMaxHp * 0.2 && !s.retry &&
+      !(s.mode === "merge" && s.round.execution)) {
+    scene(s, "watermelon-start");
+    return;
+  }
   if (s.stage === 1 && s.bossHp === 0) {
     scene(s, "chef-defeat");
     return;
@@ -270,11 +286,12 @@ export function checkGates(s) {
     scene(s, "escape-start");
   }
 }
-export function startRound(s, id) {
+export function startRound(s, id, execution = false) {
   s.mode = id;
   release(s);
   s.round = {
     id,
+    execution,
     clock: 0,
     duration: id === "bridge" ? 24000 : 16000,
     score: 0,
@@ -304,8 +321,8 @@ function nextRound(s) {
     startRound(s, ATTACKS[s.attackIndex++ % ATTACKS.length]);
     return;
   }
-  const pending = GAMES.filter((id) => !s.played.includes(id));
-  startRound(s, pending[0] || GAMES[s.gameIndex++ % GAMES.length]);
+  const pool = roundPool(s), pending = pool.filter((id) => !s.played.includes(id));
+  startRound(s, pending[0] || pool[s.gameIndex++ % pool.length]);
 }
 export function finishRound(s, success) {
   const m = s.round;
@@ -313,11 +330,22 @@ export function finishRound(s, success) {
   m.done = true;
   m.success = success;
   release(s);
-  if (GAMES.includes(m.id)) {
+  if (GAMES.includes(m.id) && !m.execution) {
     if (!s.played.includes(m.id)) s.played.push(m.id);
     if (success && !s.completed.includes(m.id)) s.completed.push(m.id);
   }
-  if (m.id === "execution") {
+  if (m.id === "merge" && m.execution) {
+    // Only the physics-created final fruit can unlock ordinary fusion.
+    success = m.success = !!(success && m.watermelon && m.fruits.some((fruit) => fruit.level === 7));
+    if (success) {
+      s.watermelonDone = true;
+      heal(s, 12);
+      hitBoss(s, 70);
+    } else {
+      hurt(s, 80);
+      s.retry = 20000;
+    }
+  } else if (m.id === "execution") {
     if (success) {
       s.executionDone = true;
       heal(s, 12);
@@ -371,6 +399,10 @@ export function continueScene(s) {
     startRound(s, "execution");
     return;
   }
+  if (kind === "watermelon-start") {
+    startRound(s, "merge", true);
+    return;
+  }
   if (kind === "escape-start") {
     startRound(s, "escape");
     return;
@@ -390,6 +422,9 @@ export function continueScene(s) {
   if (kind === "body") {
     s.over = true;
     s.won = true;
+    s.gluttonyCleared = s.scenario.id === "full" && s.bossHp === 0 &&
+      s.stage === 3 && s.watermelonDone && s.executionDone && s.escapeDone &&
+      FIRST_GAMES.every((id) => s.played.includes(id));
     scene(s, "victory", 0);
     return;
   }
@@ -490,13 +525,11 @@ function bridgeUpdate(s, dt) {
       if (e?.type === "flip") flipGrid(g);
       if (e?.type === "reward") m.reward = e.reward;
       if (m.reward && g.phase === "playing") {
-        const pending = GAMES.filter((id) => !s.played.includes(id));
+        const pool = roundPool(s), pending = pool.filter((id) => !s.played.includes(id));
         startRound(
           s,
           pending[0] ||
-            GAMES[
-              { breakout: 0, bbtan: 1, pinball: 4, sand: 2 }[m.reward] ?? 0
-            ],
+            pool[({ breakout: 0, bbtan: 1, pinball: 4, sand: 2 }[m.reward] ?? 0) % pool.length],
         );
         return;
       }
@@ -582,7 +615,7 @@ export function update(s, dt) {
   if (s.retry) {
     s.retry = Math.max(0, s.retry - dt);
     if (s.retry === 0) {
-      scene(s, s.stage === 2 ? "execution-start" : "escape-start");
+      scene(s, s.stage === 1 ? "watermelon-start" : s.stage === 2 ? "execution-start" : "escape-start");
       return;
     }
   }

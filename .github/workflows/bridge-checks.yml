@@ -38,6 +38,8 @@ jobs:
           from pathlib import Path
           site=Path('_site')
           assert (site/'bridge/gluttony-preview.html').is_file()
+          assert (site/'bridge/gluttony.html').is_file()
+          assert len(list((site/'bridge/assets/gluttony-music').glob('*.mp3'))) == 7
           assert (site/'bridge/gluttony/preview.bundle.js').is_file()
           assert not (site/'memory').exists()
           assert (site/'bridge/lust-preview.html').is_file()
@@ -54,4 +56,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gluttony-r3-validation
-          path: source-assets/gluttony/verification-r3/
+          path: |
+            source-assets/gluttony/verification-r3/
+            source-assets/gluttony/verification-r4/
+            source-assets/gluttony/music/manifest.json

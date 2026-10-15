@@ -33,7 +33,7 @@ test('filming unlocks only released bosses and preserves real clears', () => {
   assert.equal(filmingEnabled({ getItem() { throw Error('blocked'); } }), false);
   const save = storage();
   const states = sinProgress(save, undefined, { filming: true });
-  assert.deepEqual(states.filter(boss => boss.unlocked).map(boss => boss.id), ['greed', 'pride', 'envy', 'lust']);
+  assert.deepEqual(states.filter(boss => boss.unlocked).map(boss => boss.id), ['greed', 'pride', 'envy', 'lust', 'gluttony']);
   assert.ok(states.every(boss => !boss.cleared)); assert.equal(save.data.size, 0);
 });
 test('campaign cannot launch a partial preview and retains full encounter difficulty and feedback', () => {

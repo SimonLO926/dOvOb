@@ -1,3 +1,6 @@
+import {gluttonyUnlocked, createGluttonyRecorder, gluttonyScore} from './campaign.mjs';
+import {filmingEnabled} from '../filming.mjs';
+import {createGluttonyMusic, gluttonyTrack} from './music.mjs';
 import {
   createGluttony,
   update,
@@ -31,6 +34,10 @@ const $ = (id) => document.getElementById(id),
   frame = $("boss-frame"),
   fc = frame.getContext("2d"),
   wrap = $("board-wrap");
+const campaign = document.body.dataset.gluttonyCampaign === 'true';
+let campaignStorage; try {campaignStorage = localStorage;} catch {}
+const recordCampaign = createGluttonyRecorder(campaignStorage);
+const returnToBosses = () => location.assign(new URL('./cartridge.html?sin=gluttony', location.href));
 let saved = {};
 try {
   saved = JSON.parse(localStorage.getItem("bridge-settings") || "{}");
@@ -65,7 +72,25 @@ const activeTones = new Set();
 const fx = createCombatEffects(),
   overlay = createCombatOverlay(board, "gluttony-combat"),
   fxc = overlay.getContext("2d");
-Object.defineProperty(window, "gluttonyPreview", { get: () => s });
+Object.defineProperty(window, campaign ? "gluttonyGame" : "gluttonyPreview", { get: () => s });
+const music = createGluttonyMusic(() => prefs.music * (s && ['match','rope'].includes(s.mode) && s.round.duration - s.round.clock <= 3000 && !s.round.done ? .3 : 1));
+let musicKey = null, musicFadeUntil = 0;
+function selectMusic() {
+  const key = gluttonyTrack(s);
+  if (key !== musicKey || music.active !== key) {
+    musicKey = key;
+    musicFadeUntil = performance.now() + 600;
+  }
+  music.select(key);
+}
+function savePreferences({languageChanged = false} = {}) {
+  if (!campaign || s?.filming || filmingEnabled()) return;
+  try {const value = JSON.parse(localStorage.getItem('bridge-settings') || '{}');
+    Object.assign(value, {touch:prefs.touch, dangerEffect:prefs.danger, bgmVolume:prefs.music, sfxVolume:prefs.sound});
+    if (languageChanged) value.lang = prefs.lang;
+    localStorage.setItem('bridge-settings', JSON.stringify(value));
+  } catch {}
+}
 const t = (zh, en) => (prefs.lang === "zh-Hant" ? zh : en);
 // Animate only the true stomach silhouette; the environmental painting stays still.
 const stomachLayer = document.createElement("img");
@@ -154,13 +179,13 @@ function ui() {
     "difficulty-label": ["難度", "Difficulty"],
     start: ["開始試玩", "Start preview"],
     "prototype-note": [
-      "獨立試玩 · 不寫設定、通關或排行榜。細節與美術屬試作；本版只有音效，專屬 BGM／第三階段歌詞版待提供。",
-      "Independent preview · No saved settings or progress. Details and art are provisional. Effects only; dedicated BGM and the final vocal track are pending.",
+      "獨立試玩 · 不寫設定、通關或排行榜。七首專屬配樂已接入。",
+      "Independent preview · No saved settings or progress. Seven dedicated music tracks are included.",
     ],
     "menu-title": ["試玩已暫停", "Preview paused"],
     "control-guide": [
-      "方向：移動／選擇；空白：主動作；C／Shift：副動作；Bridge 上／X 右旋、Z 左旋。三消：選相鄰兩格；割繩：拖劃或選繩割；切果：拖劃或方向＋空白。逃亡：左右換道、空白／↑跳、C／Shift／↓滑；亦可滑動。合成：不限時，合出西瓜。四連造條紋、五連造彩虹、T／L造爆破。",
-      "Arrows: move / select. Space: primary. C / Shift: secondary. Bridge: Up / X rotate, Z reverse. Match: select neighbors. Ropes: swipe or select and cut. Slicer: swipe or arrows + Space. Runner: Left/Right lanes, Space/Up jump, C/Shift/Down slide; swipes also work. Fusion: no timer, make a watermelon. Match 4: striped; 5: rainbow; T/L: wrapped.",
+      "方向：移動／選擇；空白：主動作；C／Shift：副動作；Bridge 上／X 右旋、Z 左旋。三消：選相鄰兩格；割繩：拖劃或選繩割；切果：拖劃或方向＋空白。逃亡：左右換道、空白／↑跳、C／Shift／↓滑；亦可滑動。合成：不限時，處決須合出西瓜；成功後普通回合合出目標大果。四連造條紋、五連造彩虹、T／L造爆破。",
+      "Arrows: move / select. Space: primary. C / Shift: secondary. Bridge: Up / X rotate, Z reverse. Match: select neighbors. Ropes: swipe or select and cut. Slicer: swipe or arrows + Space. Runner: Left/Right lanes, Space/Up jump, C/Shift/Down slide; swipes also work. Fusion: no timer; make a watermelon in the execution, then reach the target fruit in ordinary rounds. Match 4: striped; 5: rainbow; T/L: wrapped.",
     ],
     resume: ["繼續遊玩", "Resume"],
     retry: ["重試這一關", "Retry scenario"],
@@ -168,17 +193,22 @@ function ui() {
     "touch-label": ["觸控按鈕", "Touch controls"],
     "danger-label": ["危險效果", "Danger effect"],
     "reduce-label": ["減少動態效果", "Reduce motion"],
-    "music-label": ["音樂音量（待提供）", "Music volume (pending)"],
+    "music-label": ["音樂音量", "Music volume"],
     "sound-label": ["音效音量", "Effects volume"],
     "music-note": [
-      "沒有暫用 BGM，不借其他 Boss 的歌曲。本次調整只留當前頁面。",
-      "No placeholder BGM or borrowed boss tracks. Changes last only for this page.",
+      "七首專屬配樂依戰鬥、小遊戲與處決切換。",
+      "Seven dedicated tracks follow combat, minigames and executions.",
     ],
     "menu-return": ["返回遊戲", "Back to game"],
     "scene-continue": ["繼續", "Continue"],
     "scene-retry": ["重試", "Retry"],
     "scene-pick": ["返回試玩選擇", "Preview selection"],
   };
+  if (campaign) Object.assign(labels, {
+    'launcher-title':['暴食','Gluttony'], 'menu-title':['遊戲已暫停','Game paused'],
+    retry:['重新挑戰','Retry encounter'], pick:['返回關卡','Boss selection'],
+    'scene-pick':['返回關卡','Boss selection'], 'prototype-note':['',''],
+  });
   for (const [id, p] of Object.entries(labels)) $(id).textContent = t(...p);
   const value = $("scenario").value || selected;
   $("scenario").replaceChildren(
@@ -202,6 +232,8 @@ $("music-volume").value = prefs.music * 100;
 $("sound-volume").value = prefs.sound * 100;
 ui();
 function unlock() {
+  selectMusic();
+  music.unlock();
   try {
     if (!audio) {
       audio = new AudioContext();
@@ -222,6 +254,7 @@ function unlock() {
   } catch {}
 }
 function silence() {
+  music.pause();
   for (const node of activeTones) {
     try {
       node.stop();
@@ -420,6 +453,7 @@ function presentation() {
       $("ending-art").src = storyArt[p[2]];
       $("ending-title").textContent = t(p[0], p[1]);
       $("ending-caption").textContent = t(p[3], p[4]);
+      if (campaign && s.won) $("ending-caption").textContent += ' · ' + s.difficulty + ' · ' + t('分數 ', 'Score ') + gluttonyScore(s);
     }
     const terminal = s.over || s.scenario.story;
     $("scene-continue").hidden = terminal;
@@ -430,9 +464,12 @@ function presentation() {
   cat();
 }
 function start() {
+  if (campaign && !gluttonyUnlocked(campaignStorage)) {returnToBosses(); return;}
+  music.reset();
   stopHeld();
   selected = $("scenario").value;
-  s = createGluttony({ scenario: selected, difficulty: $("difficulty").value });
+  s = createGluttony({ scenario: campaign ? 'full' : selected, difficulty: $("difficulty").value,
+    preview: !campaign, filming: campaign && filmingEnabled() });
   paused = false;
   $("launcher").hidden = true;
   $("menu").hidden = true;
@@ -466,6 +503,7 @@ function resume() {
   wake();
 }
 function pick() {
+  if (campaign) {silence(); returnToBosses(); return;}
   paused = true;
   stopHeld();
   silence();
@@ -491,26 +529,30 @@ $("scene-retry").onclick = start;
 $("scene-pick").onclick = pick;
 $("gluttony-language").onchange = (e) => {
   prefs.lang = e.target.value;
+  savePreferences({languageChanged:true});
   ui();
   render(0);
 };
 $("touch").onchange = (e) => {
   stopHeld();
   prefs.touch = e.target.value;
+  savePreferences();
   fit();
   render(0);
 };
 $("danger").onchange = (e) => {
   prefs.danger = e.target.value;
+  savePreferences();
   render(0);
 };
 $("reduce").onchange = (e) => {
   prefs.reduced = e.target.checked;
   render(0);
 };
-$("music-volume").oninput = (e) => (prefs.music = e.target.value / 100);
+$("music-volume").oninput = (e) => {prefs.music = e.target.value / 100; savePreferences();};
 $("sound-volume").oninput = (e) => {
   prefs.sound = e.target.value / 100;
+  savePreferences();
   if (sfx) sfx.gain.value = paused ? 0 : prefs.sound;
 };
 const keymap = {
@@ -643,8 +685,9 @@ function render(dt) {
     layout,
   });
   drawCombatEffects(fxc, fx, { reducedMotion: prefs.reduced });
+  if (campaign) recordCampaign(s);
   const nav = document.querySelector(".nav small");
-  nav.textContent = s.hp <= 25 ? "WARNING" : "CRAZY · GLUTTONY · r3";
+  nav.textContent = s.hp <= 25 ? "WARNING" : "CRAZY · GLUTTONY · 1.2.38";
   nav.style.color = s.hp <= 25 ? "#ff5b78" : "";
   wrap.classList.toggle("danger", s.hp <= 25);
   wrap.classList.toggle(
@@ -689,14 +732,16 @@ function tick(now) {
       };
     }
     previousRound = s.round;
+    if (s.scene?.kind === "lost") music.pause();
+    else {selectMusic(); music.tick(dt);}
     render(dt);
   }
   if (
     s &&
     !paused &&
     !document.hidden &&
-    !s.over &&
-    (!s.scenario.story || (s.scene?.kind === "body" && !prefs.reduced))
+    ((!s.over && (!s.scenario.story || (s.scene?.kind === "body" && !prefs.reduced))) ||
+      now < musicFadeUntil)
   )
     raf = requestAnimationFrame(tick);
 }
@@ -734,3 +779,9 @@ $("gluttony-cat")
     if (s) render(0);
   });
 fit();
+
+if (campaign) {
+  const requested = new URLSearchParams(location.search).get('difficulty');
+  if (requested) $('difficulty').value = requested === 'hard' ? 'hard' : 'normal';
+  if (gluttonyUnlocked(campaignStorage)) start(); else returnToBosses();
+}

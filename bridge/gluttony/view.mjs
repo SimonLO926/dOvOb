@@ -122,7 +122,7 @@ export function draw(c, s, { lang = "en", reduced = false } = {}) {
   const status = lock
     ? pair(lang, ["鎖血 · 完成挑戰", "SEALED · Complete the challenge"])
     : s.stage === 1
-      ? pair(lang, [`盛宴 ${s.played.length}/5`, `Feast ${s.played.length}/5`])
+      ? pair(lang, [`盛宴 ${s.played.filter(id => id !== "merge").length}/4`, `Feast ${s.played.filter(id => id !== "merge").length}/4`])
       : s.retry
         ? pair(lang, ["挑戰稍後重試", "Trial will return soon"])
         : "";
@@ -197,8 +197,8 @@ export function draw(c, s, { lang = "en", reduced = false } = {}) {
     } else if (m.id === "merge")
       progress =
         pair(lang, [
-          m.watermelon ? "西瓜合成成功" : "目標：合出西瓜",
-          m.watermelon ? "Watermelon made" : "Goal: make a watermelon",
+          m.execution ? (m.watermelon ? "西瓜合成成功" : "處決：真正合出西瓜") : (m.target === 6 ? "目標：合出綠色大果" : "目標：合出金色大果"),
+          m.execution ? (m.watermelon ? "Watermelon made" : "Execution: make a watermelon") : (m.target === 6 ? "Goal: make the large green fruit" : "Goal: make the large golden fruit"),
         ]) +
         (m.watermelon ? "" : " · C " + (m.swaps ? "◆".repeat(m.swaps) : "—"));
     else if (m.id === "escape") progress = `${Math.floor(m.distance)}%`;
@@ -222,7 +222,7 @@ export function draw(c, s, { lang = "en", reduced = false } = {}) {
       "#f1e4ce",
     );
     drawGame(c, s, lang, reduced);
-    text(c, pair(lang, hints[m.id]), 140, 513, 10, "#c9e0e6");
+    text(c, pair(lang, m.id === "merge" && !m.execution ? ["普通合成：不限時，合出目標大果", "Fusion reprise: no timer, reach the target fruit"] : hints[m.id]), 140, 513, 10, "#c9e0e6");
     if (m.feedbackTime > 0)
       text(
         c,
@@ -547,6 +547,11 @@ export const stories = {
     "mouth",
     "步數內收蘋果、清果凍；失敗扣 80 HP。",
     "Collect apples and clear jelly within the moves. Failure costs 80 HP.",
+  ],
+  "watermelon-start": [
+    "廚師的最後一餐", "The chef’s last serving", "intro",
+    "不限時，真正合出西瓜才解鎖；失敗扣 80 HP。",
+    "No timer. Make a watermelon to unlock fusion. Failure costs 80 HP.",
   ],
   "escape-start": [
     "逃出食道",

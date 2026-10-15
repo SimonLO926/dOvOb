@@ -101,26 +101,27 @@ test("Bridge has no automatic damage on timeout; stages require actual accepted 
   assert.equal(s.bossHp, 560);
   assert.equal(s.mode, "snake");
 });
-test("first HP cannot bypass all five games and preserves completion on failure", () => {
+test("first blood requires four ordinary games, then a real watermelon execution before defeat", () => {
   const s = make();
   hitBoss(s, 9999);
-  assert.ok(Math.abs(s.bossHp - 560 * 0.08) < 0.00001);
-  for (const id of GAMES) {
-    startRound(s, id);
-    finishRound(s, false);
+  assert.equal(s.bossHp, 560 * .2);
+  for (const id of GAMES.filter(id => id !== 'merge')) {
+    startRound(s, id); finishRound(s, false);
     assert.ok(s.played.includes(id));
-    if (s.scene) advance(s);
+    advance(s);
   }
-  assert.equal(s.played.length, 5);
-  assert.ok(s.bossHp > 0);
-  hitBoss(s, 100);
-  assert.equal(s.scene.kind, "chef-defeat");
+  assert.equal(s.scene.kind, 'watermelon-start');
   advance(s);
-  assert.equal(s.stage, 2);
-  assert.equal(s.bossHp, 700);
-  assert.equal(s.scene.kind, "mouth");
-  advance(s);
-  assert.equal(s.mode, "bridge");
+  assert.equal(s.round.execution, true);
+  assert.equal(s.mode, 'merge');
+  s.round.fruits = [106,174].map(x => ({x,y:425,level:6,age:0,vx:0,vy:0}));
+  time(s,40);
+  assert.equal(s.watermelonDone,true);
+  assert.equal(s.round.success,true);
+  advance(s); hitBoss(s, 9999);
+  assert.equal(s.scene.kind, 'chef-defeat'); advance(s);
+  assert.equal(s.stage,2); assert.equal(s.bossHp,700);
+  advance(s); assert.equal(s.mode,'bridge');
 });
 test("second blood seals at 20%; successful execution unlocks remaining HP", () => {
   const s = make("phase-3");
@@ -537,7 +538,7 @@ test("snake wraps all four borders and still fails on its own body", () => {
   assert.equal(s.round.success, false);
 });
 test("fusion never succeeds from a numerical score and has no timeout", () => {
-  const s = make("merge"),
+  const s = make("watermelon-execution"),
     m = s.round;
   m.score = 99999;
   m.clock = 999999;

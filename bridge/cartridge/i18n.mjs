@@ -42,6 +42,8 @@ export const rows={
  loading:['開啟卡帶之匣…','打开卡带之匣…','Opening cartridge archive…','カセットの匣を開く…','카트리지 보관함 여는 중…','A abrir os cartuchos…','Abriendo los cartuchos…'],
  fallback:['此裝置不支援立體效果，仍可按插卡進入 Boss。','此设备不支持立体效果，仍可按插卡进入 Boss。','3D is unavailable; the insert button still launches each Boss.','立体表示は使えません。挿入ボタンで挑戦できます。','3D를 사용할 수 없지만 삽입 버튼으로 도전할 수 있습니다.','3D indisponível; o botão ainda inicia cada Boss.','3D no disponible; el botón inicia cada Boss.'],
  error:['未能載入關卡，請返回選關再試。','未能加载关卡，请返回选关重试。','Could not load the encounter. Return to selection and retry.','読込失敗。選択に戻って再試行してください。','불러오지 못했습니다. 선택으로 돌아가 다시 시도하세요.','Falha ao carregar. Volte e tente novamente.','No se pudo cargar. Vuelve y reintenta.'],
+ gluttonyIntro:['無飽廚師','无饱厨师','The Ravenous Chef','満たされぬ料理人','굶주린 요리사','O Cozinheiro Insaciável','El Chef Insaciable'],
+ gluttonyLore:['巨大餐桌、食物山與深淵巨口。填不滿的空虛。','巨大餐桌、食物山与深渊巨口。填不满的空虚。','An immense table, mountains of food, and hunger without end.','巨大な食卓と食べ物の山。満たされぬ空虚。','거대한 식탁과 음식의 산. 끝없는 허기.','Uma mesa imensa, montanhas de comida e fome sem fim.','Una mesa inmensa, montañas de comida y hambre sin fin.'],
  lustIntro:['雲上丘比特','云上丘比特','Cupid in the Clouds','雲の上のキューピッド','구름 위의 큐피드','Cupido nas Nuvens','Cupido en las Nubes'],
  lustLore:['雲島、弓弦橋與破碎金箭。魅惑與自由的選擇。','云岛、弓弦桥与破碎金箭。魅惑与自由的选择。','Cloud islands, bowstring paths, and a choice freely made.','雲の島、弓弦の橋、砕けた金の矢。魅惑と自由の選択。','구름섬, 활시위 다리, 부서진 황금 화살. 매혹과 자유의 선택.','Ilhas nas nuvens, pontes de corda e flechas douradas partidas. Encanto e livre escolha.','Islas entre nubes, puentes de cuerda y flechas doradas rotas. Encanto y libre elección.'],
  prideIntro:['鏡宮之王','镜宫之王','King of the mirror palace','鏡宮の王','거울 궁전의 왕','Rei do palácio dos espelhos','Rey del palacio de espejos'],
