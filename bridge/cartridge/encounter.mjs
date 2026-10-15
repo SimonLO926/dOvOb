@@ -1,6 +1,6 @@
 // Build a local-only view of existing encounter pages. The original files stay unchanged.
 // Child storage is an in-memory read-through snapshot; writes never reach real storage.
-export function encounterPage(id){return ({greed:'index.html',pride:'index.html',envy:'envy-preview.html',lust:'lust-preview.html'})[id]||null;}
+export function encounterPage(id){return ({greed:'index.html',pride:'index.html',envy:'envy-preview.html',lust:'lust-preview.html',gluttony:'gluttony-preview.html'})[id]||null;}
 const encode=value=>JSON.stringify(value).replaceAll('<','\\u003c');
 export function storageBootstrap({settings,local={},session={}}){
  return `(()=>{const local=${encode({...local,'bridge-settings':JSON.stringify(settings)})},session=${encode({...session,'bridge-filming-unlock':'1'})};const memory=data=>({get length(){return Object.keys(data).length},key:i=>Object.keys(data)[i]??null,getItem:k=>Object.prototype.hasOwnProperty.call(data,k)?String(data[k]):null,setItem:(k,v)=>{data[String(k)]=String(v)},removeItem:k=>{delete data[k]},clear:()=>{for(const k of Object.keys(data))delete data[k]}});Object.defineProperty(window,'localStorage',{value:memory(local)});Object.defineProperty(window,'sessionStorage',{value:memory(session)});window.__cartridgeReadOnly=true;})();`;
@@ -21,6 +21,6 @@ export function buildEncounterHTML(html,{id,base,settings,local,session}){
   html=html.replace('</body>',start+'</body>');
  }
  // Parent can receive normal menu/ending return without writing progress.
- html=html.replace('</body>',`<script>function cartridgeFocusBoard(){const s=window.lustPreview||window.envyPreview||window.__cartridgeEncounter;if(!s||s.scene||s.over||s.won)return;const board=document.querySelector('#board,#envy-board,#lust-board');if(board){const game=document.getElementById('game');if(game)game.inert=false;board.tabIndex=-1;board.focus({preventScroll:true});}}addEventListener('click',e=>{if(e.target.closest('#cinematic-skip,#scene-continue,#play-menu-close,#resume,#menu-return')){cartridgeFocusBoard();requestAnimationFrame(cartridgeFocusBoard);}if(e.target.closest('#pick,#scene-pick,#result-bosses,#pride-preview-pick,#bosses-back,#play-menu-exit,#veil-menu'))parent.postMessage({type:'cartridge-return'},'*');});</script></body>`);
+ html=html.replace('</body>',`<script>function cartridgeFocusBoard(){const s=window.lustPreview||window.envyPreview||window.gluttonyPreview||window.__cartridgeEncounter;if(!s||s.scene||s.over||s.won)return;const board=document.querySelector('#board,#envy-board,#lust-board,#gluttony-board');if(board){const game=document.getElementById('game');if(game)game.inert=false;board.tabIndex=-1;board.focus({preventScroll:true});}}addEventListener('click',e=>{if(e.target.closest('#cinematic-skip,#scene-continue,#play-menu-close,#resume,#menu-return')){cartridgeFocusBoard();requestAnimationFrame(cartridgeFocusBoard);}if(e.target.closest('#pick,#scene-pick,#result-bosses,#pride-preview-pick,#bosses-back,#play-menu-exit,#veil-menu'))parent.postMessage({type:'cartridge-return'},'*');});</script></body>`);
  return html;
 }

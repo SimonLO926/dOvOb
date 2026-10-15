@@ -1,0 +1,22 @@
+[
+  {
+    "id": "body",
+    "prompt": "Edit this exact Gluttony illustration to fix PHONE PORTRAIT COVER CROPPING. Keep wide horizontal landscape 3:2 format, the existing detailed pixel painting, wooden table, food heaps, copper pots, rectangular stoves and dark cavern. Resize and reposition ONLY the single translucent anatomical STOMACH and nearby broken teeth into the central 26% of the image width (between x=37% and x=63%). The ENTIRE stomach including curved upper inlet, curved pouch, dark hollow with visible undigested food and tapered outlet must fit in that narrow center zone, at y=32% to y=70%. It remains large compared to nearby food and teeth. Extend detailed table/food scenery into the areas where the original larger stomach stood. Exactly one stomach; keep asymmetrical anatomical shape, NOT sphere, orb, egg, bowl or round glass shield. Main subject must be fully visible when image is center-cropped to a tall 390x844 phone. Keep top12% and bottom16% quiet for external title/buttons. No towers, arches, palaces, text, humans, cats, UI, gore, logos. Stomach is pulsing amber after revelation, cold cyan shadows.",
+    "referenced_image_paths": [
+      "/workspace/dOvOb/source-assets/gluttony/images/gluttony-body.png"
+    ],
+    "transparent_background": false,
+    "path": "/workspace/generated_images/exec-f72784b8-d471-4eff-b682-a9197f9a6103.png",
+    "status": "adopted; phone crop correction"
+  },
+  {
+    "id": "victory",
+    "prompt": "Edit this exact Gluttony illustration to fix PHONE PORTRAIT COVER CROPPING. Keep wide horizontal landscape 3:2 format, the existing detailed pixel painting, wooden table, food heaps, copper pots, rectangular stoves and dark cavern. Resize and reposition ONLY the single translucent anatomical STOMACH and nearby broken teeth into the central 26% of the image width (between x=37% and x=63%). The ENTIRE stomach including curved upper inlet, curved pouch, dark hollow with visible undigested food and tapered outlet must fit in that narrow center zone, at y=32% to y=70%. It remains large compared to nearby food and teeth. Extend detailed table/food scenery into the areas where the original larger stomach stood. Exactly one stomach; keep asymmetrical anatomical shape, NOT sphere, orb, egg, bowl or round glass shield. Main subject must be fully visible when image is center-cropped to a tall 390x844 phone. Keep top12% and bottom16% quiet for external title/buttons. No towers, arches, palaces, text, humans, cats, UI, gore, logos. Stomach is still and dim at victory, dawn gold light from top right.",
+    "referenced_image_paths": [
+      "/workspace/dOvOb/source-assets/gluttony/images/gluttony-victory.png"
+    ],
+    "transparent_background": false,
+    "path": "/workspace/generated_images/exec-1748ad70-4adb-4d93-a641-a62a18a5f6e9.png",
+    "status": "adopted; phone crop correction"
+  }
+]

@@ -4,7 +4,7 @@
 
 每次開始或恢復工作前，先讀 [memory/progress.md](../memory/progress.md)、[memory/todo.md](../memory/todo.md) 及 [最新要求](../memory/notes/latest-requirements.md)，再依本文件核對遠端、分支、未提交修改及授權。重要發現、中間狀態、完成項目與驗證證據必须寫回 memory；每完成一階段更新待辦，並在 progress.md 寫「下次恢復時應從哪裡繼續」。接近限額或交接前先寫回；整理記憶不能恢復已取消設定。
 
-最新使用者要求優先，記憶不能代替讀實際檔案與驗證，亦不能保證每個 agent 自動遵守。使用者已授權把記憶及本工作流程放 GitHub；這不是第五 Boss 的 OK，也沒有授權推送其遊戲／素材、發布 Preview 或正式整合。
+最新使用者要求優先，記憶不能代替讀實際檔案與驗證，亦不能保證每個 agent 自動遵守。2026-10-15 最新授權：使用者明確允許本次推送第五 Boss 暴食 r3 遊戲／素材及建立 PR，取代先前只准 memory 的限制；沒有授權合併、部署、公開發布或正式接線。保留前四 Boss／卡帶／正式存檔。歷史禁止 Boss PR 的段落不覆蓋本次授權。當前行為及實測見[暴食 r3](GLUTTONY_PREVIEW.md)。
 
 ## 1.2.37：正式卡帶選關效能優化
 
@@ -193,3 +193,11 @@ r6沿用已能下載的r5輕量方式：十二背景640×480、其餘色慾插�
 ## r5 輕量交付副本（2026-10-11，不發布）
 
 完整版單檔63,232,773 bytes保留，另外產生20,390,570 bytes的 `lust-r5-download.html`；比r4單檔20,902,765 bytes小。僅此封裝内十二背景為640×480、其他色慾插圖半寬半高，nearest-neighbor／WebP品質88，真貓和字型不變。原PNG及canonical WebP均保留原尺寸與SHA，沒有重新生成或刪素材；全部十二章及24差分仍包含。`--download-lite`為建置選項，來源清單記錄原檔／封裝bytes與SHA。交付包不是部署或首屏量；使用者已再次指定維持本地不發布。聊天下載限制未核實，不將檔案變大直接寫成平台確定上限。
+
+## 暴食 r3 PR 容量（2026-10-15，不部署）
+
+10採用PNG30,470,738 bytes→既有最寬1280／q88 WebP3,936,302 bytes（−87.08%）；34個原圖／草稿／參考／WebP逐一核對SHA，原貓和字型共用，不複製或重壓。本機冷快取HTTP首屏1,610,250 bytes（無傳輸壓縮、非Pages CDN），無音樂請求；離線HTML7,766,349、ZIP5,749,978 bytes，離線包不進網站。來源／歷史／驗證保存在source-assets，不部署；新增runtime輸入量另列[本次驗證JSON](../source-assets/gluttony/verification-r3/recovery-and-validation.json)，不是Jekyll產物總量。PR CI會實際Jekyll build並核對排除，沒有授權部署。
+
+## 1.2.38 暴食正式整合與七曲
+
+原七MP3逐位元保存19,360,315 bytes；完整網站128kbps／44.1kHz／立體聲副本9,687,061 bytes，下降49.96%，每曲時長差<0.15秒。原檔SHA、兩版時長／bytes與副本SHA在source-assets/gluttony/music/manifest.json；source-assets不部署。既有34圖雜湊未變，10張運行WebP仍3,936,302 bytes，原貓／字型共用。獨立頁與正式頁引用同一音樂／bundle，不把ZIP或影片進網站。四比例截圖與JSON見verification-r4。冷快取未開始試玩首屏HTTP body1,643,563 bytes；音樂按當前曲載入，七曲總量不是進關或首屏流量。正式Jekyll產物／來源排除由PR CI檢查。

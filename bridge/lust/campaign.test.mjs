@@ -24,7 +24,7 @@ test('actual zero, body continuation and both good/bad victories save separate d
   const s=createLust({preview:false,difficulty});const record=createLustRecorder(save);completed(s,{bad});assert.equal(s.lustCleared,true);assert.equal(record(s),true);assert.equal(record(s),false);
   assert.equal(save.getItem('bridge-crazy-cleared-lust'),'1');assert.deepEqual(JSON.parse(save.getItem(crazyLeaderboardKey('lust',difficulty))),[10150]);
  }
- assert.equal(sinProgress(save).find(b=>b.id==='gluttony').unlocked,false);
+ assert.equal(sinProgress(save).find(b=>b.id==='gluttony').unlocked,true);
 });
 test('partial dates, previews, filming and blocked storage cannot save a fourth Boss clear',()=>{
  const save=storage(),record=createLustRecorder(save);

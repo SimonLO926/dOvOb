@@ -1,0 +1,12 @@
+✔ batching preserves world bounds through nested transforms and a rotated root (5.182165ms)
+✔ batching preserves every triangle and carries original linear colors and gloss per surface (0.876956ms)
+✔ theme shell and textured labels retain their live materials and transforms (1.124607ms)
+✔ merging keeps pointer ray hits at the same world positions (1.745229ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 119.608874

@@ -3,7 +3,8 @@ export const CARTRIDGES=Object.freeze([
  {id:'pride',title:'傲慢',english:'PRIDE',subtitle:'The Mirror Palace',color:'#8464ae',art:'./assets/pride-first.webp',available:true},
  {id:'envy',title:'嫉妒',english:'ENVY',subtitle:'The Watching Child',color:'#548c76',art:'./assets/envy-first.webp',available:true},
  {id:'lust',title:'色慾',english:'LUST',subtitle:'Cupid in the Clouds',color:'#c56b8a',art:'./assets/lust-cupid-r2.webp',available:true,preview:true},
- ...[5,6,7].map(n=>({id:'sealed-'+n,title:'封印 '+n,english:'SEALED '+n,color:'#8a8982',available:false})),
+ {id:'gluttony',title:'暴食',english:'GLUTTONY',subtitle:'The Ravenous Chef',color:'#b88b58',art:'./assets/gluttony-intro-r1.webp',available:true,preview:true},
+ ...[6,7].map(n=>({id:'sealed-'+n,title:'封印 '+n,english:'SEALED '+n,color:'#8a8982',available:false})),
 ]);
 export function createSelection(){return {index:0,phase:'browse',elapsed:0,rotate:false,yaw:0,pitch:0,drop:{x:0,y:0},message:'',available:CARTRIDGES.map(p=>p.available)};}
 export function selectCartridge(s,index){if(s.phase!=='browse'||!CARTRIDGES[index])return false;if(!s.available[index]){s.message='sealed';return false;}s.index=index;s.drop={x:0,y:0};s.yaw=0;s.pitch=0;s.message='';return true;}

@@ -1,0 +1,72 @@
+[
+  {
+    "original": "gluttony_first_bridge_no-watermark.mp3",
+    "runtime": "bridge/assets/gluttony-music/gluttony_first_bridge.mp3",
+    "sourceBytes": 1980593,
+    "runtimeBytes": 991283,
+    "sourceSeconds": 61.831837,
+    "runtimeSeconds": 61.819841,
+    "sha256": "48d1e79b19a86ff1650c6d80b4090efb2d3a396f1fb3ac16bb5f1285f1f20be6",
+    "runtimeSha256": "fc937eccff1dcbf5b649054e59b73f5966eadab606c3402e3d9f9ecb9d32d5f6"
+  },
+  {
+    "original": "gluttony_first_last_no-watermark.mp3",
+    "runtime": "bridge/assets/gluttony-music/gluttony_first_last.mp3",
+    "sourceBytes": 2308273,
+    "runtimeBytes": 1155123,
+    "sourceSeconds": 72.071837,
+    "runtimeSeconds": 72.059841,
+    "sha256": "d58109c17a24a6b41d2597a02842a835afebd81dc35fb80e69406f883f00e26b",
+    "runtimeSha256": "cbbd2a6584d609465719897ef5dd0a1f0b8ad98bac3e680e802b0040a4cc983a"
+  },
+  {
+    "original": "gluttony_first_special_no-watermark.mp3",
+    "runtime": "bridge/assets/gluttony-music/gluttony_first_special.mp3",
+    "sourceBytes": 3689210,
+    "runtimeBytes": 1845591,
+    "sourceSeconds": 115.226122,
+    "runtimeSeconds": 115.214127,
+    "sha256": "63377635f3c9640f1deabcb4663bd42ab283eb03d82e0e006219c0c682520957",
+    "runtimeSha256": "455254d6128c35da61f4a791c0d9576441d3c9dbd54d09c9d4ae0b6061e593f3"
+  },
+  {
+    "original": "gluttony_second_bridge_no-watermark.mp3",
+    "runtime": "bridge/assets/gluttony-music/gluttony_second_bridge.mp3",
+    "sourceBytes": 1774957,
+    "runtimeBytes": 888465,
+    "sourceSeconds": 55.405714,
+    "runtimeSeconds": 55.393719,
+    "sha256": "54a193d78dcb3a7896bab955bb3a25eb3a7068d803cbc1d4a926622a83b14bae",
+    "runtimeSha256": "8ac33224f474d3855686ee2c028809e35e9f25a1a117a1463fac71bba83ba4ac"
+  },
+  {
+    "original": "gluttony_second_last_no-watermark.mp3",
+    "runtime": "bridge/assets/gluttony-music/gluttony_second_last.mp3",
+    "sourceBytes": 3527878,
+    "runtimeBytes": 1764925,
+    "sourceSeconds": 110.18449,
+    "runtimeSeconds": 110.172494,
+    "sha256": "3b87349f30ae9f9cf856c00be347316876abb9c558d13df6c19d94cc3017de60",
+    "runtimeSha256": "df91a9e3ba029d927701690dc22548cee91b58b306600ee3c90c85d66c0279cd"
+  },
+  {
+    "original": "gluttony_second_special_no-watermark.mp3",
+    "runtime": "bridge/assets/gluttony-music/gluttony_second_special.mp3",
+    "sourceBytes": 3327258,
+    "runtimeBytes": 1664615,
+    "sourceSeconds": 103.915102,
+    "runtimeSeconds": 103.903107,
+    "sha256": "78b1fb7649104a50528b2be2a336249024728c061345fee615c7d233d909bcfa",
+    "runtimeSha256": "9783c28ca2e36a518eb6bfcd9a31124215626050c37fc322872e23ce24652849"
+  },
+  {
+    "original": "gluttony_third_last_no-watermark.mp3",
+    "runtime": "bridge/assets/gluttony-music/gluttony_third_last.mp3",
+    "sourceBytes": 2752146,
+    "runtimeBytes": 1377059,
+    "sourceSeconds": 85.942857,
+    "runtimeSeconds": 85.930862,
+    "sha256": "375552fcb05a3bb41572ea8f0ecf762333b02bd8b9a791682292a0b5bfc5ed8b",
+    "runtimeSha256": "52be3c4518f2fae40378576e437f890341d00357848aa351c91e1097ff5e6398"
+  }
+]

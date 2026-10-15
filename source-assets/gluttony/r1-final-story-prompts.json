@@ -1,0 +1,109 @@
+[
+  {
+    "id": "chef-defeat",
+    "prompt": "CRITICAL ART DIRECTION: The user rejected towers and arches. Completely replace ALL architecture and scenery from these style references. NO TOWERS, NO ARCHES, NO PILLARS, NO COLONNADES, NO GOTHIC or PALACE ARCHITECTURE, NO CASTLES, NO SPIRES, NO WINDOW ARCHES, NO ROYAL banners, NO CROWNS, NO MIRRORS. Use only dense refined PIXEL PAINTING strokes, rich material textures and layered light from the references. Original GLUTTONY world: monstrous enormous wooden dining table seen at tabletop level, rough wood-grain planks, massive square table legs visible below edges, enormous simple copper cooking pots and rectangular brick stove at sides, heaps of bread, fruit, cakes and roasted food towering as organic FOOD MOUNTAINS, dark cavernous empty background and drifting cooking steam. Food mountains must not resemble towers. Landscape 1536x1024 complete opaque ONE SCENE, no atlas. Rich depth with foreground spilled food and plates. Midnight teal shadows, amber stove light, copper/russet/ivory materials. Essential subject and face entirely central 35% width, middle55% height for phone portrait cover crop; top12% and bottom16% quieter. No text, UI, cats, logo, gore, human player, 3D, smooth anime or chunky sprite art. FORMAT MUST be a WIDE HORIZONTAL landscape composition, width greater than height, 3:2. Defeated same middle-aged ravenous chef in ivory toque, navy chef coat, copper buttons and rust scarf kneels at CENTER on splintered giant wooden dining table, bowed head, CLOSED EYES, limp arms, wooden ladle dropped in front. Dark smoke from torn coat suggests transformation. No standing or triumphant pose. Surrounding only food heaps, copper pots, oven and dark cavern steam.",
+    "path": "/workspace/generated_images/exec-15d2d647-0b93-4219-84db-e3a62cd7b6a7.png",
+    "status": "adopted",
+    "referenced_image_paths": [
+      "source-assets/greed/images/greed-defeated.png",
+      "source-assets/pride/images/pride-mirror-defeated.png",
+      "source-assets/pride/images/pride-tower-ruins.png",
+      "source-assets/gluttony/images/gluttony-intro.png"
+    ]
+  },
+  {
+    "id": "mouth-defeat",
+    "prompt": "CRITICAL ART DIRECTION: The user rejected towers and arches. Completely replace ALL architecture and scenery from these style references. NO TOWERS, NO ARCHES, NO PILLARS, NO COLONNADES, NO GOTHIC or PALACE ARCHITECTURE, NO CASTLES, NO SPIRES, NO WINDOW ARCHES, NO ROYAL banners, NO CROWNS, NO MIRRORS. Use only dense refined PIXEL PAINTING strokes, rich material textures and layered light from the references. Original GLUTTONY world: monstrous enormous wooden dining table seen at tabletop level, rough wood-grain planks, massive square table legs visible below edges, enormous simple copper cooking pots and rectangular brick stove at sides, heaps of bread, fruit, cakes and roasted food towering as organic FOOD MOUNTAINS, dark cavernous empty background and drifting cooking steam. Food mountains must not resemble towers. Landscape 1536x1024 complete opaque ONE SCENE, no atlas. Rich depth with foreground spilled food and plates. Midnight teal shadows, amber stove light, copper/russet/ivory materials. Essential subject and face entirely central 35% width, middle55% height for phone portrait cover crop; top12% and bottom16% quieter. No text, UI, cats, logo, gore, human player, 3D, smooth anime or chunky sprite art. FORMAT MUST be a WIDE HORIZONTAL landscape composition, width greater than height, 3:2. Defeated gigantic NONHUMAN crust-and-dough mouth: ivory tooth plates shattered and all fallen, russet jaw cracked with DARK EMPTY central cavity, folded dough arms in navy torn sleeves collapsed on splintered giant WOOD TABLE. No intact living mouth, no eyes or hat. Foreground copper pan and fruit scraps, cold smoke, background is dark cavern and food heaps, no architecture.",
+    "path": "/workspace/generated_images/exec-77f96e83-44f7-4ed6-b059-2e23f57cce32.png",
+    "status": "adopted",
+    "referenced_image_paths": [
+      "source-assets/greed/images/greed-defeated.png",
+      "source-assets/pride/images/pride-mirror-defeated.png",
+      "source-assets/pride/images/pride-tower-ruins.png",
+      "source-assets/gluttony/images/gluttony-mouth.png"
+    ]
+  },
+  {
+    "id": "abyss",
+    "prompt": "CRITICAL ART DIRECTION: The user rejected towers and arches. Completely replace ALL architecture and scenery from these style references. NO TOWERS, NO ARCHES, NO PILLARS, NO COLONNADES, NO GOTHIC or PALACE ARCHITECTURE, NO CASTLES, NO SPIRES, NO WINDOW ARCHES, NO ROYAL banners, NO CROWNS, NO MIRRORS. Use only dense refined PIXEL PAINTING strokes, rich material textures and layered light from the references. Original GLUTTONY world: monstrous enormous wooden dining table seen at tabletop level, rough wood-grain planks, massive square table legs visible below edges, enormous simple copper cooking pots and rectangular brick stove at sides, heaps of bread, fruit, cakes and roasted food towering as organic FOOD MOUNTAINS, dark cavernous empty background and drifting cooking steam. Food mountains must not resemble towers. Landscape 1536x1024 complete opaque ONE SCENE, no atlas. Rich depth with foreground spilled food and plates. Midnight teal shadows, amber stove light, copper/russet/ivory materials. Essential subject and face entirely central 35% width, middle55% height for phone portrait cover crop; top12% and bottom16% quieter. No text, UI, cats, logo, gore, human player, 3D, smooth anime or chunky sprite art. FORMAT MUST be a WIDE HORIZONTAL landscape composition, width greater than height, 3:2. The final abyss mouth: enormous circular rings of irregular ivory teeth, dark charred russet jaw plates, bottomless midnight teal void, dough tendrils gripping the splintered huge WOOD TABLE. No eyes, human face or hat. Food mountains curve toward void, plain enormous copper pans at sides. Dark cavern and cyan vapor. WIDE horizontal scene, whole mouth central and NOT a tower, arch, window, pillar or wall.",
+    "path": "/workspace/generated_images/exec-d89189bd-2547-44b6-bf63-f0842e9ba74d.png",
+    "status": "adopted",
+    "referenced_image_paths": [
+      "source-assets/greed/images/greed-defeated.png",
+      "source-assets/pride/images/pride-mirror-defeated.png",
+      "source-assets/pride/images/pride-tower-ruins.png",
+      "source-assets/gluttony/drafts/gluttony-abyss-portrait.png"
+    ]
+  },
+  {
+    "id": "abyss-defeat",
+    "prompt": "CRITICAL ART DIRECTION: The user rejected towers and arches. Completely replace ALL architecture and scenery from these style references. NO TOWERS, NO ARCHES, NO PILLARS, NO COLONNADES, NO GOTHIC or PALACE ARCHITECTURE, NO CASTLES, NO SPIRES, NO WINDOW ARCHES, NO ROYAL banners, NO CROWNS, NO MIRRORS. Use only dense refined PIXEL PAINTING strokes, rich material textures and layered light from the references. Original GLUTTONY world: monstrous enormous wooden dining table seen at tabletop level, rough wood-grain planks, massive square table legs visible below edges, enormous simple copper cooking pots and rectangular brick stove at sides, heaps of bread, fruit, cakes and roasted food towering as organic FOOD MOUNTAINS, dark cavernous empty background and drifting cooking steam. Food mountains must not resemble towers. Landscape 1536x1024 complete opaque ONE SCENE, no atlas. Rich depth with foreground spilled food and plates. Midnight teal shadows, amber stove light, copper/russet/ivory materials. Essential subject and face entirely central 35% width, middle55% height for phone portrait cover crop; top12% and bottom16% quieter. No text, UI, cats, logo, gore, human player, 3D, smooth anime or chunky sprite art. FORMAT MUST be a WIDE HORIZONTAL landscape composition, width greater than height, 3:2. Actually destroyed final abyss mouth: the concentric tooth rings have collapsed into a huge dead and EMPTY split husk on the broken wood dining table, ALL teeth fractured and cyan energy extinguished. Pale ivory and charred russet fragments among copper pans, crumbs and spilled fruit. A faint small amber glimmer under debris hints hidden true body. No intact living mouth, no chef or creature standing. Dark cavern, smoke clearing.",
+    "path": "/workspace/generated_images/exec-8fd0ae3a-6eb8-4c89-99f0-f9479441780d.png",
+    "status": "adopted",
+    "referenced_image_paths": [
+      "source-assets/greed/images/greed-defeated.png",
+      "source-assets/pride/images/pride-mirror-defeated.png",
+      "source-assets/pride/images/pride-tower-ruins.png",
+      "source-assets/gluttony/drafts/gluttony-abyss-portrait.png"
+    ]
+  },
+  {
+    "id": "body",
+    "prompt": "CRITICAL ART DIRECTION: The user rejected towers and arches. Completely replace ALL architecture and scenery from these style references. NO TOWERS, NO ARCHES, NO PILLARS, NO COLONNADES, NO GOTHIC or PALACE ARCHITECTURE, NO CASTLES, NO SPIRES, NO WINDOW ARCHES, NO ROYAL banners, NO CROWNS, NO MIRRORS. Use only dense refined PIXEL PAINTING strokes, rich material textures and layered light from the references. Original GLUTTONY world: monstrous enormous wooden dining table seen at tabletop level, rough wood-grain planks, massive square table legs visible below edges, enormous simple copper cooking pots and rectangular brick stove at sides, heaps of bread, fruit, cakes and roasted food towering as organic FOOD MOUNTAINS, dark cavernous empty background and drifting cooking steam. Food mountains must not resemble towers. Landscape 1536x1024 complete opaque ONE SCENE, no atlas. Rich depth with foreground spilled food and plates. Midnight teal shadows, amber stove light, copper/russet/ivory materials. Essential subject and face entirely central 35% width, middle55% height for phone portrait cover crop; top12% and bottom16% quieter. No text, UI, cats, logo, gore, human player, 3D, smooth anime or chunky sprite art. FORMAT MUST be a WIDE HORIZONTAL landscape composition, width greater than height, 3:2. True body revealed after destroyed maw: one huge magical translucent amber STOMACH organ resting and gently pulsing on the splintered wooden TABLE, identifiable curved anatomical stomach pouch with short curved inlet and small tapered outlet, smooth non-gory glasslike membrane. Inside clearly visible undigested bread, fruit and cake fragments suspended in amber fluid, but an immense dark hollow center remains empty. Ruined jaw-tooth plates and copper pots nearby, cold teal cavern haze and dim stove. Serious unsettling revelation, no gore, no humanoid or intact mouth.",
+    "path": "/workspace/generated_images/exec-5f328054-21a8-48e1-9548-2397dffd8e4c.png",
+    "status": "adopted",
+    "referenced_image_paths": [
+      "source-assets/greed/images/greed-defeated.png",
+      "source-assets/pride/images/pride-mirror-defeated.png",
+      "source-assets/pride/images/pride-tower-ruins.png",
+      "source-assets/gluttony/drafts/gluttony-abyss-portrait.png"
+    ]
+  },
+  {
+    "id": "victory",
+    "prompt": "CRITICAL ART DIRECTION: The user rejected towers and arches. Completely replace ALL architecture and scenery from these style references. NO TOWERS, NO ARCHES, NO PILLARS, NO COLONNADES, NO GOTHIC or PALACE ARCHITECTURE, NO CASTLES, NO SPIRES, NO WINDOW ARCHES, NO ROYAL banners, NO CROWNS, NO MIRRORS. Use only dense refined PIXEL PAINTING strokes, rich material textures and layered light from the references. Original GLUTTONY world: monstrous enormous wooden dining table seen at tabletop level, rough wood-grain planks, massive square table legs visible below edges, enormous simple copper cooking pots and rectangular brick stove at sides, heaps of bread, fruit, cakes and roasted food towering as organic FOOD MOUNTAINS, dark cavernous empty background and drifting cooking steam. Food mountains must not resemble towers. Landscape 1536x1024 complete opaque ONE SCENE, no atlas. Rich depth with foreground spilled food and plates. Midnight teal shadows, amber stove light, copper/russet/ivory materials. Essential subject and face entirely central 35% width, middle55% height for phone portrait cover crop; top12% and bottom16% quieter. No text, UI, cats, logo, gore, human player, 3D, smooth anime or chunky sprite art. FORMAT MUST be a WIDE HORIZONTAL landscape composition, width greater than height, 3:2. Final Gluttony victory, a peaceful destroyed feast. Dawn-like warm light enters an open dark cavern, shattered gigantic jaw and ivory teeth inert on the giant splintered WOOD TABLE, all magic extinguished. The same single curved translucent amber stomach lies still and dim in CENTER among undigested crumbs and fruit. Food heaps stop moving. Copper pots and exhausted rectangular stove at edges. Atmosphere relief and melancholy: food cannot fill emotional emptiness. No living mouth, no human chef or standing boss.",
+    "path": "/workspace/generated_images/exec-9e7b9c26-7605-431b-a96c-428a8d1cbb7a.png",
+    "status": "draft: spherical stomach",
+    "referenced_image_paths": [
+      "source-assets/greed/images/greed-defeated.png",
+      "source-assets/pride/images/pride-mirror-defeated.png",
+      "source-assets/pride/images/pride-tower-ruins.png",
+      "source-assets/gluttony/drafts/gluttony-abyss-portrait.png"
+    ]
+  },
+  {
+    "id": "lost",
+    "prompt": "CRITICAL ART DIRECTION: The user rejected towers and arches. Completely replace ALL architecture and scenery from these style references. NO TOWERS, NO ARCHES, NO PILLARS, NO COLONNADES, NO GOTHIC or PALACE ARCHITECTURE, NO CASTLES, NO SPIRES, NO WINDOW ARCHES, NO ROYAL banners, NO CROWNS, NO MIRRORS. Use only dense refined PIXEL PAINTING strokes, rich material textures and layered light from the references. Original GLUTTONY world: monstrous enormous wooden dining table seen at tabletop level, rough wood-grain planks, massive square table legs visible below edges, enormous simple copper cooking pots and rectangular brick stove at sides, heaps of bread, fruit, cakes and roasted food towering as organic FOOD MOUNTAINS, dark cavernous empty background and drifting cooking steam. Food mountains must not resemble towers. Landscape 1536x1024 complete opaque ONE SCENE, no atlas. Rich depth with foreground spilled food and plates. Midnight teal shadows, amber stove light, copper/russet/ivory materials. Essential subject and face entirely central 35% width, middle55% height for phone portrait cover crop; top12% and bottom16% quieter. No text, UI, cats, logo, gore, human player, 3D, smooth anime or chunky sprite art. FORMAT MUST be a WIDE HORIZONTAL landscape composition, width greater than height, 3:2. Player defeated, the living Gluttony abyss mouth remains threatening: enormous concentric ivory tooth rings around a dark teal hungry void consuming broken wooden dining TABLE, food scraps and copper pan drawn inward. Fully intact active mouth in CENTER, cyan steam and orange stove sparks. Dark cavern only. No human player, body, stomach or cat, no text or gore.",
+    "path": "/workspace/generated_images/exec-3f7b87d3-67b4-4824-bd65-db910e8fd78e.png",
+    "status": "adopted",
+    "referenced_image_paths": [
+      "source-assets/greed/images/greed-defeated.png",
+      "source-assets/pride/images/pride-mirror-defeated.png",
+      "source-assets/pride/images/pride-tower-ruins.png",
+      "source-assets/gluttony/drafts/gluttony-abyss-portrait.png"
+    ]
+  },
+  {
+    "id": "victory-arched",
+    "prompt": "Edit the FIRST reference (Gluttony translucent stomach reveal) into a DISTINCT FINAL VICTORY illustration. Preserve the SAME unmistakable ANATOMICAL STOMACH SHAPE: asymmetrical rounded curved pouch, short curved tube inlet upper left, narrow curled tapered outlet to right; NOT a spherical globe, egg, ball, orb, bowl or round glass shield. A single huge translucent amber stomach lies STILL, dimmer, slightly collapsed on the central splintered wooden TABLE. Undigested fruit, bread and cakes remain visible inside around a dark hollow empty center. Shattered ivory teeth and crust jaw lie lifeless at sides. Morning gold light enters the dark cave from upper right; copper pots and exhausted simple brick oven at sides, food mountains motionless. Emotional calm relief and hollow melancholy. Match refined dense small pixel painting, rich material textures, no smooth art or 3D. WIDE landscape horizontal 3:2, central essential stomach and action mobile cover safe in middle35% width, top12% and bottom16% quiet. No towers, arches, palace, pillars, spires, royal crowns, mirrors, casino, cat, person, UI, text, gore, logo or watermark. Reference two to four ONLY for series pixel texture, NEVER architecture.",
+    "referenced_image_paths": [
+      "/workspace/generated_images/exec-5f328054-21a8-48e1-9548-2397dffd8e4c.png",
+      "/workspace/dOvOb/source-assets/greed/images/greed-defeated.png",
+      "/workspace/dOvOb/source-assets/pride/images/pride-mirror-defeated.png",
+      "/workspace/dOvOb/source-assets/pride/images/pride-tower-ruins.png"
+    ],
+    "transparent_background": false,
+    "path": "/workspace/generated_images/exec-68d9c22f-cae3-4980-bc0e-c24ef436983d.png",
+    "status": "draft: arch oven"
+  },
+  {
+    "id": "victory",
+    "prompt": "Edit this Gluttony victory illustration, preserve ALL of its original refined pixel painting, central asymmetrical translucent stomach with undigested food, dark hollow, broken teeth, wood table, copper pots, cave, dawn light, framing and landscape format. ONE precise background correction: replace the ARCHED STONE OVEN OPENING at the far upper-left with a SIMPLE RECTANGULAR BLACK IRON STOVE, straight vertical sides and a flat horizontal top, closed rectangular furnace door with a small rectangular orange light slit. Remove its curved stone arch stones completely. Keep surrounding copper pots and food. Absolutely no towers, arches or palace architecture anywhere. No other changes, no text or UI.",
+    "referenced_image_paths": [
+      "/workspace/generated_images/exec-68d9c22f-cae3-4980-bc0e-c24ef436983d.png"
+    ],
+    "transparent_background": false,
+    "path": "/workspace/generated_images/exec-933b560b-23a0-47e4-a62a-14740d03b133.png",
+    "status": "adopted"
+  }
+]

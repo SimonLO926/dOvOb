@@ -10,4 +10,4 @@ export function campaignTarget(sin,progress,base,difficulty='normal'){
  url.searchParams.set('difficulty',difficulty==='hard'?'hard':'normal');
  return url.href;
 }
-export function cartridgeRanks(storage){const read=key=>{try{return storage?.getItem(key);}catch{return null;}};return ['greed','pride','envy','lust'].flatMap(sin=>['normal','hard'].map(difficulty=>({sin,difficulty,scores:loadBoard([read(crazyLeaderboardKey(sin,difficulty))])})));}
+export function cartridgeRanks(storage){const read=key=>{try{return storage?.getItem(key);}catch{return null;}};return ['greed','pride','envy','lust','gluttony'].flatMap(sin=>['normal','hard'].map(difficulty=>({sin,difficulty,scores:loadBoard([read(crazyLeaderboardKey(sin,difficulty))])})));}

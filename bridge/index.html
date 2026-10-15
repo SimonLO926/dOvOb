@@ -1703,7 +1703,7 @@
     import { touchControlsEnabled } from "./touch-controls.mjs?v=1.2.36";
     import { BRIDGE_REPEAT } from "./bridge-controls.mjs?v=1.2.36";
     import { filmingEnabled } from "./filming.mjs?v=1.2.36";
-    import { sinProgress, crazyLeaderboardKey, recordSinClear } from "./crazy-sins.mjs?v=1.2.36";
+    import { sinProgress, crazyLeaderboardKey, recordSinClear } from "./crazy-sins.mjs?v=1.2.38";
     import { createCrazy, updateCrazy, inputCrazy, pointCrazy, skipCrazyCinematic } from "./crazy.mjs?v=1.2.36";
     import { drawCrazy, drawCrazyFrame, drawMischiefCat, catImageReady, crazyCanvasHeight } from "./crazy-view.mjs?v=1.2.36";
     import { createCombatEffects, resetCombatEffects, updateCombatEffects, drawCombatEffects, createCombatOverlay, combatLayout } from "./combat-effects.mjs?v=1.2.36";
@@ -1719,7 +1719,7 @@
     import { renderControlsGuide } from "./controls-guide.mjs?v=1.2.36";
     import { createTen, createTwenty, tenCycle, tenMove, tenPlace, twentyBest, twentyMove } from "./puzzle.mjs?v=1.2.36";
     import { loadBoard, rememberScore } from "./ranks.mjs?v=1.2.36";
-    import { VERSION } from "./version.mjs?v=1.2.37";
+    import { VERSION } from "./version.mjs?v=1.2.38";
     import {
       COLS, ROWS, SAND_DROPS, SAND_SCALE, SAND_HEX, SHAPES, activateFever, applyNoHoldCurse, penaltyCells, feverActive, beginSand, cellsOf, createGame, fits, flipGrid, ghostY, gravityMs, sandPaintsFor,
       dangerLevel, garbageGraceActive, hardDrop, hold, lockActive, paceOf, paceScale, pump, startGame, tryMove, tryRotate,
@@ -2314,7 +2314,7 @@
     }
     let selectedSin = "greed";
     function beginCrazy(sin = selectedSin) {
-      if (sin === "envy" || sin === "lust") {
+      if (sin === "envy" || sin === "lust" || sin === "gluttony") {
         const boss = sinProgress(localStorage).find(value => value.id === sin);
         if (!boss?.unlocked) return;
         crazyMusic.pause(); sound.stop();
@@ -3758,7 +3758,7 @@
       cartridgeEncounter=campaignSin;beginCrazy(campaignSin);history.replaceState(null,"",new URL("./index.html",location.href));
     } else if (!pridePreview && new URLSearchParams(location.search).get("bosses") === "1") {
       const requested = new URLSearchParams(location.search).get("sin");
-      selectedBoss = ["greed", "pride", "envy", "lust"].includes(requested) ? requested : "greed";
+      selectedBoss = ["greed", "pride", "envy", "lust", "gluttony"].includes(requested) ? requested : "greed";
       showBossSelection();
     }
     requestAnimationFrame(frame);

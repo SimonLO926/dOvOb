@@ -1,0 +1,366 @@
+{
+  "date": "2026-10-14 Asia/Macau",
+  "baseline": "4958f1ed63e751f4d171e072fbbd70580f593774",
+  "references": [
+    {
+      "path": "source-assets/greed/images/greed-defeated.png",
+      "bytes": 3016384,
+      "sha256": "1605ab811f6b34ae7b2df49147ec115cb825323d941fbc2eed41e5003a89f0d5",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/pride/images/pride-mirror-defeated.png",
+      "bytes": 3460994,
+      "sha256": "4db43125e4ff0342803c682c0b81972111fcde1d8a770ba64d91f5539a856655",
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/pride/images/pride-tower-ruins.png",
+      "bytes": 3066791,
+      "sha256": "b4ec6db504b26c9145434c8c6ad80c478e822d2ad170edfacaab06e049232a9d",
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB"
+    }
+  ],
+  "design": {
+    "path": "source-assets/gluttony/design/gluttony-design-original.md",
+    "bytes": 3138,
+    "sha256": "03e76d5dafd1c814b129aba690e6aa5af2ff67c8c0543a41dfcad3f76d918279"
+  },
+  "adopted": [
+    {
+      "path": "source-assets/gluttony/images/gluttony-abyss-defeat.png",
+      "bytes": 3085511,
+      "sha256": "d3b7dd8ff6a11d41ff682676b300ec2589f5d06c60b8bdbed631d5ea6ba43cc0",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/images/gluttony-abyss.png",
+      "bytes": 3216945,
+      "sha256": "aeecbf8b8e972eccf5e6d5b4de78f954c7f6dcc199e7436fe765f5ee2ae8ca9f",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/images/gluttony-body.png",
+      "bytes": 2937998,
+      "sha256": "87b67dc0ee278715097dfc94c5e42fad753d8e7518dacedda6dfae737d813e8c",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/images/gluttony-chef-defeat.png",
+      "bytes": 3057735,
+      "sha256": "5a73cab6765157b92cf461b18798b52aeddf09fd7f698b3bb9231e4209170359",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/images/gluttony-feast.png",
+      "bytes": 2937410,
+      "sha256": "456c4fa1368ba34125694b322d1b8c46d74220fcbc0b64270811354cabbe01c3",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/images/gluttony-intro.png",
+      "bytes": 3085723,
+      "sha256": "4dcd9cd44c2c62017c6abe4c5c8f6131213c170942243f05207bb44ec1bf0b71",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/images/gluttony-lost.png",
+      "bytes": 3213112,
+      "sha256": "1a0b0a68ffd3741b0857fc1f3de2ebdca366cb40fbc37b25d7701feea9832ecb",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/images/gluttony-mouth-defeat.png",
+      "bytes": 3111534,
+      "sha256": "bb001cffc4a43f2bc51afe707b6f6ecca056c1fbb961f331338b69ee6354084b",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/images/gluttony-mouth.png",
+      "bytes": 3047547,
+      "sha256": "3540a537b79b5b975884f51d34669958c25fc083c630308f6c78d45f4a7d1e0b",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/images/gluttony-victory.png",
+      "bytes": 2777223,
+      "sha256": "71194469b60ff61ffe6de8f686cb71daf76e723f765e44778a9a43f9ac26e7ec",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    }
+  ],
+  "runtime": [
+    {
+      "path": "bridge/assets/gluttony-abyss-defeat-r1.webp",
+      "bytes": 390786,
+      "sha256": "fe47d171a7a02cdaec1345358c37d67d202a35d8bf772d351ed021db84803fa4",
+      "size": [
+        1280,
+        853
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "bridge/assets/gluttony-abyss-r1.webp",
+      "bytes": 430274,
+      "sha256": "b2192d983648bc7882f12a5b2a6a7d7ff33080497b4524bb0c6ed209b4a72ca6",
+      "size": [
+        1280,
+        853
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "bridge/assets/gluttony-body-r1.webp",
+      "bytes": 383972,
+      "sha256": "bf4aa800d007b1699bbb0152a78ad21d93bfe7589f29529e4307a8854250a49e",
+      "size": [
+        1280,
+        853
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "bridge/assets/gluttony-chef-defeat-r1.webp",
+      "bytes": 384310,
+      "sha256": "b656df5216652e6eedb6bbe9a3ebf7d1a8f061fc9f61aeaf1365ab78ec6f4e8f",
+      "size": [
+        1280,
+        853
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "bridge/assets/gluttony-feast-r1.webp",
+      "bytes": 361968,
+      "sha256": "bc48b4ad703ed99b7204ea8eaa8710ec51ab9f2bf96230fc2f8dda5768157730",
+      "size": [
+        1280,
+        853
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "bridge/assets/gluttony-intro-r1.webp",
+      "bytes": 392110,
+      "sha256": "ec896b5b206c9e03687eeae0916057c41103ac4cc44426008dd1bc1366c5607b",
+      "size": [
+        1280,
+        853
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "bridge/assets/gluttony-lost-r1.webp",
+      "bytes": 440642,
+      "sha256": "ec19718161b4509463be96988cde7c54243ef3f41f1c2cc21a204e9ac9f5a704",
+      "size": [
+        1280,
+        853
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "bridge/assets/gluttony-mouth-defeat-r1.webp",
+      "bytes": 409952,
+      "sha256": "c5e375932e39407ac76209f2f0c1772936265e59bdef2e1f94bddd08ab480e44",
+      "size": [
+        1280,
+        853
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "bridge/assets/gluttony-mouth-r1.webp",
+      "bytes": 387708,
+      "sha256": "716a551663e501624917a852b0b5becebc713cd840e4b141468320392480f50f",
+      "size": [
+        1280,
+        853
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "bridge/assets/gluttony-victory-r1.webp",
+      "bytes": 354580,
+      "sha256": "3b9ac2fb781bb6eaea04ce930b2df81c2ef6ff6d98d9c84ae6088705ee91b654",
+      "size": [
+        1280,
+        853
+      ],
+      "mode": "RGB"
+    }
+  ],
+  "drafts": [
+    {
+      "path": "source-assets/gluttony/drafts/gluttony-abyss-portrait.png",
+      "bytes": 3052044,
+      "sha256": "6805719224f2646ba7410e3a0fcf7f30415633b54077f390aa1c640843db0a54",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/drafts/gluttony-abyss-towers.png",
+      "bytes": 3472721,
+      "sha256": "2523ff2a8d662597aace9c3b0d561acaec7308a2d429f76ba526184e1e4bb5c1",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/drafts/gluttony-body-large.png",
+      "bytes": 3265856,
+      "sha256": "4987b7f61549f6e241773196b2be690b3025272d7f5288ba5adb1405b7624d30",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/drafts/gluttony-chef-defeat-towers.png",
+      "bytes": 3292150,
+      "sha256": "809f2099f5905fc9b82eb578c2bdb7ec881daa44807bd88c6e169444185ee160",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/drafts/gluttony-feast-towers.png",
+      "bytes": 3650910,
+      "sha256": "1586da219d553d1ef22153524d218b0caa9d0d775284e9195fcba7ba72ddd0c3",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/drafts/gluttony-intro-towers.png",
+      "bytes": 3393228,
+      "sha256": "15a1e398431e45dcb89008e22f61ca56c45a7d72db1eac2b5248846e9744d324",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/drafts/gluttony-mouth-defeat-towers.png",
+      "bytes": 3498709,
+      "sha256": "d45bbad6f9810b21d47f1677cab3038f9483e474d056e531a21b1958c9c6c4c3",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/drafts/gluttony-mouth-towers.png",
+      "bytes": 3581356,
+      "sha256": "7c39016a61acd786dc89485cbd909d5a947fa391d48d0ba199e8c85c02b60711",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/drafts/gluttony-victory-arched.png",
+      "bytes": 3183505,
+      "sha256": "60d0ff1695251b4fb0a928aecb4e626c237a296d08bcdb31d19e079cdc08540a",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/drafts/gluttony-victory-large.png",
+      "bytes": 2864723,
+      "sha256": "8082c475c990f12a9712f666e90ae6f716455a758c13d11a7d858918eb47d96d",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "source-assets/gluttony/drafts/gluttony-victory-sphere.png",
+      "bytes": 3043094,
+      "sha256": "460bd6f983f5d4396b53f0e09d32d1c39a4b03b0a13105bab70706542468d7ff",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGB"
+    }
+  ],
+  "encoding": {
+    "maxWidth": 1280,
+    "quality": 88,
+    "resize": "nearest; preserve aspect",
+    "music": "effects only by user request; no MP3 supplied"
+  },
+  "adoptedPNGBytes": 30470738,
+  "runtimeWebPBytes": 3936302,
+  "savedDraftBytes": 36298296
+}

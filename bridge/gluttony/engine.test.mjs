@@ -1,0 +1,720 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
+  createGluttony,
+  HP,
+  SCENARIOS,
+  GAMES,
+  ATTACKS,
+  update,
+  input,
+  point,
+  release,
+  hitBoss,
+  hurt,
+  heal,
+  startRound,
+  finishRound,
+  continueScene,
+  phase,
+  bossFloor,
+  scene,
+} from "./engine.mjs";
+import { freshBoard, matches, legalMoves, swap, settle } from "./match.mjs";
+import { fruitPhysics, cutRope, setupRope, sliceLine } from "./games.mjs";
+const rng = (seed) => () =>
+  (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296;
+const make = (scenario = "phase-1", difficulty = "normal", seed = 11) =>
+  createGluttony({ scenario, difficulty, random: rng(seed) });
+const press = (s, key) => {
+  input(s, key);
+  input(s, key, false);
+};
+function time(s, ms) {
+  for (let n = 0; n < ms; n += 20) update(s, Math.min(20, ms - n));
+}
+function advance(s) {
+  if (s.round.done && !s.scene) {
+    time(s, 1200);
+    return;
+  }
+  assert.ok(s.scene);
+  s.scene.time = 500;
+  continueScene(s);
+}
+test("all standalone scenarios initialize with independent data and required HP", () => {
+  for (const difficulty of ["normal", "hard"])
+    for (const p of SCENARIOS) {
+      const s = make(p.id, difficulty);
+      assert.equal(s.bossMaxHp, HP[difficulty][s.stage - 1]);
+      assert.equal(s.preview, true);
+      assert.equal(s.hp, 100);
+      assert.ok(s.round);
+      assert.ok(!s.won);
+    }
+});
+test("five phases have distinct current appearances without changing HP totals", () => {
+  assert.equal(
+    HP.normal.reduce((a, b) => a + b),
+    2100,
+  );
+  assert.equal(
+    HP.hard.reduce((a, b) => a + b),
+    2450,
+  );
+  for (let i = 1; i <= 5; i++) assert.equal(phase(make("phase-" + i)), i);
+});
+test("Bridge native hold, rotate, drop and short press use fresh repeat clocks", () => {
+  const s = make();
+  time(s, 800);
+  const x = s.bridge.active.x;
+  press(s, "left");
+  assert.equal(s.bridge.active.x, x - 1);
+  time(s, 20);
+  assert.equal(s.bridge.active.x, x - 1);
+  press(s, "alt");
+  assert.ok(s.bridge.hold);
+  const rot = s.bridge.active.rot;
+  press(s, "up");
+  assert.notEqual(s.bridge.active.rot, rot);
+  press(s, "action");
+  assert.notEqual(s.bridge.phase, "over");
+});
+test("holding last direction repeats at native timing and release stops movement", () => {
+  const s = make();
+  input(s, "left");
+  input(s, "right");
+  const x = s.bridge.active.x;
+  time(s, 140);
+  assert.equal(s.bridge.active.x, x);
+  time(s, 20);
+  assert.equal(s.bridge.active.x, x + 1);
+  release(s);
+  const y = s.bridge.active.x;
+  time(s, 150);
+  assert.equal(s.bridge.active.x, y);
+});
+test("Bridge has no automatic damage on timeout; stages require actual accepted damage", () => {
+  const s = make();
+  time(s, 24100);
+  assert.equal(s.stats.damage, 0);
+  assert.equal(s.bossHp, 560);
+  assert.equal(s.mode, "snake");
+});
+test("first blood requires four ordinary games, then a real watermelon execution before defeat", () => {
+  const s = make();
+  hitBoss(s, 9999);
+  assert.equal(s.bossHp, 560 * .2);
+  for (const id of GAMES.filter(id => id !== 'merge')) {
+    startRound(s, id); finishRound(s, false);
+    assert.ok(s.played.includes(id));
+    advance(s);
+  }
+  assert.equal(s.scene.kind, 'watermelon-start');
+  advance(s);
+  assert.equal(s.round.execution, true);
+  assert.equal(s.mode, 'merge');
+  s.round.fruits = [106,174].map(x => ({x,y:425,level:6,age:0,vx:0,vy:0}));
+  time(s,40);
+  assert.equal(s.watermelonDone,true);
+  assert.equal(s.round.success,true);
+  advance(s); hitBoss(s, 9999);
+  assert.equal(s.scene.kind, 'chef-defeat'); advance(s);
+  assert.equal(s.stage,2); assert.equal(s.bossHp,700);
+  advance(s); assert.equal(s.mode,'bridge');
+});
+test("second blood seals at 20%; successful execution unlocks remaining HP", () => {
+  const s = make("phase-3");
+  hitBoss(s, 10000);
+  assert.equal(s.bossHp, 140);
+  assert.equal(s.scene.kind, "execution-start");
+  advance(s);
+  assert.equal(s.mode, "execution");
+  finishRound(s, true);
+  assert.equal(s.executionDone, true);
+  assert.equal(s.bossHp, 70);
+  advance(s);
+  hitBoss(s, 10000);
+  assert.equal(s.scene.kind, "mouth-defeat");
+  advance(s);
+  assert.equal(s.stage, 3);
+  assert.equal(s.bossHp, 840);
+});
+test("execution failure costs exactly 80 in both difficulties and retries after combat time only", () => {
+  for (const difficulty of ["normal", "hard"]) {
+    const s = make("phase-3", difficulty);
+    hitBoss(s, 9999);
+    advance(s);
+    finishRound(s, false);
+    assert.equal(s.hp, 20);
+    assert.equal(s.stats.damageTaken, 80);
+    assert.equal(s.retry, 20000);
+    time(s, 800);
+    assert.equal(s.retry, 20000);
+    advance(s);
+    assert.ok(s.bossHp + 1e-8 >= bossFloor(s));
+    startRound(s, "bridge");
+    time(s, 20020);
+    assert.equal(s.scene.kind, "execution-start");
+    advance(s);
+    assert.equal(s.mode, "execution");
+    assert.ok(s.round.moves > 0);
+  }
+});
+test("escape failure and retry never imply victory; low HP is final defeat", () => {
+  const s = make("phase-5");
+  hitBoss(s, 9999);
+  advance(s);
+  finishRound(s, false);
+  assert.equal(s.hp, 40);
+  assert.equal(s.stats.damageTaken, 60);
+  assert.equal(s.escapeDone, false);
+  advance(s);
+  startRound(s, "bridge");
+  time(s, 20020);
+  advance(s);
+  finishRound(s, false);
+  assert.equal(s.over, true);
+  assert.equal(s.won, false);
+  assert.equal(s.scene.kind, "lost");
+});
+test("escape success leaves 10% and burst must really reduce it to zero before body and ending", () => {
+  const s = make("phase-5");
+  hitBoss(s, 9999);
+  advance(s);
+  finishRound(s, true);
+  assert.equal(s.bossHp, 84);
+  assert.equal(s.scene, null);
+  assert.equal(s.round.done, true);
+  assert.equal(s.won, false);
+  advance(s);
+  assert.equal(s.mode, "burst");
+  hitBoss(s, 90);
+  assert.equal(s.scene.kind, "abyss-defeat");
+  assert.equal(s.won, false);
+  advance(s);
+  assert.equal(s.scene.kind, "body");
+  advance(s);
+  assert.equal(s.scene.kind, "victory");
+  assert.equal(s.won, true);
+});
+test("scenes stop elapsed, board, retry and puzzle clocks and clear held keys", () => {
+  const s = make("full");
+  s.retry = 1234;
+  s.held.add("left");
+  scene(s, "intro");
+  const elapsed = s.elapsed,
+    clock = s.round.clock;
+  time(s, 1500);
+  assert.equal(s.elapsed, elapsed);
+  assert.equal(s.round.clock, clock);
+  assert.equal(s.retry, 1234);
+  assert.equal(s.held.size, 0);
+});
+test("whole health state ignores zero or rejected damage, heal cannot exceed max or resurrect", () => {
+  const s = make();
+  assert.equal(hitBoss(s, 0), 0);
+  hurt(s, 20);
+  heal(s, 999);
+  assert.equal(s.hp, 100);
+  hurt(s, 999);
+  heal(s, 100);
+  hitBoss(s, 999);
+  assert.equal(s.hp, 0);
+  assert.equal(s.stats.damage, 0);
+  assert.equal(s.won, false);
+});
+test("match boards are stable and solvable for 500 seeds and constant random", () => {
+  for (let i = 0; i < 500; i++) {
+    const a = freshBoard(rng(i));
+    assert.equal(matches(a).length, 0);
+    assert.ok(legalMoves(a).length);
+  }
+  for (const n of [0, 0.1, 0.5, 0.99]) {
+    const a = freshBoard(() => n);
+    assert.equal(matches(a).length, 0);
+    assert.ok(legalMoves(a).length);
+  }
+});
+test("invalid match never consumes moves or changes board; valid move cascades and consumes exactly one", () => {
+  const s = make("match"),
+    m = s.round,
+    original = [...m.board],
+    steps = m.moves;
+  assert.equal(swap(m, 0, 41, s.random), false);
+  assert.deepEqual(m.board, original);
+  const [a, b] = legalMoves(m.board)[0];
+  assert.ok(swap(m, a, b, s.random));
+  assert.equal(m.moves, steps - 1);
+  time(s, 2500);
+  assert.ok(m.score >= 3);
+  assert.ok(m.board.every((v) => v >= 0 && v < 5));
+  assert.equal(m.moves, steps - 1);
+});
+test("matching a nonline reverses swap and does not give rewards", () => {
+  const s = make("match"),
+    m = s.round;
+  let bad;
+  for (let i = 0; i < 35; i++) {
+    const a = [...m.board];
+    [a[i], a[i + 6]] = [a[i + 6], a[i]];
+    if (!matches(a).length) {
+      bad = [i, i + 6];
+      break;
+    }
+  }
+  const old = [...m.board];
+  assert.equal(swap(m, ...bad, s.random), false);
+  assert.deepEqual(m.board, old);
+  assert.equal(s.stats.damage, 0);
+});
+test("move-limited execution can be completed through legal swaps for 30 seeds", () => {
+  for (let seed = 1; seed <= 30; seed++) {
+    const s = make("execution", "normal", seed);
+    for (let n = 0; n < 24 && !s.round.done; n++) {
+      const m = s.round,
+        candidates = legalMoves(m.board);
+      let best = candidates[0],
+        gain = -1;
+      for (const [a, b] of candidates) {
+        const grid = [...m.board];
+        [grid[a], grid[b]] = [grid[b], grid[a]];
+        const clone = { ...m, board: [...m.board], specials: [...m.specials] };
+        swap(clone, a, b, s.random);
+        const hit = clone.match,
+          v =
+            hit.filter((i) => grid[i] === 0).length * 3 +
+            hit.filter((i) => m.jellies[i]).length * 10 +
+            hit.length +
+            (clone.creations?.size || 0) * 3;
+        if (v > gain) {
+          best = [a, b];
+          gain = v;
+        }
+      }
+      point(s, 43 + (best[0] % 6) * 38, 220 + Math.floor(best[0] / 6) * 38);
+      point(s, 43 + (best[1] % 6) * 38, 220 + Math.floor(best[1] / 6) * 38);
+      while (m.busy && !s.scene && !m.done) time(s, 20);
+    }
+    assert.equal(s.round.success, true, "seed " + seed);
+    assert.equal(s.executionDone, true);
+  }
+});
+test("execution exhaustion fails and time is intentionally not a limit", () => {
+  const s = make("execution"),
+    m = s.round;
+  m.moves = 0;
+  time(s, 20);
+  assert.equal(m.success, false);
+  assert.equal(s.stats.damageTaken, 80);
+  assert.equal(s.scene, null);
+  assert.equal(s.round.done, true);
+});
+test("merge has gravity, wall collisions, equal-fruit merging and different-fruit collision", () => {
+  const s = make("merge"),
+    m = s.round;
+  m.fruits = [
+    { x: 100, y: 350, level: 0, age: 0, vx: 0, vy: 0 },
+    { x: 116, y: 350, level: 0, age: 0, vx: 0, vy: 0 },
+  ];
+  time(s, 40);
+  assert.equal(m.fruits.length, 1);
+  assert.equal(m.fruits[0].level, 1);
+  assert.ok(m.score >= 2);
+  assert.ok(m.fruits[0].y > 350);
+  m.fruits.push({ x: 10, y: 460, level: 2, vx: -80, vy: 20, age: 0 });
+  time(s, 300);
+  assert.ok(m.fruits.every((o) => o.x >= 24));
+});
+test("merge C swaps are limited and one held drop does not auto spam", () => {
+  const s = make("merge");
+  for (let i = 0; i < 4; i++) press(s, "alt");
+  assert.equal(s.round.swaps, 0);
+  input(s, "action");
+  time(s, 1200);
+  input(s, "action");
+  assert.ok(s.round.fruits.length <= 1);
+});
+test("swiping a rope cuts only segments actually crossed and lifted gesture never bridges strokes", () => {
+  const s = make("rope"),
+    m = s.round;
+  point(s, 80, 240, "start");
+  point(s, 150, 240, "move");
+  assert.equal(m.ropes[0].cut, true);
+  point(s, 150, 240, "cancel");
+  point(s, 200, 250, "move");
+  assert.equal(m.ropes[1].cut, false);
+  assert.equal(m.pointer, null);
+});
+test("rope reset preserves total timer and completed servings", () => {
+  const s = make("rope");
+  time(s, 500);
+  s.round.score = 1;
+  s.round.level = 1;
+  press(s, "alt");
+  assert.equal(s.round.clock, 500);
+  assert.equal(s.round.score, 1);
+  assert.equal(s.round.level, 1);
+  assert.ok(s.round.ropes.every((r) => !r.cut));
+});
+test("first candy follows gravity into receiver after both cuts", () => {
+  const s = make("rope");
+  press(s, "action");
+  press(s, "right");
+  press(s, "action");
+  time(s, 1500);
+  assert.equal(s.round.score, 1);
+  assert.equal(s.round.level, 1);
+});
+test("slicer actual swept line cuts fruit once but bombs damage the player", () => {
+  const s = make("slice"),
+    m = s.round;
+  m.objects = [
+    { x: 100, y: 300, r: 12, bomb: false, type: 1 },
+    { x: 180, y: 300, r: 12, bomb: true },
+  ];
+  point(s, 70, 300, "start");
+  point(s, 125, 300, "move");
+  point(s, 125, 300, "end");
+  assert.equal(m.score, 1);
+  point(s, 155, 300, "start");
+  point(s, 205, 300, "move");
+  point(s, 205, 300, "end");
+  assert.equal(m.score, 1);
+  assert.equal(s.stats.damageTaken, 8);
+});
+test("slicer pointer cancellation cannot produce remote long slash", () => {
+  const s = make("slice");
+  s.round.objects = [{ x: 140, y: 300, r: 12, bomb: false }];
+  point(s, 90, 300, "start");
+  point(s, 90, 300, "cancel");
+  point(s, 190, 300, "move");
+  assert.equal(s.round.score, 0);
+});
+test("hunger pull is physical and grips the nearby fixed post until release", () => {
+  const s = make("gravity-2"),
+    m = s.round;
+  m.x = 45;
+  m.y = 420;
+  press(s, "action");
+  time(s, 2500);
+  assert.equal(m.x, 45);
+  assert.equal(m.y, 420);
+  assert.ok(m.anchor);
+  press(s, "alt");
+  time(s, 200);
+  assert.equal(m.anchor, null);
+  assert.ok(m.y < 420);
+});
+test("opposing pull movement is possible in every stage and Hard", () => {
+  for (const difficulty of ["normal", "hard"])
+    for (let stage = 1; stage <= 3; stage++) {
+      const s = make("gravity-" + stage, difficulty);
+      input(s, "down");
+      time(s, 9000);
+      assert.ok(s.hp > 0);
+      assert.ok(s.round.y > 300);
+    }
+});
+test("ricochet scraps bounce physically and disappear on fifth bounce", () => {
+  const s = make("ricochet-1"),
+    m = s.round;
+  m.spawn = 999999;
+  m.objects = [{ x: 249, y: 320, vx: 150, vy: 0, r: 9, bounces: 4, type: 1 }];
+  time(s, 40);
+  assert.equal(m.objects.length, 0);
+  m.objects = [{ x: 249, y: 320, vx: 150, vy: 0, r: 9, bounces: 0, type: 1 }];
+  time(s, 40);
+  assert.ok(m.objects[0].vx < 0);
+  assert.equal(m.objects[0].bounces, 1);
+});
+test("floor bites are warned first and leave permanent connected central and bottom corridors", () => {
+  const s = make("floor-3");
+  time(s, 15500);
+  assert.ok(s.round.floor.length >= 5);
+  assert.ok(s.round.floor.every((o) => o.cx !== 2 && o.cy !== 4));
+  assert.ok(s.hp > 0);
+});
+test("counter needs range and actual available candy; holding is not unlimited damage", () => {
+  const s = make("ricochet-1"),
+    m = s.round;
+  m.counter = { x: 140, y: 350, ready: true };
+  m.x = 32;
+  m.y = 445;
+  press(s, "action");
+  assert.equal(s.stats.damage, 0);
+  m.x = 140;
+  m.y = 350;
+  press(s, "action");
+  assert.equal(s.stats.damage, 20);
+  press(s, "action");
+  assert.equal(s.stats.damage, 20);
+});
+test("escape completion happens at true 100% and immediately stops collision processing", () => {
+  const s = make("escape"),
+    m = s.round;
+  m.distance = 99.99;
+  m.obstacles = [{ lane: 1, z: 1, kind: "pit", hit: false }];
+  time(s, 20);
+  assert.equal(s.escapeDone, true);
+  assert.ok(m.distance >= 100);
+  const n = s.stats.damageTaken;
+  time(s, 100);
+  assert.equal(s.stats.damageTaken, n);
+});
+test("escape jump uses gravity and ordinary timeout fails without setting victory", () => {
+  const s = make("escape");
+  press(s, "action");
+  time(s, 200);
+  assert.ok(s.round.jump > 20);
+  time(s, 900);
+  assert.equal(s.round.jump, 0);
+  s.round.clock = s.round.duration - 10;
+  s.round.distance = 50;
+  time(s, 20);
+  assert.equal(s.round.success, false);
+  assert.equal(s.won, false);
+  assert.equal(s.stats.damageTaken, 60);
+});
+test("burst counters can finish true remaining HP and never attack through closed mouth", () => {
+  const s = make("burst"),
+    m = s.round;
+  m.x = 140;
+  m.y = 385;
+  m.counter = { x: 140, y: 385, ready: true };
+  m.burstOpen = false;
+  time(s, 20);
+  press(s, "action");
+  assert.equal(s.stats.damage, 0);
+  m.clock = 2800;
+  m.counterTime = 1500;
+  time(s, 20);
+  press(s, "action");
+  assert.equal(s.stats.damage, 32);
+});
+
+test("snake wraps all four borders and still fails on its own body", () => {
+  for (const [head, dir, end] of [
+    [
+      [11, 5],
+      [1, 0],
+      [0, 5],
+    ],
+    [
+      [0, 5],
+      [-1, 0],
+      [11, 5],
+    ],
+    [
+      [5, 0],
+      [0, -1],
+      [5, 14],
+    ],
+    [
+      [5, 14],
+      [0, 1],
+      [5, 0],
+    ],
+  ]) {
+    const s = make("snake"),
+      m = s.round;
+    m.snake = [head];
+    m.dir = dir;
+    m.food = [6, 6];
+    time(s, m.stepMs);
+    assert.deepEqual(m.snake[0], end);
+    assert.equal(m.done, false);
+  }
+  const s = make("snake");
+  s.round.snake = [
+    [3, 3],
+    [4, 3],
+    [4, 4],
+    [3, 4],
+  ];
+  s.round.dir = [1, 0];
+  time(s, 220);
+  assert.equal(s.round.done, true);
+  assert.equal(s.round.success, false);
+});
+test("fusion never succeeds from a numerical score and has no timeout", () => {
+  const s = make("watermelon-execution"),
+    m = s.round;
+  m.score = 99999;
+  m.clock = 999999;
+  time(s, 100);
+  assert.equal(m.done, false);
+  assert.equal(m.duration, Infinity);
+  m.fruits = [
+    { x: 106, y: 425, level: 6, age: 0, vx: 0, vy: 0 },
+    { x: 174, y: 425, level: 6, age: 0, vx: 0, vy: 0 },
+  ];
+  time(s, 40);
+  assert.equal(m.watermelon, true);
+  assert.equal(m.done, true);
+  assert.equal(m.success, true);
+  assert.ok(m.fruits.some((o) => o.level === 7));
+  assert.equal(s.scene, null);
+});
+test("ordinary success and failure leave the actual board visible and clocks paused before battle", () => {
+  for (const success of [true, false]) {
+    const s = make("phase-1");
+    startRound(s, "snake");
+    const m = s.round;
+    finishRound(s, success);
+    assert.equal(s.scene, null);
+    assert.equal(s.mode, "snake");
+    assert.equal(m.done, true);
+    const elapsed = s.elapsed,
+      clock = m.clock;
+    time(s, 1100);
+    assert.equal(s.round, m);
+    assert.equal(s.elapsed, elapsed);
+    assert.equal(m.clock, clock);
+    press(s, "right");
+    assert.equal(s.held.size, 0);
+    time(s, 100);
+    assert.equal(s.scene, null);
+    assert.ok(s.notice);
+  }
+});
+test("four in a row creates a striped sweet that survives the match and fall", () => {
+  const s = make("execution"),
+    m = s.round;
+  m.board = freshBoard(rng(40));
+  m.board.splice(0, 6, 0, 0, 1, 0, 2, 3);
+  m.board[8] = 0;
+  assert.ok(swap(m, 2, 8));
+  assert.equal(m.creations.get(2), "row");
+  settle(m, s.random);
+  while (m.busy) settle(m, s.random);
+  assert.ok(m.specials.includes("row"));
+  const special = m.specials.indexOf("row");
+  m.match = [special];
+  m.creations = new Map();
+  m.specials[(special + 1) % 42] = "rainbow";
+  m.board[(special + 1) % 42] = 1;
+  assert.ok(legalMoves(m.board, m.specials).length);
+});
+test("a rainbow swap is legal without a normal match and clears matching colors with jelly", () => {
+  const s = make("execution"),
+    m = s.round;
+  m.specials[0] = "rainbow";
+  const color = m.board[1],
+    targets = m.board
+      .map((v, i) => (v === color ? i : -1))
+      .filter((i) => i >= 0);
+  assert.ok(swap(m, 0, 1));
+  assert.ok(targets.every((i) => i === 1 || m.match.includes(i)));
+  const before = m.jellyCleared;
+  while (m.busy) settle(m, s.random);
+  assert.ok(m.jellyCleared >= before);
+  assert.equal(m.moves, 23);
+});
+test("execution requires both apples and jelly, permits the final move cascade, and fails only after settling", () => {
+  const s = make("execution"),
+    m = s.round;
+  m.collected = m.target;
+  m.jellies.fill(0);
+  m.jellies[0] = 1;
+  m.moves = 1;
+  time(s, 20);
+  assert.equal(m.done, false);
+  m.board[0] = m.board[1] = m.board[2] = 0;
+  m.match = [0, 1, 2];
+  m.busy = 300;
+  m.moves = 0;
+  time(s, 20);
+  assert.equal(m.done, false);
+  time(s, 3000);
+  assert.equal(m.success, true);
+  assert.equal(m.done, true);
+});
+test("sliced fruit has two cut halves, juice, and a short blade trail; bombs give sparks", () => {
+  const s = make("slice"),
+    m = s.round;
+  m.objects = [{ x: 100, y: 300, r: 12, bomb: false, type: 1 }];
+  point(s, 70, 300, "start");
+  point(s, 130, 300, "move");
+  point(s, 130, 300, "end");
+  assert.equal(m.sliceEffects.filter((o) => o.kind === "half").length, 2);
+  assert.ok(m.sliceEffects.some((o) => o.kind === "juice"));
+  assert.ok(m.slashes.length);
+  const y = m.sliceEffects[0].y;
+  time(s, 200);
+  assert.notEqual(m.sliceEffects[0].y, y);
+  time(s, 600);
+  assert.equal(m.sliceEffects.length, 0);
+  assert.equal(m.slashes.length, 0);
+});
+test("runner lanes, jump, slide and swipe use discrete controls and matching collisions", () => {
+  const s = make("escape"),
+    m = s.round;
+  press(s, "left");
+  time(s, 300);
+  assert.equal(m.lane, 0);
+  assert.ok(m.lanePosition < 0.04);
+  press(s, "right");
+  time(s, 300);
+  assert.equal(m.lane, 1);
+  m.spawn = 999999;
+  m.obstacles = [{ lane: 1, z: 0.1, kind: "beam", hit: false }];
+  press(s, "alt");
+  time(s, 20);
+  assert.equal(s.stats.damageTaken, 0);
+  assert.ok(m.slide > 0);
+  time(s, 1000);
+  m.obstacles = [{ lane: 1, z: 0.1, kind: "crumb", hit: false }];
+  time(s, 20);
+  assert.equal(s.stats.damageTaken, 7);
+  point(s, 140, 360, "start");
+  point(s, 185, 360, "move");
+  point(s, 185, 360, "end");
+  assert.equal(m.lane, 2);
+  point(s, 140, 360, "start");
+  point(s, 140, 310, "move");
+  point(s, 140, 310, "end");
+  time(s, 200);
+  assert.ok(m.jump > 20);
+});
+test("runner always leaves a clear lane in each obstacle wave and can really escape in both difficulties", () => {
+  for (const difficulty of ["normal", "hard"]) {
+    const s = make("escape", difficulty),
+      m = s.round;
+    while (!m.done && !s.over && m.clock < m.duration) {
+      const upcoming = [...m.obstacles]
+        .filter((o) => o.z > 0)
+        .sort((a, b) => a.z - b.z)[0];
+      if (upcoming && upcoming.z < 50) {
+        const lanes = m.obstacles
+          .filter((o) => Math.abs(o.z - upcoming.z) < 1)
+          .map((o) => o.lane);
+        const free = [0, 1, 2].find((i) => !lanes.includes(i));
+        if (m.lane < free) press(s, "right");
+        else if (m.lane > free) press(s, "left");
+      }
+      time(s, 50);
+    }
+    assert.equal(m.success, true);
+    assert.equal(m.distance, 100);
+    assert.equal(s.stats.damageTaken, 0);
+  }
+});
+
+test("an existing stripe activates its full row and swipe exchanges only one adjacent pair", () => {
+  const s = make("execution"),
+    m = s.round;
+  m.board = freshBoard(rng(18));
+  m.board[12] = 0;
+  m.board[13] = 1;
+  m.board[14] = 0;
+  m.board[19] = 0;
+  m.specials[12] = "row";
+  point(s, 43 + 1 * 38, 221 + 2 * 38, "start");
+  point(s, 43 + 1 * 38, 221 + 3 * 38, "move");
+  point(s, 43 + 1 * 38, 221 + 4 * 38, "move");
+  point(s, 43 + 1 * 38, 221 + 4 * 38, "end");
+  assert.equal(m.moves, 23);
+  assert.ok([12, 13, 14, 15, 16, 17].every((i) => m.match.includes(i)));
+  assert.equal(m.matchGesture, null);
+});
