@@ -12,7 +12,7 @@
 
 ## 下次恢復時應從哪裡繼續
 
-分支fix/lust-progression-and-charm，從master8805c71繼續。已完成本機修改／回歸／四比例與容量稽核；下一步推送PR並確認CI。使用者本次要求pull，先以PR交付，不宣稱新版已部署。不要重做PR #82、回退正式五Boss或舊長按必勝平衡。
+分支fix/lust-progression-and-charm，從master8805c71繼續。已完成本機修改／回歸／四比例與容量稽核，已推送PR #83：https://github.com/SimonLO926/dOvOb/pull/83 。程式提交35817b2d0dd867f0ba87208f5241da8bfccd7ef4已通過CI run38739178294全部步驟（565遊戲、4幾何、bundle cmp、Jekyll及來源排除）。另實測暴食最終返回按住250ms可回卡帶。下一步從PR #83及使用者新回饋繼續，不重做本次修正。使用者本次要求pull，先以PR交付，不宣稱新版已部署。不要重做PR #82、回退正式五Boss或舊長按必勝平衡。
 
 ## 上一版已部署記錄
 

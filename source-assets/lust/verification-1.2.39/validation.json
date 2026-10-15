@@ -15,5 +15,14 @@
   },
   "coldFirstScreenHTTPBytes": 2623273,
   "scope": "Unstarted preview, local HTTP, no transfer compression. Final return tests use explicit fixtures, not natural full clears. Chromium emulation, not physical devices.",
-  "assets": "Existing art, fonts and MP3 unchanged; source excluded from deployment."
+  "assets": "Existing art, fonts and MP3 unchanged; source excluded from deployment.",
+  "github": {
+    "pr": 83,
+    "testedCommit": "35817b2d0dd867f0ba87208f5241da8bfccd7ef4",
+    "workflowRun": 38739178294,
+    "conclusion": "success",
+    "pagesBuild": "success",
+    "sourceExclusions": "success"
+  },
+  "gluttonyFormalEndReturn": "250ms pointer hold returns to cartridge"
 }
