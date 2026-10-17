@@ -25,6 +25,8 @@ jobs:
           npm install --prefix "$RUNNER_TEMP/cartridge-tools" --no-package-lock --ignore-scripts --no-audit --no-fund esbuild@0.27.0 three@0.180.0
           NODE_PATH="$RUNNER_TEMP/cartridge-tools/node_modules" "$RUNNER_TEMP/cartridge-tools/node_modules/.bin/esbuild" bridge/tools/cartridge-batch.test-source.mjs --bundle --platform=node --format=esm --outfile="$RUNNER_TEMP/cartridge-batch.test.mjs"
           node --test "$RUNNER_TEMP/cartridge-batch.test.mjs"
+          NODE_PATH="$RUNNER_TEMP/cartridge-tools/node_modules" "$RUNNER_TEMP/cartridge-tools/node_modules/.bin/esbuild" bridge/cartridge/app.mjs --bundle --format=esm --minify --outfile="$RUNNER_TEMP/cartridge.bundle.js"
+          cmp bridge/cartridge/demo.bundle.js "$RUNNER_TEMP/cartridge.bundle.js"
       - name: Verify Gluttony bundle matches maintained modules
         run: |
           npm install --prefix "$RUNNER_TEMP/gluttony-tools" --no-package-lock --ignore-scripts --no-audit --no-fund esbuild@0.27.0
@@ -52,6 +54,8 @@ jobs:
               assert 'node_modules' not in p.parts, p
               assert not p.name.endswith('.test.mjs'), p
           PY
+      - name: Verify delivery budgets and retained originals
+        run: python3 bridge/tools/audit-game-delivery.py --site _site --out source-assets/optimization-1.2.40/jekyll-report.json
       - name: Attach Bridge validation evidence
         uses: actions/upload-artifact@v4
         with:
@@ -61,3 +65,4 @@ jobs:
             source-assets/gluttony/verification-r4/
             source-assets/gluttony/music/manifest.json
             source-assets/lust/verification-1.2.39/
+            source-assets/optimization-1.2.40/

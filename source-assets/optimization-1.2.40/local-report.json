@@ -1,0 +1,9 @@
+{
+  "bridgeWorkingTreeBytes": 118427305,
+  "preservedSourceBytes": 676630515,
+  "audioSavedBytes": 11063269,
+  "imageSavedBytes": 2239998,
+  "historicalDeliverySavedBytes": 2569006,
+  "preservedSourceFilesVerified": 263,
+  "scope": "Working tree counts include documentation and tests. Source preservation is not deployed size or Git history size."
+}

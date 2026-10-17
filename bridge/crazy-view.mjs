@@ -3,7 +3,7 @@ import { PRIDE_SECOND_MODES, SECOND_NAMES, drawPrideSecond } from './pride-secon
 import { PRIDE_MINIGAMES } from './minigames/index.mjs';
 import { PRIDE_ATTACKS, drawPrideAttack } from './pride-attacks.mjs';
 import { drawMirrorDuel } from './pride-finisher.mjs';
-import { drawPridePalace, drawPrideFrame, drawPrideBossHead } from './pride-art.mjs';
+import { drawPridePalace, drawPrideFrame, drawPrideBossHead } from './pride-art.mjs?v=1.2.40';
 import { drawPrideBackdrop } from './pride-theme.mjs';
 import { drawVault } from './crazy-vault.mjs?v=1.2.28';
 import { drawFineDealer, drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.28';

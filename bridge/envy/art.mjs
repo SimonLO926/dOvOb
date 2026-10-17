@@ -1,3 +1,4 @@
+import {createLazyImages} from '../lazy-images.mjs';
 import { avatar } from '../pride-visuals.mjs';
 import { appearance } from './engine.mjs';
 import { CARD_LAYOUT } from './geometry.mjs';
@@ -5,14 +6,9 @@ import { t } from './i18n.mjs';
 
 export const ENDING_ART_URLS = Object.freeze(['first-defeat','dragon-defeat','worm-reveal','victory-captured','victory-escaped','lost'].map(kind=>`./assets/envy-${kind}-r16.webp`));
 export const ART_URLS = Object.freeze({ windows:'./assets/envy-windows-r7.webp', room:'./assets/envy-room-r7.webp', background:'./assets/envy-swamp.webp', card:'./assets/envy-sar.webp', worm:'./assets/envy-worm.webp', tarot:'./assets/envy-tarot-r6.webp', secret:'./assets/envy-secret-r6.webp', cat:'./assets/mischief-cat.webp' });
-export const images = {};
-export function loadArt(){
-  if(typeof Image==='undefined')return Promise.resolve();
-  const entries=[...Object.entries(ART_URLS),...ENDING_ART_URLS.map((url,index)=>[`ending${index}`,url])];
-  return Promise.all(entries.map(([key,url])=>new Promise(resolve=>{
-    const image=new Image();images[key]=image;image.onload=()=>resolve(true);image.onerror=()=>resolve(false);image.src=url;
-  })));
-}
+const art=createLazyImages({...ART_URLS,...Object.fromEntries(ENDING_ART_URLS.map((url,index)=>['ending'+index,url]))});
+export const images=art.images;
+export function loadArt(){return art.load(['cat']);}
 export function text(c,label,x,y,size=12,color='#e5f4dd',width=260){
   c.fillStyle=color;c.font=`bold ${size}px "Pixel Latin", "Pixel Hant", sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(t(label),x,y,width);
 }

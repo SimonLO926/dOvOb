@@ -1,0 +1,430 @@
+{
+  "audio": [
+    {
+      "runtime": "bridge/assets/greed-music/first-bridge.mp3",
+      "beforeBytes": 5363555,
+      "afterBytes": 2681669,
+      "beforeSHA256": "73b688c7a193e28e1e6b2fca2ff94b187f9e0943a9afcddf93d9e49d4493cff1",
+      "afterSHA256": "d6b836757e555decfccffd00165b832b5cca0d3e638ded7116d0979efb975ca0",
+      "beforeDuration": "167.549388",
+      "afterDuration": "167.537392",
+      "codec": "mp3",
+      "bitrate": 128000,
+      "channels": 2,
+      "sampleRate": "44100",
+      "original": "source-assets/greed/music/first-bridge.mp3"
+    },
+    {
+      "runtime": "bridge/assets/greed-music/first-last.mp3",
+      "beforeBytes": 3224440,
+      "afterBytes": 1612111,
+      "beforeSHA256": "1cd2b8781a6074f8b168ce23253894980d150a9a8d47ba216c5fd40ed1072717",
+      "afterSHA256": "306101cf355b44468a23208d401a5de9a0d29a7b408e2561f77607f3b4cb77ff",
+      "beforeDuration": "100.702041",
+      "afterDuration": "100.690045",
+      "codec": "mp3",
+      "bitrate": 128000,
+      "channels": 2,
+      "sampleRate": "44100",
+      "original": "source-assets/greed/music/first-last.mp3"
+    },
+    {
+      "runtime": "bridge/assets/greed-music/first-special.mp3",
+      "beforeBytes": 4168192,
+      "afterBytes": 2083987,
+      "beforeSHA256": "a5c43fc7a29ddf46fa01e6712e557bee4e7da026f4aec7c92a52da97e4dab170",
+      "afterSHA256": "eccaad72e704ce5cee0d24f9c4c629f5f6efb705f8c58db94803afff087e1d9d",
+      "beforeDuration": "130.194286",
+      "afterDuration": "130.182290",
+      "codec": "mp3",
+      "bitrate": 128000,
+      "channels": 2,
+      "sampleRate": "44100",
+      "original": "source-assets/greed/music/first-special.mp3"
+    },
+    {
+      "runtime": "bridge/assets/greed-music/second-bridge.mp3",
+      "beforeBytes": 2629266,
+      "afterBytes": 1314524,
+      "beforeSHA256": "2ee98d633b4012a10522ecd1af34a1c8117bddbbe3012ad3a1d9fedc9d5ab2a7",
+      "afterSHA256": "835f071d9f7161fc13e1c19f376b429d8d708adf6d2d08f3e4c849e6367ccf01",
+      "beforeDuration": "82.102857",
+      "afterDuration": "82.090862",
+      "codec": "mp3",
+      "bitrate": 128000,
+      "channels": 2,
+      "sampleRate": "44100",
+      "original": "source-assets/greed/music/second-bridge.mp3"
+    },
+    {
+      "runtime": "bridge/assets/greed-music/second-last.mp3",
+      "beforeBytes": 3479395,
+      "afterBytes": 1739589,
+      "beforeSHA256": "1078b34d961d46f2441ce83d0c67d2e5564e8556f6cbfa4726567fff1f9b77eb",
+      "afterSHA256": "41931021c0e6c7b16ea33475013514d7fdd3e009c5cd9d0ebaee68ce2ae9855b",
+      "beforeDuration": "108.669388",
+      "afterDuration": "108.657392",
+      "codec": "mp3",
+      "bitrate": 128000,
+      "channels": 2,
+      "sampleRate": "44100",
+      "original": "source-assets/greed/music/second-last.mp3"
+    },
+    {
+      "runtime": "bridge/assets/greed-music/second-special.mp3",
+      "beforeBytes": 3260384,
+      "afterBytes": 1630083,
+      "beforeSHA256": "0c47b4df0226ba1e6ec6fc549a85f24e6c52afaeaeddd2c997dec260cf6439f9",
+      "afterSHA256": "de444596f6a5cb7b973f13c2a417f7de2ed916473e64e965c871b5552dd2290f",
+      "beforeDuration": "101.825306",
+      "afterDuration": "101.813311",
+      "codec": "mp3",
+      "bitrate": 128000,
+      "channels": 2,
+      "sampleRate": "44100",
+      "original": "source-assets/greed/music/second-special.mp3"
+    }
+  ],
+  "images": [
+    {
+      "runtime": "bridge/assets/greed-defeated.webp",
+      "source": "source-assets/greed/images/greed-defeated.png",
+      "beforeBytes": 543516,
+      "afterBytes": 371690,
+      "beforeSize": [
+        1024,
+        1536
+      ],
+      "afterSize": [
+        853,
+        1280
+      ],
+      "beforeSHA256": "c5ecc6d1de215cf6f0f55e645e759b5da5cb96014dc8b2752697a2e5c1c1aaa4",
+      "afterSHA256": "85cf079101013b321a6fc8c51c50d3e2bfd3cd589ebb9d7052e134d3b579a011",
+      "sourceSHA256": "1605ab811f6b34ae7b2df49147ec115cb825323d941fbc2eed41e5003a89f0d5",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/greed/delivery-before-1.2.40/greed-defeated.webp"
+    },
+    {
+      "runtime": "bridge/assets/greed-first.webp",
+      "source": "source-assets/greed/images/greed-first.png",
+      "beforeBytes": 379958,
+      "afterBytes": 269026,
+      "beforeSize": [
+        1536,
+        1024
+      ],
+      "afterSize": [
+        1280,
+        853
+      ],
+      "beforeSHA256": "9f92a2d25471f623c1a2d4d0c6f571dabb24f7c10ab490225a7b414055195001",
+      "afterSHA256": "a2a3fd1c3dd19770c23837caf68051124f414eb234d1080ddef36aed713ef980",
+      "sourceSHA256": "a97bdcf26a52d75a05d9e0b90079f8a52b8185c0f51ba57e91d806c95d9531a8",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/greed/delivery-before-1.2.40/greed-first.webp"
+    },
+    {
+      "runtime": "bridge/assets/pride-defeated.webp",
+      "source": "source-assets/pride/images/pride-defeated.png",
+      "beforeBytes": 473922,
+      "afterBytes": 409520,
+      "beforeSize": [
+        1536,
+        1024
+      ],
+      "afterSize": [
+        1280,
+        853
+      ],
+      "beforeSHA256": "4a123f888cd511787173c557f1dcc84237f932f2d9c4118c0f34aa6af4dca36a",
+      "afterSHA256": "a8bdbea28cefdc21a90703e81f75951d2a5c1580d51dcbf2e28c0a8de0639672",
+      "sourceSHA256": "ac2d247537952d7338d5dfb1e4bc581a39f7b43d684e203ec3e989477c997bb6",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/pride/delivery-before-1.2.40/pride-defeated.webp"
+    },
+    {
+      "runtime": "bridge/assets/pride-first.webp",
+      "source": "source-assets/pride/images/pride-first.png",
+      "beforeBytes": 446764,
+      "afterBytes": 382310,
+      "beforeSize": [
+        1536,
+        1024
+      ],
+      "afterSize": [
+        1280,
+        853
+      ],
+      "beforeSHA256": "10c8b66b05aa99350b30d16eb3f7e6ff1ebbd95fc4d0253bb0de3ef3b842fc6f",
+      "afterSHA256": "33eec7b9d191414366e137001046c2d3a6512c90bdd66ae7a1da9e01296e683d",
+      "sourceSHA256": "4ebfde03d5389deb4e82a0efe773eb2f16102e2602d91a0573b1282a63287edb",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/pride/delivery-before-1.2.40/pride-first.webp"
+    },
+    {
+      "runtime": "bridge/assets/pride-mirror-defeated.webp",
+      "source": "source-assets/pride/images/pride-mirror-defeated.png",
+      "beforeBytes": 669440,
+      "afterBytes": 454808,
+      "beforeSize": [
+        1672,
+        941
+      ],
+      "afterSize": [
+        1280,
+        720
+      ],
+      "beforeSHA256": "66d5c74ec1933792edaaeb6f976440d20d3852dcb31754e34055eee99a0c4b39",
+      "afterSHA256": "57ead042af399f90926ac9f1db937c7c2b3688a14447877576a4bdea0032262e",
+      "sourceSHA256": "4db43125e4ff0342803c682c0b81972111fcde1d8a770ba64d91f5539a856655",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/pride/delivery-before-1.2.40/pride-mirror-defeated.webp"
+    },
+    {
+      "runtime": "bridge/assets/pride-palace.webp",
+      "source": "source-assets/pride/images/pride-palace.png",
+      "beforeBytes": 452356,
+      "afterBytes": 301964,
+      "beforeSize": [
+        1672,
+        941
+      ],
+      "afterSize": [
+        1280,
+        720
+      ],
+      "beforeSHA256": "d74f20dd10486c57ef224d8470ab820dfb4036eca33bdfc513fc46ca1d243233",
+      "afterSHA256": "5aeb77769d288fc5b276f2b5423ea6095325d2e5d8d02e149d048bc4155e7e58",
+      "sourceSHA256": "3d9f6f97510c838639b49ee1f5645c1bba3bfb267e5f671dfcca94109bb899aa",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/pride/delivery-before-1.2.40/pride-palace.webp"
+    },
+    {
+      "runtime": "bridge/assets/pride-tower-collapse.webp",
+      "source": "source-assets/pride/images/pride-tower-collapse.png",
+      "beforeBytes": 549752,
+      "afterBytes": 366656,
+      "beforeSize": [
+        1672,
+        941
+      ],
+      "afterSize": [
+        1280,
+        720
+      ],
+      "beforeSHA256": "94236c1510db0de7f5704f879bed0a85e9f754fe8a701826a63f122c98d34dfc",
+      "afterSHA256": "d19b257e56ac97686aedf41c784bc35d9245d53a9d771fdfdfb5902a0a1eb0c2",
+      "sourceSHA256": "3c1066687dbe7c401d0565467a3d3a0fb9981a142ec9c736e50b236aa23c44c0",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/pride/delivery-before-1.2.40/pride-tower-collapse.webp"
+    },
+    {
+      "runtime": "bridge/assets/pride-tower-ruins.webp",
+      "source": "source-assets/pride/images/pride-tower-ruins.png",
+      "beforeBytes": 523886,
+      "afterBytes": 355660,
+      "beforeSize": [
+        1672,
+        941
+      ],
+      "afterSize": [
+        1280,
+        720
+      ],
+      "beforeSHA256": "73bdb3ffc6a39ffe54e85b042284199651b363f20a0b828bf05b594f59b03070",
+      "afterSHA256": "8433017a1c585d2a657b691b5ff1057b2aa31752b7649e180a3f43df1987f77a",
+      "sourceSHA256": "b4ec6db504b26c9145434c8c6ad80c478e822d2ad170edfacaab06e049232a9d",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/pride/delivery-before-1.2.40/pride-tower-ruins.webp"
+    },
+    {
+      "runtime": "bridge/assets/envy-dragon-defeat-r16.webp",
+      "source": "source-assets/envy/images/envy-dragon-defeat-r16.png",
+      "beforeBytes": 620516,
+      "afterBytes": 468344,
+      "beforeSize": [
+        1536,
+        1024
+      ],
+      "afterSize": [
+        1280,
+        853
+      ],
+      "beforeSHA256": "0f394a6d06dd8e44798d7f15b92c816bc43130bb7c97c4ade0dc87c0c232d668",
+      "afterSHA256": "88cbbdffdc382463b42f5663a9bdaa6e1ae89446053fa17cb2a108f45bc4d1bb",
+      "sourceSHA256": "ac9baffccf9a7d1557a4ab00731b6cf319d013f2e38e34a40f05cb9ae99d10e5",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/envy/delivery-before-1.2.40/envy-dragon-defeat-r16.webp"
+    },
+    {
+      "runtime": "bridge/assets/envy-first-defeat-r16.webp",
+      "source": "source-assets/envy/images/envy-first-defeat-r16.png",
+      "beforeBytes": 633988,
+      "afterBytes": 474484,
+      "beforeSize": [
+        1536,
+        1024
+      ],
+      "afterSize": [
+        1280,
+        853
+      ],
+      "beforeSHA256": "1603514796102056924bbe3b499018c7e6c8156e77167e34c131902914ca6fc2",
+      "afterSHA256": "198e69313491760a7d10b1f6e10d63ce237a320526c408ff099db094b9491e1b",
+      "sourceSHA256": "5ee46fb95f1bf8ee30f581638583d0e026c99a41832eb346c4f4fb80c29b2d92",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/envy/delivery-before-1.2.40/envy-first-defeat-r16.webp"
+    },
+    {
+      "runtime": "bridge/assets/envy-first.webp",
+      "source": "source-assets/envy/images/envy-first-concept-r15.png",
+      "beforeBytes": 433218,
+      "afterBytes": 333800,
+      "beforeSize": [
+        1536,
+        1024
+      ],
+      "afterSize": [
+        1280,
+        853
+      ],
+      "beforeSHA256": "8e3a0b9655ec284b5968589bf67c8f29315d874f4296d2748e4ff264b40fc2c8",
+      "afterSHA256": "7a5ba60da25bd2fcd7e02a812e6551659fe0423bae4b652938cf2d058aa48be2",
+      "sourceSHA256": "cbe51ab776675ab3b59b7c4d313f1c670a6ed6046cc740c84f283915e995389e",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/envy/delivery-before-1.2.40/envy-first.webp"
+    },
+    {
+      "runtime": "bridge/assets/envy-lost-r16.webp",
+      "source": "source-assets/envy/images/envy-lost-r16.png",
+      "beforeBytes": 628206,
+      "afterBytes": 476738,
+      "beforeSize": [
+        1536,
+        1024
+      ],
+      "afterSize": [
+        1280,
+        853
+      ],
+      "beforeSHA256": "0db9e9335ea38593a99c89449e91cdb055f7f761290a84ca36f59575df3b8f5d",
+      "afterSHA256": "770f482394fb05cb97f727d0ad270dd86a4a61febfab88b8f145f857f822c94e",
+      "sourceSHA256": "8583710b65110b8d59e6fcea703a55fc0c06bdcafe25593488fe54c6cceae592",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/envy/delivery-before-1.2.40/envy-lost-r16.webp"
+    },
+    {
+      "runtime": "bridge/assets/envy-swamp.webp",
+      "source": "source-assets/envy/images/envy-swamp.png",
+      "beforeBytes": 431046,
+      "afterBytes": 289914,
+      "beforeSize": [
+        1672,
+        941
+      ],
+      "afterSize": [
+        1280,
+        720
+      ],
+      "beforeSHA256": "06a71661540b9b6f911eb120919d94827692fd9974c6b1fd015874e089a0f81e",
+      "afterSHA256": "5db152d60db69dc5fe9d4808bc3b5736e720fad00cf709a70f4ce846bbab6b70",
+      "sourceSHA256": "6b769d3c83d063f85e7e67c65421f496b6a9272282483212324b45fdcea784fd",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/envy/delivery-before-1.2.40/envy-swamp.webp"
+    },
+    {
+      "runtime": "bridge/assets/envy-victory-captured-r16.webp",
+      "source": "source-assets/envy/images/envy-victory-captured-r16.png",
+      "beforeBytes": 616246,
+      "afterBytes": 464476,
+      "beforeSize": [
+        1536,
+        1024
+      ],
+      "afterSize": [
+        1280,
+        853
+      ],
+      "beforeSHA256": "96cb0ec4e9ee7b91bc14e61ab8703fa67c4bc29575501ca91f944b9762f074a9",
+      "afterSHA256": "0d0ee30b02fe1def8ba57162fea725ba8ef136d7b771e29c1b086c9d8218463b",
+      "sourceSHA256": "9a9de6caea7a952db6f139fb1b1a698cb80a0b15b74cd20637412945a1e782f2",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/envy/delivery-before-1.2.40/envy-victory-captured-r16.webp"
+    },
+    {
+      "runtime": "bridge/assets/envy-victory-escaped-r16.webp",
+      "source": "source-assets/envy/images/envy-victory-escaped-r16.png",
+      "beforeBytes": 521304,
+      "afterBytes": 404970,
+      "beforeSize": [
+        1536,
+        1024
+      ],
+      "afterSize": [
+        1280,
+        853
+      ],
+      "beforeSHA256": "ee48ad0c97cf036c06dd05ec9b62b6799c9d4826a1d4638a11eed09a3ddc0e84",
+      "afterSHA256": "789ac943e7fb000c7fc259c9d4ba6c594f496e655c0a1516dd675ab066c0eabc",
+      "sourceSHA256": "b128c4fa76783b4a20dd3f7e39d41ec9244b4146616a7697e179faf0bfb9281d",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/envy/delivery-before-1.2.40/envy-victory-escaped-r16.webp"
+    },
+    {
+      "runtime": "bridge/assets/envy-worm-reveal-r16.webp",
+      "source": "source-assets/envy/images/envy-worm-reveal-r16.png",
+      "beforeBytes": 567430,
+      "afterBytes": 427190,
+      "beforeSize": [
+        1536,
+        1024
+      ],
+      "afterSize": [
+        1280,
+        853
+      ],
+      "beforeSHA256": "221f0b25f273efa1b8c65c0aec33b8591ef2267463461cad31ebcb1ea4a073f3",
+      "afterSHA256": "cfb55204d70f94e22f64ed27974d7cc93e98c5af68365dac8e25a27582f49af7",
+      "sourceSHA256": "bbc112bf01a0928f8fca56eb596f18cee9af80dc95763c23d052bc9deeef5629",
+      "quality": 88,
+      "resample": "nearest",
+      "previousDelivery": "source-assets/envy/delivery-before-1.2.40/envy-worm-reveal-r16.webp"
+    }
+  ],
+  "relocations": [
+    {
+      "old": "bridge/assets/greed-first-sprite.webp",
+      "preserved": "source-assets/greed/historical-webp/greed-first-sprite.webp",
+      "bytes": 1232858,
+      "sha256": "9641f8ee46ef4a0fcc0aea59f847d007c687d40a8ea31be67590ee78014cc528"
+    },
+    {
+      "old": "bridge/assets/envy-endings-r9.webp",
+      "preserved": "source-assets/envy/historical-webp/envy-endings-r9.webp",
+      "bytes": 644412,
+      "sha256": "075536127bfca801628d836fa7760c3f9b60673330b06d963d057d29ae40a0ec"
+    },
+    {
+      "old": "bridge/assets/envy-tarot.webp",
+      "preserved": "source-assets/envy/historical-webp/envy-tarot.webp",
+      "bytes": 691736,
+      "sha256": "eeb427e929ef0ee321beecf46dca81198925815f95af6d6ac93c8c1f75f16dc4"
+    }
+  ]
+}

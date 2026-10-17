@@ -1,0 +1,60 @@
+{
+  "scope": "Explicit browser media/scene fixtures; real MP3 decode, gesture play, pause, eviction and seek; not physical Safari or natural boss completion.",
+  "music": [
+    {
+      "boss": "greed",
+      "elements": 2,
+      "resumed": 2.557445,
+      "active": "first-bridge",
+      "codecDecoded": true
+    },
+    {
+      "boss": "pride",
+      "elements": 2,
+      "resumed": 1.058465,
+      "active": "pride-first-bridge",
+      "codecDecoded": true
+    },
+    {
+      "boss": "envy",
+      "elements": 2,
+      "resumed": 1.066537,
+      "active": "first-bridge",
+      "codecDecoded": true
+    }
+  ],
+  "art": [
+    {
+      "url": "./assets/envy-first-defeat-r16.webp",
+      "width": 1280,
+      "height": 853
+    },
+    {
+      "url": "./assets/envy-dragon-defeat-r16.webp",
+      "width": 1280,
+      "height": 853
+    },
+    {
+      "url": "./assets/envy-worm-reveal-r16.webp",
+      "width": 1280,
+      "height": 853
+    },
+    {
+      "url": "./assets/envy-victory-captured-r16.webp",
+      "width": 1280,
+      "height": 853
+    },
+    {
+      "url": "./assets/envy-victory-escaped-r16.webp",
+      "width": 1280,
+      "height": 853
+    },
+    {
+      "url": "./assets/envy-lost-r16.webp",
+      "width": 1280,
+      "height": 853
+    }
+  ],
+  "errors": [],
+  "ok": true
+}
