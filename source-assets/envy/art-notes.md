@@ -38,7 +38,7 @@ Create a NEW illustration atlas of Envy secret collectibles, using supplied mult
 
 ## r2 塔羅（2026-10-08）
 
-原檔 `images/envy-tarot-atlas-r2.png`，執行圖 `bridge/assets/envy-tarot.webp`。3×2 圖集依序為月亮、寶劍、小丑、眼睛、死神、背面。圖格由 Canvas 取樣並保持比例，文字由程式畫，不烘焙在圖中。生成工具 image_gen；參考 `images/envy-sar.png` 已檢視後交予工具。保留所有 r1 原圖及未選稿；包框改用既有貪婪／傲慢的幾何構圖，不再用 SAR 圖當身體紋理。
+原檔 `images/envy-tarot-atlas-r2.png`，執行圖 `source-assets/envy/historical-webp/envy-tarot.webp`。3×2 圖集依序為月亮、寶劍、小丑、眼睛、死神、背面。圖格由 Canvas 取樣並保持比例，文字由程式畫，不烘焙在圖中。生成工具 image_gen；參考 `images/envy-sar.png` 已檢視後交予工具。保留所有 r1 原圖及未選稿；包框改用既有貪婪／傲慢的幾何構圖，不再用 SAR 圖當身體紋理。
 
 以下為這次工具的逐字提示詞：
 

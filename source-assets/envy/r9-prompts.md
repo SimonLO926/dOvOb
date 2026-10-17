@@ -1,7 +1,7 @@
 # 嫉妒 r9 終結插圖提示詞
 
 參考：images/envy-heads.png、images/envy-worm.png、images/envy-swamp.png。原貓沿用 Greed 真貓，不生成新貓。
-原圖：images/envy-endings-atlas-r9.png；運行：bridge/assets/envy-endings-r9.webp。
+原圖：images/envy-endings-atlas-r9.png；運行：source-assets/envy/historical-webp/envy-endings-r9.webp。
 3×2 方形圖集，逐列：窺視之子敗北、巨瞳敗北、本體揭露、捕獲結算、本體逃走結算、玩家敗北。
 只用於暫停戰鬥的過場；不作戰鬥頭像或背景。Boss 打至 0 後才顯示擊敗化身插圖。
 

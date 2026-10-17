@@ -28,28 +28,16 @@ test('Pride routes all eight scenes and keeps red/escape music through defeat an
     exit.over = exit.won = true; assert.equal(crazyTrack(exit), null);
   }
 });
-test('Mobile unlock primes the requested boss only and preserves independent Pride and Greed playheads', async () => {
-  const players = new Map(); let volume = .8;
-  const music = createCrazyMusic(() => volume, { audioFactory: url => {
-    const audio = { paused: true, volume: 0, currentTime: 0, muted: false, loop: false,
-      play() { this.paused = false; return Promise.resolve(); }, pause() { this.paused = true; } };
-    players.set(url, audio); return audio;
-  } });
-  music.unlock('pride'); music.select('pride-first-bridge'); await Promise.resolve();
-  assert.equal(players.size, 8); assert.ok([...players.keys()].every(url => url.includes('/pride-music/')));
-  assert.equal(PRIDE_TRACKS.length, 8); assert.ok([...players.values()].every(a => a.loop));
-  const pride = [...players.entries()].find(([url]) => url.endsWith('/pride-music/first-bridge.mp3'))[1];
-  for (let i = 0; i < 5; i++) music.tick(100);
-  assert.equal(pride.paused, false); assert.ok(pride.volume > 0); pride.currentTime = 12;
-  music.select('pride-escape'); for (let i = 0; i < 5; i++) music.tick(100);
-  assert.equal(pride.paused, true); assert.equal(pride.currentTime, 12);
-  music.unlock('greed'); music.select('first-bridge'); await Promise.resolve(); assert.equal(players.size, 14);
-  const greed = [...players.entries()].find(([url]) => url.endsWith('/greed-music/first-bridge.mp3'))[1];
-  assert.notEqual(pride, greed); assert.equal(greed.currentTime, 0);
-  music.select('pride-first-bridge'); assert.equal(pride.currentTime, 12);
-  volume = 0; music.tick(100); assert.equal(pride.volume, 0);
-  music.pause(); assert.ok([...players.values()].every(a => a.paused));
-  music.reset(); assert.ok([...players.values()].every(a => a.currentTime === 0));
+test('Mobile unlock uses two streams for the current boss; every track retains a separate position',async()=>{
+ const players=[];let volume=.8;const music=createCrazyMusic(()=>volume,{audioFactory:()=>{const a={paused:true,volume:0,currentTime:0,muted:false,play(){this.paused=false;return Promise.resolve();},pause(){this.paused=true;}};players.push(a);return a;}});
+ music.unlock('pride');await Promise.resolve();assert.equal(players.length,2);assert.ok(players.every(a=>a.src.endsWith('/pride-music/first-bridge.mp3')&&a.loop));
+ const positions=new Map();
+ for(const [i,key]of [...PRIDE_TRACKS,'first-bridge','first-special'].entries()){
+  music.select(key);for(let n=0;n<5;n++)music.tick(100);
+  const a=players.find(a=>!a.paused&&a.volume>0);assert.ok(a);a.currentTime=11+i;positions.set(key,11+i);
+ }
+ for(const[key,pos]of positions){music.select(key);for(let n=0;n<5;n++)music.tick(100);assert.equal(players.find(a=>!a.paused&&a.volume>0).currentTime,pos);}
+ volume=0;music.tick(100);assert.ok(players.every(a=>a.volume===0));music.pause();assert.ok(players.every(a=>a.paused));music.reset();assert.ok(players.every(a=>a.currentTime===0));
 });
 test('Six-track routing selects each form, special/Bridge and last-15% priority', () => {
   const s = createCrazy(); assert.equal(crazyTrack(s), 'first-bridge');
@@ -61,25 +49,12 @@ test('Six-track routing selects each form, special/Bridge and last-15% priority'
   s.cutscene.time = 2200; assert.equal(crazyTrack(s), 'second-bridge');
   s.over = true; assert.equal(crazyTrack(s), null);
 });
-test('Crossfades retain independent playheads; pause and replay reset have distinct behavior', async () => {
-  const players = new Map(); let volume = .7;
-  const music = createCrazyMusic(() => volume, { audioFactory: url => {
-    const key = url.split('/').at(-1).replace('.mp3', '');
-    const audio = { paused: true, volume: 0, currentTime: 0, play() { this.paused = false; return Promise.resolve(); }, pause() { this.paused = true; } };
-    players.set(key, audio); return audio;
-  }});
-  music.unlock(); music.select('first-bridge'); await Promise.resolve();
-  for (let i = 0; i < 5; i++) music.tick(100);
-  const bridge = players.get('first-bridge'); bridge.currentTime = 24.5;
-  music.select('first-special'); music.tick(100); assert.equal(bridge.paused, false); assert.ok(bridge.volume > 0);
-  for (let i = 0; i < 4; i++) music.tick(100); assert.equal(bridge.paused, true); assert.equal(bridge.currentTime, 24.5);
-  const special = players.get('first-special'); special.currentTime = 13.2;
-  music.select('first-bridge'); assert.equal(bridge.currentTime, 24.5); assert.equal(bridge.paused, false);
-  for (let i = 0; i < 5; i++) music.tick(100); assert.equal(special.paused, true);
-  music.pause(); assert.equal(bridge.paused, true); assert.equal(bridge.currentTime, 24.5);
-  music.select('first-special'); assert.equal(special.currentTime, 13.2);
-  volume = 0; music.tick(100); assert.equal(special.volume, 0);
-  music.reset(); assert.equal(special.currentTime, 0); assert.equal(bridge.currentTime, 0); assert.equal(music.active, null);
+test('Crossfades preserve evicted song positions; pause keeps positions and reset clears them',async()=>{
+ const players=[];const music=createCrazyMusic(()=>.7,{audioFactory:()=>{const a={paused:true,currentTime:0,volume:0,play(){this.paused=false;return Promise.resolve();},pause(){this.paused=true;}};players.push(a);return a;}});
+ music.unlock();await Promise.resolve();for(let n=0;n<5;n++)music.tick(100);const first=players.find(a=>a.volume>0);first.currentTime=24.5;
+ music.select('first-special');music.tick(100);assert.ok(!first.paused&&first.volume>0);for(let n=0;n<5;n++)music.tick(100);assert.ok(first.paused);
+ const special=players.find(a=>a.volume>0);special.currentTime=13.2;music.select('second-bridge');for(let n=0;n<5;n++)music.tick(100);music.select('first-bridge');for(let n=0;n<5;n++)music.tick(100);assert.equal(players.find(a=>a.volume>0).currentTime,24.5);
+ music.pause();assert.ok(players.every(a=>a.paused));music.select('first-special');for(let n=0;n<5;n++)music.tick(100);assert.equal(players.find(a=>a.volume>0).currentTime,13.2);music.reset();assert.equal(music.active,null);assert.ok(players.every(a=>a.currentTime===0));
 });
 test('Rejected autoplay is handled without unhandled errors and can be retried on a gesture', async () => {
   let fail = true;

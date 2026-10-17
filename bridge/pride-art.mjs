@@ -1,19 +1,12 @@
+import {createLazyImages} from './lazy-images.mjs';
 import { drawRedCrownMirror } from './pride-red-art.mjs';
 import { drawFineGauntlet } from './crazy-boss-art.mjs?v=1.2.28';
 import { drawPrideBackdrop } from './pride-theme.mjs';
 // Runtime WebP portraits; byte-identical PNG sources live in source-assets/pride.
 // Canvas artwork remains available when an image cannot be loaded.
-export const prideImages = {};
-let prideArtPromise;
-export function loadPrideArt() {
-  return prideArtPromise ??= typeof Image === 'undefined' ? Promise.resolve([]) : Promise.all(
-  [['first', 'pride-first.webp'], ['defeated', 'pride-defeated.webp'], ['mirrorDefeated', 'pride-mirror-defeated.webp'], ['second', 'pride-second.webp'], ['towerCollapse', 'pride-tower-collapse.webp'], ['towerRuins', 'pride-tower-ruins.webp']].map(([key, file]) => new Promise(resolve => {
-    const img = new Image(); prideImages[key] = img;
-    img.onload = () => resolve(true); img.onerror = () => resolve(false);
-    img.src = new URL(`./assets/${file}`, import.meta.url).href;
-  }))
-  );
-}
+const art=createLazyImages(Object.fromEntries([['first','pride-first.webp'],['defeated','pride-defeated.webp'],['mirrorDefeated','pride-mirror-defeated.webp'],['second','pride-second.webp'],['towerCollapse','pride-tower-collapse.webp'],['towerRuins','pride-tower-ruins.webp']].map(([key,file])=>[key,new URL('./assets/'+file,import.meta.url).href])));
+export const prideImages=art.images;
+export function loadPrideArt(){return art.load(['first']);}
 function cover(c, img) {
   if (!img?.naturalWidth) return false;
   const scale = Math.max(c.canvas.width / img.naturalWidth, c.canvas.height / img.naturalHeight);

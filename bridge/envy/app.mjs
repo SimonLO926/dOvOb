@@ -5,10 +5,10 @@ import { createEnvy, SCENARIOS, envyInput, envyPoint, updateEnvy, continueScene,
 import { createCampaignRecorder, envyUnlocked } from './campaign.mjs?v=1.2.36';
 import { filmingEnabled } from '../filming.mjs?v=1.2.31';
 import { canvasHeight, drawEnvy } from './view.mjs?v=1.2.33';
-import { drawFrame, loadArt, images } from './art.mjs?v=1.2.33';
+import { drawFrame, loadArt, images } from './art.mjs?v=1.2.40';
 import { endingPresentation, drawEndingPage } from './ending.mjs?v=1.2.33';
 import { puzzleCountdownCue, playCountdownTone } from './countdown.mjs';
-import { createEnvyMusic, envyTrack } from './music.mjs';
+import { createEnvyMusic, envyTrack } from './music.mjs?v=1.2.40';
 import { ATTACKS, gridLayout } from './rounds.mjs';
 import { createCombatEffects, resetCombatEffects, updateCombatEffects, drawCombatEffects, createCombatOverlay, combatLayout } from '../combat-effects.mjs?v=1.2.31';
 
@@ -72,7 +72,7 @@ function tone(frequency=180,duration=.12,type='sine',volume=.045){
   oscillator.connect(gain);gain.connect(audio.destination);oscillator.start(time);oscillator.stop(time+duration+.025);
 }
 function unlockAudio(){
-  music.unlock('envy');
+  if(encounter)music.select(envyTrack(encounter));music.unlock('envy');
   if(!preferences.sound)return;
   try{audio??=new (window.AudioContext||window.webkitAudioContext)();audio.resume().catch(()=>{});}catch{}
 }
@@ -154,7 +154,7 @@ function presentation(){
 }
 function start(){
   if(campaign&&!envyUnlocked(campaignStorage)){returnToBosses();return;}
-  music.reset();unlockAudio();encounter=createEnvy({scenario:campaign?'full':selected,difficulty,preview:!campaign,filming:campaign&&filmingEnabled()});lastHp=100;hitTime=0;lastMode='';paused=false;last=performance.now();
+  music.reset();encounter=createEnvy({scenario:campaign?'full':selected,difficulty,preview:!campaign,filming:campaign&&filmingEnabled()});unlockAudio();lastHp=100;hitTime=0;lastMode='';paused=false;last=performance.now();
   resetCombatEffects(combatEffects,encounter);
   for(const id of['launcher','menu','album-panel'])$('#'+id).hidden=true;fit();controls();
 }

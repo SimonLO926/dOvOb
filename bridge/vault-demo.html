@@ -44,7 +44,7 @@ const $=s=>document.querySelector(s),c=$('#board').getContext('2d'),t=k=>transla
 let s=null,paused=false,started=false,previous=performance.now(),resultSeen=null,viewCrop=0;
 const music=createCrazyMusic(()=>Number($('#volume').value));
 function reset(){let seed=37; s=createCrazy({random:()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296)});s.form=2;s.phase=3;s.bossMaxHp=1200;s.bossHp=260;s.hp=100;s.damageLeft=50;hitCrazyBoss(s,40);paused=false;resultSeen=null;$('#result').classList.add('hidden');$('#pause').textContent='暫停';}
-function begin(){reset();started=true;$('#gate').classList.add('hidden');music.reset();music.unlock();music.select(crazyTrack(s));}
+function begin(){reset();started=true;$('#gate').classList.add('hidden');music.reset();music.select(crazyTrack(s));music.unlock();}
 $('#start').onclick=begin;$('#restart').onclick=begin;
 $('#fail').onclick=()=>{if(!started)begin();if(s.mode!=='vault')reset();while(s.mode==='vault'&&!s.over)updateCrazy(s,50);paused=true;$('#pause').textContent='繼續';render();};
 $('#retry').onclick=()=>{if(s.vaultRetry==null)return;paused=false;s.vaultRetry=50;updateCrazy(s,50);resultSeen=null;$('#result').classList.add('hidden');$('#pause').textContent='暫停';render();};

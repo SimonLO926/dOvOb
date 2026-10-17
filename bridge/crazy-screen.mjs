@@ -1,14 +1,7 @@
-export const greedImages = {};
-let artPromise;
-export function loadGreedArt() {
-  return artPromise ??= typeof Image === 'undefined' ? Promise.resolve([]) : Promise.all(
-  [['first', 'greed-first.webp'], ['firstSprite', 'greed-first-sprite.webp'], ['second', 'greed-second.webp'], ['defeated', 'greed-defeated.webp']].map(([key, file]) => new Promise(resolve => {
-    const img = new Image(); greedImages[key] = img;
-    img.onload = () => resolve(true); img.onerror = () => resolve(false);
-    img.src = new URL(`./assets/${file}?v=1.2.28`, import.meta.url).href;
-  }))
-  );
-}
+import {createLazyImages} from './lazy-images.mjs';
+const art=createLazyImages(Object.fromEntries([['first','greed-first.webp'],['second','greed-second.webp'],['defeated','greed-defeated.webp']].map(([key,file])=>[key,new URL('./assets/'+file,import.meta.url).href])));
+export const greedImages=art.images;
+export function loadGreedArt(){return art.load(['first']);}
 export function readGreedClear(storage) {
   try { return storage.getItem('bridge-greed-cleared') === '1'; } catch { return false; }
 }

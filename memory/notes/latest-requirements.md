@@ -1,5 +1,16 @@
 # 最新要求與不可還原設定
 
+## 2026-10-18 全遊戲瘦身／1.2.40（待PR驗證）
+
+從master e012dc14獨立perf/game-slim製作，不混入僅本地Sloth。貪婪六曲由256k轉完整128kbps／44.1kHz／立體聲，22,125,232→11,061,963 bytes（−50.0%），時長差皆<0.15秒，原檔逐位元存source-assets/greed/music。16張RGB場景從原PNG製作最長邊1280／nearest／q88 WebP，節省2,239,998 bytes，舊運行WebP另存；不動原貓、透明角色、圖集格位或字型。閒置的貪婪立繪精靈、舊嫉妒塔羅／六格結局共2,569,006 bytes移到source-assets，保留原檔。按場景快取圖片；前三Boss音樂改沿既有兩串流播放，僅請求當前曲、每曲獨立續播與淡出入；修正priming未完成被tick暫停及舊metadata回呼覆蓋新曲的問題。
+
+Bridge內容總量約134.29→118.43MB（−11.8%，含文檔測試，非Jekyll正式產物）；source-assets因完整保留原曲和舊副本約676MB，GitHub歷史未改寫，不能把網站減量當作clone或Git儲存量減少。新舊副本內容相同處由Git blob共用，不另作重複二進位內容。
+
+571 Node＋4卡帶幾何通過；四比例390×844／844×390／1024×768／1280×900×主頁／卡帶／五Boss共28組前後對照，0pageerror／缺檔。桌面嫉妒冷首屏8,422,053→1,733,769 HTTP bytes（−79.4%），本地HTTP無壓縮固定2秒樣本；前三Boss進關曲目請求6／8／7→1／1／1，不稱整曲已全部下載。貪婪／傲慢／嫉妒真HTMLAudio播放、暫停、三曲切換／淘汰後續播與六張嫉妒結局decode通過；263項原始素材／字型／原貓SHA逐一通過。Chromium模擬，非實體Safari或自然完整Boss通關。細節與證據在source-assets/optimization-1.2.40，四比例截圖和美術前後對照在工作區work/slim-audit。CI增加實際Jekyll產物容量／來源排除／原檔保留檢查及卡帶bundle cmp。
+
+下一步：推送獨立瘦身PR並等CI實際Jekyll結果；未合併部署。怠惰r2保留原工作區與8767本地服務，不帶入本PR，也不改玩法／解鎖／通關資料。
+
+
 ## 2026-10-15 1.2.39 已合併並部署
 
 使用者明確指示「merge」，PR #83已合併至master，合併提交0bde2420ea5e600d82b8297eafb5e8c953c49c51。最終程式cb92094f964cb1be08e2e6e46f31dcd01a8e6667的CI run38741796861全部成功（569遊戲回歸、4卡帶幾何、bundle cmp、Jekyll／來源排除）。正式Pages run38744739077的build及deploy均成功：https://github.com/SimonLO926/dOvOb/actions/runs/38744739077 。

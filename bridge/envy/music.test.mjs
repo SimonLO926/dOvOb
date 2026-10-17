@@ -33,46 +33,16 @@ test('all seven Envy tracks follow real form thresholds, puzzle/combat rounds an
   }
 });
 
-test('rage vocals keep their playhead from the final Bridge through reveal, capture timeout and retry', () => {
-  const players=new Map(),music=createEnvyMusic(()=>.7,{audioFactory:url=>{
-    const audio={paused:true,volume:0,currentTime:0,muted:false,loop:false,plays:0,
-      play(){this.paused=false;this.plays++;return Promise.resolve();},pause(){this.paused=true;}};
-    players.set(url,audio);return audio;
-  }});
-  const s=createEnvy({scenario:'final-bridge'});
-  music.select(envyTrack(s));music.tick(100);
-  const vocal=[...players.values()][0];vocal.currentTime=37;
-  hitBoss(s,99999);music.select(envyTrack(s));
-  s.scene.time=700;continueScene(s);music.select(envyTrack(s));
-  s.scene.time=700;continueScene(s);music.select(envyTrack(s));
-  assert.equal(s.mode,'capture');assert.equal(music.active,'second-last');
-  s.round.clock=s.round.duration-16;updateEnvy(s,16);music.select(envyTrack(s));
-  assert.equal(s.scene.kind,'capture-retry');retryCapture(s);music.select(envyTrack(s));
-  assert.equal(players.size,1,'Capture must not start a first-bar special track');
-  assert.equal(vocal.currentTime,37);assert.equal(vocal.plays,1);assert.equal(vocal.paused,false);
-  finishEnvy(s);music.select(envyTrack(s));assert.equal(music.active,null);
+test('rage vocals keep their playhead through reveal, capture timeout and retry without other-song requests',async()=>{
+ const players=[],music=createEnvyMusic(()=>.7,{audioFactory:()=>{const a={paused:true,volume:0,currentTime:0,plays:0,play(){this.paused=false;this.plays++;return Promise.resolve();},pause(){this.paused=true;}};players.push(a);return a;}});
+ const s=createEnvy({scenario:'final-bridge'});music.select(envyTrack(s));music.unlock('envy');await Promise.resolve();music.tick(100);const vocal=players.find(a=>a.volume>0);vocal.currentTime=37;const plays=vocal.plays;
+ hitBoss(s,99999);music.select(envyTrack(s));s.scene.time=700;continueScene(s);music.select(envyTrack(s));s.scene.time=700;continueScene(s);music.select(envyTrack(s));assert.equal(s.mode,'capture');s.round.clock=s.round.duration-16;updateEnvy(s,16);music.select(envyTrack(s));retryCapture(s);music.select(envyTrack(s));
+ assert.equal(music.active,'second-last');assert.equal(vocal.currentTime,37);assert.equal(vocal.plays,plays);assert.ok(players.every(a=>a.src.endsWith('07_second_last_vocal_en.mp3')));finishEnvy(s);music.select(envyTrack(s));assert.equal(music.active,null);
 });
-
-test('Envy primes only its seven supplied files, crossfades, loops and retains independent playheads',async()=>{
-  const players=new Map();let volume=.7;
-  const music=createEnvyMusic(()=>volume,{audioFactory:url=>{
-    const audio={paused:true,volume:0,currentTime:0,muted:false,loop:false,
-      play(){this.paused=false;return Promise.resolve();},pause(){this.paused=true;}};
-    players.set(url,audio);return audio;
-  }});
-  music.unlock('envy');music.select('first-bridge');await Promise.resolve();
-  assert.equal(players.size,7);assert.ok([...players.keys()].every(url=>url.includes('/envy-music/')));
-  for(const file of Object.values(ENVY_TRACKS))assert.ok([...players.keys()].some(url=>url.endsWith('/'+file)));
-  assert.ok([...players.values()].every(a=>a.loop));
-  const first=[...players.entries()].find(([url])=>url.endsWith('01_first_bridge.mp3'))[1];
-  for(let i=0;i<5;i++)music.tick(100);assert.ok(first.volume>0);
-  first.currentTime=24;music.select('first-special');music.tick(100);
-  assert.ok(first.volume>0&&!first.paused,'Outgoing music must fade rather than cut abruptly');
-  for(let i=0;i<4;i++)music.tick(100);assert.ok(first.paused);assert.equal(first.currentTime,24);
-  music.select('first-bridge');assert.equal(first.currentTime,24);
-  volume=0;music.tick(100);assert.equal(first.volume,0);
-  music.pause();assert.ok([...players.values()].every(a=>a.paused));assert.equal(first.currentTime,24);
-  music.select('first-bridge');volume=.5;music.tick(100);assert.equal(first.currentTime,24);assert.ok(first.volume>0);
-  music.select(null);for(let i=0;i<5;i++)music.tick(100);assert.ok([...players.values()].every(a=>a.paused));
-  music.reset();assert.ok([...players.values()].every(a=>a.currentTime===0));
+test('all seven Envy tracks use two reusable streams, crossfade and resume after eviction',async()=>{
+ const players=[];let volume=.7;const music=createEnvyMusic(()=>volume,{audioFactory:()=>{const a={paused:true,volume:0,currentTime:0,play(){this.paused=false;return Promise.resolve();},pause(){this.paused=true;}};players.push(a);return a;}});
+ music.unlock('envy');await Promise.resolve();assert.equal(players.length,2);assert.ok(players.every(a=>a.src.endsWith('01_first_bridge.mp3')));
+ const positions=new Map();for(const[key,file]of Object.entries(ENVY_TRACKS)){music.select(key);for(let n=0;n<5;n++)music.tick(100);const a=players.find(a=>a.volume>0);assert.ok(a.src.endsWith(file));a.currentTime=positions.size+18;positions.set(key,a.currentTime);}
+ for(const[key,pos]of positions){music.select(key);for(let n=0;n<5;n++)music.tick(100);assert.equal(players.find(a=>a.volume>0).currentTime,pos);}
+ volume=0;music.tick(100);assert.ok(players.every(a=>a.volume===0));music.pause();assert.ok(players.every(a=>a.paused));music.reset();assert.ok(players.every(a=>a.currentTime===0));
 });

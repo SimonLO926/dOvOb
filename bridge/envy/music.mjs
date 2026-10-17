@@ -1,4 +1,4 @@
-import { createCrazyMusic } from '../crazy-music.mjs';
+import { createCrazyMusic } from '../crazy-music.mjs?v=1.2.40';
 
 export const ENVY_TRACKS = Object.freeze({
   'first-bridge': '01_first_bridge.mp3',
