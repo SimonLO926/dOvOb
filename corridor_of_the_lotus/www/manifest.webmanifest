@@ -1,0 +1,31 @@
+{
+  "name": "蓮島迴廊 Corridor of the Lotus",
+  "short_name": "蓮島迴廊",
+  "description": "澳門三紀紀念碑谷式視錯覺解謎（1622 · 2026 · 2077）",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1d262b",
+  "theme_color": "#1d262b",
+  "lang": "zh-Hant",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

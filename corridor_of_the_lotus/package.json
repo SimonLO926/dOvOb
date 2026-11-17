@@ -1,0 +1,15 @@
+{
+  "name": "corridor-of-the-lotus",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "蓮島迴廊 Corridor of the Lotus — 澳門三紀紀念碑谷式視錯覺解謎（離線單檔 HTML5 + Capacitor Android/iOS 原生打包管線）",
+  "scripts": {
+    "build": "node tools/build-single-html.mjs",
+    "stage:mobile": "node tools/stage-mobile-www.mjs",
+    "mobile:init": "npx @capacitor/cli add android && npx @capacitor/cli add ios",
+    "mobile:sync": "npm run stage:mobile && npx @capacitor/cli sync",
+    "build:apk": "bash tools/build-apk.sh",
+    "build:ipa": "bash tools/build-ipa.sh"
+  }
+}
