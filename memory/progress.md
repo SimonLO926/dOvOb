@@ -6,7 +6,7 @@
 
 四語完整性三項 Node 測試通過。Chromium 1280×900／390×844 驗證首頁篩選、專區預覽、語言、四個入口、傘齒輪演示和參賽者計分。1024×768 觸控模擬驗證 P207 斷網後可操作積木、查閱冰壺數目、鎖分及重設，參數可在重新載入後保留。
 
-下次恢復先核對最新 `master` 及對應的 Pages 部署紀錄。專區網址為 https://simonlo926.github.io/dOvOb/robotics/ 。
+四項工具版本 `196829f` 的 GitHub Pages 工作流程 `45633615721` 已通過建置及部署。環境代理未能直連公開網域，頁面互動以本機 Chromium 核對。下次恢復從最新 `master` 接續，專區網址為 https://simonlo926.github.io/dOvOb/robotics/ 。
 
 ## 2026-11-25 SRC 2027 相撲訓練站
 
