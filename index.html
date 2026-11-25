@@ -297,14 +297,14 @@
 
     /* Reveal the homepage through the glass on hover or keyboard focus. */
     @media (hover: hover) and (pointer: fine) {
-      .project:hover .project-preview {
+      .project:not(.project--map):hover .project-preview {
         filter: blur(.5px) saturate(1.1);
         transform: scale(1.02);
       }
     }
 
-    .project:focus-visible .project-preview,
-    .project.is-previewing .project-preview {
+    .project:not(.project--map):focus-visible .project-preview,
+    .project:not(.project--map).is-previewing .project-preview {
       filter: blur(.5px) saturate(1.1);
       transform: scale(1.02);
     }
@@ -335,6 +335,35 @@
     @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
       .project-no, .project-arrow, .project-info { background: rgba(248,250,247,.94); }
     }
+
+    .project.project--map { padding: 0; background: #fffdf7; border-color: var(--line); }
+    .project--map::before, .project--map::after { display: none; }
+
+    .project--map .project-preview {
+      position: relative;
+      inset: auto;
+      z-index: auto;
+      min-height: 148px;
+      aspect-ratio: 3 / 1;
+      filter: none;
+      transform: none;
+    }
+
+    .project--map .project-info {
+      margin: 0;
+      padding: clamp(20px, 3.5vw, 30px);
+      border: 0;
+      border-radius: 0;
+      background: #fffdf7;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      box-shadow: none;
+    }
+
+    .project--map h3 { font-size: clamp(1.65rem, 3vw, 2.25rem); }
+    .project--map p { color: var(--ink); font-size: 1rem; line-height: 1.65; }
+    .project--map .feature-action { margin-top: 16px; }
+    .project--map:hover .feature-action, .project--map:focus-visible .feature-action { text-decoration: underline; }
 
     footer {
       display: flex;
@@ -434,17 +463,14 @@
           <button type="button" data-filter="record" data-i18n="record">紀錄</button>
         </div>
         <div class="project-grid">
-          <a class="project" href="./macau.html" data-kind="interactive">
+          <a class="project project--map" href="./macau.html" data-kind="interactive" aria-labelledby="macau-map-title macau-map-action" aria-describedby="macau-map-description">
+            <div class="project-info">
+              <h3 id="macau-map-title" data-i18n="macauMapTitle">澳門立體紙地圖</h3>
+              <p id="macau-map-description" data-i18n="macauMapDescription">展開 3D 紙地圖，點選大三巴、議事亭前地等九個地標查看介紹。可切換日夜景色，或播放 55 秒導覽。</p>
+              <span class="feature-action"><span id="macau-map-action" data-i18n="macauMapAction">開啟互動地圖</span> <span aria-hidden="true">↗</span></span>
+            </div>
             <div class="project-preview" aria-hidden="true" inert>
               <img src="./assets/macau-paper-map-preview.jpg" alt="" loading="lazy" width="1080" height="560">
-            </div>
-            <div class="project-top">
-              <span class="project-no"><span data-i18n="categoryInteractive">互動</span> / 12</span>
-              <span class="project-arrow" aria-hidden="true">↗</span>
-            </div>
-            <div class="project-info">
-              <h3 data-i18n="macauMapTitle">澳門立體紙地圖</h3>
-              <p data-i18n="macauMapDescription">展開紙地圖，探索九個澳門地標，或播放 55 秒導覽。</p>
             </div>
           </a>
           <a class="project" href="./corridor_of_the_lotus/" data-kind="game">
@@ -690,6 +716,7 @@
       }
     });
     cards.forEach(card => {
+      if (card.classList.contains('project--map')) return;
       const preview = card.querySelector('.project-preview');
       if (preview.querySelector('iframe')) resizePreviews.observe(preview);
       let press = null;

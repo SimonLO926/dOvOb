@@ -11,6 +11,7 @@
       --paper: #f3f0e7;
       --acid: #dfff45;
       --line: rgba(23, 33, 27, .25);
+      --card: #fffdf7;
     }
 
     * { box-sizing: border-box; }
@@ -26,22 +27,105 @@
     .language { gap: 8px; font-size: 13px; font-weight: 700; }
     .language select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: var(--paper); font: inherit; }
 
-    main { padding: clamp(42px, 7vw, 84px) 0 84px; }
-    h1 { max-width: 19ch; margin: 0; font-size: clamp(2rem, 5vw, 4.25rem); line-height: 1.12; letter-spacing: -.035em; }
-    .intro { max-width: 55ch; margin: 18px 0 32px; font-size: 1.0625rem; line-height: 1.65; }
+    main { padding: clamp(24px, 4vw, 48px) 0 84px; }
 
-    .tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 0; padding: 24px 0 0; border-top: 2px solid var(--ink); list-style: none; }
-    .tool { display: flex; flex-direction: column; height: 100%; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: #fffdf7; text-decoration: none; }
-    .tool img { display: block; width: 100%; height: auto; background: #e5e8e6; }
-    .tool-copy { display: flex; flex: 1; flex-direction: column; gap: 10px; align-items: flex-start; padding: clamp(18px, 3vw, 26px); }
-    .tool h2 { margin: 0; font-size: clamp(1.125rem, 2.8vw, 1.55rem); }
-    .tool p { margin: 0 0 8px; line-height: 1.6; }
-    .open { display: inline-flex; align-items: center; gap: 8px; margin-top: auto; padding: 8px 12px; border: 1px solid var(--ink); border-radius: 999px; background: var(--acid); font-size: .875rem; font-weight: 700; }
-    .tool:hover h2, .tool:focus-visible h2 { text-decoration: underline; text-underline-offset: .2em; }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(24px, 4vw, 54px);
+      padding: clamp(24px, 5vw, 62px);
+      border-radius: 28px;
+      color: var(--paper);
+      background: radial-gradient(ellipse at 90% 18%, #354933, transparent 53%), linear-gradient(135deg, #1b2a21, #101b15);
+    }
 
-    @media (max-width: 640px) {
-      .shell { width: calc(100% - 32px); }
-      .tools { grid-template-columns: 1fr; gap: 16px; }
+    h1 { margin: 0; font-size: clamp(2.45rem, 5.35vw, 4.45rem); line-height: 1.02; letter-spacing: -.045em; text-wrap: balance; }
+    .title-accent { display: block; margin-top: .11em; color: var(--acid); }
+    :lang(ja) .title-accent { font-size: .76em; }
+    .intro { max-width: 42ch; margin: 20px 0 24px; color: #e1e7df; font-size: 1.0625rem; line-height: 1.65; }
+
+    .browse {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: var(--acid);
+      color: var(--ink);
+      text-decoration: none;
+      font-size: .94rem;
+      font-weight: 800;
+    }
+
+    .browse:hover, .browse:focus-visible { text-decoration: underline; }
+    .browse:focus-visible { outline-color: var(--acid); }
+    .hero-visual { padding: 9px; border: 1px solid #697a64; border-radius: 20px; background: #101b15; box-shadow: 0 20px 45px #0b130dcc; }
+    .hero-visual img { display: block; width: 100%; height: auto; border-radius: 12px; }
+
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      margin: clamp(24px, 4vw, 42px) 0 0;
+      padding: 0;
+      scroll-margin-top: 20px;
+      list-style: none;
+    }
+
+    .tool {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--card);
+      box-shadow: 0 8px 20px #17211b12;
+      text-decoration: none;
+      transition: transform .24s ease, box-shadow .24s ease;
+    }
+
+    .tool-media { position: relative; overflow: hidden; background: #dce0db; }
+    .tool-media img { display: block; width: 100%; height: auto; aspect-ratio: 1000 / 580; object-fit: cover; transition: transform .35s ease; }
+    .tool-copy { display: flex; flex: 1; flex-direction: column; padding: clamp(18px, 2.8vw, 28px); }
+    .tool-kind { align-self: flex-start; padding: 5px 9px; border-radius: 999px; background: #edf0e5; font-size: .78rem; font-weight: 800; }
+    .tool h2 { margin: 10px 0 8px; font-size: clamp(1.3rem, 2.45vw, 1.92rem); line-height: 1.17; letter-spacing: -.027em; }
+    .tool p { margin: 0 0 18px; color: #3b4b41; line-height: 1.55; }
+
+    .tool-arrow {
+      display: grid;
+      align-self: flex-end;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      margin-top: auto;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+      background: var(--acid);
+      font-size: 1.25rem;
+    }
+
+    .tool:hover, .tool:focus-visible { transform: translateY(-4px); box-shadow: 0 14px 26px #17211b26; }
+    .tool:hover img, .tool:focus-visible img { transform: scale(1.045); }
+    .tool:hover h2, .tool:focus-visible h2 { text-decoration: underline; text-underline-offset: .15em; }
+
+    @media (min-width: 901px) {
+      .tool--compact { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); }
+      .tool--compact img { position: absolute; width: 100%; height: 100%; }
+      .tool--compact h2 { font-size: 1.4rem; }
+    }
+
+    @media (max-width: 700px) {
+      .shell { width: calc(100% - 28px); }
+      .hero, .tools { grid-template-columns: 1fr; gap: 16px; }
+      .hero { padding: clamp(20px, 6vw, 32px); border-radius: 22px; }
+      .hero-visual { margin-top: 6px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tool, .tool-media img { transition: none; }
+      .tool:hover, .tool:focus-visible, .tool:hover img, .tool:focus-visible img { transform: none; }
     }
   </style>
 </head>
@@ -64,47 +148,62 @@
     </header>
 
     <main>
-      <h1 data-i18n="roboticsTitle">機械人評分與模擬</h1>
-      <p class="intro" data-i18n="roboticsDescription">我在工作中製作的機械人競賽與教學工具，收錄計分、模擬與訓練項目。</p>
+      <section class="hero" aria-labelledby="robotics-title">
+        <div>
+          <h1 id="robotics-title">
+            <span data-i18n="roboticsHeadingLead">機械人</span>
+            <span class="title-accent" data-i18n="roboticsHeadingAccent">評分與模擬</span>
+          </h1>
+          <p class="intro" data-i18n="roboticsDescription">我在工作中製作的機械人競賽與教學工具，收錄計分、模擬與訓練項目。</p>
+          <a class="browse" href="#tools"><span data-i18n="roboticsBrowse">瀏覽工具</span> <span aria-hidden="true">↓</span></a>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <img src="../assets/robotics-arena.jpg" alt="" width="780" height="520" fetchpriority="high">
+        </div>
+      </section>
 
-      <ul class="tools">
+      <ul id="tools" class="tools" role="list">
         <li>
           <a class="tool" href="./roborave_locate_master_3d_v3.html" aria-labelledby="roborave-title" aria-describedby="roborave-description">
-            <img src="../assets/roborave-p207-preview.jpg" alt="" width="1000" height="580">
+            <div class="tool-media"><img src="../assets/roborave-p207-preview.jpg" alt="" width="1000" height="580"></div>
             <div class="tool-copy">
+              <span class="tool-kind" data-i18n="categorySimulator">模擬器</span>
               <h2 id="roborave-title" data-i18n="roboraveTitle">RoboRAVE 定位精英 3D · P207</h2>
               <p id="roborave-description" data-i18n="roboraveDescription">在 3D 賽場點按 SPIKE 3 積木、調校機械人，練習推冰壺並查看即時計分。</p>
-              <span class="open"><span data-i18n="categorySimulator">模擬器</span> <span aria-hidden="true">↗</span></span>
+              <span class="tool-arrow" aria-hidden="true">↗</span>
             </div>
           </a>
         </li>
         <li>
           <a class="tool" href="../src2027_sumo_all_in_one_v2.html" aria-labelledby="sumo-title" aria-describedby="sumo-description">
-            <img src="../assets/src2027-sumo-preview.jpg" alt="" width="1000" height="580">
+            <div class="tool-media"><img src="../assets/src2027-sumo-preview.jpg" alt="" width="1000" height="580"></div>
             <div class="tool-copy">
+              <span class="tool-kind" data-i18n="categorySimulator">模擬器</span>
               <h2 id="sumo-title" data-i18n="sumoTitle">SRC 2027 羽量級遙控相撲</h2>
               <p id="sumo-description" data-i18n="sumoDescription">3D 對戰模擬、互動搭建說明與賽規圖解</p>
-              <span class="open"><span data-i18n="categorySimulator">模擬器</span> <span aria-hidden="true">↗</span></span>
+              <span class="tool-arrow" aria-hidden="true">↗</span>
             </div>
           </a>
         </li>
         <li>
-          <a class="tool" href="../齒輪教學實驗室.html" aria-labelledby="gears-title" aria-describedby="gears-description">
-            <img src="../assets/gears-lab-preview.jpg" alt="" width="1000" height="580" loading="lazy">
+          <a class="tool tool--compact" href="../齒輪教學實驗室.html" aria-labelledby="gears-title" aria-describedby="gears-description">
+            <div class="tool-media"><img src="../assets/gears-lab-preview.jpg" alt="" width="1000" height="580" loading="lazy"></div>
             <div class="tool-copy">
+              <span class="tool-kind" data-i18n="categoryExperiment">實驗</span>
               <h2 id="gears-title" data-i18n="gearsTitle">齒輪教學實驗室</h2>
               <p id="gears-description" data-i18n="gearsDescription">組合齒輪、調整轉速，觀察齒輪比和傘齒輪的傳動方向。</p>
-              <span class="open"><span data-i18n="categoryExperiment">實驗</span> <span aria-hidden="true">↗</span></span>
+              <span class="tool-arrow" aria-hidden="true">↗</span>
             </div>
           </a>
         </li>
         <li>
-          <a class="tool" href="../Test.html.html" aria-labelledby="scoreboard-title" aria-describedby="scoreboard-description">
-            <img src="../assets/match-scoreboard-preview.jpg" alt="" width="1000" height="580" loading="lazy">
+          <a class="tool tool--compact" href="../Test.html.html" aria-labelledby="scoreboard-title" aria-describedby="scoreboard-description">
+            <div class="tool-media"><img src="../assets/match-scoreboard-preview.jpg" alt="" width="1000" height="580" loading="lazy"></div>
             <div class="tool-copy">
+              <span class="tool-kind" data-i18n="categoryTool">工具</span>
               <h2 id="scoreboard-title" data-i18n="scoreboardTitle">比賽計分器</h2>
               <p id="scoreboard-description" data-i18n="scoreboardDescription">為 3 至 6 位參賽者判定及計分，並分開管理比賽和收拾時間。</p>
-              <span class="open"><span data-i18n="categoryTool">工具</span> <span aria-hidden="true">↗</span></span>
+              <span class="tool-arrow" aria-hidden="true">↗</span>
             </div>
           </a>
         </li>
