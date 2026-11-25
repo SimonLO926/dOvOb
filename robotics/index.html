@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="我在工作中製作的機械人競賽工具，收錄計分、模擬與訓練項目。">
+  <title>機械人評分與模擬 · Simon Lo</title>
+  <style>
+    :root {
+      --ink: #17211b;
+      --paper: #f3f0e7;
+      --acid: #dfff45;
+      --line: rgba(23, 33, 27, .25);
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: Arial, "Noto Sans TC", sans-serif; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid #42695a; outline-offset: 4px; }
+    .shell { width: min(1180px, calc(100% - 40px)); margin: auto; }
+
+    header, .brand, .language { display: flex; align-items: center; }
+    header { gap: 16px; flex-wrap: wrap; justify-content: space-between; min-height: 84px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+    .brand { gap: 12px; font-weight: 800; text-decoration: none; }
+    .brand-mark { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 12px; }
+    .language { gap: 8px; font-size: 13px; font-weight: 700; }
+    .language select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: var(--paper); font: inherit; }
+
+    main { padding: clamp(42px, 7vw, 84px) 0 84px; }
+    h1 { max-width: 19ch; margin: 0; font-size: clamp(2rem, 5vw, 4.25rem); line-height: 1.12; letter-spacing: -.035em; }
+    .intro { max-width: 55ch; margin: 18px 0 32px; font-size: 1.0625rem; line-height: 1.65; }
+
+    .tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 0; padding: 24px 0 0; border-top: 2px solid var(--ink); list-style: none; }
+    .tool { display: flex; flex-direction: column; height: 100%; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: #fffdf7; text-decoration: none; }
+    .tool img { display: block; width: 100%; height: auto; background: #e5e8e6; }
+    .tool-copy { display: flex; flex: 1; flex-direction: column; gap: 10px; align-items: flex-start; padding: clamp(18px, 3vw, 26px); }
+    .tool h2 { margin: 0; font-size: clamp(1.125rem, 2.8vw, 1.55rem); }
+    .tool p { margin: 0 0 8px; line-height: 1.6; }
+    .open { display: inline-flex; align-items: center; gap: 8px; margin-top: auto; padding: 8px 12px; border: 1px solid var(--ink); border-radius: 999px; background: var(--acid); font-size: .875rem; font-weight: 700; }
+    .tool:hover h2, .tool:focus-visible h2 { text-decoration: underline; text-underline-offset: .2em; }
+
+    @media (max-width: 640px) {
+      .shell { width: calc(100% - 32px); }
+      .tools { grid-template-columns: 1fr; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <a class="brand" href="../">
+        <span class="brand-mark" aria-hidden="true">SL</span>
+        Simon Lo
+      </a>
+      <label class="language" for="site-language">
+        <span data-i18n="language">語言</span>
+        <select id="site-language" name="language">
+          <option value="zh-Hant" lang="zh-Hant">繁體中文</option>
+          <option value="zh-Hans" lang="zh-Hans">简体中文</option>
+          <option value="en" lang="en">English</option>
+          <option value="ja" lang="ja">日本語</option>
+        </select>
+      </label>
+    </header>
+
+    <main>
+      <h1 data-i18n="roboticsTitle">機械人評分與模擬</h1>
+      <p class="intro" data-i18n="roboticsDescription">我在工作中製作的機械人競賽工具，收錄計分、模擬與訓練項目。</p>
+
+      <ul class="tools">
+        <li>
+          <a class="tool" href="./roborave_ipad_spike_3_p207.html" aria-labelledby="roborave-title" aria-describedby="roborave-description">
+            <img src="../assets/roborave-p207-preview.jpg" alt="" width="1000" height="580">
+            <div class="tool-copy">
+              <h2 id="roborave-title" data-i18n="roboraveTitle">RoboRAVE 定位精英 · P207</h2>
+              <p id="roborave-description" data-i18n="roboraveDescription">在 2.5D 賽場點按 SPIKE 3 積木、調校機械人，練習推冰壺並查看即時計分。</p>
+              <span class="open"><span data-i18n="categorySimulator">模擬器</span> <span aria-hidden="true">↗</span></span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a class="tool" href="../src2027_sumo_all_in_one_v2.html" aria-labelledby="sumo-title" aria-describedby="sumo-description">
+            <img src="../assets/src2027-sumo-preview.jpg" alt="" width="1000" height="580">
+            <div class="tool-copy">
+              <h2 id="sumo-title" data-i18n="sumoTitle">SRC 2027 羽量級遙控相撲</h2>
+              <p id="sumo-description" data-i18n="sumoDescription">3D 對戰模擬、互動搭建說明與賽規圖解</p>
+              <span class="open"><span data-i18n="categorySimulator">模擬器</span> <span aria-hidden="true">↗</span></span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </main>
+  </div>
+  <script type="module">
+    import { TEXT, chooseLanguage } from '../homepage-i18n.mjs';
+
+    const languageSelect = document.querySelector('#site-language');
+    const description = document.querySelector('meta[name="description"]');
+
+    function applyLanguage(language) {
+      const messages = TEXT[language];
+      document.documentElement.lang = language;
+      document.title = `${messages.roboticsTitle} · Simon Lo`;
+      description.content = messages.roboticsDescription;
+      languageSelect.value = language;
+      for (const element of document.querySelectorAll('[data-i18n]')) {
+        element.textContent = messages[element.dataset.i18n];
+      }
+    }
+
+    let savedLanguage;
+    try { savedLanguage = localStorage.getItem('homepage-language'); } catch { /* Storage may be blocked. */ }
+    applyLanguage(chooseLanguage(savedLanguage, navigator.languages || [navigator.language]));
+
+    languageSelect.addEventListener('change', () => {
+      const language = languageSelect.value;
+      applyLanguage(language);
+      try { localStorage.setItem('homepage-language', language); } catch { /* Switching still works without storage. */ }
+    });
+  </script>
+</body>
+</html>

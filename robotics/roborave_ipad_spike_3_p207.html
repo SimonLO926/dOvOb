@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>RoboRAVE 定位精英 — iPad 全離線版 SPIKE 3 模擬器 (P207)</title>
+<style>
+  :root {
+    --bg-mat: #c8c5be;
+    --chassis-top: #e8e6e0;
+    --chassis-bot: #d4d1c9;
+    --chassis-border: #aeaba2;
+    --ink-primary: #1f211e;
+    --ink-muted: #5a5d56;
+    --hairline: rgba(0, 0, 0, 0.12);
+
+    --screen-bg: #161c17;
+    --screen-ink: #e8f5e9;
+    --screen-green: #4ade80;
+    --screen-amber: #fbbf24;
+    --screen-muted: #7b9680;
+
+    --key-light-bg: linear-gradient(180deg, #f9f8f4 0%, #e9e6de 100%);
+    --key-light-shadow: 0 3px 0 #9d9a91, 0 4px 6px rgba(0, 0, 0, 0.14), inset 0 1px 0 #ffffff;
+    --key-light-active: 0 1px 0 #9d9a91, 0 2px 3px rgba(0, 0, 0, 0.14);
+
+    --key-dark-bg: linear-gradient(180deg, #4b4b47 0%, #353532 100%);
+    --key-dark-shadow: 0 3px 0 #1d1d1b, 0 4px 7px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    --key-dark-active: 0 1px 0 #1d1d1b, 0 2px 3px rgba(0, 0, 0, 0.22);
+
+    --accent-orange: #ff4f00;
+    --key-orange-bg: linear-gradient(180deg, #ff5e14 0%, #e34500 100%);
+    --key-orange-shadow: 0 3px 0 #962d00, 0 4px 9px rgba(227, 69, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    --key-orange-active: 0 1px 0 #962d00, 0 2px 4px rgba(227, 69, 0, 0.25);
+
+    /* Authentic SPIKE 3 Block Colors */
+    --blk-event: #ffbf00;
+    --blk-event-b: #d99f00;
+    --blk-ctrl: #ffab19;
+    --blk-ctrl-b: #d68908;
+    --blk-move: #e63b7a;
+    --blk-move-b: #bc245d;
+    --blk-my: #ff6680;
+    --blk-my-b: #d9435f;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-mat);
+    color: var(--ink-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .mono {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: linear-gradient(180deg, var(--chassis-top) 0%, var(--chassis-bot) 100%);
+  }
+
+  /* Minimal Top Bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--chassis-border);
+    background: linear-gradient(180deg, #eceae4 0%, #dfdcd4 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    flex-shrink: 0;
+  }
+
+  .brand-group { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .unit-badge {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+    padding: 3px 7px; border-radius: 4px;
+    background: #232622; color: #e8f5e9;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .led { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.8); display: inline-block; }
+  .led.orange { background: var(--accent-orange); box-shadow: 0 0 6px rgba(255,79,0,0.85); }
+  .brand-title { font-size: 14px; font-weight: 700; white-space: nowrap; }
+  .offline-tag {
+    font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;
+    background: #dcfce7; color: #166534; border: 1px solid #86efac;
+  }
+
+  .oled-pill {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 5px 14px; border-radius: 7px;
+    background: var(--screen-bg); border: 1px solid #303831;
+    box-shadow: inset 0 2px 7px rgba(0,0,0,0.78);
+    color: var(--screen-ink);
+  }
+  .oled-item { display: inline-flex; align-items: baseline; gap: 5px; }
+  .oled-k { font-size: 10px; color: var(--screen-muted); }
+  .oled-v { font-size: 15px; font-weight: 700; }
+  .oled-v.green { color: var(--screen-green); }
+  .oled-v.orange { color: #ff6e30; }
+  .oled-v.amber { color: var(--screen-amber); }
+
+  .toolbar-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+  .key-btn {
+    appearance: none; border: 1px solid rgba(0,0,0,0.14); border-radius: 6px;
+    padding: 6px 10px; font-size: 12px; font-weight: 600;
+    color: var(--ink-primary); background: var(--key-light-bg);
+    box-shadow: var(--key-light-shadow); cursor: pointer;
+    transition: transform 60ms ease, box-shadow 60ms ease;
+    display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+    white-space: nowrap;
+  }
+  .key-btn:active, .key-btn.pressed { transform: translateY(2px); box-shadow: var(--key-light-active); }
+  .key-btn.dark { color: #f3f2ee; background: var(--key-dark-bg); box-shadow: var(--key-dark-shadow); border-color: rgba(0,0,0,0.45); }
+  .key-btn.dark:active, .key-btn.dark.pressed { box-shadow: var(--key-dark-active); }
+  .key-btn.orange { color: #fff; background: var(--key-orange-bg); box-shadow: var(--key-orange-shadow); border-color: rgba(150,45,0,0.5); }
+  .key-btn.orange:active, .key-btn.orange.pressed { box-shadow: var(--key-orange-active); }
+  .key-btn.active-seg { background: #232622; color: #4ade80; box-shadow: inset 0 2px 4px rgba(0,0,0,0.6); transform: translateY(1px); }
+  .key-btn.sm { padding: 4px 8px; font-size: 11px; }
+
+  .select-hw {
+    width: 100%; font-size: 12px; font-weight: 600; padding: 6px 8px;
+    border-radius: 6px; border: 1px solid #a8a59c; background: #f4f2ec; color: var(--ink-primary);
+  }
+
+  /* Main Split Workspace */
+  .main-grid {
+    display: flex; flex: 1; min-height: 0; overflow: hidden;
+  }
+
+  /* Left Arena Canvas */
+  .viewport-pane {
+    flex: 1.15; min-width: 0; display: flex; flex-direction: column;
+    position: relative; background: #bfbcb4;
+  }
+
+  .canvas-wrap {
+    flex: 1; position: relative; min-height: 220px; overflow: hidden;
+  }
+
+  #arenaCanvas {
+    width: 100%; height: 100%; display: block;
+    touch-action: none; cursor: grab;
+  }
+  #arenaCanvas.dragging { cursor: grabbing; }
+
+  .cam-bar {
+    position: absolute; top: 10px; left: 10px; display: flex; gap: 5px; z-index: 10;
+  }
+
+  .status-pill {
+    position: absolute; bottom: 10px; left: 10px; right: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    pointer-events: none; z-index: 10;
+  }
+
+  .hud-toast {
+    pointer-events: auto;
+    background: rgba(22, 28, 23, 0.9); color: #e8f5e9;
+    border: 1px solid rgba(255,255,255,0.14); border-radius: 6px;
+    padding: 5px 10px; font-size: 11.5px;
+    display: inline-flex; align-items: center; gap: 7px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  }
+
+  /* Right Pure Offline SPIKE 3 Blocks Workspace */
+  .blocks-pane {
+    flex: 1; min-width: 390px; max-width: 56%;
+    border-left: 2px solid var(--chassis-border);
+    background-color: #f7f6f2;
+    background-image: radial-gradient(#d8d5cd 1.2px, transparent 1.2px);
+    background-size: 20px 20px;
+    position: relative;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 36px 14px 20px;
+  }
+
+  .spike-corner-hint {
+    position: sticky; top: 0; float: right; margin-top: -26px;
+    z-index: 15; pointer-events: none;
+    background: rgba(22, 28, 23, 0.84); color: #e8f5e9;
+    padding: 4px 9px; border-radius: 999px;
+    font-size: 10.5px; display: inline-flex; align-items: center; gap: 6px;
+  }
+
+  .spike-board {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    min-width: 520px;
+  }
+
+  .spike-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .spike-col.defs { width: 238px; flex-shrink: 0; }
+  .spike-col.runs { flex: 1; display: flex; flex-direction: column; gap: 18px; }
+
+  .runs-top-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  /* Authentic Scratch / SPIKE 3 Puzzle Blocks (Zero CDN!) */
+  .s-stack {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    border-radius: 10px;
+    transition: transform 80ms ease, filter 120ms ease;
+  }
+
+  .s-stack.runnable {
+    cursor: pointer;
+  }
+  .s-stack.runnable:active {
+    transform: scale(0.985);
+  }
+
+  @keyframes glowRun {
+    0%, 100% { filter: drop-shadow(0 0 4px #ff4f00) drop-shadow(0 0 8px #ffe600); }
+    50% { filter: drop-shadow(0 0 8px #ff4f00) drop-shadow(0 0 16px #ffe600); }
+  }
+  .s-stack.exec-caller {
+    animation: glowRun 0.8s infinite ease-in-out;
+  }
+  .s-blk.exec-active {
+    outline: 3px solid #ffe600;
+    box-shadow: 0 0 12px rgba(255, 79, 0, 0.9);
+    z-index: 5;
+  }
+
+  .s-blk {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    min-height: 34px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 6px;
+    border: 1.5px solid rgba(0, 0, 0, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    margin-top: -1.5px;
+    white-space: nowrap;
+  }
+
+  .s-blk.hat {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding-top: 9px;
+    margin-top: 0;
+  }
+
+  .s-blk.event { background: var(--blk-event); border-color: var(--blk-event-b); color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.18); }
+  .s-blk.ctrl  { background: var(--blk-ctrl);  border-color: var(--blk-ctrl-b); }
+  .s-blk.move  { background: var(--blk-move);  border-color: var(--blk-move-b); }
+  .s-blk.my    { background: var(--blk-my);    border-color: var(--blk-my-b); }
+
+  /* C-Clamp for Repeat Loop */
+  .s-loop {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: -1.5px;
+  }
+  .s-loop-body {
+    border-left: 12px solid var(--blk-ctrl);
+    padding: 2px 0 2px 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+  }
+  .s-loop-foot {
+    width: 118px;
+    height: 16px;
+    background: var(--blk-ctrl);
+    border: 1.5px solid var(--blk-ctrl-b);
+    border-radius: 0 6px 6px 6px;
+    margin-top: -1.5px;
+  }
+
+  /* Oval Number Inputs & Param Pills */
+  .s-oval {
+    width: 54px;
+    padding: 2px 4px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(0, 0, 0, 0.18);
+    background: #ffffff;
+    color: #161816;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    outline: none;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+  .s-oval::-webkit-outer-spin-button,
+  .s-oval::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .s-oval { -moz-appearance: textfield; appearance: textfield; }
+  .s-oval.sm { width: 48px; }
+  .s-oval.lg { width: 64px; }
+  .s-oval:focus {
+    border-color: #161816;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.75);
+  }
+
+  .s-param {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #e24765;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .s-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.14);
+    font-size: 11.5px;
+    font-weight: 700;
+  }
+
+  .s-icon {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(255,255,255,0.22);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px;
+  }
+
+  /* Slide-Over Secondary Menu Drawer */
+  .drawer-backdrop {
+    position: fixed; inset: 0; background: rgba(18, 22, 19, 0.35);
+    z-index: 80; opacity: 0; pointer-events: none; transition: opacity 180ms ease;
+  }
+  .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+
+  .side-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 360px; max-width: 92vw;
+    background: linear-gradient(180deg, #eae8e2 0%, #dad7cf 100%);
+    border-left: 2px solid #9d9a91; box-shadow: -16px 0 36px rgba(0,0,0,0.28);
+    z-index: 90; transform: translateX(100%);
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex; flex-direction: column;
+  }
+  .side-drawer.open { transform: translateX(0); }
+
+  .drawer-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; border-bottom: 1px solid var(--chassis-border); background: #e2dfd7; flex-shrink: 0;
+  }
+  .drawer-tabs {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
+    padding: 8px 12px; border-bottom: 1px solid var(--hairline); background: #dcd9d1; flex-shrink: 0;
+  }
+  .drawer-body {
+    flex: 1; overflow-y: auto; padding: 12px; display: none; flex-direction: column; gap: 10px;
+  }
+  .drawer-body.active { display: flex; }
+
+  .section-legend {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 10.5px; font-weight: 700; color: var(--ink-muted);
+    padding-bottom: 4px; border-bottom: 1px solid var(--hairline); flex-shrink: 0;
+  }
+
+  .cal-row {
+    flex-shrink: 0; display: flex; flex-direction: column; gap: 4px;
+    background: #f1efe9; border: 1px solid rgba(0,0,0,0.12); border-radius: 7px; padding: 8px 10px;
+  }
+  .cal-head { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; font-weight: 600; }
+  .cal-val { font-size: 11.5px; font-weight: 700; color: var(--accent-orange); }
+  input[type="range"] { width: 100%; accent-color: var(--accent-orange); }
+
+  .toggle-row {
+    flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; font-weight: 600; background: #f1efe9;
+    border: 1px solid rgba(0,0,0,0.12); border-radius: 7px; padding: 8px 10px;
+  }
+  .row-align-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 4px; }
+
+  .rim-grid { flex-shrink: 0; display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; }
+  .rim-dot {
+    font-size: 10px; font-weight: 700; text-align: center; padding: 4px 2px; border-radius: 5px;
+    background: #d9d6ce; color: #555954; border: 1px solid rgba(0,0,0,0.12);
+  }
+  .rim-dot.s50 { background: #1d8cf8; color: #fff; border-color: #1166bd; }
+  .rim-dot.s20 { background: #f59e0b; color: #fff; border-color: #c27803; }
+  .rim-dot.s10 { background: #ef231f; color: #fff; border-color: #b91c1c; }
+  .rim-dot.staged { background: #2d332e; color: #e8f5e9; }
+  .rim-dot.out { background: #3f2222; color: #fca5a5; text-decoration: line-through; }
+
+  .rc-pad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 240px; margin: 6px auto; }
+  .rc-key { height: 58px; font-size: 16px; font-weight: 700; }
+
+  /* Finish Modal */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(18,22,19,0.65);
+    display: none; align-items: center; justify-content: center; z-index: 110; padding: 16px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-card {
+    width: 100%; max-width: 420px;
+    background: linear-gradient(180deg, #eceae4 0%, #dcd9d1 100%);
+    border: 1px solid #9d9a91; border-radius: 10px; box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+    padding: 16px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .modal-oled {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 12px;
+    background: var(--screen-bg); border-radius: 7px; color: var(--screen-ink);
+  }
+
+  @media (max-width: 960px) {
+    .topbar { flex-wrap: wrap; }
+    .main-grid { flex-direction: column; }
+    .viewport-pane { flex: none; height: 47vh; }
+    .blocks-pane { flex: 1; min-width: 0; max-width: 100%; border-left: none; border-top: 2px solid var(--chassis-border); }
+    .oled-pill { gap: 10px; padding: 4px 10px; }
+    .oled-v { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- Minimal Top Bar -->
+  <header class="topbar">
+    <div class="brand-group">
+      <div class="unit-badge"><span class="led" id="sysLed"></span>P207</div>
+      <div class="brand-title">定位精英</div>
+      <span class="offline-tag">iPad 全離線</span>
+    </div>
+
+    <div class="oled-pill mono">
+      <span class="oled-item"><span class="oled-k">時間</span><span class="oled-v green" id="oledTime">02:00.0</span></span>
+      <span class="oled-item"><span class="oled-k">道具</span><span class="oled-v" id="oledPropScore">0</span></span>
+      <span class="oled-item"><span class="oled-k">總分</span><span class="oled-v orange" id="oledTotal">0</span></span>
+      <span class="oled-item"><span class="oled-k">冰壺</span><span class="oled-v amber" id="oledRimCount">0/9</span></span>
+    </div>
+
+    <div class="toolbar-actions">
+      <button class="key-btn sm dark" id="btnStopTop">■ 急停</button>
+      <button class="key-btn sm" id="btnFinishMatch">鎖分</button>
+      <button class="key-btn sm orange" id="btnResetFull">重設</button>
+      <button class="key-btn sm" id="btnOpenDrawer">⚙ 選單</button>
+    </div>
+  </header>
+
+  <!-- Main Workspace: Left 2.5D Arena + Right Zero-CDN SPIKE 3 Blocks -->
+  <div class="main-grid">
+    <section class="viewport-pane">
+      <div class="canvas-wrap" id="canvasWrap">
+        <canvas id="arenaCanvas"></canvas>
+
+        <div class="cam-bar">
+          <button class="key-btn sm active-seg" data-view="full">全場</button>
+          <button class="key-btn sm" data-view="start">啟動區放大</button>
+          <button class="key-btn sm" data-view="score">得分區放大</button>
+        </div>
+
+        <div class="status-pill">
+          <div class="hud-toast">
+            <span class="led" id="runLed"></span>
+            <span id="toastText">拖動 P207 對準 50 分格，拖動冰壺上黑線，直接點右邊積木就跑！</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: 100% Offline SPIKE 3 Click-to-Run Blocks -->
+    <section class="blocks-pane">
+      <div class="spike-corner-hint">
+        <span class="led" style="width:6px;height:6px;"></span>
+        <span>像 SPIKE 3：直接點積木即運行</span>
+      </div>
+
+      <div class="spike-board">
+        <!-- Left Column: Definitions (1:1 Screenshot) -->
+        <div class="spike-col defs">
+          <!-- 定義 前後 -->
+          <div class="s-stack" id="def_fn1">
+            <div class="s-blk hat my">定義 前後 <span class="s-param">前</span> 圈 <span class="s-param">後</span> 圈</div>
+            <div class="s-blk move" id="blk_fn1_spd"><span class="s-icon">⚙</span> 將運動速度設置為 <input type="number" class="s-oval sm" id="def1Spd" value="52" min="5" max="100" /> %</div>
+            <div class="s-blk move" id="blk_fn1_m1"><span class="s-icon">↑</span> 移動 <span class="s-param">前</span> 圈</div>
+            <div class="s-blk move" id="blk_fn1_m2"><span class="s-icon">↓</span> 移動 <span class="s-param">後</span> 圈</div>
+          </div>
+
+          <!-- 定義 前後2 -->
+          <div class="s-stack" id="def_fn2">
+            <div class="s-blk hat my">定義 前後2 <span class="s-param">前2</span> 圈 <span class="s-param">後2</span> 圈</div>
+            <div class="s-blk move" id="blk_fn2_spd1"><span class="s-icon">⚙</span> 將運動速度設置為 <input type="number" class="s-oval sm" id="def2Spd1" value="80" min="5" max="100" /> %</div>
+            <div class="s-blk move" id="blk_fn2_m1"><span class="s-icon">↑</span> 移動 <span class="s-param">前2</span> 圈</div>
+            <div class="s-blk move" id="blk_fn2_spd2"><span class="s-icon">⚙</span> 將運動速度設置為 <input type="number" class="s-oval sm" id="def2Spd2" value="30" min="5" max="100" /> %</div>
+            <div class="s-blk move" id="blk_fn2_m2"><span class="s-icon">↑</span> 移動 <input type="number" class="s-oval sm" id="def2SlowSec" value="0.5" step="0.05" min="0" max="5" /> 秒</div>
+            <div class="s-blk move" id="blk_fn2_spd3"><span class="s-icon">⚙</span> 將運動速度設置為 <input type="number" class="s-oval sm" id="def2Spd3" value="95" min="5" max="100" /> %</div>
+            <div class="s-blk move" id="blk_fn2_m3"><span class="s-icon">↓</span> 移動 <span class="s-param">後2</span> 圈</div>
+          </div>
+
+          <!-- 定義 前後3 -->
+          <div class="s-stack" id="def_fn3">
+            <div class="s-blk hat my">定義 前後3 <span class="s-param">前3</span> 圈 <span class="s-param">後3</span> 圈</div>
+            <div class="s-blk move" id="blk_fn3_spd1"><span class="s-icon">⚙</span> 將運動速度設置為 <input type="number" class="s-oval sm" id="def3Spd1" value="100" min="5" max="100" /> %</div>
+            <div class="s-blk move" id="blk_fn3_m1"><span class="s-icon">↑</span> 移動 <span class="s-param">前3</span> 圈</div>
+            <div class="s-blk move" id="blk_fn3_spd2"><span class="s-icon">⚙</span> 將運動速度設置為 <input type="number" class="s-oval sm" id="def3Spd2" value="100" min="5" max="100" /> %</div>
+            <div class="s-blk move" id="blk_fn3_m2"><span class="s-icon">↓</span> 移動 <span class="s-param">後3</span> 圈</div>
+          </div>
+        </div>
+
+        <!-- Right Column: Click-to-Run Stacks (1:1 Screenshot) -->
+        <div class="spike-col runs">
+          <div class="runs-top-row">
+            <!-- 當接收到 1-5 -->
+            <div class="s-stack runnable" id="stack_15" data-run="stack_15">
+              <div class="s-blk hat event">當接收到 <span class="s-badge-pill">1-5 ▾</span></div>
+              <div class="s-loop">
+                <div class="s-blk ctrl">重複執行 <input type="number" class="s-oval sm" id="rep15" value="5" min="1" max="12" /> 次</div>
+                <div class="s-loop-body">
+                  <div class="s-blk my">前後 <input type="number" class="s-oval" id="c15Fwd" value="0.67" step="0.01" /> 圈 <input type="number" class="s-oval" id="c15Back" value="0.58" step="0.01" /> 圈</div>
+                  <div class="s-blk ctrl" id="blk_wait15">等待 <input type="number" class="s-oval sm" id="w15Sec" value="0.1" step="0.05" min="0" /> 秒</div>
+                </div>
+                <div class="s-loop-foot"></div>
+              </div>
+            </div>
+
+            <!-- 當接收到 6-9 -->
+            <div class="s-stack runnable" id="stack_69" data-run="stack_69">
+              <div class="s-blk hat event">當接收到 <span class="s-badge-pill">6-9 ▾</span></div>
+              <div class="s-loop">
+                <div class="s-blk ctrl">重複執行 <input type="number" class="s-oval sm" id="rep69" value="4" min="1" max="12" /> 次</div>
+                <div class="s-loop-body">
+                  <div class="s-blk my">前後 <input type="number" class="s-oval" id="c69Fwd" value="0.67" step="0.01" /> 圈 <input type="number" class="s-oval" id="c69Back" value="0.58" step="0.01" /> 圈</div>
+                  <div class="s-blk ctrl" id="blk_wait69">等待 <input type="number" class="s-oval sm" id="w69Sec" value="0.1" step="0.05" min="0" /> 秒</div>
+                </div>
+                <div class="s-loop-foot"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 前後2 3.205 圈 3.2 圈 -->
+          <div class="s-stack runnable" id="stack_fn2" data-run="stack_fn2">
+            <div class="s-blk my">前後2 <input type="number" class="s-oval lg" id="c2Fwd" value="3.205" step="0.01" /> 圈 <input type="number" class="s-oval" id="c2Back" value="3.2" step="0.05" /> 圈</div>
+          </div>
+
+          <!-- 前後3 2.7 圈 2.45 圈 -->
+          <div class="s-stack runnable" id="stack_fn3a" data-run="stack_fn3a">
+            <div class="s-blk my">前後3 <input type="number" class="s-oval" id="c3aFwd" value="2.7" step="0.05" /> 圈 <input type="number" class="s-oval" id="c3aBack" value="2.45" step="0.05" /> 圈</div>
+          </div>
+
+          <!-- 前後3 2.5 圈 2.5 圈 -->
+          <div class="s-stack runnable" id="stack_fn3b" data-run="stack_fn3b">
+            <div class="s-blk my">前後3 <input type="number" class="s-oval" id="c3bFwd" value="2.5" step="0.05" /> 圈 <input type="number" class="s-oval" id="c3bBack" value="2.5" step="0.05" /> 圈</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Slide-Over Secondary Menu Drawer -->
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="side-drawer" id="sideDrawer">
+  <div class="drawer-header">
+    <strong style="font-size:14px;">⚙ 副選單（場地 / 遙控 / 校準）</strong>
+    <button class="key-btn sm" id="btnCloseDrawer">✕ 關閉</button>
+  </div>
+  <div class="drawer-tabs">
+    <button class="key-btn sm active-seg" data-dtab="arena">場地與示範</button>
+    <button class="key-btn sm" data-dtab="rc">手動遙控</button>
+    <button class="key-btn sm" data-dtab="cal">實車校準</button>
+  </div>
+
+  <div class="drawer-body active" id="dtab-arena">
+    <div class="section-legend">
+      <span>9 顆冰壺落點明細</span>
+      <span id="leaveStartBadge" style="color:#15803d;">離區判定：待出線</span>
+    </div>
+    <div class="rim-grid mono" id="rimGrid"></div>
+
+    <div class="cal-row">
+      <div class="cal-head"><span>賽場地圖配置</span></div>
+      <select id="mapSelect" class="select-hw">
+        <option value="uploaded">上傳實戰圖 (左上50最近)</option>
+        <option value="yuque">語雀官方參考圖</option>
+        <option value="random">裁判隨機洗牌 (4/8/12)</option>
+      </select>
+      <div style="display:flex;gap:6px;margin-top:4px;">
+        <button class="key-btn sm" id="btnShuffleMap" style="flex:1;">隨機洗牌</button>
+        <button class="key-btn sm" id="btnSpeedToggle">1x 速度</button>
+        <button class="key-btn sm" id="btnSoundToggle">音效：開</button>
+      </div>
+    </div>
+
+    <div class="section-legend"><span>示範與裁判快捷工具</span></div>
+    <button class="key-btn orange" id="btnRunSequence">▶ 一鍵示範跑完 9 顆 (1-5 → 前後2 → 6-9 → 前後2)</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+      <button class="key-btn sm" id="btnDropOne">+ 快捷放 1 顆上黑線</button>
+      <button class="key-btn sm" id="btnRetrieveOut">拿回出界/失誤冰壺</button>
+      <button class="key-btn sm" id="btnResetRobotOnly">機械人回靠山</button>
+      <button class="key-btn sm" id="btnResetBlocks">還原預設積木數字</button>
+    </div>
+  </div>
+
+  <div class="drawer-body" id="dtab-rc">
+    <div class="section-legend">
+      <span>手動遙控 RC</span>
+      <span id="gamepadStatus" style="color:#5a5d56;">手柄：未偵測</span>
+    </div>
+    <div class="cal-row">
+      <div class="cal-head"><span>手動油門速度上限</span><span class="cal-val mono" id="rcSpeedVal">80%</span></div>
+      <input type="range" id="rcSpeedSlider" min="20" max="100" step="5" value="80" />
+    </div>
+    <div class="rc-pad-grid">
+      <div></div><button class="key-btn rc-key" id="rcFwd">▲</button><div></div>
+      <button class="key-btn rc-key" id="rcLeft">◀</button>
+      <button class="key-btn rc-key orange" id="rcDrop" style="font-size:11px;">放1顆</button>
+      <button class="key-btn rc-key" id="rcRight">▶</button>
+      <div></div><button class="key-btn rc-key" id="rcBack">▼</button><div></div>
+    </div>
+    <div class="cal-row" style="font-size:11.5px;line-height:1.5;color:#3f423d;">
+      <div><strong>鍵盤</strong>：WASD / 方向鍵移動、Space 放 1 顆冰壺、R 回靠山。</div>
+      <div><strong>iPad</strong>：直接按上方方向鍵或連藍牙手柄操控。</div>
+    </div>
+  </div>
+
+  <div class="drawer-body" id="dtab-cal">
+    <div class="section-legend">
+      <span>定位靠山 &amp; 實車校準</span>
+      <button class="key-btn sm" id="btnResetCal">恢復預設</button>
+    </div>
+    <div class="cal-row">
+      <div class="cal-head"><span>啟動區列數快選 (Z)</span><span class="cal-val mono" id="calZVal">6.5 cm (第 1 列)</span></div>
+      <input type="range" id="calZSlider" min="6.5" max="41.5" step="0.5" value="6.5" />
+      <div class="row-align-btns">
+        <button class="key-btn sm" data-rowz="6.5">第 1 列</button>
+        <button class="key-btn sm" data-rowz="18.0">第 2 列</button>
+        <button class="key-btn sm" data-rowz="30.0">第 3 列</button>
+        <button class="key-btn sm" data-rowz="41.5">第 4 列</button>
+      </div>
+    </div>
+    <div class="cal-row">
+      <div class="cal-head"><span>每 1 圈行走距離 (cm/圈)</span><span class="cal-val mono" id="calCmPerRotVal">50.8 cm/圈</span></div>
+      <input type="range" id="calCmPerRot" min="15" max="65" step="0.4" value="50.8" />
+    </div>
+    <div class="cal-row">
+      <div class="cal-head"><span>100% 滿速馬達轉速 (圈/秒)</span><span class="cal-val mono" id="calMaxRpsVal">1.65 圈/秒</span></div>
+      <input type="range" id="calMaxRps" min="0.8" max="2.6" step="0.05" value="1.65" />
+    </div>
+    <div class="cal-row">
+      <div class="cal-head"><span>P207 偏左漂移補償</span><span class="cal-val mono" id="calDriftVal">0.0 °/s</span></div>
+      <input type="range" id="calDrift" min="-4.0" max="4.0" step="0.2" value="0" />
+    </div>
+    <div class="cal-row">
+      <div class="cal-head"><span>雪弗板表面摩擦係數</span><span class="cal-val mono" id="calFricVal">0.34</span></div>
+      <input type="range" id="calFric" min="0.15" max="0.65" step="0.02" value="0.34" />
+    </div>
+    <label class="toggle-row"><span>顯示啟動區「物理定位靠山」</span><input type="checkbox" id="chkJig" checked /></label>
+    <label class="toggle-row"><span>顯示車頭「瞄準 50 分格」輔助虛線</span><input type="checkbox" id="chkAimLine" checked /></label>
+    <label class="toggle-row"><span>跑 [1-5]/[6-9] 時自動把托盤冰壺補到黑線</span><input type="checkbox" id="chkAutoDrop" checked /></label>
+  </div>
+</aside>
+
+<!-- Match Finished Modal -->
+<div class="modal-backdrop" id="finishModal">
+  <div class="modal-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <strong style="font-size:16px;">本輪挑戰成績單</strong>
+      <span class="unit-badge">LOCKED</span>
+    </div>
+    <div class="modal-oled mono">
+      <div><div class="oled-k">道具分</div><div class="oled-v" id="mPropScore">0</div></div>
+      <div><div class="oled-k">時間分</div><div class="oled-v amber" id="mTimeBonus">0</div></div>
+      <div><div class="oled-k">總分</div><div class="oled-v orange" id="mTotalScore">0</div></div>
+    </div>
+    <div id="mSummaryText" style="font-size:12.5px;line-height:1.55;color:#2f322d;"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button class="key-btn sm" id="btnCloseModal">繼續檢視</button>
+      <button class="key-btn sm orange" id="btnModalRestart">再來一輪</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // =========================================================================
+  // 1. FIELD & ROBOT CONSTANTS (100% Grounded, Zero External Dependencies)
+  // =========================================================================
+  const FIELD_L = 195.0;
+  const FIELD_W = 48.0;
+  const START_LINE_X = 24.25;
+  const START_LINE_W = 0.5;
+  const GRID_X0 = 139.7;
+  const GRID_COLS = 6;
+  const GRID_ROWS = 4;
+  const CELL_W = (FIELD_L - GRID_X0) / GRID_COLS;
+  const CELL_H = FIELD_W / GRID_ROWS;
+
+  const RIM_RADIUS = 1.52;
+  const MAX_RIMS = 9;
+  const MATCH_SECONDS = 120.0;
+
+  const ROBOT_HALF_LEN = 6.2;
+  const ROBOT_HALF_W = 6.3;
+  const FORK_LEN = 9.0;
+  const FORK_INNER_HALF_W = 5.0;
+  const FORK_THICK = 0.8;
+  const START_BACKSTOP_X = 2.0;
+  const ROBOT_START_X = START_BACKSTOP_X + ROBOT_HALF_LEN; // 8.2 cm
+
+  const TRAY_Z = FIELD_W + 7.4;
+  const TRAY_X0 = 5.0;
+  const TRAY_STEP = 4.6;
+
+  const MAP_PRESETS = {
+    uploaded: [
+      [50, 10, 20, 10, 10, 20],
+      [10, 10, 10, 10, 20, 50],
+      [10, 20, 10, 50, 50, 10],
+      [20, 20, 20, 20, 10, 10]
+    ],
+    yuque: [
+      [10, 20, 20, 10, 50, 50],
+      [10, 10, 10, 10, 10, 10],
+      [20, 10, 10, 10, 20, 20],
+      [10, 20, 20, 50, 20, 50]
+    ]
+  };
+
+  // =========================================================================
+  // 2. WEB AUDIO SYNTH (Zero Files)
+  // =========================================================================
+  let audioCtx = null;
+  let soundEnabled = true;
+
+  function ensureAudio() {
+    if (!soundEnabled) return null;
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) audioCtx = new AC();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+    return audioCtx;
+  }
+
+  function playClick(freq = 540, dur = 0.035, gainVal = 0.05) {
+    const ctx = ensureAudio();
+    if (!ctx) return;
+    try {
+      const osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      g.gain.setValueAtTime(gainVal, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0008, ctx.currentTime + dur);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + dur);
+    } catch (e) {}
+  }
+
+  function playChime(notes = [523, 659, 784]) {
+    const ctx = ensureAudio();
+    if (!ctx) return;
+    notes.forEach((f, idx) => setTimeout(() => playClick(f, 0.11, 0.055), idx * 75));
+  }
+
+  // =========================================================================
+  // 3. STATE & PERSISTENCE
+  // =========================================================================
+  const STORAGE_KEY = 'roborave_locate_master_offline_ipad_v3';
+  const BLOCK_INPUT_IDS = ['def1Spd','def2Spd1','def2Spd2','def2SlowSec','def2Spd3','def3Spd1','def3Spd2','rep15','c15Fwd','c15Back','w15Sec','rep69','c69Fwd','c69Back','w69Sec','c2Fwd','c2Back','c3aFwd','c3aBack','c3bFwd','c3bBack'];
+  const BLOCK_DEFAULTS = {
+    def1Spd:52, def2Spd1:80, def2Spd2:30, def2SlowSec:0.5, def2Spd3:95, def3Spd1:100, def3Spd2:100,
+    rep15:5, c15Fwd:0.67, c15Back:0.58, w15Sec:0.1,
+    rep69:4, c69Fwd:0.67, c69Back:0.58, w69Sec:0.1,
+    c2Fwd:3.205, c2Back:3.2, c3aFwd:2.7, c3aBack:2.45, c3bFwd:2.5, c3bBack:2.5
+  };
+
+  const state = {
+    mapMode: 'uploaded',
+    grid: JSON.parse(JSON.stringify(MAP_PRESETS.uploaded)),
+    viewMode: 'full', // 'full' | 'start' | 'score'
+    simSpeed: 1,
+    matchStarted: false,
+    matchFinished: false,
+    timeLeft: MATCH_SECONDS,
+    lockedTimeBonus: 0,
+
+    startX: ROBOT_START_X,
+    startZ: 6.5,
+    startYaw: 0,
+    cmPerRot: 50.8,
+    maxRps: 1.65,
+    driftDegS: 0.0,
+    friction: 0.34,
+    showJig: true,
+    showAimLine: true,
+    autoDropOnLoop: true,
+
+    robot: { x: ROBOT_START_X, z: 6.5, yaw: 0, vx: 0, vz: 0, omega: 0, wheelRot: 0, leftStartAreaOnce: false },
+    rims: [],
+
+    running: false,
+    runningStackId: null,
+    runToken: 0,
+
+    rcSpeedPct: 80,
+    keys: { fwd: false, back: false, left: false, right: false },
+    touch: { fwd: false, back: false, left: false, right: false }
+  };
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function loadSettings() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const s = JSON.parse(raw);
+      BLOCK_INPUT_IDS.forEach(id => { if (s[id] !== undefined && document.getElementById(id)) document.getElementById(id).value = s[id]; });
+      if (typeof s.startZ === 'number') state.startZ = s.startZ;
+      if (typeof s.cmPerRot === 'number') state.cmPerRot = s.cmPerRot;
+      if (typeof s.maxRps === 'number') state.maxRps = s.maxRps;
+      if (typeof s.driftDegS === 'number') state.driftDegS = s.driftDegS;
+      if (typeof s.friction === 'number') state.friction = s.friction;
+      if (typeof s.showJig === 'boolean') state.showJig = s.showJig;
+      if (typeof s.showAimLine === 'boolean') state.showAimLine = s.showAimLine;
+      if (typeof s.autoDropOnLoop === 'boolean') state.autoDropOnLoop = s.autoDropOnLoop;
+    } catch (e) {}
+  }
+
+  function saveSettings() {
+    try {
+      const out = {
+        startZ: state.startZ, cmPerRot: state.cmPerRot, maxRps: state.maxRps,
+        driftDegS: state.driftDegS, friction: state.friction,
+        showJig: state.showJig, showAimLine: state.showAimLine, autoDropOnLoop: state.autoDropOnLoop
+      };
+      BLOCK_INPUT_IDS.forEach(id => { const el = document.getElementById(id); if (el) out[id] = el.value; });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
+    } catch (e) {}
+  }
+
+  function initAllNineRims() {
+    state.rims = [];
+    for (let i = 0; i < MAX_RIMS; i++) {
+      const tx = TRAY_X0 + i * TRAY_STEP;
+      const tz = TRAY_Z;
+      state.rims.push({
+        id: i + 1, status: 'tray',
+        trayX: tx, trayZ: tz, x: tx, z: tz,
+        vx: 0, vz: 0, score: 0, straddling: false
+      });
+    }
+  }
+  initAllNineRims();
+
+  // =========================================================================
+  // 4. HIGH-DPI 2.5D ARENA RENDERER (Pure HTML5 Canvas, 60fps on iPad!)
+  // =========================================================================
+  const canvas = document.getElementById('arenaCanvas');
+  const canvasWrap = document.getElementById('canvasWrap');
+  const ctx = canvas.getContext('2d');
+
+  // Dynamic viewport transform (cm -> canvas px)
+  const viewTf = { scale: 4, ox: 20, oy: 40, targetScale: 4, targetOx: 20, targetOy: 40 };
+
+  function computeTargetView() {
+    const cw = canvasWrap.clientWidth || 640;
+    const ch = canvasWrap.clientHeight || 400;
+    let minX = -6, maxX = FIELD_L + 6, minZ = -6, maxZ = TRAY_Z + 9;
+    if (state.viewMode === 'start') {
+      minX = -4; maxX = 62; minZ = -3; maxZ = TRAY_Z + 8;
+    } else if (state.viewMode === 'score') {
+      minX = 115; maxX = FIELD_L + 5; minZ = -4; maxZ = FIELD_W + 6;
+    }
+    const spanX = maxX - minX;
+    const spanZ = maxZ - minZ;
+    const sc = Math.min((cw - 24) / spanX, (ch - 64) / spanZ);
+    viewTf.targetScale = sc;
+    viewTf.targetOx = (cw - spanX * sc) / 2 - minX * sc;
+    viewTf.targetOy = (ch - spanZ * sc) / 2 - minZ * sc + 8;
+  }
+
+  function resizeCanvas() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const cw = canvasWrap.clientWidth || 640;
+    const ch = canvasWrap.clientHeight || 400;
+    canvas.width = Math.round(cw * dpr);
+    canvas.height = Math.round(ch * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    computeTargetView();
+    viewTf.scale = viewTf.targetScale;
+    viewTf.ox = viewTf.targetOx;
+    viewTf.oy = viewTf.targetOy;
+  }
+
+  function cmToPx(x, z) { return [viewTf.ox + x * viewTf.scale, viewTf.oy + z * viewTf.scale]; }
+  function pxToCm(px, py) { return [(px - viewTf.ox) / viewTf.scale, (py - viewTf.oy) / viewTf.scale]; }
+
+  function renderArena() {
+    const cw = canvasWrap.clientWidth || 640;
+    const ch = canvasWrap.clientHeight || 400;
+    viewTf.scale += (viewTf.targetScale - viewTf.scale) * 0.16;
+    viewTf.ox += (viewTf.targetOx - viewTf.ox) * 0.16;
+    viewTf.oy += (viewTf.targetOy - viewTf.oy) * 0.16;
+
+    const S = viewTf.scale;
+    ctx.clearRect(0, 0, cw, ch);
+
+    // Studio mat background
+    ctx.fillStyle = '#c2bfb7';
+    ctx.fillRect(0, 0, cw, ch);
+
+    ctx.save();
+    ctx.translate(viewTf.ox, viewTf.oy);
+
+    // 1) 3D Extruded PVC Board Drop Shadow & Side Thickness
+    ctx.fillStyle = 'rgba(0,0,0,0.22)';
+    ctx.fillRect(2 * S, 2.2 * S, FIELD_L * S, FIELD_W * S);
+    ctx.fillStyle = '#d4d1c8';
+    ctx.fillRect(0, 1.1 * S, FIELD_L * S, FIELD_W * S);
+
+    // 2) Main White Snow-Foam Board
+    ctx.fillStyle = '#f8f9f7';
+    ctx.fillRect(0, 0, FIELD_L * S, FIELD_W * S);
+
+    // Subtle 10 cm Ruler Ticks
+    ctx.strokeStyle = 'rgba(0,0,0,0.14)';
+    ctx.fillStyle = 'rgba(0,0,0,0.42)';
+    ctx.lineWidth = 1;
+    ctx.font = `600 ${Math.max(8, 1.5 * S)}px ui-monospace, Menlo, monospace`;
+    ctx.textAlign = 'center';
+    for (let xCm = 30; xCm < GRID_X0; xCm += 10) {
+      ctx.beginPath();
+      ctx.moveTo(xCm * S, 0); ctx.lineTo(xCm * S, 1.1 * S);
+      ctx.moveTo(xCm * S, FIELD_W * S); ctx.lineTo(xCm * S, (FIELD_W - 1.1) * S);
+      ctx.stroke();
+      if (xCm % 20 === 0 && S > 2.2) ctx.fillText(xCm + 'cm', xCm * S, (FIELD_W - 1.5) * S);
+    }
+
+    // Lane dashed guides
+    ctx.save();
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+    for (let r = 1; r < GRID_ROWS; r++) {
+      ctx.beginPath();
+      ctx.moveTo(START_LINE_X * S, r * CELL_H * S);
+      ctx.lineTo(GRID_X0 * S, r * CELL_H * S);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Starting Area labels
+    ctx.fillStyle = '#1f211e';
+    ctx.font = `700 ${Math.max(10, 2.6 * S)}px -apple-system, PingFang TC, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('啟動區', 12 * S, 13 * S);
+    ctx.fillStyle = '#5a5d56';
+    ctx.font = `600 ${Math.max(8, 1.6 * S)}px -apple-system, sans-serif`;
+    ctx.fillText('Starting Area', 12 * S, 37 * S);
+
+    // Center RoboRAVE Emblem
+    const ecx = 81 * S, ecy = 24 * S, erad = 14.0 * S;
+    ctx.beginPath(); ctx.arc(ecx, ecy, erad, 0, Math.PI * 2);
+    ctx.fillStyle = '#f97316'; ctx.fill(); ctx.lineWidth = Math.max(1, 0.35 * S); ctx.strokeStyle = '#1f211e'; ctx.stroke();
+    ctx.beginPath(); ctx.arc(ecx, ecy, erad * 0.86, 0, Math.PI * 2);
+    ctx.fillStyle = '#38bdf8'; ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(ecx, ecy, erad * 0.72, 0, Math.PI * 2);
+    ctx.fillStyle = '#eab308'; ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(ecx, ecy + erad * 0.16, erad * 0.4, 0, Math.PI * 2);
+    ctx.fillStyle = '#b91c1c'; ctx.fill();
+    ctx.beginPath(); ctx.arc(ecx, ecy + erad * 0.22, erad * 0.22, 0, Math.PI * 2);
+    ctx.fillStyle = '#f8fafc'; ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#111827';
+    ctx.fillRect(ecx - erad * 0.9, ecy - erad * 0.16, erad * 1.8, erad * 0.3);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `700 ${Math.max(7, 2.1 * S)}px -apple-system, sans-serif`;
+    ctx.textBaseline = 'middle';
+    ctx.fillText('LOCATE MASTER', ecx, ecy - erad * 0.01);
+
+    // Black Starting Line
+    ctx.fillStyle = '#141514';
+    ctx.fillRect((START_LINE_X - START_LINE_W / 2) * S, 0, Math.max(2, START_LINE_W * S), FIELD_W * S);
+
+    // 4x6 Scoring Grid
+    const colorMap = { 50: '#1d8cf8', 20: '#f59e0b', 10: '#ef231f' };
+    for (let r = 0; r < GRID_ROWS; r++) {
+      for (let c = 0; c < GRID_COLS; c++) {
+        const val = state.grid[r][c];
+        const x0 = (GRID_X0 + c * CELL_W) * S;
+        const y0 = r * CELL_H * S;
+        const cwCell = CELL_W * S, chCell = CELL_H * S;
+        ctx.fillStyle = colorMap[val] || '#ef231f';
+        ctx.fillRect(x0, y0, cwCell, chCell);
+        ctx.strokeStyle = '#161816';
+        ctx.lineWidth = Math.max(1.2, 0.28 * S);
+        ctx.strokeRect(x0, y0, cwCell, chCell);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `700 ${Math.max(10, 3.8 * S)}px -apple-system, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(val), x0 + cwCell / 2, y0 + chCell / 2 + 1);
+      }
+    }
+
+    // Outer Board Frame
+    ctx.strokeStyle = '#232622';
+    ctx.lineWidth = Math.max(1.5, 0.35 * S);
+    ctx.strokeRect(0, 0, FIELD_L * S, FIELD_W * S);
+
+    // 3) 9-Rim Draggable Staging Tray (Below Starting Area)
+    const trayW = (MAX_RIMS * TRAY_STEP + 3) * S;
+    const trayH = 8.4 * S;
+    const trayX = (TRAY_X0 - 3.6) * S;
+    const trayY = (TRAY_Z - 3.0) * S;
+    ctx.fillStyle = '#232824';
+    ctx.fillRect(trayX, trayY, trayW, trayH);
+    ctx.strokeStyle = '#4ade80';
+    ctx.lineWidth = Math.max(1.5, 0.3 * S);
+    ctx.strokeRect(trayX, trayY, trayW, trayH);
+    ctx.fillStyle = '#e8f5e9';
+    ctx.font = `700 ${Math.max(9, 1.7 * S)}px -apple-system, PingFang TC, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('▲ 拖動冰壺放到黑線上 ▲', trayX + trayW / 2, trayY + trayH - 1.6 * S);
+
+    // 4) Physical Positioning Jig
+    if (state.showJig) {
+      ctx.fillStyle = '#3b3f3c';
+      ctx.fillRect((START_BACKSTOP_X - 1.2) * S, (state.startZ - 7.5) * S, 1.2 * S, 15 * S);
+      ctx.fillStyle = '#facc15';
+      ctx.fillRect(START_BACKSTOP_X * S, (state.startZ - ROBOT_HALF_W - 1.0) * S, 11 * S, 0.9 * S);
+      ctx.fillRect(START_BACKSTOP_X * S, (state.startZ + ROBOT_HALF_W + 0.1) * S, 11 * S, 0.9 * S);
+    }
+
+    // 5) Magnetic Snap Ring on Black Start Line
+    if (dragState.active && dragState.type === 'rim' && dragState.snapActive) {
+      ctx.beginPath();
+      ctx.arc(START_LINE_X * S, dragState.snapZ * S, 2.5 * S, 0, Math.PI * 2);
+      ctx.strokeStyle = '#ff4f00';
+      ctx.lineWidth = Math.max(2, 0.5 * S);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(255, 79, 0, 0.16)';
+      ctx.fill();
+    }
+
+    // 6) Aiming Dashed Laser Line
+    if (state.showAimLine) {
+      ctx.save();
+      ctx.translate(state.robot.x * S, state.robot.z * S);
+      ctx.rotate(state.robot.yaw);
+      ctx.setLineDash([6, 4]);
+      ctx.strokeStyle = 'rgba(255, 79, 0, 0.72)';
+      ctx.lineWidth = Math.max(1.5, 0.32 * S);
+      ctx.beginPath();
+      ctx.moveTo((ROBOT_HALF_LEN + FORK_LEN) * S, 0);
+      ctx.lineTo(180 * S, 0);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // 7) Draw All 9 LEGO 56145 Wheel Rims (2.5D Shaded)
+    for (const rim of state.rims) {
+      if (rim.status === 'out') continue;
+      const rx = rim.x * S;
+      const ry = rim.z * S;
+      const rad = RIM_RADIUS * S;
+      const isDragged = dragState.active && dragState.type === 'rim' && dragState.rim === rim;
+
+      // Score straddle highlight ring
+      if (rim.status === 'field' && rim.score === 50) {
+        ctx.beginPath();
+        ctx.arc(rx, ry, rad * 1.42, 0, Math.PI * 2);
+        ctx.strokeStyle = rim.straddling ? '#facc15' : '#4ade80';
+        ctx.lineWidth = Math.max(2, 0.45 * S);
+        ctx.stroke();
+      }
+
+      // Drop shadow
+      ctx.beginPath();
+      ctx.arc(rx + (isDragged ? 2.5 : 0.7) * (S * 0.4), ry + (isDragged ? 3.5 : 1.0) * (S * 0.4), rad, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.28)';
+      ctx.fill();
+
+      // Cylindrical Rim Body
+      ctx.beginPath();
+      ctx.arc(rx, ry - (isDragged ? 0.8 * S : 0), rad, 0, Math.PI * 2);
+      ctx.fillStyle = '#e5e7eb';
+      ctx.fill();
+      ctx.lineWidth = Math.max(1, 0.25 * S);
+      ctx.strokeStyle = '#6b7280';
+      ctx.stroke();
+
+      // Hollow Wheel Core
+      ctx.beginPath();
+      ctx.arc(rx, ry - (isDragged ? 0.8 * S : 0), rad * 0.56, 0, Math.PI * 2);
+      ctx.fillStyle = '#374151';
+      ctx.fill();
+    }
+
+    // 8) Draw P207 Robot (Detailed 2.5D Top-Down)
+    ctx.save();
+    ctx.translate(state.robot.x * S, state.robot.z * S);
+    ctx.rotate(state.robot.yaw);
+
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.24)';
+    ctx.fillRect((-ROBOT_HALF_LEN + 0.6) * S, (-ROBOT_HALF_W + 0.8) * S, (ROBOT_HALF_LEN * 2) * S, (ROBOT_HALF_W * 2) * S);
+
+    // 4 Cyan 56mm Wheels
+    const wheelCoords = [
+      [3.2, -(ROBOT_HALF_W - 0.7)], [3.2, (ROBOT_HALF_W - 0.7)],
+      [-3.2, -(ROBOT_HALF_W - 0.7)], [-3.2, (ROBOT_HALF_W - 0.7)]
+    ];
+    wheelCoords.forEach(([wx, wz]) => {
+      ctx.fillStyle = '#38bdf8';
+      ctx.strokeStyle = '#0369a1';
+      ctx.lineWidth = Math.max(1, 0.2 * S);
+      ctx.fillRect((wx - 2.8) * S, (wz - 0.8) * S, 5.6 * S, 1.6 * S);
+      ctx.strokeRect((wx - 2.8) * S, (wz - 0.8) * S, 5.6 * S, 1.6 * S);
+      // Animated spin tick
+      const tickOff = (((state.robot.wheelRot % 2) + 2) % 2 - 1) * 2.1;
+      ctx.fillStyle = '#0c4a6e';
+      ctx.fillRect((wx + tickOff - 0.2) * S, (wz - 0.8) * S, 0.45 * S, 1.6 * S);
+    });
+
+    // Dark chassis & magenta SPIKE Essential motors
+    ctx.fillStyle = '#3b3d3a';
+    ctx.fillRect(-5.8 * S, -4.3 * S, 11.6 * S, 8.6 * S);
+    ctx.fillStyle = '#c02678';
+    ctx.fillRect(-0.5 * S, -3.9 * S, 4.0 * S, 2.8 * S);
+    ctx.fillRect(-0.5 * S, 1.1 * S, 4.0 * S, 2.8 * S);
+
+    // Front Bumper
+    ctx.fillStyle = '#2d302d';
+    ctx.fillRect((ROBOT_HALF_LEN - 1.1) * S, -6.1 * S, 1.2 * S, 12.2 * S);
+
+    // Two White 15M Front Pusher Forks
+    [-1, 1].forEach(side => {
+      const fz = side > 0 ? FORK_INNER_HALF_W : -(FORK_INNER_HALF_W + FORK_THICK);
+      ctx.fillStyle = '#f8f8f5';
+      ctx.strokeStyle = '#9ca3af';
+      ctx.lineWidth = Math.max(1, 0.2 * S);
+      ctx.fillRect(ROBOT_HALF_LEN * S, fz * S, FORK_LEN * S, FORK_THICK * S);
+      ctx.strokeRect(ROBOT_HALF_LEN * S, fz * S, FORK_LEN * S, FORK_THICK * S);
+    });
+
+    // White SPIKE Essential Hub ("P207 偏左")
+    ctx.fillStyle = '#f4f3ef';
+    ctx.strokeStyle = '#a8a59c';
+    ctx.lineWidth = Math.max(1, 0.25 * S);
+    ctx.fillRect(-5.6 * S, -3.8 * S, 6.8 * S, 7.6 * S);
+    ctx.strokeRect(-5.6 * S, -3.8 * S, 6.8 * S, 7.6 * S);
+
+    // Hub LED
+    ctx.fillStyle = state.running ? '#ff4f00' : '#4ade80';
+    ctx.fillRect(-2.6 * S, -0.5 * S, 1.0 * S, 1.0 * S);
+
+    // P207 Label
+    ctx.save();
+    ctx.translate(-3.4 * S, 0);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillStyle = '#1d4ed8';
+    ctx.font = `700 ${Math.max(7, 1.65 * S)}px -apple-system, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('P207', 0, 0);
+    ctx.restore();
+
+    // Draggable Orange Aiming Arrow Handle (when not running)
+    if (state.showAimLine && !state.running) {
+      const hx = (ROBOT_HALF_LEN + FORK_LEN + 2.8) * S;
+      ctx.beginPath();
+      ctx.moveTo(hx + 2.2 * S, 0);
+      ctx.lineTo(hx - 1.4 * S, -1.7 * S);
+      ctx.lineTo(hx - 1.4 * S, 1.7 * S);
+      ctx.closePath();
+      ctx.fillStyle = '#ff4f00';
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = Math.max(1, 0.22 * S);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+    ctx.restore();
+  }
+
+  // =========================================================================
+  // 5. SCORING & PHYSICS (Identical 120Hz Sub-Step Curling Physics)
+  // =========================================================================
+  function evaluateRimScore(rim) {
+    if (rim.status !== 'field' || rim.x + RIM_RADIUS < GRID_X0) {
+      rim.score = 0; rim.straddling = false; return 0;
+    }
+    const samples = [[0, 0]];
+    for (let a = 0; a < 8; a++) {
+      const ang = (a / 8) * Math.PI * 2;
+      samples.push([Math.cos(ang) * RIM_RADIUS, Math.sin(ang) * RIM_RADIUS]);
+    }
+    const touched = new Set();
+    let best = 0;
+    for (const [dx, dz] of samples) {
+      const sx = rim.x + dx, sz = rim.z + dz;
+      if (sx >= GRID_X0 && sx <= FIELD_L && sz >= 0 && sz <= FIELD_W) {
+        const col = Math.min(GRID_COLS - 1, Math.max(0, Math.floor((sx - GRID_X0) / CELL_W)));
+        const row = Math.min(GRID_ROWS - 1, Math.max(0, Math.floor(sz / CELL_H)));
+        touched.add(row + ',' + col);
+        if (state.grid[row][col] > best) best = state.grid[row][col];
+      }
+    }
+    rim.score = best;
+    rim.straddling = touched.size > 1 && best > 0;
+    return best;
+  }
+
+  function computeTotals() {
+    let propScore = 0, onFieldCount = 0;
+    for (const rim of state.rims) {
+      if (rim.status !== 'tray') onFieldCount++;
+      propScore += evaluateRimScore(rim);
+    }
+    const timeBonus = state.matchFinished ? state.lockedTimeBonus : Math.floor(Math.max(0, state.timeLeft));
+    return { propScore, timeBonus, total: propScore + (state.matchStarted ? timeBonus : 0), onFieldCount };
+  }
+
+  const G_CM = 980.0;
+  function getMaxSpeedCmS() { return state.maxRps * state.cmPerRot; }
+
+  function stepPhysics(dt) {
+    if (state.matchStarted && !state.matchFinished) {
+      state.timeLeft = Math.max(0, state.timeLeft - dt);
+      if (state.timeLeft <= 0) finishMatch(true);
+    }
+
+    const r = state.robot;
+    const maxSpd = getMaxSpeedCmS();
+
+    if (!state.running && !state.matchFinished && !dragState.active) {
+      let fwdIn = (state.keys.fwd || state.touch.fwd ? 1 : 0) - (state.keys.back || state.touch.back ? 1 : 0);
+      let turnIn = (state.keys.right || state.touch.right ? 1 : 0) - (state.keys.left || state.touch.left ? 1 : 0);
+      const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+      let padFound = false;
+      for (const p of pads) {
+        if (!p) continue;
+        padFound = true;
+        if (Math.abs(-p.axes[1]) > 0.16) fwdIn = -p.axes[1];
+        if (Math.abs(p.axes[0]) > 0.16) turnIn = p.axes[0];
+      }
+      const gpEl = document.getElementById('gamepadStatus');
+      if (gpEl) gpEl.textContent = padFound ? '手柄：已連線' : '手柄：未偵測';
+
+      if (Math.abs(fwdIn) > 0.01 || Math.abs(turnIn) > 0.01) { if (!state.matchStarted) state.matchStarted = true; }
+      const vCmd = fwdIn * (state.rcSpeedPct / 100) * maxSpd;
+      r.vx = Math.cos(r.yaw) * vCmd;
+      r.vz = Math.sin(r.yaw) * vCmd;
+      r.omega = turnIn * 2.6;
+      if (Math.abs(vCmd) > 0.1) r.omega += (state.driftDegS * Math.PI / 180) * (vCmd / maxSpd);
+    }
+
+    const prevX = r.x, prevZ = r.z;
+    if (!dragState.active || dragState.type !== 'robot') {
+      r.yaw += r.omega * dt;
+      r.x += r.vx * dt;
+      r.z += r.vz * dt;
+    }
+
+    if (state.showJig && !dragState.active && r.x < START_LINE_X) {
+      if (r.x < state.startX) {
+        r.x = state.startX;
+        if (r.vx < 0) r.vx = 0;
+        r.yaw += (state.startYaw - r.yaw) * Math.min(1, 14 * dt);
+        r.z += (state.startZ - r.z) * Math.min(1, 14 * dt);
+      }
+      if (r.x < START_BACKSTOP_X + 12.5 && Math.abs(state.startYaw) < 0.05) {
+        const dz = r.z - state.startZ;
+        if (Math.abs(dz) > 0.35) r.z = state.startZ + Math.sign(dz) * 0.35;
+      }
+    }
+
+    r.x = clamp(r.x, ROBOT_HALF_LEN, FIELD_L - 4);
+    r.z = clamp(r.z, ROBOT_HALF_W, FIELD_W - ROBOT_HALF_W);
+
+    const forwardSpeed = Math.cos(r.yaw) * ((r.x - prevX) / Math.max(dt, 1e-5)) +
+                         Math.sin(r.yaw) * ((r.z - prevZ) / Math.max(dt, 1e-5));
+    r.wheelRot += (forwardSpeed / 2.8) * dt;
+    if (r.x - ROBOT_HALF_LEN > START_LINE_X + START_LINE_W / 2) r.leftStartAreaOnce = true;
+
+    const cosY = Math.cos(r.yaw), sinY = Math.sin(r.yaw);
+    const decel = state.friction * G_CM;
+
+    for (const rim of state.rims) {
+      if (rim.status !== 'field') continue;
+      if (dragState.active && dragState.type === 'rim' && dragState.rim === rim) continue;
+
+      const spd = Math.hypot(rim.vx, rim.vz);
+      if (spd > 0.01) {
+        const drop = decel * dt;
+        if (drop >= spd) { rim.vx = 0; rim.vz = 0; }
+        else { const f = (spd - drop) / spd; rim.vx *= f; rim.vz *= f; }
+      }
+      rim.x += rim.vx * dt; rim.z += rim.vz * dt;
+
+      const dx = rim.x - r.x, dz = rim.z - r.z;
+      const lx = dx * cosY + dz * sinY, lz = -dx * sinY + dz * cosY;
+      let pushed = false, nlx = lx, nlz = lz;
+      let vLocalX = rim.vx * cosY + rim.vz * sinY, vLocalZ = -rim.vx * sinY + rim.vz * cosY;
+      const robLocalVx = r.vx * cosY + r.vz * sinY;
+
+      if (lx > -ROBOT_HALF_LEN && lx < ROBOT_HALF_LEN + RIM_RADIUS && Math.abs(lz) < ROBOT_HALF_W + RIM_RADIUS && lx > 0) {
+        nlx = ROBOT_HALF_LEN + RIM_RADIUS;
+        if (vLocalX < robLocalVx) vLocalX = robLocalVx * 1.01;
+        pushed = true;
+      }
+
+      if (lx >= ROBOT_HALF_LEN - 0.5 && lx <= ROBOT_HALF_LEN + FORK_LEN + RIM_RADIUS) {
+        const innerWall = FORK_INNER_HALF_W, outerWall = FORK_INNER_HALF_W + FORK_THICK;
+        if (Math.abs(lz) <= innerWall && Math.abs(lz) > innerWall - RIM_RADIUS) {
+          nlz = Math.sign(lz || 1) * (innerWall - RIM_RADIUS); vLocalZ *= -0.15; pushed = true;
+        } else if (Math.abs(lz) > innerWall && Math.abs(lz) < outerWall + RIM_RADIUS) {
+          nlz = Math.sign(lz || 1) * (outerWall + RIM_RADIUS); vLocalZ *= -0.2; pushed = true;
+        }
+      }
+
+      if (pushed) {
+        rim.x = r.x + nlx * cosY - nlz * sinY;
+        rim.z = r.z + nlx * sinY + nlz * cosY;
+        rim.vx = vLocalX * cosY - vLocalZ * sinY;
+        rim.vz = vLocalX * sinY + vLocalZ * cosY;
+      }
+
+      if (rim.x < -0.5 || rim.x > FIELD_L + 0.5 || rim.z < -0.5 || rim.z > FIELD_W + 0.5) {
+        rim.status = 'out';
+        setToast(`#${rim.id} 冰壺出界！可在「⚙ 選單」拿回。`);
+        playClick(220, 0.15, 0.07);
+      }
+    }
+
+    const minDist = RIM_RADIUS * 2.02;
+    for (let iter = 0; iter < 3; iter++) {
+      for (let i = 0; i < state.rims.length; i++) {
+        const a = state.rims[i];
+        if (a.status !== 'field') continue;
+        for (let j = i + 1; j < state.rims.length; j++) {
+          const b = state.rims[j];
+          if (b.status !== 'field') continue;
+          const dx = b.x - a.x, dz = b.z - a.z, dist = Math.hypot(dx, dz);
+          if (dist > 0.0001 && dist < minDist) {
+            const nx = dx / dist, nz = dz / dist, ov = (minDist - dist) * 0.52;
+            a.x -= nx * ov; a.z -= nz * ov; b.x += nx * ov; b.z += nz * ov;
+            const relNorm = (b.vx - a.vx) * nx + (b.vz - a.vz) * nz;
+            if (relNorm < 0) {
+              const imp = -1.25 * relNorm * 0.5;
+              a.vx -= imp * nx; a.vz -= imp * nz; b.vx += imp * nx; b.vz += imp * nz;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // =========================================================================
+  // 6. IPAD-FRIENDLY TOUCH & MOUSE DRAGGING (Robot, Aim Arrow, 9 Rims)
+  // =========================================================================
+  const dragState = { active: false, type: null, rim: null, offsetX: 0, offsetZ: 0, snapActive: false, snapZ: 6.5 };
+
+  function placeRimOnStartLine(rim, targetZ) {
+    const zClamped = clamp(targetZ, 2.5, FIELD_W - 2.5);
+    const conflict = state.rims.find(r => r !== rim && r.status === 'field' && Math.hypot(r.x - START_LINE_X, r.z - zClamped) < RIM_RADIUS * 1.9);
+    if (conflict) { setToast('黑線上已有 1 顆冰壺（每次限放 1 顆）'); return false; }
+    rim.status = 'field';
+    rim.x = START_LINE_X; rim.z = zClamped; rim.vx = 0; rim.vz = 0;
+    playClick(760, 0.04, 0.045);
+    setToast(`#${rim.id} 冰壺已放上黑線`);
+    updateUI();
+    return true;
+  }
+
+  function autoDropNextTrayRim() {
+    const next = state.rims.find(r => r.status === 'tray');
+    if (!next) return null;
+    const conflict = state.rims.find(r => r.status === 'field' && Math.abs(r.x - START_LINE_X) < RIM_RADIUS * 1.9 && Math.abs(r.z - state.robot.z) < 5.0);
+    if (conflict) return null;
+    const jitterZ = ((next.id % 3) - 1) * 1.1;
+    placeRimOnStartLine(next, clamp(state.robot.z + jitterZ, 2.5, FIELD_W - 2.5));
+    return next;
+  }
+
+  canvas.addEventListener('pointerdown', e => {
+    if (state.running) return;
+    canvas.setPointerCapture(e.pointerId);
+    ensureAudio();
+    const rect = canvas.getBoundingClientRect();
+    const [cx, cz] = pxToCm(e.clientX - rect.left, e.clientY - rect.top);
+
+    // 1) Aim handle hit (generous iPad finger radius)
+    const hx = state.robot.x + Math.cos(state.robot.yaw) * (ROBOT_HALF_LEN + FORK_LEN + 2.8);
+    const hz = state.robot.z + Math.sin(state.robot.yaw) * (ROBOT_HALF_LEN + FORK_LEN + 2.8);
+    if (state.showAimLine && Math.hypot(cx - hx, cz - hz) < 5.5) {
+      dragState.active = true; dragState.type = 'aim'; canvas.classList.add('dragging'); return;
+    }
+
+    // 2) Rim hit (generous 4.2 cm touch radius)
+    let bestRim = null, bestD = 4.2;
+    for (const rim of state.rims) {
+      if (rim.status === 'out') continue;
+      const d = Math.hypot(cx - rim.x, cz - rim.z);
+      if (d < bestD) { bestD = d; bestRim = rim; }
+    }
+    if (bestRim) {
+      dragState.active = true; dragState.type = 'rim'; dragState.rim = bestRim;
+      bestRim.vx = 0; bestRim.vz = 0; canvas.classList.add('dragging');
+      playClick(680, 0.03, 0.04); return;
+    }
+
+    // 3) Robot chassis hit
+    if (Math.hypot(cx - state.robot.x, cz - state.robot.z) < 10.5) {
+      dragState.active = true; dragState.type = 'robot';
+      dragState.offsetX = state.robot.x - cx; dragState.offsetZ = state.robot.z - cz;
+      canvas.classList.add('dragging'); playClick(520, 0.03, 0.04); return;
+    }
+  });
+
+  canvas.addEventListener('pointermove', e => {
+    if (!dragState.active) return;
+    const rect = canvas.getBoundingClientRect();
+    const [cx, cz] = pxToCm(e.clientX - rect.left, e.clientY - rect.top);
+
+    if (dragState.type === 'robot') {
+      const maxStartX = START_LINE_X - (ROBOT_HALF_LEN + FORK_LEN) - 0.35;
+      state.robot.x = clamp(cx + dragState.offsetX, ROBOT_HALF_LEN, Math.max(ROBOT_START_X, maxStartX));
+      state.robot.z = clamp(cz + dragState.offsetZ, ROBOT_HALF_W, FIELD_W - ROBOT_HALF_W);
+      state.startX = state.robot.x; state.startZ = state.robot.z;
+      syncCalUI();
+    } else if (dragState.type === 'aim') {
+      let ang = clamp(Math.atan2(cz - state.robot.z, cx - state.robot.x), -0.45, 0.45);
+      if (Math.abs(ang) < 0.035) ang = 0;
+      state.robot.yaw = ang; state.startYaw = ang;
+    } else if (dragState.type === 'rim' && dragState.rim) {
+      const rim = dragState.rim;
+      rim.x = clamp(cx, -2, FIELD_L - 1);
+      rim.z = clamp(cz, 1.8, TRAY_Z + 4);
+      if (Math.abs(rim.x - START_LINE_X) < 7.0 && rim.z <= FIELD_W) {
+        dragState.snapActive = true;
+        dragState.snapZ = clamp(rim.z, 2.5, FIELD_W - 2.5);
+      } else {
+        dragState.snapActive = false;
+      }
+    }
+  });
+
+  canvas.addEventListener('pointerup', () => {
+    if (!dragState.active) return;
+    if (dragState.type === 'rim' && dragState.rim) {
+      const rim = dragState.rim;
+      if (dragState.snapActive) {
+        const ok = placeRimOnStartLine(rim, dragState.snapZ);
+        if (!ok && rim.status === 'tray') { rim.x = rim.trayX; rim.z = rim.trayZ; }
+      } else if (rim.z > FIELD_W + 1.5) {
+        rim.status = 'tray'; rim.x = rim.trayX; rim.z = rim.trayZ;
+      } else {
+        rim.status = 'field'; rim.x = clamp(rim.x, 2, FIELD_L - 2); rim.z = clamp(rim.z, 2, FIELD_W - 2);
+        playClick(600, 0.04, 0.04);
+      }
+      updateUI();
+    } else if (dragState.type === 'robot' || dragState.type === 'aim') {
+      saveSettings();
+      const rowIdx = Math.min(4, Math.max(1, Math.floor(state.robot.z / CELL_H) + 1));
+      setToast(`P207 已對準第 ${rowIdx} 列 (角度 ${(state.robot.yaw * 180 / Math.PI).toFixed(1)}°)`);
+    }
+    dragState.active = false; dragState.type = null; dragState.rim = null; dragState.snapActive = false;
+    canvas.classList.remove('dragging');
+  });
+
+  // =========================================================================
+  // 7. SPIKE 3 CLICK-TO-RUN INTERPRETER (Zero CDN!)
+  // =========================================================================
+  let pendingTimers = [];
+
+  function sleepSim(seconds, token) {
+    return new Promise((resolve, reject) => {
+      if (seconds <= 0) return resolve();
+      let elapsed = 0;
+      function tick(dt) {
+        if (token !== state.runToken) return reject('STOPPED');
+        elapsed += dt;
+        if (elapsed >= seconds) return resolve();
+        pendingTimers.push(tick);
+      }
+      pendingTimers.push(tick);
+    });
+  }
+
+  function driveRotOrSec(speedPct, value, unit, dirSign, token) {
+    return new Promise((resolve, reject) => {
+      if (token !== state.runToken) return reject('STOPPED');
+      if (value <= 0) return resolve();
+      if (!state.matchStarted) state.matchStarted = true;
+      const rps = (speedPct / 100) * state.maxRps;
+      const vCmd = dirSign * rps * state.cmPerRot;
+      const duration = (unit === 'ROT') ? (value / Math.max(0.05, rps)) : value;
+      const effScale = (unit === 'ROT' && dirSign > 0 && value < 1.0) ? 0.87 : 1.0;
+
+      let elapsed = 0;
+      function tick(dt) {
+        if (token !== state.runToken) {
+          state.robot.vx = 0; state.robot.vz = 0; state.robot.omega = 0;
+          return reject('STOPPED');
+        }
+        const step = Math.min(dt, duration - elapsed);
+        const vNow = vCmd * effScale;
+        state.robot.vx = Math.cos(state.robot.yaw) * vNow;
+        state.robot.vz = Math.sin(state.robot.yaw) * vNow;
+        state.robot.omega = (state.driftDegS * Math.PI / 180) * (vNow / Math.max(1, getMaxSpeedCmS()));
+        elapsed += step;
+        if (elapsed >= duration - 1e-5) {
+          state.robot.vx = 0; state.robot.vz = 0; state.robot.omega = 0;
+          return resolve();
+        }
+        pendingTimers.push(tick);
+      }
+      pendingTimers.push(tick);
+    });
+  }
+
+  function setActiveVisual(callerStackId, activeBlkId) {
+    document.querySelectorAll('.s-stack.exec-caller').forEach(el => el.classList.remove('exec-caller'));
+    document.querySelectorAll('.s-blk.exec-active').forEach(el => el.classList.remove('exec-active'));
+    if (callerStackId) {
+      const s = document.getElementById(callerStackId);
+      if (s) s.classList.add('exec-caller');
+    }
+    if (activeBlkId) {
+      const b = document.getElementById(activeBlkId);
+      if (b) b.classList.add('exec-active');
+    }
+  }
+
+  function numVal(id, fb) {
+    const v = parseFloat(document.getElementById(id).value);
+    return Number.isFinite(v) ? v : fb;
+  }
+
+  function stopProgram(quiet = false) {
+    state.runToken++;
+    pendingTimers = [];
+    state.running = false;
+    state.runningStackId = null;
+    state.robot.vx = 0; state.robot.vz = 0; state.robot.omega = 0;
+    setActiveVisual(null, null);
+    document.getElementById('runLed').className = 'led';
+    if (!quiet) { setToast('已停止運行'); playClick(300, 0.06, 0.05); }
+  }
+
+  async function execFn1(fwd, back, stackId, token) {
+    const spd = clamp(numVal('def1Spd', 52), 5, 100);
+    setActiveVisual(stackId, 'blk_fn1_m1');
+    await driveRotOrSec(spd, fwd, 'ROT', +1, token);
+    setActiveVisual(stackId, 'blk_fn1_m2');
+    await driveRotOrSec(spd, back, 'ROT', -1, token);
+  }
+
+  async function execFn2(fwd, back, stackId, token) {
+    const s1 = clamp(numVal('def2Spd1', 80), 5, 100);
+    const s2 = clamp(numVal('def2Spd2', 30), 5, 100);
+    const slow = Math.max(0, numVal('def2SlowSec', 0.5));
+    const s3 = clamp(numVal('def2Spd3', 95), 5, 100);
+    setToast(`執行 前後2 (${fwd} 圈 / ${back} 圈)`);
+    setActiveVisual(stackId, 'blk_fn2_m1');
+    await driveRotOrSec(s1, fwd, 'ROT', +1, token);
+    setActiveVisual(stackId, 'blk_fn2_m2');
+    await driveRotOrSec(s2, slow, 'SEC', +1, token);
+    await sleepSim(0.08, token);
+    setActiveVisual(stackId, 'blk_fn2_m3');
+    await driveRotOrSec(s3, back, 'ROT', -1, token);
+  }
+
+  async function execFn3(fwd, back, stackId, token) {
+    const s1 = clamp(numVal('def3Spd1', 100), 5, 100);
+    const s2 = clamp(numVal('def3Spd2', 100), 5, 100);
+    setToast(`執行 前後3 (${fwd} 圈 / ${back} 圈)`);
+    setActiveVisual(stackId, 'blk_fn3_m1');
+    await driveRotOrSec(s1, fwd, 'ROT', +1, token);
+    await sleepSim(0.06, token);
+    setActiveVisual(stackId, 'blk_fn3_m2');
+    await driveRotOrSec(s2, back, 'ROT', -1, token);
+  }
+
+  async function runNamedStack(stackId) {
+    if (state.running && state.runningStackId === stackId) {
+      stopProgram(false);
+      return;
+    }
+    if (state.matchFinished) resetFull(true);
+    stopProgram(true);
+    state.running = true;
+    state.runningStackId = stackId;
+    const token = ++state.runToken;
+    document.getElementById('runLed').className = 'led orange';
+    playClick(680, 0.045, 0.05);
+
+    try {
+      if (stackId === 'stack_15' || stackId === 'stack_69') {
+        const is15 = stackId === 'stack_15';
+        const times = Math.max(1, Math.round(numVal(is15 ? 'rep15' : 'rep69', is15 ? 5 : 4)));
+        const fwd = numVal(is15 ? 'c15Fwd' : 'c69Fwd', 0.67);
+        const back = numVal(is15 ? 'c15Back' : 'c69Back', 0.58);
+        const wait = Math.max(0, numVal(is15 ? 'w15Sec' : 'w69Sec', 0.1));
+        for (let i = 0; i < times; i++) {
+          if (token !== state.runToken) throw 'STOPPED';
+          if (state.autoDropOnLoop) autoDropNextTrayRim();
+          setToast(`${is15 ? '1-5' : '6-9'} 執行中 (${i + 1}/${times})`);
+          await execFn1(fwd, back, stackId, token);
+          setActiveVisual(stackId, is15 ? 'blk_wait15' : 'blk_wait69');
+          if (wait > 0) await sleepSim(wait, token);
+        }
+      } else if (stackId === 'stack_fn2') {
+        await execFn2(numVal('c2Fwd', 3.205), numVal('c2Back', 3.2), stackId, token);
+      } else if (stackId === 'stack_fn3a') {
+        await execFn3(numVal('c3aFwd', 2.7), numVal('c3aBack', 2.45), stackId, token);
+      } else if (stackId === 'stack_fn3b') {
+        await execFn3(numVal('c3bFwd', 2.5), numVal('c3bBack', 2.5), stackId, token);
+      }
+      if (token === state.runToken) {
+        state.running = false;
+        state.runningStackId = null;
+        setActiveVisual(null, null);
+        document.getElementById('runLed').className = 'led';
+        playChime([587, 784]);
+        setToast('完成！可檢視得分或點下一條積木繼續。');
+      }
+    } catch (err) {
+      if (err !== 'STOPPED') console.error(err);
+    }
+  }
+
+  // Wire Click-to-Run on every right-column SPIKE stack (input clicks never trigger run!)
+  document.querySelectorAll('.s-oval').forEach(inp => {
+    inp.addEventListener('click', e => e.stopPropagation());
+    inp.addEventListener('pointerdown', e => e.stopPropagation());
+    inp.addEventListener('change', saveSettings);
+  });
+
+  document.querySelectorAll('.s-stack.runnable').forEach(stack => {
+    stack.addEventListener('click', () => runNamedStack(stack.dataset.run));
+  });
+
+  // =========================================================================
+  // 8. UI, DRAWER & REFEREE CONTROLS
+  // =========================================================================
+  function setToast(msg) { document.getElementById('toastText').textContent = msg; }
+  function formatTime(sec) {
+    const s = Math.max(0, sec), m = Math.floor(s / 60), r = (s % 60).toFixed(1).padStart(4, '0');
+    return `${String(m).padStart(2, '0')}:${r}`;
+  }
+
+  function updateUI() {
+    const { propScore, total, onFieldCount } = computeTotals();
+    document.getElementById('oledTime').textContent = formatTime(state.timeLeft);
+    document.getElementById('oledPropScore').textContent = String(propScore);
+    document.getElementById('oledTotal').textContent = String(total);
+    document.getElementById('oledRimCount').textContent = `${onFieldCount}/${MAX_RIMS}`;
+
+    const leaveEl = document.getElementById('leaveStartBadge');
+    if (leaveEl) {
+      leaveEl.textContent = state.robot.leftStartAreaOnce ? '離區判定：合規 ✓' : '離區判定：待出線';
+      leaveEl.style.color = state.robot.leftStartAreaOnce ? '#15803d' : '#5a5d56';
+    }
+
+    const rimGrid = document.getElementById('rimGrid');
+    if (rimGrid) {
+      let html = '';
+      for (let i = 0; i < MAX_RIMS; i++) {
+        const rim = state.rims[i];
+        if (!rim || rim.status === 'tray') html += `<div class="rim-dot">#${i + 1}</div>`;
+        else if (rim.status === 'out') html += `<div class="rim-dot out">出界</div>`;
+        else if (rim.score === 50) html += `<div class="rim-dot s50">50${rim.straddling ? '*' : ''}</div>`;
+        else if (rim.score === 20) html += `<div class="rim-dot s20">20</div>`;
+        else if (rim.score === 10) html += `<div class="rim-dot s10">10</div>`;
+        else html += `<div class="rim-dot staged">黑線</div>`;
+      }
+      rimGrid.innerHTML = html;
+    }
+  }
+
+  function resetRobotOnly() {
+    stopProgram(true);
+    state.robot.x = state.startX; state.robot.z = state.startZ; state.robot.yaw = state.startYaw;
+    state.robot.vx = 0; state.robot.vz = 0; state.robot.omega = 0;
+    setToast('P207 已回到靠山位置'); playClick(500); updateUI();
+  }
+
+  function resetFull(silent = false) {
+    stopProgram(true);
+    state.matchStarted = false; state.matchFinished = false;
+    state.timeLeft = MATCH_SECONDS; state.lockedTimeBonus = 0;
+    state.robot.x = state.startX; state.robot.z = state.startZ; state.robot.yaw = state.startYaw;
+    state.robot.vx = 0; state.robot.vz = 0; state.robot.omega = 0;
+    state.robot.leftStartAreaOnce = false;
+    for (const rim of state.rims) {
+      rim.status = 'tray'; rim.x = rim.trayX; rim.z = rim.trayZ;
+      rim.vx = 0; rim.vz = 0; rim.score = 0; rim.straddling = false;
+    }
+    document.getElementById('finishModal').classList.remove('open');
+    if (!silent) { setToast('已重設，拖動冰壺上黑線並點積木出發！'); playClick(440); }
+    updateUI();
+  }
+
+  function retrieveOutRims() {
+    let found = null;
+    for (let i = state.rims.length - 1; i >= 0; i--) {
+      const r = state.rims[i];
+      if (r.status === 'out' || (r.status === 'field' && r.score === 0)) { found = r; break; }
+    }
+    if (found) {
+      found.status = 'tray'; found.x = found.trayX; found.z = found.trayZ; found.vx = 0; found.vz = 0;
+      setToast(`已拿回 #${found.id} 號冰壺至托盤`); playClick(620);
+    } else { setToast('目前沒有出界或未得分的冰壺'); }
+    updateUI();
+  }
+
+  function finishMatch(timeout = false) {
+    if (state.matchFinished) return;
+    stopProgram(true);
+    state.matchStarted = true; state.matchFinished = true;
+    state.lockedTimeBonus = Math.floor(Math.max(0, state.timeLeft));
+    const { propScore, timeBonus, total, onFieldCount } = computeTotals();
+    const c50 = state.rims.filter(r => r.score === 50).length;
+    const c20 = state.rims.filter(r => r.score === 20).length;
+    const c10 = state.rims.filter(r => r.score === 10).length;
+    const usedSec = (MATCH_SECONDS - state.timeLeft).toFixed(1);
+
+    document.getElementById('mPropScore').textContent = String(propScore);
+    document.getElementById('mTimeBonus').textContent = `+${timeBonus}`;
+    document.getElementById('mTotalScore').textContent = String(total);
+    document.getElementById('mSummaryText').innerHTML =
+      `${timeout ? '2 分鐘時間到！' : '已鎖定剩餘時間分！'}<br>` +
+      `耗時 <strong>${usedSec} 秒</strong>，共上場 <strong>${onFieldCount}/9</strong> 顆：` +
+      `50 分 <strong>${c50}</strong> 顆 · 20 分 <strong>${c20}</strong> 顆 · 10 分 <strong>${c10}</strong> 顆。`;
+    document.getElementById('finishModal').classList.add('open');
+    playChime([523, 659, 784, 1046]);
+    updateUI();
+  }
+
+  function shuffleRandomGrid() {
+    const pool = [50,50,50,50, 20,20,20,20,20,20,20,20, 10,10,10,10,10,10,10,10,10,10,10,10];
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    const g = [];
+    for (let r = 0; r < GRID_ROWS; r++) g.push(pool.slice(r * GRID_COLS, (r + 1) * GRID_COLS));
+    return g;
+  }
+
+  function applyMapMode(mode) {
+    state.mapMode = mode;
+    if (mode === 'uploaded') state.grid = JSON.parse(JSON.stringify(MAP_PRESETS.uploaded));
+    else if (mode === 'yuque') state.grid = JSON.parse(JSON.stringify(MAP_PRESETS.yuque));
+    else state.grid = shuffleRandomGrid();
+    updateUI();
+  }
+
+  // Drawer
+  function setDrawerOpen(open) {
+    document.getElementById('sideDrawer').classList.toggle('open', open);
+    document.getElementById('drawerBackdrop').classList.toggle('open', open);
+    playClick(open ? 600 : 460);
+  }
+  document.getElementById('btnOpenDrawer').addEventListener('click', () => setDrawerOpen(true));
+  document.getElementById('btnCloseDrawer').addEventListener('click', () => setDrawerOpen(false));
+  document.getElementById('drawerBackdrop').addEventListener('click', () => setDrawerOpen(false));
+
+  document.querySelectorAll('[data-dtab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const t = btn.dataset.dtab;
+      document.querySelectorAll('[data-dtab]').forEach(b => b.classList.toggle('active-seg', b.dataset.dtab === t));
+      document.querySelectorAll('.drawer-body').forEach(p => p.classList.toggle('active', p.id === 'dtab-' + t));
+      playClick(540);
+    });
+  });
+
+  // View presets
+  document.querySelectorAll('[data-view]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.viewMode = btn.dataset.view;
+      document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('active-seg', b.dataset.view === state.viewMode));
+      computeTargetView();
+      playClick(520);
+    });
+  });
+
+  // Top & Drawer Buttons
+  document.getElementById('btnStopTop').addEventListener('click', () => stopProgram(false));
+  document.getElementById('btnFinishMatch').addEventListener('click', () => finishMatch(false));
+  document.getElementById('btnResetFull').addEventListener('click', () => resetFull(false));
+  document.getElementById('btnCloseModal').addEventListener('click', () => document.getElementById('finishModal').classList.remove('open'));
+  document.getElementById('btnModalRestart').addEventListener('click', () => resetFull(false));
+  document.getElementById('mapSelect').addEventListener('change', e => { applyMapMode(e.target.value); setToast('已切換場地地圖'); playClick(580); });
+  document.getElementById('btnShuffleMap').addEventListener('click', () => { document.getElementById('mapSelect').value = 'random'; applyMapMode('random'); setToast('裁判已隨機洗牌'); playClick(640); });
+  document.getElementById('btnSpeedToggle').addEventListener('click', e => {
+    state.simSpeed = state.simSpeed === 1 ? 2 : 1;
+    e.target.textContent = `${state.simSpeed}x 速度`;
+    e.target.classList.toggle('active-seg', state.simSpeed === 2);
+    playClick(600);
+  });
+  document.getElementById('btnSoundToggle').addEventListener('click', e => {
+    soundEnabled = !soundEnabled;
+    e.target.textContent = soundEnabled ? '音效：開' : '音效：關';
+    if (soundEnabled) playClick(660);
+  });
+  document.getElementById('btnDropOne').addEventListener('click', () => autoDropNextTrayRim());
+  document.getElementById('btnRetrieveOut').addEventListener('click', retrieveOutRims);
+  document.getElementById('btnResetRobotOnly').addEventListener('click', resetRobotOnly);
+  document.getElementById('btnResetBlocks').addEventListener('click', () => {
+    BLOCK_INPUT_IDS.forEach(id => { document.getElementById(id).value = BLOCK_DEFAULTS[id]; });
+    saveSettings(); setToast('已還原截圖預設積木數字'); playClick(560);
+  });
+
+  // One-Click Demo Sequence
+  document.getElementById('btnRunSequence').addEventListener('click', () => {
+    setDrawerOpen(false);
+    resetFull(true);
+    stopProgram(true);
+    state.running = true;
+    const token = ++state.runToken;
+    document.getElementById('runLed').className = 'led orange';
+    (async () => {
+      try {
+        const f1 = numVal('c15Fwd', 0.67), b1 = numVal('c15Back', 0.58), w1 = numVal('w15Sec', 0.1);
+        const f2 = numVal('c2Fwd', 3.205), b2 = numVal('c2Back', 3.2);
+        for (let i = 0; i < 5; i++) { autoDropNextTrayRim(); await execFn1(f1, b1, 'stack_15', token); await sleepSim(w1, token); }
+        await execFn2(f2, b2, 'stack_fn2', token);
+        for (let i = 0; i < 4; i++) { autoDropNextTrayRim(); await execFn1(f1, b1, 'stack_69', token); await sleepSim(w1, token); }
+        await execFn2(Math.max(0.2, f2 - 0.12), b2, 'stack_fn2', token);
+        await sleepSim(0.35, token);
+        if (token === state.runToken) finishMatch(false);
+      } catch (err) { if (err !== 'STOPPED') console.error(err); }
+    })();
+  });
+
+  // RC Controls
+  function bindTouchHold(elId, keyName) {
+    const el = document.getElementById(elId);
+    const onDown = e => { e.preventDefault(); state.touch[keyName] = true; el.classList.add('pressed'); ensureAudio(); };
+    const onUp = e => { e.preventDefault(); state.touch[keyName] = false; el.classList.remove('pressed'); };
+    el.addEventListener('pointerdown', onDown); el.addEventListener('pointerup', onUp);
+    el.addEventListener('pointerleave', onUp); el.addEventListener('pointercancel', onUp);
+  }
+  bindTouchHold('rcFwd', 'fwd'); bindTouchHold('rcBack', 'back');
+  bindTouchHold('rcLeft', 'left'); bindTouchHold('rcRight', 'right');
+  document.getElementById('rcDrop').addEventListener('click', () => autoDropNextTrayRim());
+  document.getElementById('rcSpeedSlider').addEventListener('input', e => {
+    state.rcSpeedPct = Number(e.target.value);
+    document.getElementById('rcSpeedVal').textContent = state.rcSpeedPct + '%';
+  });
+
+  window.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    if (e.code === 'KeyW' || e.code === 'ArrowUp') state.keys.fwd = true;
+    if (e.code === 'KeyS' || e.code === 'ArrowDown') state.keys.back = true;
+    if (e.code === 'KeyA' || e.code === 'ArrowLeft') state.keys.left = true;
+    if (e.code === 'KeyD' || e.code === 'ArrowRight') state.keys.right = true;
+    if (e.code === 'Space') { e.preventDefault(); autoDropNextTrayRim(); }
+    if (e.code === 'KeyR') resetRobotOnly();
+  });
+  window.addEventListener('keyup', e => {
+    if (e.code === 'KeyW' || e.code === 'ArrowUp') state.keys.fwd = false;
+    if (e.code === 'KeyS' || e.code === 'ArrowDown') state.keys.back = false;
+    if (e.code === 'KeyA' || e.code === 'ArrowLeft') state.keys.left = false;
+    if (e.code === 'KeyD' || e.code === 'ArrowRight') state.keys.right = false;
+  });
+
+  // Calibration
+  function syncCalUI() {
+    const rowIdx = Math.min(4, Math.max(1, Math.floor(state.startZ / CELL_H) + 1));
+    document.getElementById('calZSlider').value = state.startZ;
+    document.getElementById('calZVal').textContent = `${state.startZ.toFixed(1)} cm (第 ${rowIdx} 列)`;
+    document.getElementById('calCmPerRot').value = state.cmPerRot;
+    document.getElementById('calCmPerRotVal').textContent = `${state.cmPerRot.toFixed(1)} cm/圈`;
+    document.getElementById('calMaxRps').value = state.maxRps;
+    document.getElementById('calMaxRpsVal').textContent = `${state.maxRps.toFixed(2)} 圈/秒`;
+    document.getElementById('calDrift').value = state.driftDegS;
+    document.getElementById('calDriftVal').textContent = `${state.driftDegS.toFixed(1)} °/s`;
+    document.getElementById('calFric').value = state.friction;
+    document.getElementById('calFricVal').textContent = state.friction.toFixed(2);
+    document.getElementById('chkJig').checked = state.showJig;
+    document.getElementById('chkAimLine').checked = state.showAimLine;
+    document.getElementById('chkAutoDrop').checked = state.autoDropOnLoop;
+  }
+
+  document.getElementById('calZSlider').addEventListener('input', e => {
+    state.startZ = parseFloat(e.target.value);
+    if (!state.running && state.robot.x < START_LINE_X) state.robot.z = state.startZ;
+    syncCalUI(); saveSettings();
+  });
+  document.querySelectorAll('[data-rowz]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.startZ = parseFloat(btn.dataset.rowz); state.startYaw = 0;
+      if (!state.running) { state.robot.x = state.startX; state.robot.z = state.startZ; state.robot.yaw = 0; }
+      syncCalUI(); saveSettings(); playClick(580);
+    });
+  });
+  document.getElementById('calCmPerRot').addEventListener('input', e => { state.cmPerRot = parseFloat(e.target.value); syncCalUI(); saveSettings(); });
+  document.getElementById('calMaxRps').addEventListener('input', e => { state.maxRps = parseFloat(e.target.value); syncCalUI(); saveSettings(); });
+  document.getElementById('calDrift').addEventListener('input', e => { state.driftDegS = parseFloat(e.target.value); syncCalUI(); saveSettings(); });
+  document.getElementById('calFric').addEventListener('input', e => { state.friction = parseFloat(e.target.value); syncCalUI(); saveSettings(); });
+  document.getElementById('chkJig').addEventListener('change', e => { state.showJig = e.target.checked; saveSettings(); });
+  document.getElementById('chkAimLine').addEventListener('change', e => { state.showAimLine = e.target.checked; saveSettings(); });
+  document.getElementById('chkAutoDrop').addEventListener('change', e => { state.autoDropOnLoop = e.target.checked; saveSettings(); });
+  document.getElementById('btnResetCal').addEventListener('click', () => {
+    state.startX = ROBOT_START_X; state.startZ = 6.5; state.startYaw = 0;
+    state.cmPerRot = 50.8; state.maxRps = 1.65; state.driftDegS = 0.0; state.friction = 0.34;
+    state.showJig = true; state.showAimLine = true; state.autoDropOnLoop = true;
+    if (!state.running) { state.robot.x = state.startX; state.robot.z = state.startZ; state.robot.yaw = 0; }
+    syncCalUI(); saveSettings(); setToast('已恢復預設校準'); playClick(500);
+  });
+
+  // =========================================================================
+  // 9. MAIN 60FPS ANIMATION LOOP
+  // =========================================================================
+  window.addEventListener('resize', resizeCanvas);
+  let lastTs = 0, uiAccum = 0;
+
+  function animate(ts) {
+    requestAnimationFrame(animate);
+    if (!lastTs) lastTs = ts;
+    const rawDt = Math.min(0.05, (ts - lastTs) / 1000);
+    lastTs = ts;
+
+    const SUB_DT = 1 / 120;
+    let rem = rawDt * state.simSpeed;
+    while (rem > 1e-6) {
+      const step = Math.min(SUB_DT, rem);
+      const cbs = pendingTimers; pendingTimers = [];
+      for (const cb of cbs) cb(step);
+      stepPhysics(step);
+      rem -= step;
+    }
+
+    renderArena();
+    uiAccum += rawDt;
+    if (uiAccum >= 0.08) { uiAccum = 0; updateUI(); }
+  }
+
+  window.addEventListener('load', () => {
+    loadSettings();
+    state.robot.z = state.startZ;
+    syncCalUI();
+    resizeCanvas();
+    updateUI();
+    requestAnimationFrame(animate);
+  });
+})();
+</script>
+</body>
+</html>

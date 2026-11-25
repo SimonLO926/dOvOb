@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { LANGUAGES, TEXT, chooseLanguage, projectCountText } from './homepage-i18n.mjs';
 
-test('Every homepage translation marker has text in all four languages', async () => {
-  const html = await readFile(new URL('./index.html', import.meta.url), 'utf8');
-  const keys = [...html.matchAll(/data-i18n(?:-aria-label|-title|-content)?="([^"]+)"/g)].map(match => match[1]);
+test('Every homepage and robotics translation marker has text in all four languages', async () => {
+  const pages = await Promise.all(['./index.html', './robotics/index.html'].map(path => readFile(new URL(path, import.meta.url), 'utf8')));
+  const keys = pages.flatMap(html => [...html.matchAll(/data-i18n(?:-aria-label|-title|-content)?="([^"]+)"/g)].map(match => match[1]));
   for (const language of LANGUAGES) {
     for (const key of keys) assert.equal(typeof TEXT[language][key], 'string', `${language}: ${key}`);
     assert.deepEqual(Object.keys(TEXT[language]).sort(), Object.keys(TEXT['zh-Hant']).sort());
