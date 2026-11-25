@@ -82,7 +82,7 @@
 
   /* Tour Timeline Scrubber */
   .tour-bar {
-    position: fixed; top: 72px; left: 50%; transform: translateX(-50%);
+    position: fixed; top: var(--toolbar-bottom, 72px); left: 50%; transform: translateX(-50%);
     width: min(560px, calc(100vw - 28px));
     background: var(--glass-bg);
     backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
@@ -93,7 +93,7 @@
   }
   .tour-bar.show { display: flex; }
   .tour-bar input[type="range"] {
-    flex: 1; accent-color: var(--gold); cursor: pointer;
+    flex: 1; min-width: 0; accent-color: var(--gold); cursor: pointer;
   }
   .time-lbl {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -115,7 +115,7 @@
 
   /* Landmark Info Drawer Card (Click on any 3D paper landmark!) */
   .info-card {
-    position: fixed; right: 16px; top: 76px;
+    position: fixed; right: 16px; top: var(--toolbar-bottom, 76px);
     width: min(350px, calc(100vw - 32px));
     max-height: calc(100vh - 165px);
     overflow-y: auto;
@@ -1224,6 +1224,10 @@
   const btnNight = document.getElementById('btnNight');
   const btnFold = document.getElementById('btnFold');
   const btnReset = document.getElementById('btnReset');
+  const topBar = document.querySelector('.top-bar');
+  new ResizeObserver(() => {
+    document.documentElement.style.setProperty('--toolbar-bottom', `${topBar.getBoundingClientRect().bottom + 10}px`);
+  }).observe(topBar);
 
   function setMoodButtons(activeBtn) {
     [btnDay, btnSunset, btnNight].forEach(b => b.classList.toggle('active', b === activeBtn));
