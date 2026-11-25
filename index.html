@@ -135,6 +135,39 @@
 
     .scroll-note::after { content: "↓"; font-size: 19px; }
 
+    .homepage-feature { margin-bottom: 32px; }
+
+    .feature-link {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+      align-items: center;
+      overflow: hidden;
+      border-radius: 24px;
+      background: var(--ink);
+      color: var(--paper);
+      text-decoration: none;
+    }
+
+    .feature-copy { padding: clamp(24px, 5vw, 54px); }
+    .feature-copy h2 { font-size: clamp(1.55rem, 3.3vw, 3.2rem); line-height: 1.1; }
+    .feature-copy p { max-width: 40ch; margin: 14px 0 22px; line-height: 1.6; }
+    .feature-link img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+    .feature-action {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 9px 15px;
+      border-radius: 999px;
+      background: var(--acid);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .feature-link:hover .feature-action, .feature-link:focus-visible .feature-action { text-decoration: underline; }
+    .feature-link:focus-visible { outline: 3px solid #42695a; outline-offset: 4px; }
+
     .projects { padding: 24px 0 110px; }
 
     .section-heading {
@@ -325,6 +358,8 @@
       h1 { font-size: clamp(38px, 13.7vw, 94px); }
       h1 span { margin-left: .12em; }
       .intro { max-width: 430px; }
+      .feature-link { grid-template-columns: 1fr; }
+      .feature-link img { aspect-ratio: 1000 / 580; }
       .project-grid { grid-template-columns: 1fr; }
       .project { min-height: 300px; padding: 16px; }
       .project-info { margin-top: 110px; padding: 18px; }
@@ -374,6 +409,17 @@
         </div>
       </section>
 
+      <section class="homepage-feature" aria-labelledby="robotics-feature-title">
+        <a class="feature-link" href="./robotics/" aria-labelledby="robotics-feature-title robotics-feature-action" aria-describedby="robotics-feature-description">
+          <div class="feature-copy">
+            <h2 id="robotics-feature-title" data-i18n="roboticsTitle">機械人評分與模擬</h2>
+            <p id="robotics-feature-description" data-i18n="roboticsDescription">我在工作中製作的機械人競賽與教學工具，收錄計分、模擬與訓練項目。</p>
+            <span class="feature-action"><span id="robotics-feature-action" data-i18n="roboticsAction">進入專區</span> <span aria-hidden="true">↗</span></span>
+          </div>
+          <img src="./assets/roborave-p207-preview.jpg" alt="" width="1000" height="580">
+        </a>
+      </section>
+
       <section class="projects" id="projects" aria-labelledby="projects-title">
         <div class="section-heading">
           <h2 id="projects-title" data-i18n="selectedWorks">Selected works / 精選作品</h2>
@@ -388,17 +434,17 @@
           <button type="button" data-filter="record" data-i18n="record">紀錄</button>
         </div>
         <div class="project-grid">
-          <a class="project" href="./robotics/" data-kind="interactive">
+          <a class="project" href="./macau.html" data-kind="interactive">
             <div class="project-preview" aria-hidden="true" inert>
-              <img src="./assets/roborave-p207-preview.jpg" alt="" loading="lazy" width="1000" height="580">
+              <img src="./assets/macau-paper-map-preview.jpg" alt="" loading="lazy" width="1080" height="560">
             </div>
             <div class="project-top">
               <span class="project-no"><span data-i18n="categoryInteractive">互動</span> / 12</span>
               <span class="project-arrow" aria-hidden="true">↗</span>
             </div>
             <div class="project-info">
-              <h3 data-i18n="roboticsTitle">機械人評分與模擬</h3>
-              <p data-i18n="roboticsDescription">我在工作中製作的機械人競賽與教學工具，收錄計分、模擬與訓練項目。</p>
+              <h3 data-i18n="macauMapTitle">澳門立體紙地圖</h3>
+              <p data-i18n="macauMapDescription">展開紙地圖，探索九個澳門地標，或播放 55 秒導覽。</p>
             </div>
           </a>
           <a class="project" href="./corridor_of_the_lotus/" data-kind="game">

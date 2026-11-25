@@ -1,0 +1,2450 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>RoboRAVE 定位精英 (Locate Master) 3D — SPIKE 3 點擊即跑模擬器</title>
+<script src="../assets/macau/three-r128.min.js"></script>
+<script src="../assets/roborave/blockly/blockly.min.js"></script>
+<style>
+  @font-face {
+    font-family: 'Space Grotesk';
+    src: url('../assets/roborave/fonts/space-grotesk.woff2') format('woff2');
+    font-weight: 500 700;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'JetBrains Mono';
+    src: url('../assets/roborave/fonts/jetbrains-mono.woff2') format('woff2');
+    font-weight: 500 700;
+    font-display: swap;
+  }
+  :root {
+    --bg-mat: #c8c5be;
+    --chassis-top: #e8e6e0;
+    --chassis-bot: #d4d1c9;
+    --chassis-border: #aeaba2;
+    --ink-primary: #1f211e;
+    --ink-muted: #5a5d56;
+    --hairline: rgba(0, 0, 0, 0.12);
+
+    --screen-bg: #161c17;
+    --screen-ink: #e8f5e9;
+    --screen-green: #4ade80;
+    --screen-amber: #fbbf24;
+    --screen-muted: #7b9680;
+
+    --key-light-bg: linear-gradient(180deg, #f9f8f4 0%, #e9e6de 100%);
+    --key-light-shadow: 0 3px 0 #9d9a91, 0 4px 6px rgba(0, 0, 0, 0.14), inset 0 1px 0 #ffffff;
+    --key-light-active: 0 1px 0 #9d9a91, 0 2px 3px rgba(0, 0, 0, 0.14);
+
+    --key-dark-bg: linear-gradient(180deg, #4b4b47 0%, #353532 100%);
+    --key-dark-shadow: 0 3px 0 #1d1d1b, 0 4px 7px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    --key-dark-active: 0 1px 0 #1d1d1b, 0 2px 3px rgba(0, 0, 0, 0.22);
+
+    --accent-orange: #ff4f00;
+    --key-orange-bg: linear-gradient(180deg, #ff5e14 0%, #e34500 100%);
+    --key-orange-shadow: 0 3px 0 #962d00, 0 4px 9px rgba(227, 69, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    --key-orange-active: 0 1px 0 #962d00, 0 2px 4px rgba(227, 69, 0, 0.25);
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg-mat);
+    color: var(--ink-primary);
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  }
+
+  /* Blockly SVG visibility & SPIKE 3 execution pulse */
+  svg[display="none"], .blocklySvg [display="none"] {
+    display: none !important;
+  }
+  .blocklyFlyout[style*="display: none"] ~ .blocklyScrollbarVertical:not(.blocklyMainWorkspaceScrollbar) {
+    display: none !important;
+  }
+  @keyframes spikePulseActive {
+    0%, 100% { stroke: #ff4f00; stroke-width: 5px; }
+    50% { stroke: #ffe600; stroke-width: 6.5px; }
+  }
+  @keyframes spikePulseCaller {
+    0%, 100% { stroke: #ff9900; stroke-width: 4px; }
+    50% { stroke: #fff176; stroke-width: 5.5px; }
+  }
+  .ev3-exec-active > .blocklyPath {
+    animation: spikePulseActive 0.65s infinite ease-in-out;
+  }
+  .ev3-exec-caller > .blocklyPath {
+    animation: spikePulseCaller 0.85s infinite ease-in-out;
+  }
+  .blocklySelected:not(.ev3-exec-caller):not(.ev3-exec-active) > .blocklyPath {
+    stroke: #1f211e;
+    stroke-width: 2.5px;
+  }
+  .blocklyDraggable {
+    cursor: pointer;
+  }
+
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: linear-gradient(180deg, var(--chassis-top) 0%, var(--chassis-bot) 100%);
+  }
+
+  /* Ultra-Clean Top Bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--chassis-border);
+    background: linear-gradient(180deg, #eceae4 0%, #dfdcd4 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    flex-shrink: 0;
+  }
+
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .unit-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 3px 7px;
+    border-radius: 4px;
+    background: #232622;
+    color: #e8f5e9;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .led {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 6px rgba(74, 222, 128, 0.8);
+    display: inline-block;
+  }
+  .led.orange { background: var(--accent-orange); box-shadow: 0 0 6px rgba(255, 79, 0, 0.85); }
+
+  .brand-title {
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* Compact Recessed OLED Pill Bar in Center */
+  .oled-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 5px 14px;
+    border-radius: 7px;
+    background: var(--screen-bg);
+    border: 1px solid #303831;
+    box-shadow: inset 0 2px 7px rgba(0, 0, 0, 0.78);
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--screen-ink);
+  }
+
+  .oled-item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+  }
+
+  .oled-k {
+    font-size: 10px;
+    color: var(--screen-muted);
+  }
+
+  .oled-v {
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .oled-v.green { color: var(--screen-green); }
+  .oled-v.orange { color: #ff6e30; }
+  .oled-v.amber { color: var(--screen-amber); }
+
+  .toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Tactile Keycap Buttons */
+  .key-btn {
+    appearance: none;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-family: 'Space Grotesk', 'PingFang TC', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-primary);
+    background: var(--key-light-bg);
+    box-shadow: var(--key-light-shadow);
+    cursor: pointer;
+    transition: transform 60ms ease, box-shadow 60ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .key-btn:active, .key-btn.pressed { transform: translateY(2px); box-shadow: var(--key-light-active); }
+  .key-btn.dark { color: #f3f2ee; background: var(--key-dark-bg); box-shadow: var(--key-dark-shadow); border-color: rgba(0, 0, 0, 0.45); }
+  .key-btn.dark:active, .key-btn.dark.pressed { box-shadow: var(--key-dark-active); }
+  .key-btn.orange { color: #ffffff; background: var(--key-orange-bg); box-shadow: var(--key-orange-shadow); border-color: rgba(150, 45, 0, 0.5); }
+  .key-btn.orange:active, .key-btn.orange.pressed { box-shadow: var(--key-orange-active); }
+  .key-btn.active-seg { background: #232622; color: #4ade80; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6); transform: translateY(1px); }
+  .key-btn.sm { padding: 4px 8px; font-size: 11px; }
+
+  .select-hw {
+    width: 100%;
+    font-family: 'JetBrains Mono', 'PingFang TC', monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid #a8a59c;
+    background: #f4f2ec;
+    color: var(--ink-primary);
+    cursor: pointer;
+  }
+
+  /* Main Split: Left 3D Arena + Right Pure SPIKE Blockly */
+  .main-grid {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .viewport-pane {
+    flex: 1.2;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: #bdbab2;
+  }
+
+  .canvas-wrap {
+    flex: 1;
+    position: relative;
+    min-height: 240px;
+    overflow: hidden;
+  }
+
+  #arenaCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+    cursor: grab;
+  }
+  #arenaCanvas.dragging-obj { cursor: grabbing; }
+
+  .cam-bar {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 5px;
+    z-index: 10;
+  }
+
+  .status-pill {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .hud-toast {
+    pointer-events: auto;
+    background: rgba(22, 28, 23, 0.88);
+    color: #e8f5e9;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-family: 'JetBrains Mono', 'PingFang TC', monospace;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Right Pure Blockly Pane */
+  .blockly-pane {
+    flex: 1;
+    min-width: 380px;
+    max-width: 56%;
+    position: relative;
+    border-left: 2px solid var(--chassis-border);
+    background: #f7f6f2;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .blockly-host {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .spike-corner-hint {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    z-index: 15;
+    pointer-events: none;
+    background: rgba(22, 28, 23, 0.82);
+    color: #e8f5e9;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', 'PingFang TC', monospace;
+    font-size: 10.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Slide-Over Secondary Menu Drawer (副選單) */
+  .drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(18, 22, 19, 0.35);
+    z-index: 80;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+  }
+  .drawer-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .side-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 370px;
+    max-width: 92vw;
+    background: linear-gradient(180deg, #eae8e2 0%, #dad7cf 100%);
+    border-left: 2px solid #9d9a91;
+    box-shadow: -16px 0 36px rgba(0, 0, 0, 0.28);
+    z-index: 90;
+    transform: translateX(100%);
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+  }
+  .side-drawer.open {
+    transform: translateX(0);
+  }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--chassis-border);
+    background: #e2dfd7;
+    flex-shrink: 0;
+  }
+
+  .drawer-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--hairline);
+    background: #dcd9d1;
+    flex-shrink: 0;
+  }
+
+  .drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .drawer-body.active {
+    display: flex;
+  }
+
+  .section-legend {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--hairline);
+    flex-shrink: 0;
+  }
+
+  .cal-row {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: #f1efe9;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 7px;
+    padding: 8px 10px;
+  }
+  .cal-head { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; font-weight: 600; }
+  .cal-val { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 700; color: var(--accent-orange); font-variant-numeric: tabular-nums; }
+  input[type="range"] { width: 100%; accent-color: var(--accent-orange); cursor: pointer; }
+
+  .toggle-row {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+    background: #f1efe9;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 7px;
+    padding: 8px 10px;
+  }
+
+  .row-align-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 4px; }
+
+  .rim-grid {
+    flex-shrink: 0;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 4px;
+  }
+  .rim-dot {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    padding: 4px 2px;
+    border-radius: 5px;
+    background: #d9d6ce;
+    color: #555954;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    font-variant-numeric: tabular-nums;
+  }
+  .rim-dot.s50 { background: #1d8cf8; color: #ffffff; border-color: #1166bd; }
+  .rim-dot.s20 { background: #f59e0b; color: #ffffff; border-color: #c27803; }
+  .rim-dot.s10 { background: #ef231f; color: #ffffff; border-color: #b91c1c; }
+  .rim-dot.staged { background: #2d332e; color: #e8f5e9; }
+  .rim-dot.out { background: #3f2222; color: #fca5a5; text-decoration: line-through; }
+
+  .rc-pad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-width: 240px;
+    margin: 6px auto;
+  }
+  .rc-key { height: 58px; font-size: 16px; font-weight: 700; }
+
+  /* Finish Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(18, 22, 19, 0.65);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 110;
+    padding: 16px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-card {
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(180deg, #eceae4 0%, #dcd9d1 100%);
+    border: 1px solid #9d9a91;
+    border-radius: 10px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .modal-oled {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 10px 12px;
+    background: var(--screen-bg);
+    border-radius: 7px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--screen-ink);
+  }
+
+  @media (max-width: 900px) {
+    .topbar { flex-wrap: wrap; }
+    .main-grid { flex-direction: column; }
+    .viewport-pane { flex: none; height: 48vh; }
+    .blockly-pane { flex: 1; min-width: 0; max-width: 100%; border-left: none; border-top: 2px solid var(--chassis-border); }
+    .oled-pill { gap: 10px; padding: 4px 10px; }
+    .oled-v { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- Minimal Top Bar -->
+  <header class="topbar">
+    <div class="brand-group">
+      <div class="unit-badge"><span class="led" id="sysLed"></span>P207</div>
+      <div class="brand-title">定位精英 3D</div>
+    </div>
+
+    <div class="oled-pill">
+      <span class="oled-item"><span class="oled-k">時間</span><span class="oled-v green" id="oledTime">02:00.0</span></span>
+      <span class="oled-item"><span class="oled-k">道具</span><span class="oled-v" id="oledPropScore">0</span></span>
+      <span class="oled-item"><span class="oled-k">總分</span><span class="oled-v orange" id="oledTotal">0</span></span>
+      <span class="oled-item"><span class="oled-k">冰壺</span><span class="oled-v amber" id="oledRimCount">0/9</span></span>
+    </div>
+
+    <div class="toolbar-actions">
+      <button class="key-btn sm dark" id="btnStopTop" title="急停目前運行的積木">■ 急停</button>
+      <button class="key-btn sm" id="btnFinishMatch" title="完成挑戰並鎖定時間分">鎖分</button>
+      <button class="key-btn sm orange" id="btnResetFull" title="全部重設">重設</button>
+      <button class="key-btn sm" id="btnOpenDrawer" title="開啟副選單（地圖、校準、遙控、示範）">⚙ 選單</button>
+    </div>
+  </header>
+
+  <!-- Main Clean Workspace: Left 3D Arena + Right Pure SPIKE 3 Blockly -->
+  <div class="main-grid">
+    <section class="viewport-pane">
+      <div class="canvas-wrap" id="canvasWrap">
+        <canvas id="arenaCanvas"></canvas>
+
+        <div class="cam-bar">
+          <button class="key-btn sm active-seg" data-cam="overview">全景</button>
+          <button class="key-btn sm" data-cam="scoring">得分區</button>
+          <button class="key-btn sm" data-cam="start">啟動區</button>
+          <button class="key-btn sm" data-cam="top">俯視</button>
+        </div>
+
+        <div class="status-pill">
+          <div class="hud-toast">
+            <span class="led" id="runLed"></span>
+            <span id="toastText">拖動車身對準 50 分格，拖動冰壺上黑線，直接點右邊積木就跑！</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="blockly-pane">
+      <div class="spike-corner-hint">
+        <span class="led" style="width:6px;height:6px;"></span>
+        <span>像 SPIKE 3：直接點積木條即運行</span>
+      </div>
+      <div class="blockly-host" id="blocklyDiv"></div>
+    </section>
+  </div>
+</div>
+
+<!-- Slide-Over Secondary Menu Drawer (副選單) -->
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="side-drawer" id="sideDrawer">
+  <div class="drawer-header">
+    <strong style="font-size:14px;">⚙ 副選單（場地 / 遙控 / 校準）</strong>
+    <button class="key-btn sm" id="btnCloseDrawer">✕ 關閉</button>
+  </div>
+
+  <div class="drawer-tabs">
+    <button class="key-btn sm active-seg" data-dtab="arena">場地與示範</button>
+    <button class="key-btn sm" data-dtab="rc">手動遙控</button>
+    <button class="key-btn sm" data-dtab="cal">實車校準</button>
+  </div>
+
+  <!-- Drawer Tab 1: Arena, Demo & Referee -->
+  <div class="drawer-body active" id="dtab-arena">
+    <div class="section-legend">
+      <span>9 顆冰壺落點明細</span>
+      <span id="leaveStartBadge" style="color:#15803d;">離區判定：待出線</span>
+    </div>
+    <div class="rim-grid" id="rimGrid"></div>
+
+    <div class="cal-row">
+      <div class="cal-head"><span>賽場地圖配置</span></div>
+      <select id="mapSelect" class="select-hw">
+        <option value="uploaded">上傳實戰圖 (左上50最近)</option>
+        <option value="yuque">語雀官方參考圖</option>
+        <option value="random">裁判隨機洗牌 (4/8/12)</option>
+      </select>
+      <div style="display:flex;gap:6px;margin-top:4px;">
+        <button class="key-btn sm" id="btnShuffleMap" style="flex:1;">🎲 重新隨機洗牌</button>
+        <button class="key-btn sm" id="btnSpeedToggle">1x 速度</button>
+        <button class="key-btn sm" id="btnSoundToggle">音效：開</button>
+      </div>
+    </div>
+
+    <div class="section-legend"><span>示範與裁判快捷工具</span></div>
+    <button class="key-btn orange" id="btnRunSequence">▶ 一鍵示範跑完 9 顆 (1-5 → 前後2 → 6-9 → 前後2)</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+      <button class="key-btn sm" id="btnDropOne">+ 快捷放 1 顆上黑線</button>
+      <button class="key-btn sm" id="btnRetrieveOut">拿回出界/失誤冰壺</button>
+      <button class="key-btn sm" id="btnResetRobotOnly">機械人回靠山</button>
+      <button class="key-btn sm" id="btnBlkResetWs">還原預設積木</button>
+    </div>
+  </div>
+
+  <!-- Drawer Tab 2: Manual RC -->
+  <div class="drawer-body" id="dtab-rc">
+    <div class="section-legend">
+      <span>手動遙控 RC</span>
+      <span id="gamepadStatus" style="color:#5a5d56;">手柄：未偵測</span>
+    </div>
+    <div class="cal-row">
+      <div class="cal-head">
+        <span>手動油門速度上限</span>
+        <span class="cal-val" id="rcSpeedVal">80%</span>
+      </div>
+      <input type="range" id="rcSpeedSlider" min="20" max="100" step="5" value="80" />
+    </div>
+    <div class="rc-pad-grid">
+      <div></div>
+      <button class="key-btn rc-key" id="rcFwd">▲</button>
+      <div></div>
+      <button class="key-btn rc-key" id="rcLeft">◀</button>
+      <button class="key-btn rc-key orange" id="rcDrop" style="font-size:11px;">放1顆</button>
+      <button class="key-btn rc-key" id="rcRight">▶</button>
+      <div></div>
+      <button class="key-btn rc-key" id="rcBack">▼</button>
+      <div></div>
+    </div>
+    <div class="cal-row" style="font-size:11.5px;line-height:1.5;color:#3f423d;">
+      <div><strong>鍵盤</strong>：`W/S/A/D` 或方向鍵移動、`Space` 放 1 顆冰壺、`R` 回靠山。</div>
+      <div><strong>手柄</strong>：支援藍牙／Xbox 搖桿即時操控。</div>
+    </div>
+  </div>
+
+  <!-- Drawer Tab 3: Calibration -->
+  <div class="drawer-body" id="dtab-cal">
+    <div class="section-legend">
+      <span>定位靠山 &amp; 實車物理校準</span>
+      <button class="key-btn sm" id="btnResetCal">恢復預設</button>
+    </div>
+    <div class="cal-row">
+      <div class="cal-head">
+        <span>啟動區列數快選 (Z)</span>
+        <span class="cal-val" id="calZVal">6.5 cm (第 1 列)</span>
+      </div>
+      <input type="range" id="calZSlider" min="6.5" max="41.5" step="0.5" value="6.5" />
+      <div class="row-align-btns">
+        <button class="key-btn sm" data-rowz="6.5">第 1 列</button>
+        <button class="key-btn sm" data-rowz="18.0">第 2 列</button>
+        <button class="key-btn sm" data-rowz="30.0">第 3 列</button>
+        <button class="key-btn sm" data-rowz="41.5">第 4 列</button>
+      </div>
+    </div>
+    <div class="cal-row">
+      <div class="cal-head">
+        <span>每 1 圈行走距離 (cm/圈)</span>
+        <span class="cal-val" id="calCmPerRotVal">50.8 cm/圈</span>
+      </div>
+      <input type="range" id="calCmPerRot" min="15" max="65" step="0.4" value="50.8" />
+    </div>
+    <div class="cal-row">
+      <div class="cal-head">
+        <span>100% 滿速馬達轉速 (圈/秒)</span>
+        <span class="cal-val" id="calMaxRpsVal">1.65 圈/秒</span>
+      </div>
+      <input type="range" id="calMaxRps" min="0.8" max="2.6" step="0.05" value="1.65" />
+    </div>
+    <div class="cal-row">
+      <div class="cal-head">
+        <span>P207 偏左漂移補償</span>
+        <span class="cal-val" id="calDriftVal">0.0 °/s (已校直)</span>
+      </div>
+      <input type="range" id="calDrift" min="-4.0" max="4.0" step="0.2" value="0" />
+    </div>
+    <div class="cal-row">
+      <div class="cal-head">
+        <span>雪弗板表面摩擦係數</span>
+        <span class="cal-val" id="calFricVal">0.34</span>
+      </div>
+      <input type="range" id="calFric" min="0.15" max="0.65" step="0.02" value="0.34" />
+    </div>
+    <label class="toggle-row">
+      <span>顯示啟動區「物理定位靠山」</span>
+      <input type="checkbox" id="chkJig" checked />
+    </label>
+    <label class="toggle-row">
+      <span>顯示車頭「瞄準 50 分格」輔助虛線</span>
+      <input type="checkbox" id="chkAimLine" checked />
+    </label>
+    <label class="toggle-row">
+      <span>跑 [1-5]/[6-9] 時自動把托盤冰壺補到黑線</span>
+      <input type="checkbox" id="chkAutoDrop" checked />
+    </label>
+  </div>
+</aside>
+
+<!-- Match Finished Modal -->
+<div class="modal-backdrop" id="finishModal">
+  <div class="modal-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <strong style="font-size:16px;">本輪挑戰成績單</strong>
+      <span class="unit-badge">LOCKED</span>
+    </div>
+    <div class="modal-oled">
+      <div><div class="oled-k">道具分</div><div class="oled-v" id="mPropScore">0</div></div>
+      <div><div class="oled-k">時間分</div><div class="oled-v amber" id="mTimeBonus">0</div></div>
+      <div><div class="oled-k">總分</div><div class="oled-v orange" id="mTotalScore">0</div></div>
+    </div>
+    <div id="mSummaryText" style="font-size:12.5px;line-height:1.55;color:#2f322d;"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button class="key-btn sm" id="btnCloseModal">繼續檢視</button>
+      <button class="key-btn sm orange" id="btnModalRestart">再來一輪</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // =========================================================================
+  // 1. FIELD & COMPETITION CONSTANTS (1 Three.js unit = 1 cm)
+  // =========================================================================
+  const FIELD_L = 195.0;
+  const FIELD_W = 48.0;
+  const BOARD_H = 1.5;
+  const START_LINE_X = 24.25;
+  const START_LINE_W = 0.5;
+  const GRID_X0 = 139.7;
+  const GRID_COLS = 6;
+  const GRID_ROWS = 4;
+  const CELL_W = (FIELD_L - GRID_X0) / GRID_COLS;
+  const CELL_H = FIELD_W / GRID_ROWS;
+
+  const RIM_RADIUS = 1.52;
+  const RIM_HEIGHT = 2.0;
+  const MAX_RIMS = 9;
+  const MATCH_SECONDS = 120.0;
+
+  const ROBOT_HALF_LEN = 6.2;
+  const ROBOT_HALF_W = 6.3;
+  const FORK_LEN = 9.0;
+  const FORK_INNER_HALF_W = 5.0;
+  const FORK_THICK = 0.8;
+  const START_BACKSTOP_X = 2.0;
+  const ROBOT_START_X = START_BACKSTOP_X + ROBOT_HALF_LEN;
+
+  const TRAY_Z = FIELD_W + 7.2;
+  const TRAY_X0 = 4.5;
+  const TRAY_STEP = 4.2;
+
+  const MAP_PRESETS = {
+    uploaded: [
+      [50, 10, 20, 10, 10, 20],
+      [10, 10, 10, 10, 20, 50],
+      [10, 20, 10, 50, 50, 10],
+      [20, 20, 20, 20, 10, 10]
+    ],
+    yuque: [
+      [10, 20, 20, 10, 50, 50],
+      [10, 10, 10, 10, 10, 10],
+      [20, 10, 10, 10, 20, 20],
+      [10, 20, 20, 50, 20, 50]
+    ]
+  };
+
+  // =========================================================================
+  // 2. AUDIO
+  // =========================================================================
+  let audioCtx = null;
+  let soundEnabled = true;
+
+  function ensureAudio() {
+    if (!soundEnabled) return null;
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) audioCtx = new AC();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+    return audioCtx;
+  }
+
+  function playClick(freq = 540, dur = 0.035, gainVal = 0.05) {
+    const ctx = ensureAudio();
+    if (!ctx) return;
+    try {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      g.gain.setValueAtTime(gainVal, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0008, ctx.currentTime + dur);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + dur);
+    } catch (e) {}
+  }
+
+  function playChime(notes = [523, 659, 784]) {
+    const ctx = ensureAudio();
+    if (!ctx) return;
+    notes.forEach((f, idx) => setTimeout(() => playClick(f, 0.11, 0.055), idx * 75));
+  }
+
+  // =========================================================================
+  // 3. STATE & PERSISTENCE
+  // =========================================================================
+  const STORAGE_KEY = 'roborave_locate_master_spike3_v5';
+  const LEGACY_STORAGE_KEY = 'roborave_locate_master_offline_ipad_v3';
+
+  const state = {
+    mapMode: 'uploaded',
+    grid: JSON.parse(JSON.stringify(MAP_PRESETS.uploaded)),
+    simSpeed: 1,
+    matchStarted: false,
+    matchFinished: false,
+    timeLeft: MATCH_SECONDS,
+    lockedTimeBonus: 0,
+
+    startX: ROBOT_START_X,
+    startZ: 6.5,
+    startYaw: 0,
+    cmPerRot: 50.8,
+    maxRps: 1.65,
+    driftDegS: 0.0,
+    friction: 0.34,
+    showJig: true,
+    showAimLine: true,
+    autoDropOnLoop: true,
+
+    robot: {
+      x: ROBOT_START_X, z: 6.5, yaw: 0,
+      vx: 0, vz: 0, omega: 0, wheelRot: 0,
+      leftStartAreaOnce: false
+    },
+
+    rims: [],
+    running: false,
+    runningRootId: null,
+    runToken: 0,
+    activeBlockId: null,
+    callerBlockId: null,
+    highlightDirty: false,
+
+    rcSpeedPct: 80,
+    keys: { fwd: false, back: false, left: false, right: false },
+    touch: { fwd: false, back: false, left: false, right: false }
+  };
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function loadSettings() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (typeof saved.startZ === 'number') state.startZ = saved.startZ;
+      if (typeof saved.cmPerRot === 'number') state.cmPerRot = saved.cmPerRot;
+      if (typeof saved.maxRps === 'number') state.maxRps = saved.maxRps;
+      if (typeof saved.driftDegS === 'number') state.driftDegS = saved.driftDegS;
+      if (typeof saved.friction === 'number') state.friction = saved.friction;
+      if (typeof saved.showJig === 'boolean') state.showJig = saved.showJig;
+      if (typeof saved.showAimLine === 'boolean') state.showAimLine = saved.showAimLine;
+      if (typeof saved.autoDropOnLoop === 'boolean') state.autoDropOnLoop = saved.autoDropOnLoop;
+    } catch (e) {}
+  }
+
+  function saveSettings() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        startZ: state.startZ,
+        cmPerRot: state.cmPerRot,
+        maxRps: state.maxRps,
+        driftDegS: state.driftDegS,
+        friction: state.friction,
+        showJig: state.showJig,
+        showAimLine: state.showAimLine,
+        autoDropOnLoop: state.autoDropOnLoop
+      }));
+    } catch (e) {}
+  }
+
+  // =========================================================================
+  // 4. THREE.JS 3D SCENE
+  // =========================================================================
+  const canvas = document.getElementById('arenaCanvas');
+  const canvasWrap = document.getElementById('canvasWrap');
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xc5c2ba);
+  const camera = new THREE.PerspectiveCamera(42, 16 / 9, 1, 1000);
+
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0xb8b5ad, 0.48);
+  hemiLight.position.set(FIELD_L / 2, 120, FIELD_W / 2);
+  scene.add(hemiLight);
+
+  const dirLight = new THREE.DirectionalLight(0xfffdf7, 0.42);
+  dirLight.position.set(110, 140, 85);
+  dirLight.castShadow = true;
+  dirLight.shadow.mapSize.width = 2048;
+  dirLight.shadow.mapSize.height = 1024;
+  dirLight.shadow.camera.near = 20;
+  dirLight.shadow.camera.far = 350;
+  dirLight.shadow.camera.left = -130;
+  dirLight.shadow.camera.right = 130;
+  dirLight.shadow.camera.top = 75;
+  dirLight.shadow.camera.bottom = -75;
+  dirLight.shadow.bias = -0.0005;
+  scene.add(dirLight);
+  dirLight.target.position.set(FIELD_L / 2, 0, FIELD_W / 2);
+  scene.add(dirLight.target);
+
+  const studioFloor = new THREE.Mesh(
+    new THREE.PlaneGeometry(750, 500),
+    new THREE.MeshStandardMaterial({ color: 0xb9b6ae, roughness: 0.92 })
+  );
+  studioFloor.rotation.x = -Math.PI / 2;
+  studioFloor.position.set(FIELD_L / 2, -BOARD_H - 0.1, FIELD_W / 2);
+  studioFloor.receiveShadow = true;
+  scene.add(studioFloor);
+
+  // High-DPI Mat Texture
+  const matCanvas = document.createElement('canvas');
+  const MAT_SCALE = 15;
+  matCanvas.width = Math.round(FIELD_L * MAT_SCALE);
+  matCanvas.height = Math.round(FIELD_W * MAT_SCALE);
+  const matCtx = matCanvas.getContext('2d');
+  const matTexture = new THREE.CanvasTexture(matCanvas);
+  matTexture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  matTexture.encoding = THREE.sRGBEncoding;
+
+  function drawMatTexture() {
+    const W = matCanvas.width, H = matCanvas.height, S = MAT_SCALE, ctx = matCtx;
+    ctx.fillStyle = '#f7f8f6';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.13)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.38)';
+    ctx.font = '600 18px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    for (let xCm = 30; xCm < GRID_X0; xCm += 10) {
+      const px = xCm * S;
+      ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, 16); ctx.moveTo(px, H); ctx.lineTo(px, H - 16); ctx.stroke();
+      if (xCm % 20 === 0) ctx.fillText(xCm + 'cm', px, H - 22);
+    }
+
+    ctx.fillStyle = '#1f211e';
+    ctx.font = '700 38px "Space Grotesk", "PingFang TC", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('啟動區', 12 * S, 13 * S);
+    ctx.font = '600 22px "Space Grotesk", sans-serif';
+    ctx.fillStyle = '#474a44';
+    ctx.fillText('Starting Area', 12 * S, 36 * S);
+
+    ctx.save();
+    ctx.setLineDash([14, 14]);
+    ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+    ctx.lineWidth = 2;
+    for (let r = 1; r < GRID_ROWS; r++) {
+      const py = r * CELL_H * S;
+      ctx.beginPath(); ctx.moveTo(START_LINE_X * S + 10, py); ctx.lineTo(GRID_X0 * S - 6, py); ctx.stroke();
+    }
+    ctx.restore();
+
+    const cx = 81 * S, cy = 24 * S, rad = 14.5 * S;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2);
+    ctx.fillStyle = '#f97316'; ctx.fill(); ctx.lineWidth = 6; ctx.strokeStyle = '#1f211e'; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy, rad * 0.88, 0, Math.PI * 2);
+    ctx.fillStyle = '#38bdf8'; ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy, rad * 0.76, 0, Math.PI * 2);
+    ctx.fillStyle = '#eab308'; ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy + rad * 0.16, rad * 0.44, 0, Math.PI * 2);
+    ctx.fillStyle = '#b91c1c'; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy + rad * 0.22, rad * 0.26, 0, Math.PI * 2);
+    ctx.fillStyle = '#f8fafc'; ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = '#1e293b'; ctx.stroke();
+    ctx.fillStyle = '#111827';
+    ctx.fillRect(cx - rad * 0.92, cy - rad * 0.16, rad * 1.84, rad * 0.28);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 30px "Space Grotesk", sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('LOCATE MASTER', cx, cy - rad * 0.02);
+    ctx.fillStyle = '#111827';
+    ctx.font = '700 20px "JetBrains Mono", monospace';
+    ctx.fillText('ROBORAVE ASIA', cx, cy - rad * 0.36);
+    ctx.restore();
+
+    ctx.fillStyle = '#141514';
+    ctx.fillRect((START_LINE_X - START_LINE_W / 2) * S, 0, START_LINE_W * S, H);
+
+    const colorMap = { 50: '#1d8cf8', 20: '#f59e0b', 10: '#ef231f' };
+    for (let r = 0; r < GRID_ROWS; r++) {
+      for (let c = 0; c < GRID_COLS; c++) {
+        const val = state.grid[r][c];
+        const x0 = (GRID_X0 + c * CELL_W) * S;
+        const y0 = (r * CELL_H) * S;
+        const cw = CELL_W * S, ch = CELL_H * S;
+        ctx.fillStyle = colorMap[val] || '#ef231f';
+        ctx.fillRect(x0, y0, cw, ch);
+        ctx.strokeStyle = '#161816'; ctx.lineWidth = 4;
+        ctx.strokeRect(x0, y0, cw, ch);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 54px "Space Grotesk", sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(String(val), x0 + cw / 2, y0 + ch / 2 + 2);
+      }
+    }
+    ctx.strokeStyle = '#232622'; ctx.lineWidth = 4;
+    ctx.strokeRect(2, 2, W - 4, H - 4);
+    matTexture.needsUpdate = true;
+  }
+
+  const boardSideMat = new THREE.MeshStandardMaterial({ color: 0xe2e0d8, roughness: 0.8 });
+  const boardTopMat = new THREE.MeshStandardMaterial({ map: matTexture, roughness: 0.72, metalness: 0.02 });
+  const boardMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(FIELD_L, BOARD_H, FIELD_W),
+    [boardSideMat, boardSideMat, boardTopMat, boardSideMat, boardSideMat, boardSideMat]
+  );
+  boardMesh.position.set(FIELD_L / 2, -BOARD_H / 2, FIELD_W / 2);
+  boardMesh.receiveShadow = true; boardMesh.castShadow = true;
+  scene.add(boardMesh);
+  drawMatTexture();
+
+  // Staging Tray (9 Draggable Rims)
+  const trayCanvas = document.createElement('canvas');
+  trayCanvas.width = 512; trayCanvas.height = 128;
+  const tctx = trayCanvas.getContext('2d');
+  tctx.fillStyle = '#262b27'; tctx.fillRect(0, 0, 512, 128);
+  tctx.strokeStyle = '#4ade80'; tctx.lineWidth = 4; tctx.strokeRect(4, 4, 504, 120);
+  tctx.fillStyle = '#e8f5e9'; tctx.font = '700 22px "Space Grotesk", "PingFang TC", sans-serif';
+  tctx.textAlign = 'center';
+  tctx.fillText('▲ 拖動冰壺到黑線上出發 ▲', 256, 108);
+  const trayTex = new THREE.CanvasTexture(trayCanvas);
+  trayTex.encoding = THREE.sRGBEncoding;
+
+  const trayDark = new THREE.MeshStandardMaterial({ color: 0x262b27 });
+  const trayMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(42, 0.8, 9.5),
+    [trayDark, trayDark, new THREE.MeshStandardMaterial({ map: trayTex, roughness: 0.6 }), trayDark, trayDark, trayDark]
+  );
+  trayMesh.position.set(TRAY_X0 + (MAX_RIMS - 1) * TRAY_STEP / 2, -BOARD_H + 0.4, TRAY_Z + 1.0);
+  trayMesh.receiveShadow = true;
+  scene.add(trayMesh);
+
+  const snapRingMat = new THREE.MeshBasicMaterial({ color: 0xff4f00, side: THREE.DoubleSide, transparent: true, opacity: 0.0 });
+  const snapRing = new THREE.Mesh(new THREE.RingGeometry(1.7, 2.5, 28), snapRingMat);
+  snapRing.rotation.x = -Math.PI / 2;
+  snapRing.position.set(START_LINE_X, 0.08, 6.5);
+  scene.add(snapRing);
+
+  // Positioning Jig
+  const jigGroup = new THREE.Group();
+  const jigMat = new THREE.MeshStandardMaterial({ color: 0x3b3f3c, roughness: 0.55 });
+  const jigAccentMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.45 });
+  const backBar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.8, 15.0), jigMat);
+  backBar.position.set(START_BACKSTOP_X - 0.6, 0.9, 0); backBar.castShadow = true; jigGroup.add(backBar);
+  const sideRailL = new THREE.Mesh(new THREE.BoxGeometry(11.0, 1.2, 0.8), jigAccentMat);
+  sideRailL.position.set(START_BACKSTOP_X + 5.5, 0.6, -(ROBOT_HALF_W + 0.6)); jigGroup.add(sideRailL);
+  const sideRailR = new THREE.Mesh(new THREE.BoxGeometry(11.0, 1.2, 0.8), jigAccentMat);
+  sideRailR.position.set(START_BACKSTOP_X + 5.5, 0.6, (ROBOT_HALF_W + 0.6)); jigGroup.add(sideRailR);
+  jigGroup.position.z = state.startZ;
+  scene.add(jigGroup);
+
+  // Aiming Dashed Line + Interactive Orange Arrow Handle
+  const aimLineGeo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0, 0.14, 0), new THREE.Vector3(175, 0.14, 0)
+  ]);
+  const aimLine = new THREE.Line(aimLineGeo, new THREE.LineDashedMaterial({
+    color: 0xff4f00, dashSize: 3.5, gapSize: 2.5, transparent: true, opacity: 0.65
+  }));
+  aimLine.computeLineDistances();
+
+  const aimHandle = new THREE.Mesh(
+    new THREE.ConeGeometry(1.5, 3.6, 16),
+    new THREE.MeshStandardMaterial({ color: 0xff4f00, roughness: 0.35 })
+  );
+  aimHandle.rotation.z = -Math.PI / 2;
+  aimHandle.position.set(ROBOT_HALF_LEN + FORK_LEN + 3.2, 1.2, 0);
+
+  // P207 Robot
+  const robotGroup = new THREE.Group();
+  const wheelMeshes = [];
+
+  function buildP207Robot() {
+    const hubCanvas = document.createElement('canvas');
+    hubCanvas.width = 256; hubCanvas.height = 256;
+    const hctx = hubCanvas.getContext('2d');
+    hctx.fillStyle = '#f3f2ee'; hctx.fillRect(0, 0, 256, 256);
+    hctx.fillStyle = '#e7e5dc'; hctx.fillRect(36, 130, 184, 72);
+    hctx.strokeStyle = 'rgba(0,0,0,0.12)'; hctx.lineWidth = 2; hctx.strokeRect(36, 130, 184, 72);
+    hctx.fillStyle = '#e2e0d8'; hctx.fillRect(102, 54, 52, 52);
+    hctx.strokeStyle = '#c4c1b7'; hctx.strokeRect(102, 54, 52, 52);
+    hctx.fillStyle = '#1d4ed8'; hctx.font = '700 42px "Space Grotesk", sans-serif';
+    hctx.textAlign = 'center'; hctx.fillText('P207', 128, 178);
+    hctx.font = '700 20px "PingFang TC", sans-serif'; hctx.fillText('偏左', 194, 176);
+    hctx.fillStyle = '#737670'; hctx.font = '700 18px "JetBrains Mono", monospace';
+    hctx.fillText('A', 66, 232); hctx.fillText('B', 190, 232);
+    const hubTopTex = new THREE.CanvasTexture(hubCanvas);
+    hubTopTex.encoding = THREE.sRGBEncoding;
+
+    const whiteMat = new THREE.MeshStandardMaterial({ color: 0xf4f3ef, roughness: 0.42 });
+    const hubTopMat = new THREE.MeshStandardMaterial({ map: hubTopTex, roughness: 0.45 });
+    const darkGreyMat = new THREE.MeshStandardMaterial({ color: 0x3b3d3a, roughness: 0.55 });
+    const lightGreyMat = new THREE.MeshStandardMaterial({ color: 0x8d918b, roughness: 0.5 });
+    const magentaMat = new THREE.MeshStandardMaterial({ color: 0xc02678, roughness: 0.45 });
+    const cyanTireMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.55 });
+    const blackHubMat = new THREE.MeshStandardMaterial({ color: 0x181a18, roughness: 0.5 });
+
+    const chassis = new THREE.Mesh(new THREE.BoxGeometry(11.8, 2.2, 8.6), darkGreyMat);
+    chassis.position.set(0, 2.4, 0); chassis.castShadow = true; robotGroup.add(chassis);
+    const motorL = new THREE.Mesh(new THREE.BoxGeometry(4.2, 2.2, 3.0), magentaMat);
+    motorL.position.set(1.2, 2.8, -2.5); robotGroup.add(motorL);
+    const motorR = new THREE.Mesh(new THREE.BoxGeometry(4.2, 2.2, 3.0), magentaMat);
+    motorR.position.set(1.2, 2.8, 2.5); robotGroup.add(motorR);
+
+    const hubMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(6.8, 3.2, 7.6),
+      [whiteMat, whiteMat, hubTopMat, whiteMat, whiteMat, whiteMat]
+    );
+    hubMesh.position.set(-2.2, 5.1, 0); hubMesh.castShadow = true; robotGroup.add(hubMesh);
+    const hubLed = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.15, 0.9), new THREE.MeshBasicMaterial({ color: 0x4ade80 }));
+    hubLed.position.set(-1.3, 6.75, 0); robotGroup.add(hubLed);
+
+    [-4.6, 4.6].forEach(zPos => {
+      const beam = new THREE.Mesh(new THREE.BoxGeometry(11.6, 0.9, 0.8), lightGreyMat);
+      beam.position.set(0.2, 3.3, zPos); beam.castShadow = true; robotGroup.add(beam);
+    });
+
+    const bumper = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.4, 12.2), darkGreyMat);
+    bumper.position.set(ROBOT_HALF_LEN - 0.55, 1.3, 0); bumper.castShadow = true; robotGroup.add(bumper);
+    const bumperTop = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.9, 10.8), lightGreyMat);
+    bumperTop.position.set(ROBOT_HALF_LEN - 0.6, 2.4, 0); robotGroup.add(bumperTop);
+
+    [-1, 1].forEach(side => {
+      const fork = new THREE.Mesh(new THREE.BoxGeometry(FORK_LEN, 1.1, FORK_THICK), whiteMat);
+      fork.position.set(ROBOT_HALF_LEN + FORK_LEN / 2, 1.1, side * (FORK_INNER_HALF_W + FORK_THICK / 2));
+      fork.castShadow = true; robotGroup.add(fork);
+      const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 1.2, 10), blackHubMat);
+      pin.position.set(ROBOT_HALF_LEN + 1.4, 1.1, side * (FORK_INNER_HALF_W + FORK_THICK / 2));
+      robotGroup.add(pin);
+    });
+
+    const tireGeo = new THREE.CylinderGeometry(2.8, 2.8, 1.4, 24); tireGeo.rotateX(Math.PI / 2);
+    const rimGeo = new THREE.CylinderGeometry(2.0, 2.0, 1.45, 16); rimGeo.rotateX(Math.PI / 2);
+    const spokeGeo = new THREE.BoxGeometry(3.4, 0.35, 1.5);
+    [
+      [3.2, 2.8, -(ROBOT_HALF_W - 0.7)], [3.2, 2.8, (ROBOT_HALF_W - 0.7)],
+      [-3.2, 2.8, -(ROBOT_HALF_W - 0.7)], [-3.2, 2.8, (ROBOT_HALF_W - 0.7)]
+    ].forEach(([wx, wy, wz]) => {
+      const wg = new THREE.Group();
+      wg.position.set(wx, wy, wz);
+      const tire = new THREE.Mesh(tireGeo, cyanTireMat); tire.castShadow = true; wg.add(tire);
+      wg.add(new THREE.Mesh(rimGeo, blackHubMat));
+      wg.add(new THREE.Mesh(spokeGeo, lightGreyMat));
+      robotGroup.add(wg); wheelMeshes.push(wg);
+    });
+
+    robotGroup.add(aimLine);
+    robotGroup.add(aimHandle);
+    scene.add(robotGroup);
+  }
+  buildP207Robot();
+
+  // 9 Wheel Rims
+  const rimOuterGeo = new THREE.CylinderGeometry(RIM_RADIUS, RIM_RADIUS, RIM_HEIGHT, 24);
+  const rimInnerGeo = new THREE.CylinderGeometry(RIM_RADIUS * 0.62, RIM_RADIUS * 0.62, RIM_HEIGHT + 0.08, 16);
+  const rimMat = new THREE.MeshStandardMaterial({ color: 0xe6e8eb, roughness: 0.38, metalness: 0.12 });
+  const rimCoreMat = new THREE.MeshStandardMaterial({ color: 0x3b4046, roughness: 0.6 });
+  const glowRingGeo = new THREE.RingGeometry(RIM_RADIUS + 0.15, RIM_RADIUS + 0.65, 24);
+  glowRingGeo.rotateX(-Math.PI / 2);
+
+  function initAllNineRims() {
+    for (const r of state.rims) scene.remove(r.mesh);
+    state.rims = [];
+    for (let i = 0; i < MAX_RIMS; i++) {
+      const g = new THREE.Group();
+      const outer = new THREE.Mesh(rimOuterGeo, rimMat);
+      outer.position.y = RIM_HEIGHT / 2; outer.castShadow = true; outer.receiveShadow = true; g.add(outer);
+      const inner = new THREE.Mesh(rimInnerGeo, rimCoreMat);
+      inner.position.y = RIM_HEIGHT / 2; g.add(inner);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0x4ade80, side: THREE.DoubleSide, transparent: true, opacity: 0.0 });
+      const ring = new THREE.Mesh(glowRingGeo, ringMat); ring.position.y = 0.06; g.add(ring);
+      scene.add(g);
+
+      const tx = TRAY_X0 + i * TRAY_STEP, tz = TRAY_Z - 1.2;
+      const rim = {
+        id: i + 1, status: 'tray',
+        trayX: tx, trayZ: tz, x: tx, z: tz, y: -BOARD_H + 0.8,
+        vx: 0, vz: 0, vy: 0, score: 0, straddling: false, mesh: g, ringMat
+      };
+      g.position.set(rim.x, rim.y, rim.z);
+      state.rims.push(rim);
+    }
+  }
+  initAllNineRims();
+
+  function hasRimOnStartLine(zRef) {
+    return state.rims.find(r => r.status === 'field' && Math.abs(r.x - START_LINE_X) < RIM_RADIUS * 1.9 && Math.abs(r.z - zRef) < 5.0);
+  }
+
+  function placeRimOnStartLine(rim, targetZ) {
+    const zClamped = clamp(targetZ, 2.5, FIELD_W - 2.5);
+    const conflict = state.rims.find(r => r !== rim && r.status === 'field' && Math.hypot(r.x - START_LINE_X, r.z - zClamped) < RIM_RADIUS * 1.9);
+    if (conflict) {
+      setToast('黑線上已有 1 顆冰壺（每次限放 1 顆）');
+      return false;
+    }
+    rim.status = 'field';
+    rim.x = START_LINE_X; rim.z = zClamped; rim.y = 0;
+    rim.vx = 0; rim.vz = 0; rim.vy = 0;
+    playClick(760, 0.04, 0.045);
+    setToast(`#${rim.id} 冰壺已放上黑線`);
+    updateUI();
+    return true;
+  }
+
+  function autoDropNextTrayRim() {
+    const next = state.rims.find(r => r.status === 'tray');
+    if (!next) return null;
+    if (hasRimOnStartLine(state.robot.z)) return null;
+    const jitterZ = ((next.id % 3) - 1) * 1.1;
+    placeRimOnStartLine(next, clamp(state.robot.z + jitterZ, 2.5, FIELD_W - 2.5));
+    return next;
+  }
+
+  // =========================================================================
+  // 5. SCORING & PHYSICS
+  // =========================================================================
+  function evaluateRimScore(rim) {
+    if (rim.status !== 'field' || rim.x + RIM_RADIUS < GRID_X0) {
+      rim.score = 0; rim.straddling = false; rim.ringMat.opacity = 0;
+      return 0;
+    }
+    const samples = [[0, 0]];
+    for (let a = 0; a < 8; a++) {
+      const ang = (a / 8) * Math.PI * 2;
+      samples.push([Math.cos(ang) * RIM_RADIUS, Math.sin(ang) * RIM_RADIUS]);
+    }
+    const touched = new Set();
+    let best = 0;
+    for (const [dx, dz] of samples) {
+      const sx = rim.x + dx, sz = rim.z + dz;
+      if (sx >= GRID_X0 && sx <= FIELD_L && sz >= 0 && sz <= FIELD_W) {
+        const col = Math.min(GRID_COLS - 1, Math.max(0, Math.floor((sx - GRID_X0) / CELL_W)));
+        const row = Math.min(GRID_ROWS - 1, Math.max(0, Math.floor(sz / CELL_H)));
+        touched.add(row + ',' + col);
+        if (state.grid[row][col] > best) best = state.grid[row][col];
+      }
+    }
+    rim.score = best;
+    rim.straddling = touched.size > 1 && best > 0;
+    if (best === 50) {
+      rim.ringMat.color.setHex(rim.straddling ? 0xfacc15 : 0x4ade80);
+      rim.ringMat.opacity = rim.straddling ? 0.95 : 0.6;
+    } else if (best > 0) {
+      rim.ringMat.color.setHex(0xffffff);
+      rim.ringMat.opacity = 0.35;
+    } else {
+      rim.ringMat.opacity = 0;
+    }
+    return best;
+  }
+
+  function computeTotals() {
+    let propScore = 0, onFieldCount = 0;
+    for (const rim of state.rims) {
+      if (rim.status !== 'tray') onFieldCount++;
+      propScore += evaluateRimScore(rim);
+    }
+    const timeBonus = state.matchFinished ? state.lockedTimeBonus : Math.floor(Math.max(0, state.timeLeft));
+    return { propScore, timeBonus, total: propScore + (state.matchStarted ? timeBonus : 0), onFieldCount };
+  }
+
+  const G_CM = 980.0;
+  function getMaxSpeedCmS() { return state.maxRps * state.cmPerRot; }
+
+  function stepPhysics(dt) {
+    if (state.matchStarted && !state.matchFinished) {
+      state.timeLeft = Math.max(0, state.timeLeft - dt);
+      if (state.timeLeft <= 0) finishMatch(true);
+    }
+
+    const r = state.robot;
+    const maxSpd = getMaxSpeedCmS();
+
+    if (!state.running && !state.matchFinished && !dragState.active) {
+      let fwdIn = (state.keys.fwd || state.touch.fwd ? 1 : 0) - (state.keys.back || state.touch.back ? 1 : 0);
+      let turnIn = (state.keys.right || state.touch.right ? 1 : 0) - (state.keys.left || state.touch.left ? 1 : 0);
+
+      const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+      let padFound = false;
+      for (const p of pads) {
+        if (!p) continue;
+        padFound = true;
+        if (Math.abs(-p.axes[1]) > 0.16) fwdIn = -p.axes[1];
+        if (Math.abs(p.axes[0]) > 0.16) turnIn = p.axes[0];
+      }
+      const gpEl = document.getElementById('gamepadStatus');
+      if (gpEl) gpEl.textContent = padFound ? '手柄：已連線' : '手柄：未偵測';
+
+      if (Math.abs(fwdIn) > 0.01 || Math.abs(turnIn) > 0.01) {
+        if (!state.matchStarted) state.matchStarted = true;
+      }
+      const speed = (state.rcSpeedPct / 100) * maxSpd;
+      const vCmd = fwdIn * speed;
+      r.vx = Math.cos(r.yaw) * vCmd;
+      r.vz = Math.sin(r.yaw) * vCmd;
+      r.omega = turnIn * 2.6;
+      if (Math.abs(vCmd) > 0.1) r.omega += (state.driftDegS * Math.PI / 180) * (vCmd / maxSpd);
+    }
+
+    const prevX = r.x, prevZ = r.z;
+    if (!dragState.active || dragState.type !== 'robot') {
+      r.yaw += r.omega * dt;
+      r.x += r.vx * dt;
+      r.z += r.vz * dt;
+    }
+
+    if (state.showJig && !dragState.active && r.x < START_LINE_X) {
+      if (r.x < state.startX) {
+        r.x = state.startX;
+        if (r.vx < 0) r.vx = 0;
+        r.yaw += (state.startYaw - r.yaw) * Math.min(1, 14 * dt);
+        r.z += (state.startZ - r.z) * Math.min(1, 14 * dt);
+      }
+      if (r.x < START_BACKSTOP_X + 12.5 && Math.abs(state.startYaw) < 0.05) {
+        const dz = r.z - state.startZ;
+        if (Math.abs(dz) > 0.35) r.z = state.startZ + Math.sign(dz) * 0.35;
+      }
+    }
+
+    r.x = clamp(r.x, ROBOT_HALF_LEN, FIELD_L - 4);
+    r.z = clamp(r.z, ROBOT_HALF_W, FIELD_W - ROBOT_HALF_W);
+
+    const forwardSpeed = Math.cos(r.yaw) * ((r.x - prevX) / Math.max(dt, 1e-5)) +
+                         Math.sin(r.yaw) * ((r.z - prevZ) / Math.max(dt, 1e-5));
+    r.wheelRot += (forwardSpeed / 2.8) * dt;
+    if (r.x - ROBOT_HALF_LEN > START_LINE_X + START_LINE_W / 2) r.leftStartAreaOnce = true;
+
+    const cosY = Math.cos(r.yaw), sinY = Math.sin(r.yaw);
+    const decel = state.friction * G_CM;
+
+    for (const rim of state.rims) {
+      if (rim.status === 'tray') continue;
+      if (dragState.active && dragState.type === 'rim' && dragState.rim === rim) continue;
+      if (rim.status === 'out') {
+        if (rim.y > -12) { rim.vy -= 980 * dt; rim.y += rim.vy * dt; rim.x += rim.vx * dt; rim.z += rim.vz * dt; }
+        continue;
+      }
+
+      const spd = Math.hypot(rim.vx, rim.vz);
+      if (spd > 0.01) {
+        const drop = decel * dt;
+        if (drop >= spd) { rim.vx = 0; rim.vz = 0; }
+        else { const f = (spd - drop) / spd; rim.vx *= f; rim.vz *= f; }
+      }
+      rim.x += rim.vx * dt; rim.z += rim.vz * dt;
+
+      const dx = rim.x - r.x, dz = rim.z - r.z;
+      const lx = dx * cosY + dz * sinY, lz = -dx * sinY + dz * cosY;
+      let pushed = false, nlx = lx, nlz = lz;
+      let vLocalX = rim.vx * cosY + rim.vz * sinY, vLocalZ = -rim.vx * sinY + rim.vz * cosY;
+      const robLocalVx = r.vx * cosY + r.vz * sinY;
+
+      if (lx > -ROBOT_HALF_LEN && lx < ROBOT_HALF_LEN + RIM_RADIUS && Math.abs(lz) < ROBOT_HALF_W + RIM_RADIUS && lx > 0) {
+        nlx = ROBOT_HALF_LEN + RIM_RADIUS;
+        if (vLocalX < robLocalVx) vLocalX = robLocalVx * 1.01;
+        pushed = true;
+      }
+
+      if (lx >= ROBOT_HALF_LEN - 0.5 && lx <= ROBOT_HALF_LEN + FORK_LEN + RIM_RADIUS) {
+        const innerWall = FORK_INNER_HALF_W, outerWall = FORK_INNER_HALF_W + FORK_THICK;
+        if (Math.abs(lz) <= innerWall && Math.abs(lz) > innerWall - RIM_RADIUS) {
+          nlz = Math.sign(lz || 1) * (innerWall - RIM_RADIUS); vLocalZ *= -0.15; pushed = true;
+        } else if (Math.abs(lz) > innerWall && Math.abs(lz) < outerWall + RIM_RADIUS) {
+          nlz = Math.sign(lz || 1) * (outerWall + RIM_RADIUS); vLocalZ *= -0.2; pushed = true;
+        }
+      }
+
+      if (pushed) {
+        rim.x = r.x + nlx * cosY - nlz * sinY;
+        rim.z = r.z + nlx * sinY + nlz * cosY;
+        rim.vx = vLocalX * cosY - vLocalZ * sinY;
+        rim.vz = vLocalX * sinY + vLocalZ * cosY;
+      }
+
+      if (rim.x < -0.5 || rim.x > FIELD_L + 0.5 || rim.z < -0.5 || rim.z > FIELD_W + 0.5) {
+        rim.status = 'out'; rim.vy = -5;
+        setToast(`#${rim.id} 冰壺出界！可在「⚙ 選單」拿回。`);
+        playClick(220, 0.15, 0.07);
+      }
+    }
+
+    const minDist = RIM_RADIUS * 2.02;
+    for (let iter = 0; iter < 3; iter++) {
+      for (let i = 0; i < state.rims.length; i++) {
+        const a = state.rims[i];
+        if (a.status !== 'field') continue;
+        for (let j = i + 1; j < state.rims.length; j++) {
+          const b = state.rims[j];
+          if (b.status !== 'field') continue;
+          const dx = b.x - a.x, dz = b.z - a.z, dist = Math.hypot(dx, dz);
+          if (dist > 0.0001 && dist < minDist) {
+            const nx = dx / dist, nz = dz / dist, ov = (minDist - dist) * 0.52;
+            a.x -= nx * ov; a.z -= nz * ov; b.x += nx * ov; b.z += nz * ov;
+            const relNorm = (b.vx - a.vx) * nx + (b.vz - a.vz) * nz;
+            if (relNorm < 0) {
+              const imp = -1.25 * relNorm * 0.5;
+              a.vx -= imp * nx; a.vz -= imp * nz; b.vx += imp * nx; b.vz += imp * nz;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // =========================================================================
+  // 6. 3D DIRECT DRAG (Robot, Aim Handle, Rims) & CAMERA ORBIT
+  // =========================================================================
+  const raycaster = new THREE.Raycaster();
+  const pointerNDC = new THREE.Vector2();
+  const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  const hitPoint = new THREE.Vector3();
+
+  const dragState = { active: false, type: null, rim: null, offsetX: 0, offsetZ: 0, panning: false, lastX: 0, lastY: 0 };
+
+  function getGroundHit(cx, cy) {
+    const rect = canvas.getBoundingClientRect();
+    pointerNDC.x = ((cx - rect.left) / rect.width) * 2 - 1;
+    pointerNDC.y = -((cy - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointerNDC, camera);
+    return raycaster.ray.intersectPlane(groundPlane, hitPoint) ? hitPoint.clone() : null;
+  }
+
+  const camState = {
+    target: new THREE.Vector3(97.5, 0, 26), theta: 0.0, phi: 0.74, radius: 235,
+    desiredTarget: new THREE.Vector3(97.5, 0, 26), desiredTheta: 0.0, desiredPhi: 0.74, desiredRadius: 235
+  };
+
+  function setCameraPreset(name) {
+    document.querySelectorAll('[data-cam]').forEach(b => b.classList.toggle('active-seg', b.dataset.cam === name));
+    if (name === 'overview') {
+      camState.desiredTarget.set(97.5, 0, 26); camState.desiredTheta = 0.0; camState.desiredPhi = 0.74; camState.desiredRadius = 235;
+    } else if (name === 'scoring') {
+      camState.desiredTarget.set(162, 0, 22); camState.desiredTheta = 0.22; camState.desiredPhi = 0.66; camState.desiredRadius = 85;
+    } else if (name === 'start') {
+      camState.desiredTarget.set(20, 1, 30); camState.desiredTheta = -0.35; camState.desiredPhi = 0.68; camState.desiredRadius = 86;
+    } else if (name === 'top') {
+      camState.desiredTarget.set(97.5, 0, 27); camState.desiredTheta = 0.0; camState.desiredPhi = 0.05; camState.desiredRadius = 242;
+    }
+  }
+
+  function updateCamera() {
+    camState.target.lerp(camState.desiredTarget, 0.14);
+    camState.theta += (camState.desiredTheta - camState.theta) * 0.14;
+    camState.phi += (camState.desiredPhi - camState.phi) * 0.14;
+    camState.radius += (camState.desiredRadius - camState.radius) * 0.14;
+    const s = Math.sin(camState.phi);
+    camera.position.set(
+      camState.target.x + camState.radius * s * Math.sin(camState.theta),
+      camState.target.y + camState.radius * Math.cos(camState.phi),
+      camState.target.z + camState.radius * s * Math.cos(camState.theta)
+    );
+    camera.lookAt(camState.target);
+  }
+
+  canvas.addEventListener('pointerdown', e => {
+    canvas.setPointerCapture(e.pointerId);
+    ensureAudio();
+    dragState.lastX = e.clientX; dragState.lastY = e.clientY;
+    dragState.panning = (e.button === 2 || e.shiftKey);
+
+    if (!state.running && !dragState.panning) {
+      const pt = getGroundHit(e.clientX, e.clientY);
+      if (pt) {
+        const hw = new THREE.Vector3(); aimHandle.getWorldPosition(hw);
+        if (Math.hypot(pt.x - hw.x, pt.z - hw.z) < 4.8) {
+          dragState.active = true; dragState.type = 'aim'; canvas.classList.add('dragging-obj'); return;
+        }
+        let bestRim = null, bestDist = 3.8;
+        for (const rim of state.rims) {
+          if (rim.status === 'out') continue;
+          const d = Math.hypot(pt.x - rim.x, pt.z - rim.z);
+          if (d < bestDist) { bestDist = d; bestRim = rim; }
+        }
+        if (bestRim) {
+          dragState.active = true; dragState.type = 'rim'; dragState.rim = bestRim;
+          bestRim.vx = 0; bestRim.vz = 0; canvas.classList.add('dragging-obj');
+          playClick(680, 0.03, 0.04); return;
+        }
+        if (Math.hypot(pt.x - state.robot.x, pt.z - state.robot.z) < 9.5) {
+          dragState.active = true; dragState.type = 'robot';
+          dragState.offsetX = state.robot.x - pt.x; dragState.offsetZ = state.robot.z - pt.z;
+          canvas.classList.add('dragging-obj'); playClick(520, 0.03, 0.04); return;
+        }
+      }
+    }
+    dragState.active = true; dragState.type = 'orbit';
+  });
+
+  canvas.addEventListener('pointermove', e => {
+    if (!dragState.active) return;
+    if (dragState.type === 'orbit') {
+      const dx = e.clientX - dragState.lastX, dy = e.clientY - dragState.lastY;
+      dragState.lastX = e.clientX; dragState.lastY = e.clientY;
+      if (dragState.panning) {
+        const ps = camState.desiredRadius * 0.0014;
+        camState.desiredTarget.x = clamp(camState.desiredTarget.x - dx * ps, 0, FIELD_L);
+        camState.desiredTarget.z = clamp(camState.desiredTarget.z - dy * ps, 0, FIELD_W + 14);
+      } else {
+        camState.desiredTheta -= dx * 0.0065;
+        camState.desiredPhi = clamp(camState.desiredPhi - dy * 0.0065, 0.05, 1.42);
+      }
+      return;
+    }
+    const pt = getGroundHit(e.clientX, e.clientY);
+    if (!pt) return;
+    if (dragState.type === 'robot') {
+      const maxStartX = START_LINE_X - (ROBOT_HALF_LEN + FORK_LEN) - 0.35;
+      state.robot.x = clamp(pt.x + dragState.offsetX, ROBOT_HALF_LEN, Math.max(ROBOT_START_X, maxStartX));
+      state.robot.z = clamp(pt.z + dragState.offsetZ, ROBOT_HALF_W, FIELD_W - ROBOT_HALF_W);
+      state.startX = state.robot.x; state.startZ = state.robot.z;
+      syncCalUI();
+    } else if (dragState.type === 'aim') {
+      let ang = clamp(Math.atan2(pt.z - state.robot.z, pt.x - state.robot.x), -0.45, 0.45);
+      if (Math.abs(ang) < 0.03) ang = 0;
+      state.robot.yaw = ang; state.startYaw = ang;
+    } else if (dragState.type === 'rim' && dragState.rim) {
+      const rim = dragState.rim;
+      rim.x = clamp(pt.x, -4, FIELD_L - 1);
+      rim.z = clamp(pt.z, 1.8, TRAY_Z + 4);
+      rim.y = 1.2;
+      if (Math.abs(rim.x - START_LINE_X) < 6.0 && rim.z <= FIELD_W) {
+        snapRing.position.set(START_LINE_X, 0.09, clamp(rim.z, 2.5, FIELD_W - 2.5));
+        snapRingMat.opacity = 0.85;
+      } else {
+        snapRingMat.opacity = 0.0;
+      }
+    }
+  });
+
+  canvas.addEventListener('pointerup', () => {
+    if (!dragState.active) return;
+    if (dragState.type === 'rim' && dragState.rim) {
+      const rim = dragState.rim;
+      snapRingMat.opacity = 0.0;
+      if (Math.abs(rim.x - START_LINE_X) < 6.0 && rim.z <= FIELD_W) {
+        const ok = placeRimOnStartLine(rim, rim.z);
+        if (!ok && rim.status === 'tray') { rim.x = rim.trayX; rim.z = rim.trayZ; rim.y = -BOARD_H + 0.8; }
+      } else if (rim.z > FIELD_W + 1.5) {
+        rim.status = 'tray'; rim.x = rim.trayX; rim.z = rim.trayZ; rim.y = -BOARD_H + 0.8;
+      } else {
+        rim.status = 'field'; rim.x = clamp(rim.x, 2, FIELD_L - 2); rim.z = clamp(rim.z, 2, FIELD_W - 2); rim.y = 0;
+        playClick(600, 0.04, 0.04);
+      }
+      updateUI();
+    } else if (dragState.type === 'robot' || dragState.type === 'aim') {
+      saveSettings();
+      const rowIdx = Math.min(4, Math.max(1, Math.floor(state.robot.z / CELL_H) + 1));
+      setToast(`P207 已對準第 ${rowIdx} 列 (角度 ${(state.robot.yaw * 180 / Math.PI).toFixed(1)}°)`);
+    }
+    dragState.active = false; dragState.type = null; dragState.rim = null;
+    canvas.classList.remove('dragging-obj');
+  });
+
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    camState.desiredRadius = clamp(camState.desiredRadius + e.deltaY * 0.12, 35, 320);
+  }, { passive: false });
+
+  // =========================================================================
+  // 7. SPIKE 3 BLOCKLY WORKSPACE (1:1 Screenshot + Click-Stack-to-Run!)
+  // =========================================================================
+  let workspace = null;
+  let activeCallerDom = null;
+  let activeExecDom = null;
+
+  function setExecHighlight(callerId, activeId) {
+    state.callerBlockId = callerId;
+    state.activeBlockId = activeId;
+    state.highlightDirty = true;
+  }
+
+  function flushBlocklyHighlights() {
+    if (!state.highlightDirty || !workspace) return;
+    state.highlightDirty = false;
+    if (activeCallerDom) { activeCallerDom.classList.remove('ev3-exec-caller'); activeCallerDom = null; }
+    if (activeExecDom) { activeExecDom.classList.remove('ev3-exec-active'); activeExecDom = null; }
+    if (state.callerBlockId) {
+      const b = workspace.getBlockById(state.callerBlockId);
+      if (b && b.getSvgRoot()) { activeCallerDom = b.getSvgRoot(); activeCallerDom.classList.add('ev3-exec-caller'); }
+    }
+    if (state.activeBlockId) {
+      const b = workspace.getBlockById(state.activeBlockId);
+      if (b && b.getSvgRoot()) { activeExecDom = b.getSvgRoot(); activeExecDom.classList.add('ev3-exec-active'); }
+    }
+  }
+
+  function initBlockly() {
+    if (typeof Blockly === 'undefined') return;
+
+    Blockly.defineBlocksWithJsonArray([
+      {
+        "type": "spike_when_recv",
+        "message0": "當接收到 %1",
+        "args0": [{ "type": "field_dropdown", "name": "MSG", "options": [["1-5","1-5"],["6-9","6-9"]] }],
+        "nextStatement": null,
+        "colour": "#FFBF00"
+      },
+      {
+        "type": "spike_repeat",
+        "message0": "重複執行 %1 次",
+        "args0": [{ "type": "field_number", "name": "TIMES", "value": 5, "min": 1, "max": 20 }],
+        "message1": "%1",
+        "args1": [{ "type": "input_statement", "name": "DO" }],
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": "#FFAB19"
+      },
+      {
+        "type": "spike_wait",
+        "message0": "等待 %1 秒",
+        "args0": [{ "type": "field_number", "name": "SEC", "value": 0.1, "min": 0, "max": 10, "precision": 0.05 }],
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": "#FFAB19"
+      },
+      {
+        "type": "spike_set_speed",
+        "message0": "將運動速度設置為 %1 %%",
+        "args0": [{ "type": "field_number", "name": "SPD", "value": 52, "min": 5, "max": 100 }],
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": "#E63B7A"
+      },
+      {
+        "type": "spike_move_param",
+        "message0": "%1 移動 %2 %3",
+        "args0": [
+          { "type": "field_dropdown", "name": "DIR", "options": [["↑","FWD"],["↓","BACK"]] },
+          { "type": "field_dropdown", "name": "PARAM", "options": [["前","p_fwd"],["後","p_back"],["前2","p2_fwd"],["後2","p2_back"],["前3","p3_fwd"],["後3","p3_back"]] },
+          { "type": "field_dropdown", "name": "UNIT", "options": [["圈","ROT"],["秒","SEC"]] }
+        ],
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": "#E63B7A"
+      },
+      {
+        "type": "spike_move_fixed",
+        "message0": "%1 移動 %2 %3",
+        "args0": [
+          { "type": "field_dropdown", "name": "DIR", "options": [["↑","FWD"],["↓","BACK"]] },
+          { "type": "field_number", "name": "VAL", "value": 0.5, "min": 0, "max": 20, "precision": 0.05 },
+          { "type": "field_dropdown", "name": "UNIT", "options": [["秒","SEC"],["圈","ROT"]] }
+        ],
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": "#E63B7A"
+      },
+      {
+        "type": "spike_def_fn1",
+        "message0": "定義  前後  (前) 圈  (後) 圈",
+        "nextStatement": null,
+        "colour": "#FF6680"
+      },
+      {
+        "type": "spike_def_fn2",
+        "message0": "定義  前後2  (前2) 圈  (後2) 圈",
+        "nextStatement": null,
+        "colour": "#FF6680"
+      },
+      {
+        "type": "spike_def_fn3",
+        "message0": "定義  前後3  (前3) 圈  (後3) 圈",
+        "nextStatement": null,
+        "colour": "#FF6680"
+      },
+      {
+        "type": "spike_call_fn1",
+        "message0": "前後 %1 圈 %2 圈",
+        "args0": [
+          { "type": "field_number", "name": "FWD", "value": 0.67, "min": 0, "max": 20, "precision": 0.01 },
+          { "type": "field_number", "name": "BACK", "value": 0.58, "min": 0, "max": 20, "precision": 0.01 }
+        ],
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": "#FF6680"
+      },
+      {
+        "type": "spike_call_fn2",
+        "message0": "前後2 %1 圈 %2 圈",
+        "args0": [
+          { "type": "field_number", "name": "FWD", "value": 3.205, "min": 0, "max": 20, "precision": 0.005 },
+          { "type": "field_number", "name": "BACK", "value": 3.2, "min": 0, "max": 20, "precision": 0.01 }
+        ],
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": "#FF6680"
+      },
+      {
+        "type": "spike_call_fn3",
+        "message0": "前後3 %1 圈 %2 圈",
+        "args0": [
+          { "type": "field_number", "name": "FWD", "value": 2.7, "min": 0, "max": 20, "precision": 0.01 },
+          { "type": "field_number", "name": "BACK", "value": 2.45, "min": 0, "max": 20, "precision": 0.01 }
+        ],
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": "#FF6680"
+      }
+    ]);
+
+    const spikeTheme = Blockly.Theme.defineTheme('spikeTheme', {
+      base: Blockly.Themes.Zelos,
+      componentStyles: {
+        workspaceBackgroundColour: '#f7f6f2',
+        scrollbarColour: '#b4b1a8'
+      },
+      fontStyle: {
+        family: '"Space Grotesk", "PingFang TC", sans-serif',
+        weight: '700',
+        size: 11
+      }
+    });
+
+    workspace = Blockly.inject('blocklyDiv', {
+      media: '../assets/roborave/blockly/media/',
+      renderer: 'zelos',
+      theme: spikeTheme,
+      grid: { spacing: 24, length: 2, colour: '#dedcd4', snap: true },
+      zoom: { controls: true, wheel: true, startScale: 0.72, maxScale: 1.4, minScale: 0.45 },
+      move: { scrollbars: true, drag: true, wheel: false },
+      trashcan: false
+    });
+
+    loadDefaultScreenshotBlocks();
+    wireSpike3ClickToRun();
+  }
+
+  function loadDefaultScreenshotBlocks() {
+    if (!workspace) return;
+    workspace.clear();
+    const xmlText = `
+      <xml xmlns="https://developers.google.com/blockly/xml">
+        <!-- Left Col: 定義 前後 / 前後2 / 前後3 (exact match to screenshot) -->
+        <block type="spike_def_fn1" id="def_fn1" x="18" y="20">
+          <next>
+            <block type="spike_set_speed" id="fn1_spd"><field name="SPD">52</field>
+              <next>
+                <block type="spike_move_param" id="fn1_m1"><field name="DIR">FWD</field><field name="PARAM">p_fwd</field><field name="UNIT">ROT</field>
+                  <next>
+                    <block type="spike_move_param" id="fn1_m2"><field name="DIR">BACK</field><field name="PARAM">p_back</field><field name="UNIT">ROT</field></block>
+                  </next>
+                </block>
+              </next>
+            </block>
+          </next>
+        </block>
+
+        <block type="spike_def_fn2" id="def_fn2" x="18" y="210">
+          <next>
+            <block type="spike_set_speed" id="fn2_spd1"><field name="SPD">80</field>
+              <next>
+                <block type="spike_move_param" id="fn2_m1"><field name="DIR">FWD</field><field name="PARAM">p2_fwd</field><field name="UNIT">ROT</field>
+                  <next>
+                    <block type="spike_set_speed" id="fn2_spd2"><field name="SPD">30</field>
+                      <next>
+                        <block type="spike_move_fixed" id="fn2_m2"><field name="DIR">FWD</field><field name="VAL">0.5</field><field name="UNIT">SEC</field>
+                          <next>
+                            <block type="spike_set_speed" id="fn2_spd3"><field name="SPD">95</field>
+                              <next>
+                                <block type="spike_move_param" id="fn2_m3"><field name="DIR">BACK</field><field name="PARAM">p2_back</field><field name="UNIT">ROT</field></block>
+                              </next>
+                            </block>
+                          </next>
+                        </block>
+                      </next>
+                    </block>
+                  </next>
+                </block>
+              </next>
+            </block>
+          </next>
+        </block>
+
+        <block type="spike_def_fn3" id="def_fn3" x="18" y="530">
+          <next>
+            <block type="spike_set_speed" id="fn3_spd1"><field name="SPD">100</field>
+              <next>
+                <block type="spike_move_param" id="fn3_m1"><field name="DIR">FWD</field><field name="PARAM">p3_fwd</field><field name="UNIT">ROT</field>
+                  <next>
+                    <block type="spike_set_speed" id="fn3_spd2"><field name="SPD">100</field>
+                      <next>
+                        <block type="spike_move_param" id="fn3_m2"><field name="DIR">BACK</field><field name="PARAM">p3_back</field><field name="UNIT">ROT</field></block>
+                      </next>
+                    </block>
+                  </next>
+                </block>
+              </next>
+            </block>
+          </next>
+        </block>
+
+        <!-- Right Col: Runnable Stacks (Click Any Stack to Run!) -->
+        <block type="spike_when_recv" id="hat_15" x="325" y="20">
+          <field name="MSG">1-5</field>
+          <next>
+            <block type="spike_repeat" id="rep_15">
+              <field name="TIMES">5</field>
+              <statement name="DO">
+                <block type="spike_call_fn1" id="call_15">
+                  <field name="FWD">0.67</field><field name="BACK">0.58</field>
+                  <next>
+                    <block type="spike_wait" id="wait_15"><field name="SEC">0.1</field></block>
+                  </next>
+                </block>
+              </statement>
+            </block>
+          </next>
+        </block>
+
+        <block type="spike_when_recv" id="hat_69" x="600" y="20">
+          <field name="MSG">6-9</field>
+          <next>
+            <block type="spike_repeat" id="rep_69">
+              <field name="TIMES">4</field>
+              <statement name="DO">
+                <block type="spike_call_fn1" id="call_69">
+                  <field name="FWD">0.67</field><field name="BACK">0.58</field>
+                  <next>
+                    <block type="spike_wait" id="wait_69"><field name="SEC">0.1</field></block>
+                  </next>
+                </block>
+              </statement>
+            </block>
+          </next>
+        </block>
+
+        <block type="spike_call_fn2" id="call_fn2_main" x="345" y="255">
+          <field name="FWD">3.205</field><field name="BACK">3.2</field>
+        </block>
+
+        <block type="spike_call_fn3" id="call_fn3_a" x="345" y="345">
+          <field name="FWD">2.7</field><field name="BACK">2.45</field>
+        </block>
+
+        <block type="spike_call_fn3" id="call_fn3_b" x="345" y="435">
+          <field name="FWD">2.5</field><field name="BACK">2.5</field>
+        </block>
+      </xml>
+    `;
+    const dom = Blockly.utils.xml.textToDom(xmlText);
+    Blockly.Xml.domToWorkspace(dom, workspace);
+  }
+
+  // Native SPIKE 3 Click-Stack-to-Run Listener
+  function wireSpike3ClickToRun() {
+    const host = document.getElementById('blocklyDiv');
+    let downX = 0, downY = 0, downTarget = null, skipClick = false;
+
+    host.addEventListener('pointerdown', e => {
+      downX = e.clientX;
+      downY = e.clientY;
+      downTarget = e.target;
+      // Do NOT trigger run if user clicked inside an editable oval, dropdown, or zoom button
+      skipClick = Boolean(
+        e.target.closest('.blocklyEditableText') ||
+        e.target.closest('.blocklyHtmlInput') ||
+        e.target.closest('.blocklyZoom') ||
+        e.target.closest('.blocklyScrollbarHandle')
+      );
+    }, true);
+
+    host.addEventListener('pointerup', e => {
+      if (skipClick || !workspace) return;
+      if (Math.hypot(e.clientX - downX, e.clientY - downY) > 6) return; // Was a drag, not a click
+      const g = (downTarget && downTarget.closest) ? downTarget.closest('g[data-id]') : null;
+      if (!g) return;
+      const blk = workspace.getBlockById(g.getAttribute('data-id'));
+      if (!blk) return;
+      const root = blk.getRootBlock();
+      if (!root) return;
+
+      // Definition hats don't run directly
+      if (root.type === 'spike_def_fn1' || root.type === 'spike_def_fn2' || root.type === 'spike_def_fn3') {
+        setToast('這是函數定義區，請直接點擊右邊的積木條來執行！');
+        playClick(420, 0.03, 0.03);
+        return;
+      }
+
+      // Clicking the currently running stack toggles it OFF (just like Scratch / SPIKE 3)
+      if (state.running && state.runningRootId === root.id) {
+        stopProgram(false);
+        return;
+      }
+
+      // Execute the clicked stack!
+      runBlockStack(root);
+    }, true);
+  }
+
+  // =========================================================================
+  // 8. LIVE AST INTERPRETER FOR BLOCKLY STACKS
+  // =========================================================================
+  let pendingTimers = [];
+
+  function sleepSim(seconds, token) {
+    return new Promise((resolve, reject) => {
+      if (seconds <= 0) return resolve();
+      let elapsed = 0;
+      function tick(dt) {
+        if (token !== state.runToken) return reject('STOPPED');
+        elapsed += dt;
+        if (elapsed >= seconds) return resolve();
+        pendingTimers.push(tick);
+      }
+      pendingTimers.push(tick);
+    });
+  }
+
+  function driveRotationsOrSeconds(speedPct, value, unit, dirSign, token) {
+    return new Promise((resolve, reject) => {
+      if (token !== state.runToken) return reject('STOPPED');
+      if (value <= 0) return resolve();
+      if (!state.matchStarted) state.matchStarted = true;
+
+      const rps = (speedPct / 100) * state.maxRps;
+      const vCmd = dirSign * rps * state.cmPerRot;
+      const duration = (unit === 'ROT') ? (value / Math.max(0.05, rps)) : value;
+      const effScale = (unit === 'ROT' && dirSign > 0 && value < 1.0) ? 0.87 : 1.0;
+
+      let elapsed = 0;
+      function tick(dt) {
+        if (token !== state.runToken) {
+          state.robot.vx = 0; state.robot.vz = 0; state.robot.omega = 0;
+          return reject('STOPPED');
+        }
+        const step = Math.min(dt, duration - elapsed);
+        const vNow = vCmd * effScale;
+        state.robot.vx = Math.cos(state.robot.yaw) * vNow;
+        state.robot.vz = Math.sin(state.robot.yaw) * vNow;
+        state.robot.omega = (state.driftDegS * Math.PI / 180) * (vNow / Math.max(1, getMaxSpeedCmS()));
+        elapsed += step;
+        if (elapsed >= duration - 1e-5) {
+          state.robot.vx = 0; state.robot.vz = 0; state.robot.omega = 0;
+          return resolve();
+        }
+        pendingTimers.push(tick);
+      }
+      pendingTimers.push(tick);
+    });
+  }
+
+  async function executeDefChain(defType, params, callerId, token) {
+    if (!workspace) return;
+    const defBlock = workspace.getTopBlocks(false).find(b => b.type === defType);
+    if (!defBlock) return;
+    let curSpeed = 50;
+    let node = defBlock.getNextBlock();
+    while (node) {
+      if (token !== state.runToken) throw 'STOPPED';
+      setExecHighlight(callerId, node.id);
+      if (node.type === 'spike_set_speed') {
+        curSpeed = clamp(parseFloat(node.getFieldValue('SPD')) || 50, 5, 100);
+      } else if (node.type === 'spike_move_param') {
+        const dir = node.getFieldValue('DIR') === 'BACK' ? -1 : +1;
+        const pname = node.getFieldValue('PARAM');
+        const unit = node.getFieldValue('UNIT');
+        const val = params[pname] !== undefined ? params[pname] : 0;
+        await driveRotationsOrSeconds(curSpeed, val, unit, dir, token);
+      } else if (node.type === 'spike_move_fixed') {
+        const dir = node.getFieldValue('DIR') === 'BACK' ? -1 : +1;
+        const val = parseFloat(node.getFieldValue('VAL')) || 0;
+        const unit = node.getFieldValue('UNIT');
+        await driveRotationsOrSeconds(curSpeed, val, unit, dir, token);
+      } else if (node.type === 'spike_wait') {
+        await sleepSim(parseFloat(node.getFieldValue('SEC')) || 0, token);
+      }
+      node = node.getNextBlock();
+    }
+  }
+
+  async function executeChain(startBlock, token, rootId) {
+    let cur = startBlock;
+    while (cur) {
+      if (token !== state.runToken) throw 'STOPPED';
+      if (cur.type === 'spike_when_recv') {
+        setExecHighlight(cur.id, cur.id);
+      } else if (cur.type === 'spike_repeat') {
+        const times = Math.max(1, parseInt(cur.getFieldValue('TIMES'), 10) || 1);
+        const body = cur.getInputTargetBlock('DO');
+        for (let i = 0; i < times; i++) {
+          if (token !== state.runToken) throw 'STOPPED';
+          if (state.autoDropOnLoop) autoDropNextTrayRim();
+          setToast(`執行中 (${i + 1}/${times})`);
+          if (body) await executeChain(body, token, rootId);
+        }
+      } else if (cur.type === 'spike_wait') {
+        setExecHighlight(rootId, cur.id);
+        await sleepSim(parseFloat(cur.getFieldValue('SEC')) || 0, token);
+      } else if (cur.type === 'spike_call_fn1') {
+        const fwd = parseFloat(cur.getFieldValue('FWD')) || 0;
+        const back = parseFloat(cur.getFieldValue('BACK')) || 0;
+        await executeDefChain('spike_def_fn1', { p_fwd: fwd, p_back: back }, cur.id, token);
+      } else if (cur.type === 'spike_call_fn2') {
+        const fwd = parseFloat(cur.getFieldValue('FWD')) || 0;
+        const back = parseFloat(cur.getFieldValue('BACK')) || 0;
+        setToast(`執行 前後2 (${fwd} 圈 / ${back} 圈)`);
+        await executeDefChain('spike_def_fn2', { p2_fwd: fwd, p2_back: back }, cur.id, token);
+      } else if (cur.type === 'spike_call_fn3') {
+        const fwd = parseFloat(cur.getFieldValue('FWD')) || 0;
+        const back = parseFloat(cur.getFieldValue('BACK')) || 0;
+        setToast(`執行 前後3 (${fwd} 圈 / ${back} 圈)`);
+        await executeDefChain('spike_def_fn3', { p3_fwd: fwd, p3_back: back }, cur.id, token);
+      }
+      cur = cur.getNextBlock();
+    }
+  }
+
+  function stopProgram(quiet = false) {
+    state.runToken++;
+    pendingTimers = [];
+    state.running = false;
+    state.runningRootId = null;
+    state.robot.vx = 0; state.robot.vz = 0; state.robot.omega = 0;
+    setExecHighlight(null, null);
+    document.getElementById('runLed').className = 'led';
+    if (!quiet) {
+      setToast('已停止運行');
+      playClick(300, 0.06, 0.05);
+    }
+  }
+
+  async function runBlockStack(rootBlock) {
+    if (state.matchFinished) resetFull(true);
+    stopProgram(true);
+    state.running = true;
+    state.runningRootId = rootBlock.id;
+    const token = ++state.runToken;
+    document.getElementById('runLed').className = 'led orange';
+    playClick(680, 0.045, 0.05);
+    try {
+      await executeChain(rootBlock, token, rootBlock.id);
+      if (token === state.runToken) {
+        state.running = false;
+        state.runningRootId = null;
+        setExecHighlight(null, null);
+        document.getElementById('runLed').className = 'led';
+        playChime([587, 784]);
+        setToast('完成！可檢視得分或點下一條積木繼續。');
+      }
+    } catch (err) {
+      if (err !== 'STOPPED') console.error(err);
+    }
+  }
+
+  // =========================================================================
+  // 9. UI, DRAWER & REFEREE CONTROLS
+  // =========================================================================
+  function setToast(msg) { document.getElementById('toastText').textContent = msg; }
+
+  function formatTime(sec) {
+    const s = Math.max(0, sec);
+    const m = Math.floor(s / 60);
+    const r = (s % 60).toFixed(1).padStart(4, '0');
+    return `${String(m).padStart(2, '0')}:${r}`;
+  }
+
+  function updateUI() {
+    const { propScore, total, onFieldCount } = computeTotals();
+    document.getElementById('oledTime').textContent = formatTime(state.timeLeft);
+    document.getElementById('oledPropScore').textContent = String(propScore);
+    document.getElementById('oledTotal').textContent = String(total);
+    document.getElementById('oledRimCount').textContent = `${onFieldCount}/${MAX_RIMS}`;
+
+    const leaveEl = document.getElementById('leaveStartBadge');
+    if (leaveEl) {
+      leaveEl.textContent = state.robot.leftStartAreaOnce ? '離區判定：合規 ✓' : '離區判定：待出線';
+      leaveEl.style.color = state.robot.leftStartAreaOnce ? '#15803d' : '#5a5d56';
+    }
+
+    const rimGrid = document.getElementById('rimGrid');
+    if (rimGrid) {
+      let html = '';
+      for (let i = 0; i < MAX_RIMS; i++) {
+        const rim = state.rims[i];
+        if (!rim || rim.status === 'tray') html += `<div class="rim-dot">#${i + 1}</div>`;
+        else if (rim.status === 'out') html += `<div class="rim-dot out">出界</div>`;
+        else if (rim.score === 50) html += `<div class="rim-dot s50">50${rim.straddling ? '*' : ''}</div>`;
+        else if (rim.score === 20) html += `<div class="rim-dot s20">20</div>`;
+        else if (rim.score === 10) html += `<div class="rim-dot s10">10</div>`;
+        else html += `<div class="rim-dot staged">黑線</div>`;
+      }
+      rimGrid.innerHTML = html;
+    }
+  }
+
+  function resetRobotOnly() {
+    stopProgram(true);
+    state.robot.x = state.startX; state.robot.z = state.startZ; state.robot.yaw = state.startYaw;
+    state.robot.vx = 0; state.robot.vz = 0; state.robot.omega = 0;
+    setToast('P207 已回到靠山位置');
+    playClick(500, 0.04, 0.04);
+    updateUI();
+  }
+
+  function resetFull(silent = false) {
+    stopProgram(true);
+    state.matchStarted = false; state.matchFinished = false;
+    state.timeLeft = MATCH_SECONDS; state.lockedTimeBonus = 0;
+    state.robot.x = state.startX; state.robot.z = state.startZ; state.robot.yaw = state.startYaw;
+    state.robot.vx = 0; state.robot.vz = 0; state.robot.omega = 0;
+    state.robot.leftStartAreaOnce = false;
+    for (const rim of state.rims) {
+      rim.status = 'tray'; rim.x = rim.trayX; rim.z = rim.trayZ; rim.y = -BOARD_H + 0.8;
+      rim.vx = 0; rim.vz = 0; rim.vy = 0; rim.score = 0; rim.straddling = false; rim.ringMat.opacity = 0;
+    }
+    document.getElementById('finishModal').classList.remove('open');
+    if (!silent) { setToast('已重設，拖動冰壺上黑線並點積木出發！'); playClick(440, 0.05, 0.05); }
+    updateUI();
+  }
+
+  function retrieveOutRims() {
+    let found = null;
+    for (let i = state.rims.length - 1; i >= 0; i--) {
+      const r = state.rims[i];
+      if (r.status === 'out' || (r.status === 'field' && r.score === 0)) { found = r; break; }
+    }
+    if (found) {
+      found.status = 'tray'; found.x = found.trayX; found.z = found.trayZ; found.y = -BOARD_H + 0.8;
+      found.vx = 0; found.vz = 0; found.vy = 0;
+      setToast(`已拿回 #${found.id} 號冰壺至托盤`);
+      playClick(620, 0.04, 0.04);
+    } else {
+      setToast('目前沒有出界或未得分的冰壺');
+    }
+    updateUI();
+  }
+
+  function finishMatch(timeout = false) {
+    if (state.matchFinished) return;
+    stopProgram(true);
+    state.matchStarted = true; state.matchFinished = true;
+    state.lockedTimeBonus = Math.floor(Math.max(0, state.timeLeft));
+    const { propScore, timeBonus, total, onFieldCount } = computeTotals();
+    const c50 = state.rims.filter(r => r.score === 50).length;
+    const c20 = state.rims.filter(r => r.score === 20).length;
+    const c10 = state.rims.filter(r => r.score === 10).length;
+    const usedSec = (MATCH_SECONDS - state.timeLeft).toFixed(1);
+
+    document.getElementById('mPropScore').textContent = String(propScore);
+    document.getElementById('mTimeBonus').textContent = `+${timeBonus}`;
+    document.getElementById('mTotalScore').textContent = String(total);
+    document.getElementById('mSummaryText').innerHTML =
+      `${timeout ? '2 分鐘時間到！' : '已鎖定剩餘時間分！'}<br>` +
+      `耗時 <strong>${usedSec} 秒</strong>，共上場 <strong>${onFieldCount}/9</strong> 顆：` +
+      `50 分 <strong>${c50}</strong> 顆 · 20 分 <strong>${c20}</strong> 顆 · 10 分 <strong>${c10}</strong> 顆。`;
+    document.getElementById('finishModal').classList.add('open');
+    playChime([523, 659, 784, 1046]);
+    updateUI();
+  }
+
+  function shuffleRandomGrid() {
+    const pool = [50,50,50,50, 20,20,20,20,20,20,20,20, 10,10,10,10,10,10,10,10,10,10,10,10];
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    const g = [];
+    for (let r = 0; r < GRID_ROWS; r++) g.push(pool.slice(r * GRID_COLS, (r + 1) * GRID_COLS));
+    return g;
+  }
+
+  function applyMapMode(mode) {
+    state.mapMode = mode;
+    if (mode === 'uploaded') state.grid = JSON.parse(JSON.stringify(MAP_PRESETS.uploaded));
+    else if (mode === 'yuque') state.grid = JSON.parse(JSON.stringify(MAP_PRESETS.yuque));
+    else state.grid = shuffleRandomGrid();
+    drawMatTexture(); updateUI();
+  }
+
+  // Drawer open/close
+  function setDrawerOpen(open) {
+    document.getElementById('sideDrawer').classList.toggle('open', open);
+    document.getElementById('drawerBackdrop').classList.toggle('open', open);
+    playClick(open ? 600 : 460, 0.03, 0.04);
+  }
+  document.getElementById('btnOpenDrawer').addEventListener('click', () => setDrawerOpen(true));
+  document.getElementById('btnCloseDrawer').addEventListener('click', () => setDrawerOpen(false));
+  document.getElementById('drawerBackdrop').addEventListener('click', () => setDrawerOpen(false));
+
+  document.querySelectorAll('[data-dtab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const t = btn.dataset.dtab;
+      document.querySelectorAll('[data-dtab]').forEach(b => b.classList.toggle('active-seg', b.dataset.dtab === t));
+      document.querySelectorAll('.drawer-body').forEach(p => p.classList.toggle('active', p.id === 'dtab-' + t));
+      playClick(540);
+    });
+  });
+
+  // Topbar & Drawer Events
+  document.getElementById('btnStopTop').addEventListener('click', () => stopProgram(false));
+  document.getElementById('btnFinishMatch').addEventListener('click', () => finishMatch(false));
+  document.getElementById('btnResetFull').addEventListener('click', () => resetFull(false));
+  document.getElementById('btnCloseModal').addEventListener('click', () => document.getElementById('finishModal').classList.remove('open'));
+  document.getElementById('btnModalRestart').addEventListener('click', () => resetFull(false));
+
+  document.querySelectorAll('[data-cam]').forEach(btn => {
+    btn.addEventListener('click', () => { setCameraPreset(btn.dataset.cam); playClick(520); });
+  });
+
+  document.getElementById('mapSelect').addEventListener('change', e => {
+    applyMapMode(e.target.value); setToast('已切換場地地圖'); playClick(580);
+  });
+  document.getElementById('btnShuffleMap').addEventListener('click', () => {
+    document.getElementById('mapSelect').value = 'random';
+    applyMapMode('random'); setToast('裁判已隨機洗牌'); playClick(640);
+  });
+  document.getElementById('btnSpeedToggle').addEventListener('click', e => {
+    state.simSpeed = state.simSpeed === 1 ? 2 : 1;
+    e.target.textContent = `${state.simSpeed}x 速度`;
+    e.target.classList.toggle('active-seg', state.simSpeed === 2);
+    playClick(600);
+  });
+  document.getElementById('btnSoundToggle').addEventListener('click', e => {
+    soundEnabled = !soundEnabled;
+    e.target.textContent = soundEnabled ? '音效：開' : '音效：關';
+    if (soundEnabled) playClick(660);
+  });
+  document.getElementById('btnDropOne').addEventListener('click', () => autoDropNextTrayRim());
+  document.getElementById('btnRetrieveOut').addEventListener('click', retrieveOutRims);
+  document.getElementById('btnResetRobotOnly').addEventListener('click', resetRobotOnly);
+  document.getElementById('btnBlkResetWs').addEventListener('click', () => {
+    loadDefaultScreenshotBlocks(); setToast('已還原預設積木'); playClick(560);
+  });
+
+  // One-Click Demo Sequence inside Drawer
+  document.getElementById('btnRunSequence').addEventListener('click', () => {
+    setDrawerOpen(false);
+    resetFull(true);
+    stopProgram(true);
+    state.running = true;
+    const token = ++state.runToken;
+    document.getElementById('runLed').className = 'led orange';
+    (async () => {
+      try {
+        const b15 = workspace && workspace.getBlockById('hat_15');
+        const b69 = workspace && workspace.getBlockById('hat_69');
+        const b2 = workspace && workspace.getBlockById('call_fn2_main');
+        if (b15) await executeChain(b15, token, b15.id);
+        if (b2) await executeChain(b2, token, b2.id);
+        if (b69) await executeChain(b69, token, b69.id);
+        if (b2) {
+          const origF = parseFloat(b2.getFieldValue('FWD')) || 3.205;
+          const origB = parseFloat(b2.getFieldValue('BACK')) || 3.2;
+          await executeDefChain('spike_def_fn2', { p2_fwd: Math.max(0.2, origF - 0.12), p2_back: origB }, b2.id, token);
+        }
+        await sleepSim(0.35, token);
+        if (token === state.runToken) finishMatch(false);
+      } catch (err) {
+        if (err !== 'STOPPED') console.error(err);
+      }
+    })();
+  });
+
+  // RC Controls
+  function bindTouchHold(elId, keyName) {
+    const el = document.getElementById(elId);
+    const onDown = e => { e.preventDefault(); state.touch[keyName] = true; el.classList.add('pressed'); ensureAudio(); };
+    const onUp = e => { e.preventDefault(); state.touch[keyName] = false; el.classList.remove('pressed'); };
+    el.addEventListener('pointerdown', onDown); el.addEventListener('pointerup', onUp);
+    el.addEventListener('pointerleave', onUp); el.addEventListener('pointercancel', onUp);
+  }
+  bindTouchHold('rcFwd', 'fwd'); bindTouchHold('rcBack', 'back');
+  bindTouchHold('rcLeft', 'left'); bindTouchHold('rcRight', 'right');
+  document.getElementById('rcDrop').addEventListener('click', () => autoDropNextTrayRim());
+  document.getElementById('rcSpeedSlider').addEventListener('input', e => {
+    state.rcSpeedPct = Number(e.target.value);
+    document.getElementById('rcSpeedVal').textContent = state.rcSpeedPct + '%';
+  });
+
+  window.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    if (e.code === 'KeyW' || e.code === 'ArrowUp') state.keys.fwd = true;
+    if (e.code === 'KeyS' || e.code === 'ArrowDown') state.keys.back = true;
+    if (e.code === 'KeyA' || e.code === 'ArrowLeft') state.keys.left = true;
+    if (e.code === 'KeyD' || e.code === 'ArrowRight') state.keys.right = true;
+    if (e.code === 'Space') { e.preventDefault(); autoDropNextTrayRim(); }
+    if (e.code === 'KeyR') resetRobotOnly();
+  });
+  window.addEventListener('keyup', e => {
+    if (e.code === 'KeyW' || e.code === 'ArrowUp') state.keys.fwd = false;
+    if (e.code === 'KeyS' || e.code === 'ArrowDown') state.keys.back = false;
+    if (e.code === 'KeyA' || e.code === 'ArrowLeft') state.keys.left = false;
+    if (e.code === 'KeyD' || e.code === 'ArrowRight') state.keys.right = false;
+  });
+
+  // Calibration Controls
+  function syncCalUI() {
+    const rowIdx = Math.min(4, Math.max(1, Math.floor(state.startZ / CELL_H) + 1));
+    document.getElementById('calZSlider').value = state.startZ;
+    document.getElementById('calZVal').textContent = `${state.startZ.toFixed(1)} cm (第 ${rowIdx} 列)`;
+    document.getElementById('calCmPerRot').value = state.cmPerRot;
+    document.getElementById('calCmPerRotVal').textContent = `${state.cmPerRot.toFixed(1)} cm/圈`;
+    document.getElementById('calMaxRps').value = state.maxRps;
+    document.getElementById('calMaxRpsVal').textContent = `${state.maxRps.toFixed(2)} 圈/秒`;
+    document.getElementById('calDrift').value = state.driftDegS;
+    const dTxt = state.driftDegS === 0 ? '0.0 °/s (已校直)' : (state.driftDegS < 0 ? `${state.driftDegS.toFixed(1)} °/s (偏左)` : `+${state.driftDegS.toFixed(1)} °/s (偏右)`);
+    document.getElementById('calDriftVal').textContent = dTxt;
+    document.getElementById('calFric').value = state.friction;
+    document.getElementById('calFricVal').textContent = state.friction.toFixed(2);
+    document.getElementById('chkJig').checked = state.showJig;
+    document.getElementById('chkAimLine').checked = state.showAimLine;
+    document.getElementById('chkAutoDrop').checked = state.autoDropOnLoop;
+    jigGroup.visible = state.showJig;
+    jigGroup.position.z = state.startZ;
+    aimLine.visible = state.showAimLine;
+    aimHandle.visible = state.showAimLine && !state.running;
+  }
+
+  document.getElementById('calZSlider').addEventListener('input', e => {
+    state.startZ = parseFloat(e.target.value);
+    if (!state.running && state.robot.x < START_LINE_X) state.robot.z = state.startZ;
+    syncCalUI(); saveSettings();
+  });
+  document.querySelectorAll('[data-rowz]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.startZ = parseFloat(btn.dataset.rowz); state.startYaw = 0;
+      if (!state.running) { state.robot.x = state.startX; state.robot.z = state.startZ; state.robot.yaw = 0; }
+      syncCalUI(); saveSettings(); playClick(580);
+    });
+  });
+  document.getElementById('calCmPerRot').addEventListener('input', e => { state.cmPerRot = parseFloat(e.target.value); syncCalUI(); saveSettings(); });
+  document.getElementById('calMaxRps').addEventListener('input', e => { state.maxRps = parseFloat(e.target.value); syncCalUI(); saveSettings(); });
+  document.getElementById('calDrift').addEventListener('input', e => { state.driftDegS = parseFloat(e.target.value); syncCalUI(); saveSettings(); });
+  document.getElementById('calFric').addEventListener('input', e => { state.friction = parseFloat(e.target.value); syncCalUI(); saveSettings(); });
+  document.getElementById('chkJig').addEventListener('change', e => { state.showJig = e.target.checked; syncCalUI(); saveSettings(); });
+  document.getElementById('chkAimLine').addEventListener('change', e => { state.showAimLine = e.target.checked; syncCalUI(); saveSettings(); });
+  document.getElementById('chkAutoDrop').addEventListener('change', e => { state.autoDropOnLoop = e.target.checked; saveSettings(); });
+  document.getElementById('btnResetCal').addEventListener('click', () => {
+    state.startX = ROBOT_START_X; state.startZ = 6.5; state.startYaw = 0;
+    state.cmPerRot = 50.8; state.maxRps = 1.65; state.driftDegS = 0.0; state.friction = 0.34;
+    state.showJig = true; state.showAimLine = true; state.autoDropOnLoop = true;
+    if (!state.running) { state.robot.x = state.startX; state.robot.z = state.startZ; state.robot.yaw = 0; }
+    syncCalUI(); saveSettings(); setToast('已恢復預設校準'); playClick(500);
+  });
+
+  // =========================================================================
+  // 10. MAIN RENDER LOOP
+  // =========================================================================
+  function resizeRenderer() {
+    const w = canvasWrap.clientWidth || 640;
+    const h = canvasWrap.clientHeight || 400;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    // Keep the board in frame when the adjacent Blockly pane narrows the viewport.
+    camera.zoom = Math.min(1, camera.aspect / (4 / 3));
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', () => {
+    resizeRenderer();
+    if (workspace) Blockly.svgResize(workspace);
+  });
+
+  let lastTs = 0, uiAccum = 0;
+
+  function animate(ts) {
+    requestAnimationFrame(animate);
+    if (!lastTs) lastTs = ts;
+    const rawDt = Math.min(0.05, (ts - lastTs) / 1000);
+    lastTs = ts;
+
+    const totalSimDt = rawDt * state.simSpeed;
+    const SUB_DT = 1 / 120;
+    let rem = totalSimDt;
+    while (rem > 1e-6) {
+      const step = Math.min(SUB_DT, rem);
+      const cbs = pendingTimers; pendingTimers = [];
+      for (const cb of cbs) cb(step);
+      stepPhysics(step);
+      rem -= step;
+    }
+
+    robotGroup.position.set(state.robot.x, 0, state.robot.z);
+    robotGroup.rotation.y = -state.robot.yaw;
+    aimHandle.visible = state.showAimLine && !state.running;
+    for (const wg of wheelMeshes) wg.rotation.z = -state.robot.wheelRot;
+    for (const rim of state.rims) rim.mesh.position.set(rim.x, rim.y, rim.z);
+
+    flushBlocklyHighlights();
+    updateCamera();
+    renderer.render(scene, camera);
+
+    uiAccum += rawDt;
+    if (uiAccum >= 0.08) { uiAccum = 0; updateUI(); }
+  }
+
+  window.addEventListener('load', () => {
+    loadSettings();
+    initBlockly();
+    state.robot.z = state.startZ;
+    syncCalUI();
+    resizeRenderer();
+    setCameraPreset('overview');
+    updateUI();
+    requestAnimationFrame(animate);
+  });
+})();
+</script>
+</body>
+</html>
