@@ -110,6 +110,12 @@
     .tool:hover img, .tool:focus-visible img { transform: scale(1.045); }
     .tool:hover h2, .tool:focus-visible h2 { text-decoration: underline; text-underline-offset: .15em; }
 
+    @media (min-width: 701px) {
+      .featured-tool { grid-column: 1 / -1; }
+      .featured-tool .tool { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); }
+      .featured-tool .tool-copy { padding: clamp(24px, 4vw, 48px); }
+    }
+
     @media (min-width: 901px) {
       .tool--compact { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); }
       .tool--compact img { position: absolute; width: 100%; height: 100%; }
@@ -158,29 +164,18 @@
           <a class="browse" href="#tools"><span data-i18n="roboticsBrowse">瀏覽工具</span> <span aria-hidden="true">↓</span></a>
         </div>
         <div class="hero-visual" aria-hidden="true">
-          <img src="../assets/robotics-arena.jpg" alt="" width="780" height="520" fetchpriority="high">
+          <img src="../assets/roborave-p207-preview.jpg" alt="" width="1000" height="580" fetchpriority="high">
         </div>
       </section>
 
       <ul id="tools" class="tools" role="list">
-        <li>
+        <li class="featured-tool">
           <a class="tool" href="./roborave_locate_master_3d_v3.html" aria-labelledby="roborave-title" aria-describedby="roborave-description">
             <div class="tool-media"><img src="../assets/roborave-p207-preview.jpg" alt="" width="1000" height="580"></div>
             <div class="tool-copy">
               <span class="tool-kind" data-i18n="categorySimulator">模擬器</span>
               <h2 id="roborave-title" data-i18n="roboraveTitle">RoboRAVE 定位精英 3D · P207</h2>
               <p id="roborave-description" data-i18n="roboraveDescription">在 3D 賽場點按 SPIKE 3 積木、調校機械人，練習推冰壺並查看即時計分。</p>
-              <span class="tool-arrow" aria-hidden="true">↗</span>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a class="tool" href="../src2027_sumo_all_in_one_v2.html" aria-labelledby="sumo-title" aria-describedby="sumo-description">
-            <div class="tool-media"><img src="../assets/src2027-sumo-preview.jpg" alt="" width="1000" height="580"></div>
-            <div class="tool-copy">
-              <span class="tool-kind" data-i18n="categorySimulator">模擬器</span>
-              <h2 id="sumo-title" data-i18n="sumoTitle">SRC 2027 羽量級遙控相撲</h2>
-              <p id="sumo-description" data-i18n="sumoDescription">3D 對戰模擬、互動搭建說明與賽規圖解</p>
               <span class="tool-arrow" aria-hidden="true">↗</span>
             </div>
           </a>
