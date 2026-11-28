@@ -1,0 +1,2775 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>SRC 2027 羽量級遙控相撲 3D 模擬器 — iPad 雙邊操控版</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="./assets/macau/three-r128.min.js"></script>
+  <style>
+    :root {
+      /* 03 - Tactile Industrial (Braun / Teenage Engineering) */
+      --bg-mat: #202220;
+      --chassis-fill: linear-gradient(180deg, #e7e5df 0%, #d6d3cb 100%);
+      --chassis-border: #b0ada5;
+      --chassis-shadow:
+        0 14px 32px rgba(0, 0, 0, 0.32),
+        0 3px 0 #96938b,
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.85);
+
+      --screen-bg: #161b17;
+      --screen-border: #a5a299;
+      --screen-shadow:
+        inset 0 4px 10px rgba(0, 0, 0, 0.82),
+        0 1px 0 rgba(255, 255, 255, 0.72);
+      --screen-ink: #e8f5e9;
+      --screen-muted: #78937d;
+      --screen-amber: #fbbf24;
+      --screen-red: #f87171;
+      --screen-green: #4ade80;
+
+      --ink-primary: #1f201e;
+      --ink-secondary: #56544e;
+      --ink-silk: #6d6a63;
+
+      --key-light-bg: linear-gradient(180deg, #f8f7f3 0%, #e9e6df 100%);
+      --key-light-shadow: 0 3px 0 #9e9b93, 0 4px 7px rgba(0,0,0,0.18), inset 0 1px 0 #ffffff;
+      --key-light-active: 0 1px 0 #9e9b93, 0 2px 3px rgba(0,0,0,0.16), inset 0 1px 0 #ffffff;
+
+      --key-dark-bg: linear-gradient(180deg, #4b4b47 0%, #373734 100%);
+      --key-dark-shadow: 0 3px 0 #1f1f1d, 0 4px 7px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.16);
+      --key-dark-active: 0 1px 0 #1f1f1d, 0 2px 3px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.16);
+
+      --accent-orange: #ff4f00;
+      --key-orange-bg: linear-gradient(180deg, #ff5e14 0%, #e34500 100%);
+      --key-orange-shadow: 0 3px 0 #992e00, 0 4px 9px rgba(227,69,0,0.30), inset 0 1px 0 rgba(255,255,255,0.38);
+      --key-orange-active: 0 1px 0 #992e00, 0 2px 4px rgba(227,69,0,0.28), inset 0 1px 0 rgba(255,255,255,0.38);
+
+      --hairline: 1px solid rgba(0, 0, 0, 0.12);
+      --font-ui: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+      --font-mono: 'JetBrains Mono', 'Noto Sans TC', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-mat);
+      color: var(--ink-primary);
+      font-family: var(--font-ui);
+      touch-action: none;
+    }
+
+    /* Full-Viewport Layout: Slim Top Bar + Unobstructed 3D Arena */
+    .app-root {
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    /* TOP HARDWARE BAR (Compact, Zero Overlap) */
+    .top-bar {
+      height: 52px;
+      flex-shrink: 0;
+      background: var(--chassis-fill);
+      border-bottom: 1.5px solid var(--chassis-border);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      gap: 10px;
+      z-index: 30;
+    }
+
+    .bar-left, .bar-right {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .brand-badge {
+      background: var(--ink-primary);
+      color: #f8f7f3;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      padding: 4px 8px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .led-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-orange);
+      box-shadow: 0 0 8px rgba(255, 79, 0, 0.78);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .led-dot.green {
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.75);
+    }
+
+    /* Center Recessed OLED Scoreboard */
+    .oled-scoreboard {
+      background: var(--screen-bg);
+      border: 1.5px solid var(--screen-border);
+      border-radius: 7px;
+      box-shadow: var(--screen-shadow);
+      padding: 3px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--screen-ink);
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      height: 36px;
+      white-space: nowrap;
+    }
+
+    .score-pair {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .score-tag {
+      font-size: 10px;
+      color: var(--screen-muted);
+    }
+    .score-num {
+      font-size: 16px;
+      min-width: 12px;
+      text-align: center;
+    }
+    .score-num.me { color: #ff7b3b; }
+    .score-num.opp { color: #60a5fa; }
+
+    .timer-readout {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--screen-green);
+      min-width: 54px;
+      text-align: center;
+      border-left: 1px solid rgba(255,255,255,0.14);
+      border-right: 1px solid rgba(255,255,255,0.14);
+      padding: 0 10px;
+    }
+    .timer-readout.warn { color: var(--screen-amber); }
+    .timer-readout.danger { color: var(--screen-red); }
+
+    .round-badge {
+      font-size: 10.5px;
+      color: #d7e6da;
+    }
+
+    /* 3D Physical Keycaps */
+    .keycap {
+      appearance: none;
+      border: none;
+      border-radius: 7px;
+      background: var(--key-light-bg);
+      color: var(--ink-primary);
+      box-shadow: var(--key-light-shadow);
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: 12px;
+      padding: 6px 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      white-space: nowrap;
+      transition: transform 60ms ease, box-shadow 60ms ease;
+    }
+    .keycap:active, .keycap.pressed {
+      transform: translateY(2px);
+      box-shadow: var(--key-light-active);
+    }
+    .keycap.dark {
+      background: var(--key-dark-bg);
+      color: #f4f3ef;
+      box-shadow: var(--key-dark-shadow);
+    }
+    .keycap.dark:active, .keycap.dark.pressed {
+      box-shadow: var(--key-dark-active);
+    }
+    .keycap.orange {
+      background: var(--key-orange-bg);
+      color: #ffffff;
+      box-shadow: var(--key-orange-shadow);
+    }
+    .keycap.orange:active, .keycap.orange.pressed {
+      box-shadow: var(--key-orange-active);
+    }
+    .keycap.sm {
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: 6px;
+    }
+    .keycap.active-mode {
+      background: var(--key-dark-bg);
+      color: #ffffff;
+      box-shadow: var(--key-dark-shadow);
+    }
+    .keycap.active-mode::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-orange);
+      box-shadow: 0 0 6px var(--accent-orange);
+    }
+
+    /* FULL-SCREEN 3D STAGE */
+    .stage-wrap {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+      background: #202220;
+      overflow: hidden;
+    }
+    #canvas-host {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Minimal Non-Overlapping Corner Pills */
+    .corner-tl {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 12;
+      flex-wrap: wrap;
+      max-width: 48%;
+    }
+    .corner-tr {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 12;
+    }
+
+    .hud-pill {
+      background: rgba(22, 27, 23, 0.84);
+      border: 1px solid rgba(255,255,255,0.16);
+      color: #e8f5e9;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      padding: 5px 9px;
+      border-radius: 6px;
+      backdrop-filter: blur(6px);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hud-btn {
+      appearance: none;
+      background: rgba(22, 27, 23, 0.84);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #e8f5e9;
+      font-family: var(--font-ui);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 9px;
+      border-radius: 6px;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: background 120ms ease, border-color 120ms ease;
+    }
+    .hud-btn:hover { background: rgba(38, 46, 40, 0.92); }
+    .hud-btn.active {
+      background: var(--accent-orange);
+      border-color: #ff7c40;
+      color: #ffffff;
+    }
+
+    /* Big Center Countdown / Result Banner */
+    .center-banner {
+      position: absolute;
+      top: 44%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.92);
+      background: rgba(20, 24, 21, 0.94);
+      border: 2px solid var(--accent-orange);
+      border-radius: 14px;
+      padding: 16px 30px;
+      text-align: center;
+      color: #ffffff;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 150ms ease, transform 150ms ease;
+      z-index: 25;
+      box-shadow: 0 18px 44px rgba(0,0,0,0.58);
+      max-width: 82%;
+    }
+    .center-banner.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .banner-main {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+    .banner-sub {
+      margin-top: 5px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+
+    /* Compact Bottom-Center Status Bar (Never collides with edge controls!) */
+    .bottom-status-bar {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(22, 27, 23, 0.88);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 9px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #e8f5e9;
+      font-size: 12px;
+      z-index: 16;
+      max-width: calc(100vw - 320px);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+    }
+    .status-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ============================================================
+     * IPAD-STYLE FLOATING EDGE CONTROLLERS
+     *   Tank Mode: Left edge = Stick 1 (L), Right edge = Stick 2 (R)
+     *   Arcade Mode: Left edge ONLY = 360° Analog Stick, Right side EMPTY!
+     * ============================================================ */
+    .edge-ctrl {
+      position: absolute;
+      bottom: 24px;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+    }
+    .edge-ctrl.left  { left: 20px; }
+    .edge-ctrl.right { right: 20px; }
+    .edge-ctrl.hidden { display: none !important; }
+
+    /* Vertical Tank Lever Housing (Makerzoid 1 / 2 Style) */
+    .tank-pad {
+      width: 84px;
+      padding: 10px 0;
+      border-radius: 42px;
+      background: rgba(229, 227, 221, 0.86);
+      border: 2px solid rgba(176, 173, 165, 0.95);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.36), inset 0 1.5px 0 rgba(255,255,255,0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tank-track {
+      width: 60px;
+      height: 158px;
+      border-radius: 30px;
+      background: linear-gradient(180deg, #272b28 0%, #1a1d1b 100%);
+      border: 2px solid #8c8981;
+      box-shadow: inset 0 4px 12px rgba(0,0,0,0.75);
+      position: relative;
+      touch-action: none;
+      cursor: ns-resize;
+    }
+    .tank-track::before, .tank-track::after {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: rgba(255,255,255,0.32);
+      pointer-events: none;
+    }
+    .tank-track::before { content: '▲'; top: 8px; }
+    .tank-track::after  { content: '▼'; bottom: 8px; }
+
+    .tank-knob {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #ff6c26 0%, #e04400 100%);
+      border: 2px solid #ffd4be;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.45), inset 0 2px 2px rgba(255,255,255,0.45);
+      position: absolute;
+      left: 3px;
+      top: 52px; /* center = 52px, range 6px..98px */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 16px;
+      color: #ffffff;
+      pointer-events: none;
+    }
+    .tank-knob.right-stick {
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+      border-color: #e0f2fe;
+    }
+
+    .ctrl-caption {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--ink-primary);
+      letter-spacing: 0.05em;
+    }
+
+    /* Circular Axis-Locked Touch Joysticks (Split Dual-Stick: Left=Vertical ONLY, Right=Horizontal ONLY) */
+    .axis-slot-v {
+      position: absolute;
+      width: 14px;
+      height: 108px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      pointer-events: none;
+    }
+    .axis-slot-h {
+      position: absolute;
+      height: 14px;
+      width: 108px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      pointer-events: none;
+    }
+    .axis-arrow {
+      position: absolute;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.42);
+      pointer-events: none;
+    }
+    .arcade-knob.blue-knob {
+      background: radial-gradient(circle at 35% 30%, #38bdf8 0%, #0284c7 72%);
+      border-color: #e0f2fe;
+    }
+
+    /* 360° Single Analog Joystick (Arcade Mode - Left Edge ONLY) */
+    .arcade-pad {
+      width: 156px;
+      height: 156px;
+      border-radius: 50%;
+      background: rgba(229, 227, 221, 0.84);
+      border: 2.5px solid rgba(176, 173, 165, 0.95);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.42), inset 0 2px 0 rgba(255,255,255,0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      touch-action: none;
+      cursor: move;
+    }
+    .arcade-well {
+      width: 132px;
+      height: 132px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, #262b27 0%, #161a17 100%);
+      border: 2px solid #8c8981;
+      box-shadow: inset 0 5px 14px rgba(0,0,0,0.8);
+      position: relative;
+    }
+    .arcade-cross-h, .arcade-cross-v {
+      position: absolute;
+      background: rgba(255,255,255,0.10);
+      pointer-events: none;
+    }
+    .arcade-cross-h { width: 100%; height: 1px; top: 50%; left: 0; }
+    .arcade-cross-v { height: 100%; width: 1px; left: 50%; top: 0; }
+
+    .arcade-knob {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #ff7836 0%, #e04400 72%);
+      border: 2.5px solid #ffe0cf;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.5), inset 0 2px 3px rgba(255,255,255,0.45);
+      position: absolute;
+      left: 36px;
+      top: 36px;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 11px;
+      color: #ffffff;
+    }
+
+    /* Quick Maneuver Mini Keycaps above Edge Controls */
+    .quick-pill-btn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(22, 27, 23, 0.85);
+      color: #f1f5f9;
+      font-family: var(--font-ui);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      white-space: nowrap;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .quick-pill-btn:active {
+      background: var(--accent-orange);
+      border-color: #ff8c52;
+    }
+
+    /* ============================================================
+     * SLIDE-OVER SUB-PAGE DRAWER (戰術演示 & 對手/賽制設定)
+     * Keeps main 3D arena 100% clean & zero overlap!
+     * ============================================================ */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 14, 12, 0.52);
+      backdrop-filter: blur(3px);
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+    }
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .subpage-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(440px, 94vw);
+      height: 100vh;
+      height: 100dvh;
+      background: var(--chassis-fill);
+      border-left: 2px solid var(--chassis-border);
+      box-shadow: -18px 0 42px rgba(0,0,0,0.45);
+      z-index: 50;
+      transform: translateX(100%);
+      transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .subpage-drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 12px 14px;
+      border-bottom: var(--hairline);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: rgba(255,255,255,0.28);
+    }
+    .drawer-title {
+      font-weight: 700;
+      font-size: 14.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .drawer-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 10px 14px 8px;
+      border-bottom: var(--hairline);
+    }
+
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 14px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      touch-action: pan-y;
+    }
+    .drawer-body::-webkit-scrollbar { width: 6px; }
+    .drawer-body::-webkit-scrollbar-thumb { background: #b4b1a9; border-radius: 3px; }
+
+    .tab-pane { display: none; flex-direction: column; gap: 12px; }
+    .tab-pane.active { display: flex; }
+
+    .section-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-bottom: 12px;
+      border-bottom: var(--hairline);
+    }
+    .section-block:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .silk-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--ink-silk);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .btn-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+
+    /* Opponent Archetype Cards */
+    .arch-card {
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(0, 0, 0, 0.14);
+      border-radius: 8px;
+      padding: 9px 10px;
+      cursor: pointer;
+      transition: all 120ms ease;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .arch-card.selected {
+      background: #232421;
+      color: #f5f4f0;
+      border-color: #111;
+      box-shadow: 0 3px 0 #8f8c84;
+    }
+    .arch-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 12.5px;
+    }
+    .arch-pill {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .arch-pill.fast { background: #fee2e2; color: #b91c1c; }
+    .arch-pill.slow { background: #dbeafe; color: #1d4ed8; }
+    .arch-pill.bal  { background: #dcfce7; color: #15803d; }
+    .arch-card.selected .arch-pill.fast { background: #dc2626; color: #fff; }
+    .arch-card.selected .arch-pill.slow { background: #2563eb; color: #fff; }
+    .arch-card.selected .arch-pill.bal  { background: #16a34a; color: #fff; }
+    .arch-desc { font-size: 11px; color: var(--ink-secondary); line-height: 1.38; }
+    .arch-card.selected .arch-desc { color: #c7c6c0; }
+
+    /* Tactic Item Button */
+    .tac-btn {
+      width: 100%;
+      text-align: left;
+      justify-content: flex-start;
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    .tac-btn.selected {
+      background: var(--key-dark-bg);
+      color: #ffffff;
+      box-shadow: var(--key-dark-shadow);
+    }
+
+    /* Recessed OLED Box */
+    .oled-box {
+      background: var(--screen-bg);
+      border: 1.5px solid var(--screen-border);
+      border-radius: 8px;
+      box-shadow: var(--screen-shadow);
+      padding: 10px 12px;
+      color: var(--screen-ink);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+    .oled-title {
+      color: var(--accent-orange);
+      font-weight: 700;
+      font-size: 11.5px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .oled-steps {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 12px;
+      color: #d9eadc;
+    }
+    .oled-steps li {
+      padding-left: 14px;
+      position: relative;
+    }
+    .oled-steps li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--accent-orange);
+    }
+    .oled-steps li.active-step {
+      color: #ffffff;
+      font-weight: 700;
+      background: rgba(255, 79, 0, 0.2);
+      border-radius: 4px;
+      padding: 3px 6px 3px 16px;
+    }
+
+    /* Sliders & Spec Grid */
+    .slider-row { display: flex; flex-direction: column; gap: 4px; }
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--ink-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #b5b2aa;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.35);
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      background: #2f2f2c;
+      border: 1.5px solid #f7f6f2;
+      cursor: pointer;
+    }
+
+    .spec-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      background: rgba(0,0,0,0.06);
+      border-radius: 7px;
+      padding: 8px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-align: center;
+    }
+    .spec-strip strong { display: block; font-size: 12px; color: var(--ink-primary); }
+    .spec-strip span { color: var(--ink-silk); font-size: 9.5px; }
+
+    .tele-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+    .tele-cell {
+      background: #141916;
+      border: 1px solid #303a33;
+      border-radius: 6px;
+      padding: 7px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .tele-k { font-size: 9.5px; color: var(--screen-muted); }
+    .tele-v { font-size: 13px; font-weight: 700; color: var(--screen-ink); }
+
+    @media (max-width: 760px) {
+      .round-badge { display: none; }
+      .brand-badge span.hide-xs { display: none; }
+      .bottom-status-bar { max-width: calc(100vw - 210px); font-size: 11px; }
+      .tank-track { height: 136px; }
+      .tank-knob { top: 42px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-root">
+    <!-- SLIM TOP HARDWARE BAR -->
+    <header class="top-bar">
+      <div class="bar-left">
+        <div class="brand-badge"><span class="led-dot"></span>SRC 2027 <span class="hide-xs">相撲</span></div>
+        <button class="keycap orange sm" id="btn-start">▶ 3-2-1 開賽</button>
+        <button class="keycap sm" id="btn-reset-round">↺ 重置</button>
+      </div>
+
+      <div class="oled-scoreboard" aria-label="比賽計分板">
+        <div class="score-pair">
+          <span class="score-tag">我方</span>
+          <span class="score-num me" id="score-me">0</span>
+          <span style="color:#64748b">:</span>
+          <span class="score-num opp" id="score-opp">0</span>
+          <span class="score-tag" id="score-opp-name">獵豹快車</span>
+        </div>
+        <div class="timer-readout" id="timer-display">60.0</div>
+        <div class="round-badge" id="round-display">第1局 · 面向左</div>
+      </div>
+
+      <div class="bar-right">
+        <button class="keycap sm active-mode" id="btn-ctrl-toggle" title="切換雙鍵手掣或左側單搖桿">雙鍵 1/2</button>
+        <button class="keycap dark sm" id="btn-open-drawer">☰ 戰術與設定</button>
+        <button class="keycap sm" id="btn-mute" title="開關音效">🔊</button>
+      </div>
+    </header>
+
+    <!-- UNOBSTRUCTED FULL-SCREEN 3D STAGE -->
+    <main class="stage-wrap">
+      <div id="canvas-host"></div>
+
+      <!-- Top-Left Camera & Vector Pills -->
+      <div class="corner-tl">
+        <button class="hud-btn active" id="cam-broadcast">賽場</button>
+        <button class="hud-btn" id="cam-top">俯視</button>
+        <button class="hud-btn" id="cam-chase">追尾</button>
+        <button class="hud-btn active" id="btn-toggle-vectors">箭頭 ON</button>
+      </div>
+
+      <!-- Top-Right Zone & Speed Pills -->
+      <div class="corner-tr">
+        <div class="hud-pill">
+          <span class="led-dot green" id="led-zone"></span>
+          <span id="hud-zone-text">安全區 · R=16cm</span>
+        </div>
+        <button class="hud-btn" id="spd-05">0.5x</button>
+        <button class="hud-btn active" id="spd-10">1x</button>
+        <button class="hud-btn" id="spd-15">1.5x</button>
+      </div>
+
+      <!-- Center Countdown / Result Banner -->
+      <div class="center-banner" id="center-banner">
+        <div class="banner-main" id="banner-main">3</div>
+        <div class="banner-sub" id="banner-sub">雙方貼齊中心黑線後方，準備開賽！</div>
+      </div>
+
+      <!-- Compact Bottom-Center Status & Quick Demo Bar -->
+      <div class="bottom-status-bar" id="bottom-status-bar">
+        <span class="led-dot" id="led-status"></span>
+        <span class="status-text" id="toast-text">雙方已貼齊黑線後方！按「▶ 3-2-1 開賽」直接操控，或點右上「☰ 戰術與設定」看快/慢車示範。</span>
+        <button class="hud-btn" id="btn-quick-replay" style="display:none;flex-shrink:0;">↺ 重播</button>
+      </div>
+
+      <!-- ============================================================
+           IPAD EDGE CONTROLLER — LEFT EDGE
+           Tank Mode: Left Motor (1鍵) | Arcade Mode: 360° Single Joystick
+           ============================================================ -->
+      <div class="edge-ctrl left" id="edge-left-tank">
+        <button class="quick-pill-btn" id="btn-move-back-l">↙ 單輪斜退 (Q)</button>
+        <div class="tank-pad">
+          <div class="tank-track" id="stick-left-track">
+            <div class="tank-knob" id="stick-left-knob">1</div>
+          </div>
+          <div class="ctrl-caption" id="left-stick-caption">左鍵 W/S</div>
+        </div>
+      </div>
+
+      <div class="edge-ctrl left hidden" id="edge-left-arcade">
+        <button class="quick-pill-btn" id="btn-move-feint-arcade">⚡ 輕退破僵局 (Space)</button>
+        <div class="arcade-pad" id="arcade-pad">
+          <div class="arcade-well" id="arcade-well">
+            <div class="arcade-cross-h"></div>
+            <div class="arcade-cross-v"></div>
+            <div class="arcade-knob" id="arcade-knob">MOVE</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPLIT DUAL-STICK LEFT EDGE (Circular Joystick - Forward/Backward ONLY!) -->
+      <div class="edge-ctrl left hidden" id="edge-left-split">
+        <button class="quick-pill-btn" id="btn-move-back-l-split">↙ 單輪斜退 (Q)</button>
+        <div class="arcade-pad" id="split-fwd-pad" style="cursor:ns-resize;">
+          <div class="arcade-well" id="split-fwd-well">
+            <div class="axis-slot-v"></div>
+            <span class="axis-arrow" style="top:7px;left:50%;transform:translateX(-50%);">▲</span>
+            <span class="axis-arrow" style="bottom:7px;left:50%;transform:translateX(-50%);">▼</span>
+            <div class="arcade-knob" id="split-fwd-knob">前後</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           IPAD EDGE CONTROLLER — RIGHT EDGE
+           Tank Mode: Right Motor (2鍵) | Arcade Mode: COMPLETELY EMPTY!
+           ============================================================ -->
+      <div class="edge-ctrl right" id="edge-right-tank">
+        <button class="quick-pill-btn" id="btn-move-back-r">↘ 單輪斜退 (E)</button>
+        <div class="tank-pad">
+          <div class="tank-track" id="stick-right-track">
+            <div class="tank-knob right-stick" id="stick-right-knob">2</div>
+          </div>
+          <div class="ctrl-caption">右鍵 ↑/↓</div>
+        </div>
+      </div>
+
+      <!-- SPLIT DUAL-STICK RIGHT EDGE (Circular Joystick - Left/Right ONLY!) -->
+      <div class="edge-ctrl right hidden" id="edge-right-split">
+        <button class="quick-pill-btn" id="btn-move-feint-split">⚡ 輕退破僵局 (Space)</button>
+        <div class="arcade-pad" id="split-steer-pad" style="cursor:ew-resize;">
+          <div class="arcade-well" id="split-steer-well">
+            <div class="axis-slot-h"></div>
+            <span class="axis-arrow" style="left:8px;top:50%;transform:translateY(-50%);">◀</span>
+            <span class="axis-arrow" style="right:8px;top:50%;transform:translateY(-50%);">▶</span>
+            <div class="arcade-knob blue-knob" id="split-steer-knob">左右</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- SLIDE-OVER SUB-PAGE DRAWER (戰術示範 & 對手設定副頁) -->
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <aside class="subpage-drawer" id="subpage-drawer" aria-label="戰術演練與設定副頁">
+    <div class="drawer-header">
+      <div class="drawer-title"><span class="led-dot"></span>戰術演練與賽場設定</div>
+      <button class="keycap sm" id="btn-close-drawer">✕ 關閉返回場地</button>
+    </div>
+
+    <div class="drawer-tabs">
+      <button class="keycap sm active-mode" id="tab-btn-tactics">⚡ 快/慢車應對演示</button>
+      <button class="keycap sm" id="tab-btn-setup">⚙️ 對手、開局與遙測</button>
+    </div>
+
+    <div class="drawer-body">
+      <!-- SUB-PAGE TAB 1: TACTICAL COUNTER-PLAYBOOK -->
+      <div class="tab-pane active" id="tab-pane-tactics">
+        <div class="section-block">
+          <div class="silk-header">
+            <span>COUNTER LAB // 選擇實戰應對招式</span>
+            <span style="color:var(--accent-orange)">課件策略 1–6</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <button class="keycap sm tac-btn selected" id="tac-fast-lr">① 打快車【左/右開局】：單輪斜退拉弧線反鏟</button>
+            <button class="keycap sm tac-btn" id="tac-fast-back">② 打快車【向後開局】：前進半步→黃圈邊掉頭</button>
+            <button class="keycap sm tac-btn" id="tac-slow-45">③ 打慢車【搶 45° 側切】：開局繞弧插輪胎側面</button>
+            <button class="keycap sm tac-btn" id="tac-slow-feint">④ 打慢車【頂死破僵局】：滑步輕退騙前撲反切</button>
+            <button class="keycap sm tac-btn" id="tac-edge-save">⑤ 邊緣自救【紅紫黑邊】：單輪甩尾閃開反殺</button>
+            <button class="keycap sm tac-btn" id="tac-cup-drill">⑥ 準確度訓練：中心紙杯塔推擊練習 (Level 1)</button>
+          </div>
+
+          <div class="btn-grid-2" style="margin-top:4px;">
+            <button class="keycap orange" id="btn-auto-demo">▶ 自動示範這招</button>
+            <button class="keycap dark" id="btn-manual-drill">🎮 我來手動練</button>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <div class="silk-header">
+            <span>TACTICAL PLAYBOOK // 步驟詳解</span>
+            <span id="strat-status" style="color:var(--accent-orange)">READY</span>
+          </div>
+          <div class="oled-box">
+            <div class="oled-title">
+              <span id="strat-name">策略 2：開局【面向左／右】打快車</span>
+            </div>
+            <ul class="oled-steps" id="strat-steps">
+              <li class="active-step">① 快車會急轉衝過來！千萬別原地慢轉（轉一半就被撞側面）</li>
+              <li>② 單輪斜退拉弧線：只拉後右鍵，退半步（勿退進紅紫區）</li>
+              <li>③ 等快車撲空煞不住，立刻雙鍵前推用 11 片橙鏟反鏟側面！</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <div class="silk-header">
+            <span>MY ROBOT // 相撲車.IO 實車參數</span>
+            <span style="color:#15803d;">≤400G 合規</span>
+          </div>
+          <div class="spec-strip">
+            <div><strong>17.6×19.2</strong><span>尺寸 (cm)</span></div>
+            <div><strong>12T→20T</strong><span>大力減速 1:1.67</span></div>
+            <div><strong>11片橙鏟</strong><span>56mm 氣球胎</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-PAGE TAB 2: OPPONENT, START POSE & TELEMETRY -->
+      <div class="tab-pane" id="tab-pane-setup">
+        <div class="section-block">
+          <div class="silk-header">
+            <span>START POSE // 開局方向 (貼齊黑線後方)</span>
+            <button class="keycap sm" id="btn-rand-pose" style="padding:3px 8px;font-size:10px;">🎲 隨機抽籤</button>
+          </div>
+          <div class="btn-grid-4">
+            <button class="keycap sm active-mode" data-pose="left" id="pose-left">面向左</button>
+            <button class="keycap sm" data-pose="right" id="pose-right">面向右</button>
+            <button class="keycap sm" data-pose="back" id="pose-back">面向後</button>
+            <button class="keycap sm" data-pose="front" id="pose-front">面向前</button>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <div class="silk-header">
+            <span>OPPONENT // 選擇對手類型</span>
+            <span>AI 模擬</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <div class="arch-card selected" data-arch="fast" id="arch-fast">
+              <div class="arch-top">
+                <span>🐆 快車（獵豹型 · 3:1 加速齒）</span>
+                <span class="arch-pill fast">高速低扭</span>
+              </div>
+              <div class="arch-desc">速度極快、煞車距離長、易衝過頭；正面推力較弱。</div>
+            </div>
+            <div class="arch-card" data-arch="slow" id="arch-slow">
+              <div class="arch-top">
+                <span>🐘 慢車（大象型 · 1:3 大力齒）</span>
+                <span class="arch-pill slow">重裝高扭</span>
+              </div>
+              <div class="arch-desc">轉身慢、大鏟重推；正面硬頂極易卡死和局。</div>
+            </div>
+            <div class="arch-card" data-arch="balanced" id="arch-balanced">
+              <div class="arch-top">
+                <span>⚖️ 均衡型（1:1 標準直驅）</span>
+                <span class="arch-pill bal">攻守平衡</span>
+              </div>
+              <div class="arch-desc">速度與推力適中，會主動繞邊尋找我方側面空隙。</div>
+            </div>
+          </div>
+
+          <div class="slider-row" style="margin-top:4px;">
+            <div class="slider-label"><span>對手速度倍率 (SPEED)</span><strong id="val-opp-spd">100%</strong></div>
+            <input type="range" id="sl-opp-spd" min="60" max="140" value="100" step="5" />
+          </div>
+          <div class="slider-row">
+            <div class="slider-label"><span>對手推力倍率 (TORQUE)</span><strong id="val-opp-trq">100%</strong></div>
+            <input type="range" id="sl-opp-trq" min="60" max="140" value="100" step="5" />
+          </div>
+        </div>
+
+        <div class="section-block">
+          <div class="silk-header">
+            <span>CONTROLLER // iPad 邊緣操控與手掣</span>
+            <span id="gamepad-status">手掣：待機</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+            <button class="keycap sm active-mode" id="ctrl-tank">雙鍵 1/2</button>
+            <button class="keycap sm" id="ctrl-arcade">左側單搖桿</button>
+            <button class="keycap sm" id="ctrl-split">雙搖桿(前/轉)</button>
+          </div>
+          <div class="btn-grid-2" style="margin-top:4px;">
+            <button class="keycap sm" id="btn-move-feint">⚡ 觸發破僵局 (Space)</button>
+            <button class="keycap dark sm" id="btn-reset-match">新場次 (清空比分)</button>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <div class="silk-header">
+            <span>TELEMETRY // 實時力學遙測</span>
+            <span>120 HZ</span>
+          </div>
+          <div class="tele-grid">
+            <div class="tele-cell">
+              <span class="tele-k">我方速度</span>
+              <span class="tele-v" id="tele-my-spd">0.0 cm/s</span>
+            </div>
+            <div class="tele-cell">
+              <span class="tele-k">對手速度</span>
+              <span class="tele-v" id="tele-opp-spd">0.0 cm/s</span>
+            </div>
+            <div class="tele-cell">
+              <span class="tele-k">接觸狀態</span>
+              <span class="tele-v" id="tele-contact" style="color:var(--screen-muted)">未接觸</span>
+            </div>
+            <div class="tele-cell">
+              <span class="tele-k">推力優勢</span>
+              <span class="tele-v" id="tele-adv" style="color:var(--screen-green)">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    (() => {
+      'use strict';
+
+      /* ================================================================
+       * 1. OFFICIAL SRC 2027 FEATHERWEIGHT ARENA & ROBOT SPECS
+       *    1 Three.js world unit = 1 cm
+       * ================================================================ */
+      const ARENA_R = 50.0;          // 1000 mm diameter
+      const ARENA_H = 3.0;           // 30 mm thickness
+      const BLACK_LINE_Z = 6.0;      // Center of the two official black start lines (outer edge = 6.6 cm)
+      const SAFE_ZONE_R = 35.5;      // Outer boundary of Yellow ring
+      const DANGER_ZONE_R = 42.5;    // Outer boundary of Red ring
+      const RING_OUT_EDGE = 47.2;
+
+      const ARCHETYPES = {
+        fast: {
+          id: 'fast',
+          name: '獵豹快車',
+          label: '快車（獵豹型 · 3:1）',
+          maxSpeed: 54.0,
+          maxTurn: 4.3,
+          accel: 105.0,
+          brakeDrag: 2.1,
+          pushForce: 60.0,
+          mass: 0.34,
+          width: 15.2,
+          length: 16.4,
+          colorMain: 0xdc2626,
+          colorBlade: 0xf59e0b,
+          colorAccent: 0x1f2937
+        },
+        slow: {
+          id: 'slow',
+          name: '大象大力車',
+          label: '慢車（大象型 · 1:3）',
+          maxSpeed: 27.5,
+          maxTurn: 2.15,
+          accel: 72.0,
+          brakeDrag: 6.5,
+          pushForce: 108.0,
+          mass: 0.398,
+          width: 18.2,
+          length: 19.2,
+          colorMain: 0x1d4ed8,
+          colorBlade: 0xea580c,
+          colorAccent: 0x334155
+        },
+        balanced: {
+          id: 'balanced',
+          name: '均衡全能車',
+          label: '均衡型（1:1 標準）',
+          maxSpeed: 39.0,
+          maxTurn: 3.1,
+          accel: 86.0,
+          brakeDrag: 4.4,
+          pushForce: 84.0,
+          mass: 0.375,
+          width: 16.6,
+          length: 17.6,
+          colorMain: 0x059669,
+          colorBlade: 0x94a3b8,
+          colorAccent: 0x1e293b
+        }
+      };
+
+      // Player Robot (from 相撲車_05_46_28_Copy.io: 11 orange separators, 12T->20T torque gearing, 56mm tires)
+      const MY_SPEC = {
+        name: '我方11片大鏟車',
+        maxSpeed: 28.5,
+        maxTurn: 2.65,
+        accel: 82.0,
+        brakeDrag: 6.5,
+        pushForce: 114.0,
+        mass: 0.392,
+        width: 17.6,
+        length: 19.2
+      };
+
+      const TACTICS = {
+        'fast-lr': {
+          id: 'fast-lr', arch: 'fast', pose: 'left',
+          title: '策略 2：開局【面向左／右】打快車',
+          steps: [
+            '① 快車會急轉衝過來！千萬別原地慢轉（轉一半就被撞側面）',
+            '② 單輪斜退拉弧線：只拉後右鍵，斜退半步（勿退進紅紫區）',
+            '③ 等快車衝過頭煞不住撲空，立刻雙鍵前推用 11 片橙鏟反鏟側面！'
+          ],
+          toast: '打快車【面向左】：按右側斜退（或 E 鍵）讓快車撲空，再前推反鏟側面！'
+        },
+        'fast-back': {
+          id: 'fast-back', arch: 'fast', pose: 'back',
+          title: '策略 3：開局【面向後】打快車',
+          steps: [
+            '① 正前方是空的！先往前走半步拉開距離，走到黃圈邊就停',
+            '② 趁拉開距離的 1 秒，在安全區完成 180° 掉頭把大鏟對準圓心',
+            '③ 迎擊追出來衝過頭的快車，用 11 片橙鏟正面頂住或切它側面！'
+          ],
+          toast: '打快車【面向後】：先向前走半步到黃圈邊，再掉頭 180° 迎擊快車！'
+        },
+        'slow-45': {
+          id: 'slow-45', arch: 'slow', pose: 'left',
+          title: '策略 4A：打慢車【開局搶 45° 側切】',
+          steps: [
+            '① 對手轉身一樣慢！開局不要退縮，搶佔主動權',
+            '② 差速往前繞弧線（左鍵全推、右鍵微推），切入對手 45° 側前方',
+            '③ 用 11 片寬大橙鏟直接插進對手輪胎側面，一口氣推出黑邊！'
+          ],
+          toast: '打慢車【搶 45° 側切】：開局直接差速前衝繞弧線，先插進對手輪胎側面！'
+        },
+        'slow-feint': {
+          id: 'slow-feint', arch: 'slow', pose: 'front',
+          title: '策略 4B：打慢車【頂死破僵局・滑步反切】',
+          steps: [
+            '① 雙車正面硬頂卡死時，千萬別死按前進 60 秒和局！',
+            '② 輕退滑步放力（按 Space），讓死頂的對手往前撲空失去重心',
+            '③ 立刻反手繞過車頭切入對手暴露的輪胎側面，順勢鏟出界！'
+          ],
+          toast: '打慢車【頂死破僵局】：頂死時按 Space 滑步騙對手前撲，再反手斜切側面！'
+        },
+        'edge-save': {
+          id: 'edge-save', arch: 'fast', pose: 'edge',
+          title: '策略 5：邊緣自救【單輪甩尾反殺】',
+          steps: [
+            '① 紅紫區＝危險區！被對手逼到黑邊快出界時，千萬別死頂',
+            '② 單輪急轉甩尾滑離推線，讓車身沿切線閃進安全區',
+            '③ 對手失去阻力因慣性直接衝出黑邊自爆，完成反殺！'
+          ],
+          toast: '邊緣自救：被推到黑邊別硬頂！單輪急轉閃開，讓對手自己衝出界！'
+        },
+        'cup-drill': {
+          id: 'cup-drill', arch: 'cups', pose: 'drill1',
+          title: '準確度訓練 Level 1：中心紙杯塔',
+          steps: [
+            '① 機械人從外圈出發，對準白色中心區的 3 個紙杯塔',
+            '② 練習雙鍵直行微調與大鏟對準，將所有紙杯推出黑邊外',
+            '③ 注意剎車控制：機械人本體必須留在擂台內不可衝出界！'
+          ],
+          toast: '準確度訓練：把中心 3 個紙杯全部推出黑邊，機械人留在擂台內！'
+        }
+      };
+
+      /* ================================================================
+       * 2. WEB AUDIO SYNTH
+       * ================================================================ */
+      let audioCtx = null;
+      let isMuted = false;
+
+      function playTone(freq, dur = 0.08, type = 'triangle', vol = 0.12) {
+        if (isMuted) return;
+        try {
+          if (!audioCtx) {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (Ctx) audioCtx = new Ctx();
+          }
+          if (!audioCtx) return;
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + dur);
+        } catch (e) {}
+      }
+      const playClick = () => playTone(680, 0.025, 'square', 0.045);
+      const playCountdown = (isGo) => playTone(isGo ? 880 : 440, isGo ? 0.24 : 0.11, 'sine', 0.16);
+      const playBump = (i) => playTone(110 + Math.min(i, 1) * 70, 0.055, 'sawtooth', Math.min(0.14, 0.04 + i * 0.08));
+      function playWin(isMe) {
+        if (isMe) {
+          playTone(523, 0.12, 'triangle', 0.15);
+          setTimeout(() => playTone(659, 0.12, 'triangle', 0.15), 110);
+          setTimeout(() => playTone(784, 0.25, 'triangle', 0.18), 220);
+        } else {
+          playTone(330, 0.15, 'sawtooth', 0.12);
+          setTimeout(() => playTone(247, 0.28, 'sawtooth', 0.14), 140);
+        }
+      }
+
+      /* ================================================================
+       * 3. THREE.JS SCENE & 1:1 CM SRC 2027 ARENA
+       * ================================================================ */
+      const host = document.getElementById('canvas-host');
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x202220);
+
+      const camera = new THREE.PerspectiveCamera(42, host.clientWidth / Math.max(host.clientHeight, 1), 1, 600);
+      const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(host.clientWidth, host.clientHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      host.appendChild(renderer.domElement);
+
+      const hemi = new THREE.HemisphereLight(0xf8fafc, 0x475569, 0.62);
+      scene.add(hemi);
+      const dirLight = new THREE.DirectionalLight(0xfffaf0, 0.72);
+      dirLight.position.set(45, 95, 55);
+      dirLight.castShadow = true;
+      dirLight.shadow.mapSize.width = 2048;
+      dirLight.shadow.mapSize.height = 2048;
+      dirLight.shadow.camera.near = 20;
+      dirLight.shadow.camera.far = 220;
+      dirLight.shadow.camera.left = -75;
+      dirLight.shadow.camera.right = 75;
+      dirLight.shadow.camera.top = 75;
+      dirLight.shadow.camera.bottom = -75;
+      dirLight.shadow.bias = -0.0005;
+      scene.add(dirLight);
+
+      const rimLight = new THREE.DirectionalLight(0xcbd5e1, 0.25);
+      rimLight.position.set(-60, 45, -50);
+      scene.add(rimLight);
+
+      // Studio Floor
+      const floorCanvas = document.createElement('canvas');
+      floorCanvas.width = 512; floorCanvas.height = 512;
+      const fctx = floorCanvas.getContext('2d');
+      fctx.fillStyle = '#2d302d';
+      fctx.fillRect(0, 0, 512, 512);
+      fctx.strokeStyle = 'rgba(255,255,255,0.045)';
+      fctx.lineWidth = 1;
+      for (let i = 0; i <= 512; i += 32) {
+        fctx.beginPath(); fctx.moveTo(i, 0); fctx.lineTo(i, 512); fctx.stroke();
+        fctx.beginPath(); fctx.moveTo(0, i); fctx.lineTo(512, i); fctx.stroke();
+      }
+      const floorTex = new THREE.CanvasTexture(floorCanvas);
+      floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
+      floorTex.repeat.set(10, 10);
+      const floorMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(360, 360),
+        new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.9, metalness: 0.05 })
+      );
+      floorMesh.rotation.x = -Math.PI / 2;
+      floorMesh.receiveShadow = true;
+      scene.add(floorMesh);
+
+      // High-DPI SRC 2027 Circular Dohyo Texture (2048x2048)
+      function buildDohyoTexture() {
+        const S = 2048;
+        const c = document.createElement('canvas');
+        c.width = S; c.height = S;
+        const ctx = c.getContext('2d');
+        const cx = S / 2, cy = S / 2;
+        const pxPerCm = (S / 2) / ARENA_R;
+
+        const rings = [
+          { r: 50.0, col: '#141517' },
+          { r: 48.5, col: '#6d2c91' },
+          { r: 42.5, col: '#e31e24' },
+          { r: 35.5, col: '#fde100' },
+          { r: 28.5, col: '#7ac143' },
+          { r: 21.5, col: '#0095da' },
+          { r: 14.5, col: '#f4f6f8' }
+        ];
+        for (const ring of rings) {
+          ctx.beginPath();
+          ctx.arc(cx, cy, ring.r * pxPerCm, 0, Math.PI * 2);
+          ctx.fillStyle = ring.col;
+          ctx.fill();
+        }
+
+        // White center dividing line (z = 0)
+        ctx.fillStyle = '#f8fafc';
+        const lineW = 1.1 * pxPerCm;
+        ctx.fillRect(cx - 48.5 * pxPerCm, cy - lineW / 2, 97.0 * pxPerCm, lineW);
+
+        // Two prominent official black start lines at z = ±6.0 cm (length 15cm, thickness 1.2cm)
+        // Robots MUST be placed strictly BEHIND these black lines (outer edge at z = ±6.6 cm)
+        ctx.fillStyle = '#111113';
+        const barLen = 15.0 * pxPerCm;
+        const barThick = 1.2 * pxPerCm;
+        const barOff = BLACK_LINE_Z * pxPerCm;
+        ctx.fillRect(cx - barLen / 2, cy - barOff - barThick / 2, barLen, barThick);
+        ctx.fillRect(cx - barLen / 2, cy + barOff - barThick / 2, barLen, barThick);
+
+        ctx.fillStyle = 'rgba(30, 41, 59, 0.35)';
+        ctx.font = 'bold 34px "Space Grotesk", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('SRC 2027 · SUMO', cx, cy);
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
+      }
+
+      // Solid raised cylinder base (3cm thick)
+      const dohyoBase = new THREE.Mesh(
+        new THREE.CylinderGeometry(ARENA_R, ARENA_R, ARENA_H, 96),
+        new THREE.MeshStandardMaterial({ color: 0x1c1d20, roughness: 0.7 })
+      );
+      dohyoBase.position.y = ARENA_H / 2;
+      dohyoBase.receiveShadow = true;
+      dohyoBase.castShadow = true;
+      scene.add(dohyoBase);
+
+      // Top arena mat using CircleGeometry (avoids CylinderGeometry's 90° rotated cap UVs!)
+      // With rotation.x = -PI/2: Canvas X -> World +X (Left-Right), Canvas Y -> World +Z (Top-Bottom)
+      const dohyoTop = new THREE.Mesh(
+        new THREE.CircleGeometry(ARENA_R, 96),
+        new THREE.MeshStandardMaterial({ map: buildDohyoTexture(), roughness: 0.58, metalness: 0.04 })
+      );
+      dohyoTop.rotation.x = -Math.PI / 2;
+      dohyoTop.position.y = ARENA_H + 0.02;
+      dohyoTop.receiveShadow = true;
+      scene.add(dohyoTop);
+
+      // Safe-Zone Dashed Ring (R = 35.5cm)
+      const safeRingGroup = new THREE.Group();
+      safeRingGroup.position.y = ARENA_H + 0.08;
+      const safePts = [];
+      for (let i = 0; i <= 128; i++) {
+        const a = (i / 128) * Math.PI * 2;
+        safePts.push(new THREE.Vector3(Math.cos(a) * SAFE_ZONE_R, 0, Math.sin(a) * SAFE_ZONE_R));
+      }
+      const safeLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(safePts),
+        new THREE.LineDashedMaterial({ color: 0x22c55e, dashSize: 2.2, gapSize: 1.4, transparent: true, opacity: 0.85 })
+      );
+      safeLine.computeLineDistances();
+      safeRingGroup.add(safeLine);
+      scene.add(safeRingGroup);
+
+      // Tactical 3D Arrows Group
+      const tacticalGroup = new THREE.Group();
+      tacticalGroup.position.y = ARENA_H + 0.16;
+      scene.add(tacticalGroup);
+      let showVectors = true;
+
+      function addCurvedArrow(points, colorHex) {
+        const curve = new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(p[0], 0.1, p[1])));
+        const mat = new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.88 });
+        tacticalGroup.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 32, 0.42, 8, false), mat));
+        const end = curve.getPoint(1);
+        const tan = curve.getTangent(1);
+        const cone = new THREE.Mesh(new THREE.ConeGeometry(1.4, 3.2, 12), mat);
+        cone.position.copy(end);
+        cone.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tan.normalize());
+        tacticalGroup.add(cone);
+      }
+
+      function rebuildTacticalArrows(tacticId) {
+        while (tacticalGroup.children.length) tacticalGroup.remove(tacticalGroup.children[0]);
+        if (!showVectors) return;
+        if (tacticId === 'fast-lr') {
+          addCurvedArrow([[0, -16], [-3, -2], [-6, 15]], 0xef4444);
+          addCurvedArrow([[0, 16], [12, 22], [21, 16]], 0x22c55e);
+          addCurvedArrow([[19, 15], [8, 13], [-4, 13]], 0xff5e14);
+        } else if (tacticId === 'fast-back') {
+          addCurvedArrow([[0, 17], [0, 27]], 0x22c55e);
+          addCurvedArrow([[0, 27], [11, 30], [13, 20]], 0x3b82f6);
+          addCurvedArrow([[11, 19], [4, 11], [-1, 5]], 0xff5e14);
+        } else if (tacticId === 'slow-45') {
+          addCurvedArrow([[0, 16], [-15, 7], [-13, -10], [-4, -15]], 0x22c55e);
+        } else if (tacticId === 'slow-feint') {
+          addCurvedArrow([[0, 15], [10, 20], [16, 12]], 0x22c55e);
+          addCurvedArrow([[14, 10], [6, 3], [-2, 0]], 0xff5e14);
+        } else if (tacticId === 'edge-save') {
+          addCurvedArrow([[16, 0], [34, 0], [52, -2]], 0xef4444);
+          addCurvedArrow([[32, 0], [26, 14], [18, 22]], 0x22c55e);
+        }
+      }
+
+      /* ================================================================
+       * 4. PROCEDURAL 3D ROBOT BUILDERS (+Z = FRONT 11-BLADE ORANGE SCOOP)
+       * ================================================================ */
+      function makeWheelMesh(radius, width, rimColor) {
+        const g = new THREE.Group();
+        const tireMat = new THREE.MeshStandardMaterial({ color: 0x1e2022, roughness: 0.85, metalness: 0.05 });
+        const rimMat = new THREE.MeshStandardMaterial({ color: rimColor, roughness: 0.45, metalness: 0.2 });
+
+        const tire = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, width, 24), tireMat);
+        tire.rotation.z = Math.PI / 2;
+        tire.castShadow = true;
+        g.add(tire);
+
+        const ribGeo = new THREE.BoxGeometry(width + 0.08, 0.35, 0.45);
+        for (let i = 0; i < 12; i++) {
+          const a = (i / 12) * Math.PI * 2;
+          const rib = new THREE.Mesh(ribGeo, tireMat);
+          rib.position.set(0, Math.sin(a) * radius, Math.cos(a) * radius);
+          rib.rotation.x = -a;
+          g.add(rib);
+        }
+
+        const rim = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.56, radius * 0.56, width + 0.14, 16), rimMat);
+        rim.rotation.z = Math.PI / 2;
+        g.add(rim);
+
+        const axle = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, width + 0.35, 8), new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.5 }));
+        axle.rotation.z = Math.PI / 2;
+        g.add(axle);
+        return g;
+      }
+
+      function buildMyRobotMesh() {
+        const root = new THREE.Group();
+        const matOrange = new THREE.MeshStandardMaterial({ color: 0xff6d00, roughness: 0.35, metalness: 0.05 });
+        const matLime   = new THREE.MeshStandardMaterial({ color: 0x99d900, roughness: 0.4 });
+        const matRed    = new THREE.MeshStandardMaterial({ color: 0xd62828, roughness: 0.42 });
+        const matLGrey  = new THREE.MeshStandardMaterial({ color: 0xa6adb5, roughness: 0.45 });
+        const matDGrey  = new THREE.MeshStandardMaterial({ color: 0x5c636a, roughness: 0.5 });
+        const matWhite  = new THREE.MeshStandardMaterial({ color: 0xf4f5f6, roughness: 0.32 });
+        const matBlack  = new THREE.MeshStandardMaterial({ color: 0x222426, roughness: 0.6 });
+        const matTan    = new THREE.MeshStandardMaterial({ color: 0xd9bc8c, roughness: 0.5 });
+        const matGreen  = new THREE.MeshStandardMaterial({ color: 0x22c55e, emissive: 0x16a34a, emissiveIntensity: 0.45 });
+
+        // 11-Piece Orange Brick-Separator Front Wedge (+Z = Forward!)
+        const bladeGroup = new THREE.Group();
+        for (let i = 0; i < 11; i++) {
+          const x = (i - 5) * 1.56;
+          const ramp = new THREE.Mesh(new THREE.BoxGeometry(1.48, 0.48, 6.2), matOrange);
+          ramp.position.set(x, 1.85, 6.5);
+          ramp.rotation.x = 0.52;
+          ramp.castShadow = true;
+          ramp.receiveShadow = true;
+          bladeGroup.add(ramp);
+
+          const lip = new THREE.Mesh(new THREE.BoxGeometry(1.48, 0.22, 1.4), matOrange);
+          lip.position.set(x, 0.22, 9.2);
+          lip.rotation.x = 0.2;
+          bladeGroup.add(lip);
+
+          const ridge = new THREE.Mesh(new THREE.BoxGeometry(0.88, 0.25, 4.4), matOrange);
+          ridge.position.set(x, 2.35, 6.0);
+          ridge.rotation.x = 0.52;
+          bladeGroup.add(ridge);
+        }
+        root.add(bladeGroup);
+
+        const limeBar = new THREE.Mesh(new THREE.BoxGeometry(16.8, 1.0, 1.2), matLime);
+        limeBar.position.set(0, 4.1, 3.6); limeBar.castShadow = true; root.add(limeBar);
+
+        const greyWall = new THREE.Mesh(new THREE.BoxGeometry(17.2, 4.8, 1.1), matLGrey);
+        greyWall.position.set(0, 3.2, 2.6); greyWall.castShadow = true; root.add(greyWall);
+
+        const redWall = new THREE.Mesh(new THREE.BoxGeometry(16.4, 5.2, 1.0), matRed);
+        redWall.position.set(0, 3.5, 1.6); redWall.castShadow = true; root.add(redWall);
+
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(1.1, 3.6, 11.5), matRed);
+        sideL.position.set(-7.6, 2.5, -3.2); sideL.castShadow = true; root.add(sideL);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(1.1, 3.6, 11.5), matRed);
+        sideR.position.set(7.6, 2.5, -3.2); sideR.castShadow = true; root.add(sideR);
+
+        const rearBeam = new THREE.Mesh(new THREE.BoxGeometry(16.4, 1.6, 1.2), matRed);
+        rearBeam.position.set(0, 2.2, -9.0); rearBeam.castShadow = true; root.add(rearBeam);
+
+        const motorL = new THREE.Mesh(new THREE.BoxGeometry(3.2, 3.0, 5.6), matDGrey);
+        motorL.position.set(-3.2, 2.6, -1.6); motorL.castShadow = true; root.add(motorL);
+        const motorR = new THREE.Mesh(new THREE.BoxGeometry(3.2, 3.0, 5.6), matDGrey);
+        motorR.position.set(3.2, 2.6, -1.6); motorR.castShadow = true; root.add(motorR);
+
+        const midBrace = new THREE.Mesh(new THREE.BoxGeometry(14.5, 1.2, 2.2), matLGrey);
+        midBrace.position.set(0, 4.3, -1.5); root.add(midBrace);
+
+        const gearL = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 0.7, 14), matTan);
+        gearL.rotation.z = Math.PI / 2; gearL.position.set(-4.3, 2.8, -5.4); root.add(gearL);
+        const gearR = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 0.7, 14), matTan);
+        gearR.rotation.z = Math.PI / 2; gearR.position.set(4.3, 2.8, -5.4); root.add(gearR);
+
+        const hub = new THREE.Mesh(new THREE.BoxGeometry(6.6, 3.6, 5.2), matWhite);
+        hub.position.set(0, 5.4, -6.2); hub.castShadow = true; root.add(hub);
+        const hubBtn = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.25, 1.1), matGreen);
+        hubBtn.position.set(0, 7.25, -6.2); root.add(hubBtn);
+
+        const handleBar = new THREE.Mesh(new THREE.BoxGeometry(13.6, 0.8, 1.5), matBlack);
+        handleBar.position.set(0, 8.6, -3.5); handleBar.castShadow = true; root.add(handleBar);
+        const handlePadL = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.9, 2.8), matWhite);
+        handlePadL.position.set(-5.2, 8.5, -3.5); root.add(handlePadL);
+        const handlePadR = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.9, 2.8), matWhite);
+        handlePadR.position.set(5.2, 8.5, -3.5); root.add(handlePadR);
+        const handlePostL = new THREE.Mesh(new THREE.BoxGeometry(0.9, 5.0, 1.2), matRed);
+        handlePostL.position.set(-6.5, 6.0, -3.5); root.add(handlePostL);
+        const handlePostR = new THREE.Mesh(new THREE.BoxGeometry(0.9, 5.0, 1.2), matRed);
+        handlePostR.position.set(6.5, 6.0, -3.5); root.add(handlePostR);
+
+        const wheelL = makeWheelMesh(2.8, 2.6, 0xb8bec6);
+        wheelL.position.set(-6.1, 2.8, -5.4); root.add(wheelL);
+        const wheelR = makeWheelMesh(2.8, 2.6, 0xb8bec6);
+        wheelR.position.set(6.1, 2.8, -5.4); root.add(wheelR);
+
+        const skid = new THREE.Mesh(new THREE.BoxGeometry(8.0, 0.5, 2.4), matWhite);
+        skid.position.set(0, 0.3, 2.4); root.add(skid);
+
+        return { root, wheelL, wheelR, gearL, gearR };
+      }
+
+      function buildOpponentMesh(arch) {
+        const root = new THREE.Group();
+        const matMain   = new THREE.MeshStandardMaterial({ color: arch.colorMain, roughness: 0.38, metalness: 0.1 });
+        const matBlade  = new THREE.MeshStandardMaterial({ color: arch.colorBlade, roughness: 0.35, metalness: 0.15 });
+        const matAccent = new THREE.MeshStandardMaterial({ color: arch.colorAccent, roughness: 0.55 });
+        const matWhite  = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.35 });
+
+        const w = arch.width, l = arch.length;
+        const body = new THREE.Mesh(new THREE.BoxGeometry(w - 3.0, 4.4, l - 5.0), matMain);
+        body.position.set(0, 3.0, -1.6); body.castShadow = true; body.receiveShadow = true; root.add(body);
+
+        const hub = new THREE.Mesh(new THREE.BoxGeometry(6.2, 2.2, 5.4), matWhite);
+        hub.position.set(0, 6.0, -2.0); hub.castShadow = true; root.add(hub);
+
+        const chevron = new THREE.Mesh(new THREE.ConeGeometry(1.4, 2.6, 3), matBlade);
+        chevron.rotation.x = Math.PI / 2; chevron.position.set(0, 7.25, -1.5); root.add(chevron);
+
+        const bladeW = arch.id === 'fast' ? w * 0.78 : w * 0.96;
+        const blade = new THREE.Mesh(new THREE.BoxGeometry(bladeW, 0.65, 5.4), matBlade);
+        blade.position.set(0, 1.75, l / 2 - 2.6); blade.rotation.x = 0.52; blade.castShadow = true; root.add(blade);
+        const bladeLip = new THREE.Mesh(new THREE.BoxGeometry(bladeW, 0.25, 1.2), matBlade);
+        bladeLip.position.set(0, 0.25, l / 2 - 0.3); root.add(bladeLip);
+
+        if (arch.id === 'fast') {
+          const finGeo = new THREE.BoxGeometry(0.6, 2.2, 6.0);
+          const finL = new THREE.Mesh(finGeo, matAccent); finL.position.set(-w/2 + 2.0, 5.4, -4.5); root.add(finL);
+          const finR = new THREE.Mesh(finGeo, matAccent); finR.position.set( w/2 - 2.0, 5.4, -4.5); root.add(finR);
+        } else if (arch.id === 'slow') {
+          const armGeo = new THREE.BoxGeometry(1.4, 3.4, l - 6.0);
+          const armL = new THREE.Mesh(armGeo, matAccent); armL.position.set(-w/2 + 1.0, 2.8, -1.5); root.add(armL);
+          const armR = new THREE.Mesh(armGeo, matAccent); armR.position.set( w/2 - 1.0, 2.8, -1.5); root.add(armR);
+        }
+
+        const wheelR = arch.id === 'fast' ? 2.6 : 2.85;
+        const wheelW = arch.id === 'fast' ? 2.0 : 2.6;
+        const wL = makeWheelMesh(wheelR, wheelW, 0xe2e8f0); wL.position.set(-w/2 + 1.1, wheelR, -2.5); root.add(wL);
+        const wR = makeWheelMesh(wheelR, wheelW, 0xe2e8f0); wR.position.set( w/2 - 1.1, wheelR, -2.5); root.add(wR);
+
+        return { root, wheelL: wL, wheelR: wR };
+      }
+
+      // Paper Cups (Drill Level 1)
+      const cupGroup = new THREE.Group();
+      scene.add(cupGroup);
+      let cups = [];
+      function clearCups() {
+        while (cupGroup.children.length) cupGroup.remove(cupGroup.children[0]);
+        cups = [];
+      }
+      function spawnCupTower() {
+        clearCups();
+        const cupMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, roughness: 0.4 });
+        const rimMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.3 });
+        [{ x: -3.8, z: 0 }, { x: 3.8, z: 0 }, { x: 0.0, z: -4.2 }].forEach((p, idx) => {
+          const g = new THREE.Group();
+          const body = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 2.6, 8.5, 20), cupMat);
+          body.position.y = 4.25; body.castShadow = true; g.add(body);
+          const rim = new THREE.Mesh(new THREE.TorusGeometry(3.2, 0.22, 8, 20), rimMat);
+          rim.rotation.x = Math.PI / 2; rim.position.y = 8.5; g.add(rim);
+          g.position.set(p.x, ARENA_H, p.z);
+          cupGroup.add(g);
+          cups.push({ id: idx, mesh: g, x: p.x, z: p.z, vx: 0, vz: 0, r: 3.3, out: false, fallY: 0, vy: 0 });
+        });
+      }
+
+      /* ================================================================
+       * 5. SIMULATION STATE & EXACT BEHIND-BLACK-LINE START POSES
+       * ================================================================ */
+      const myVisual = buildMyRobotMesh();
+      scene.add(myVisual.root);
+
+      let currentArch = ARCHETYPES.fast;
+      let oppVisual = buildOpponentMesh(currentArch);
+      scene.add(oppVisual.root);
+
+      const state = {
+        phase: 'idle',
+        mode: 'duel',
+        activeTactic: 'fast-lr',
+        pose: 'left',
+        ctrlMode: 'tank', // 'tank' (left+right edge sticks) | 'arcade' (left 360° stick ONLY, right side empty)
+        simSpeed: 1.0,
+        round: 1,
+        scoreMe: 0,
+        scoreOpp: 0,
+        timer: 60.0,
+        countdownVal: 3,
+        countdownAcc: 0,
+        matchElapsed: 0,
+        oppSpeedMult: 1.0,
+        oppTorqueMult: 1.0,
+        deadlockTime: 0,
+        feintTimer: 0,
+        contactText: '未接觸',
+        advText: '—',
+        bumpCooldown: 0
+      };
+
+      function createBody(spec) {
+        return {
+          x: 0, z: 0, y: ARENA_H,
+          vx: 0, vz: 0, vy: 0,
+          heading: 0, omega: 0,
+          leftCmd: 0, rightCmd: 0,
+          pitch: 0, roll: 0, targetPitch: 0, targetRoll: 0,
+          lifted: 0, out: false, spec
+        };
+      }
+
+      let me = createBody(MY_SPEC);
+      let opp = createBody(currentArch);
+
+      // EXACT SRC 2027 Rule H.4 & Slide 3/4:
+      // Outer edge of black start lines is at z = ±(BLACK_LINE_Z + 0.6) = ±6.6 cm.
+      // Every single part of each robot MUST sit strictly BEHIND its black line!
+      function applyStartPose(pose) {
+        state.pose = pose;
+        clearCups();
+        oppVisual.root.visible = (pose !== 'drill1');
+
+        const resetBody = (b, x, z, heading) => {
+          b.x = x; b.z = z; b.y = ARENA_H;
+          b.vx = 0; b.vz = 0; b.vy = 0;
+          b.heading = heading; b.omega = 0;
+          b.leftCmd = 0; b.rightCmd = 0;
+          b.pitch = 0; b.roll = 0; b.targetPitch = 0; b.targetRoll = 0;
+          b.lifted = 0; b.out = false;
+        };
+
+        const lineEdge = BLACK_LINE_Z + 0.7; // 6.7 cm (flush behind the black line!)
+        const myHalfW  = MY_SPEC.width * 0.5;        // 8.8 cm
+        const myHalfL  = MY_SPEC.length * 0.5 + 0.4; // 10.0 cm (clears 11-blade tip & rear beam)
+        const oppHalfW = currentArch.width * 0.5;
+        const oppHalfL = currentArch.length * 0.5 + 0.3;
+
+        if (pose === 'left') {
+          // Centered left-right, inner side flush behind black line, facing own Left
+          resetBody(me,  0,  lineEdge + myHalfW,  -Math.PI / 2);
+          resetBody(opp, 0, -(lineEdge + oppHalfW), Math.PI / 2);
+        } else if (pose === 'right') {
+          resetBody(me,  0,  lineEdge + myHalfW,   Math.PI / 2);
+          resetBody(opp, 0, -(lineEdge + oppHalfW), -Math.PI / 2);
+        } else if (pose === 'back') {
+          // Rear beam flush behind black line, facing outward
+          resetBody(me,  0,  lineEdge + myHalfL,   0);
+          resetBody(opp, 0, -(lineEdge + oppHalfL), Math.PI);
+        } else if (pose === 'front') {
+          // Front blade tip flush behind black line, facing center
+          resetBody(me,  0,  lineEdge + myHalfL,   Math.PI);
+          resetBody(opp, 0, -(lineEdge + oppHalfL), 0);
+        } else if (pose === 'edge') {
+          resetBody(me,  32.0, 0, -Math.PI / 2);
+          resetBody(opp, 12.0, 0,  Math.PI / 2);
+        } else if (pose === 'drill1') {
+          resetBody(me, 0, 35.0, Math.PI);
+          resetBody(opp, 0, -90, 0);
+          spawnCupTower();
+        }
+
+        state.timer = 60.0;
+        state.matchElapsed = 0;
+        state.deadlockTime = 0;
+        state.feintTimer = 0;
+        state.contactText = '未接觸';
+        state.advText = '—';
+        syncMeshes();
+        updateScoreboardUI();
+      }
+
+      /* ================================================================
+       * 6. INPUT SYSTEM (iPad Multi-Touch Edge Sticks + Arcade 360° + Keys + Gamepad)
+       * ================================================================ */
+      const keys = {};
+      let touchLeft = 0, touchRight = 0, touchSplitFwd = 0, touchSteer = 0;
+      let arcadeFwd = 0, arcadeTrn = 0;
+      let holdBtnLeftBack = false, holdBtnRightBack = false;
+
+      window.addEventListener('keydown', (e) => {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();
+        keys[e.code] = true;
+        if (e.code === 'Space' && state.phase === 'running') triggerFeintMove();
+      });
+      window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+      function triggerFeintMove() {
+        if (state.feintTimer <= 0) {
+          state.feintTimer = 0.85;
+          showToast('⚡ 觸發「滑步破僵局」：繞過對手車頭切入側面！');
+          playClick();
+        }
+      }
+
+      // Multi-touch independent vertical tank sticks (Left Edge 1 & Right Edge 2)
+      function bindTankStick(trackId, setter) {
+        const track = document.getElementById(trackId);
+        let activePointerId = null;
+        const update = (clientY) => {
+          const rect = track.getBoundingClientRect();
+          const norm = ((rect.top + rect.height / 2) - clientY) / (rect.height / 2 - 22);
+          setter(Math.max(-1, Math.min(1, norm)));
+        };
+        track.addEventListener('pointerdown', (e) => {
+          e.stopPropagation();
+          activePointerId = e.pointerId;
+          track.setPointerCapture(e.pointerId);
+          update(e.clientY);
+        });
+        track.addEventListener('pointermove', (e) => {
+          if (activePointerId === e.pointerId) update(e.clientY);
+        });
+        const release = (e) => {
+          if (activePointerId === e.pointerId) {
+            activePointerId = null;
+            setter(0);
+          }
+        };
+        track.addEventListener('pointerup', release);
+        track.addEventListener('pointercancel', release);
+      }
+      bindTankStick('stick-left-track', v => { touchLeft = v; });
+      bindTankStick('stick-right-track', v => { touchRight = v; });
+
+      // Split Dual-Stick Circular Joysticks: Left = Vertical Fwd/Back ONLY, Right = Horizontal Left/Right ONLY
+      (function bindSplitCircularSticks() {
+        const maxR = 38;
+        // Left circular joystick (locked vertical axis)
+        const fwdPad = document.getElementById('split-fwd-pad');
+        const fwdWell = document.getElementById('split-fwd-well');
+        let fwdPid = null;
+        const updFwd = (cy) => {
+          const rect = fwdWell.getBoundingClientRect();
+          const dy = Math.max(-maxR, Math.min(maxR, cy - (rect.top + rect.height / 2)));
+          touchSplitFwd = -dy / maxR;
+        };
+        fwdPad.addEventListener('pointerdown', (e) => {
+          e.stopPropagation(); fwdPid = e.pointerId;
+          fwdPad.setPointerCapture(e.pointerId); updFwd(e.clientY);
+        });
+        fwdPad.addEventListener('pointermove', (e) => { if (fwdPid === e.pointerId) updFwd(e.clientY); });
+        const relFwd = (e) => { if (fwdPid === e.pointerId) { fwdPid = null; touchSplitFwd = 0; } };
+        fwdPad.addEventListener('pointerup', relFwd);
+        fwdPad.addEventListener('pointercancel', relFwd);
+
+        // Right circular joystick (locked horizontal axis)
+        const strPad = document.getElementById('split-steer-pad');
+        const strWell = document.getElementById('split-steer-well');
+        let strPid = null;
+        const updStr = (cx) => {
+          const rect = strWell.getBoundingClientRect();
+          const dx = Math.max(-maxR, Math.min(maxR, cx - (rect.left + rect.width / 2)));
+          touchSteer = dx / maxR;
+        };
+        strPad.addEventListener('pointerdown', (e) => {
+          e.stopPropagation(); strPid = e.pointerId;
+          strPad.setPointerCapture(e.pointerId); updStr(e.clientX);
+        });
+        strPad.addEventListener('pointermove', (e) => { if (strPid === e.pointerId) updStr(e.clientX); });
+        const relStr = (e) => { if (strPid === e.pointerId) { strPid = null; touchSteer = 0; } };
+        strPad.addEventListener('pointerup', relStr);
+        strPad.addEventListener('pointercancel', relStr);
+      })();
+
+      // 360° Single Analog Joystick (Left Edge ONLY in Arcade Mode)
+      (function bindArcadeStick() {
+        const pad = document.getElementById('arcade-pad');
+        const well = document.getElementById('arcade-well');
+        const knob = document.getElementById('arcade-knob');
+        let pid = null;
+        const maxR = 38;
+        const update = (cx, cy) => {
+          const rect = well.getBoundingClientRect();
+          const ox = rect.left + rect.width / 2;
+          const oy = rect.top + rect.height / 2;
+          let dx = cx - ox, dy = cy - oy;
+          const dist = Math.hypot(dx, dy);
+          if (dist > maxR) { dx = (dx / dist) * maxR; dy = (dy / dist) * maxR; }
+          knob.style.left = `${36 + dx}px`;
+          knob.style.top  = `${36 + dy}px`;
+          arcadeTrn = dx / maxR;
+          arcadeFwd = -dy / maxR;
+        };
+        const reset = () => {
+          pid = null;
+          arcadeFwd = 0; arcadeTrn = 0;
+          knob.style.left = '36px'; knob.style.top = '36px';
+        };
+        pad.addEventListener('pointerdown', (e) => {
+          e.stopPropagation();
+          pid = e.pointerId;
+          pad.setPointerCapture(e.pointerId);
+          update(e.clientX, e.clientY);
+        });
+        pad.addEventListener('pointermove', (e) => {
+          if (pid === e.pointerId) update(e.clientX, e.clientY);
+        });
+        pad.addEventListener('pointerup', (e) => { if (pid === e.pointerId) reset(); });
+        pad.addEventListener('pointercancel', (e) => { if (pid === e.pointerId) reset(); });
+      })();
+
+      function getManualCommands() {
+        if (state.feintTimer > 0) {
+          if (state.feintTimer > 0.40) return { l: 1.0, r: -0.25 };
+          return { l: 1.0, r: 0.75 };
+        }
+        if (keys['KeyQ'] || holdBtnLeftBack)  return { l: -1.0, r:  0.0 };
+        if (keys['KeyE'] || holdBtnRightBack) return { l:  0.0, r: -1.0 };
+
+        // Gamepad
+        try {
+          const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+          const gp = pads && Array.from(pads).find(p => p && p.connected);
+          if (gp) {
+            document.getElementById('gamepad-status').textContent = '手掣：已連線';
+            document.getElementById('gamepad-status').style.color = '#15803d';
+            const dz = v => Math.abs(v) < 0.15 ? 0 : v;
+            let l, r;
+            if (state.ctrlMode === 'tank') {
+              l = dz(-gp.axes[1]);
+              r = dz(-(gp.axes[3] !== undefined ? gp.axes[3] : gp.axes[1]));
+            } else if (state.ctrlMode === 'split') {
+              const f = dz(-gp.axes[1]);
+              const t = dz(gp.axes[2] !== undefined ? gp.axes[2] : gp.axes[0]);
+              l = Math.max(-1, Math.min(1, f + t * 0.9));
+              r = Math.max(-1, Math.min(1, f - t * 0.9));
+            } else {
+              const f = dz(-gp.axes[1]), t = dz(gp.axes[0]);
+              l = Math.max(-1, Math.min(1, f + t));
+              r = Math.max(-1, Math.min(1, f - t));
+            }
+            if (Math.abs(l) > 0.05 || Math.abs(r) > 0.05) return { l, r };
+          }
+        } catch (e) {}
+
+        // On-screen iPad edge sticks
+        if (state.ctrlMode === 'tank') {
+          if (Math.abs(touchLeft) > 0.04 || Math.abs(touchRight) > 0.04) {
+            return { l: touchLeft, r: touchRight };
+          }
+          let l = 0, r = 0;
+          if (keys['KeyW']) l += 1;
+          if (keys['KeyS']) l -= 1;
+          if (keys['ArrowUp'] || keys['KeyI']) r += 1;
+          if (keys['ArrowDown'] || keys['KeyK']) r -= 1;
+          if (keys['KeyA'] || keys['ArrowLeft'])  { l = -0.85; r =  0.85; }
+          if (keys['KeyD'] || keys['ArrowRight']) { l =  0.85; r = -0.85; }
+          return { l, r };
+        } else if (state.ctrlMode === 'split') {
+          // Left vertical stick = Forward/Backward ONLY; Right horizontal stick = Left/Right ONLY!
+          let fwd = touchSplitFwd;
+          let trn = touchSteer;
+          if (Math.abs(fwd) < 0.04) {
+            if (keys['KeyW'] || keys['ArrowUp']) fwd += 1;
+            if (keys['KeyS'] || keys['ArrowDown']) fwd -= 1;
+          }
+          if (Math.abs(trn) < 0.04) {
+            if (keys['KeyA'] || keys['ArrowLeft']) trn -= 0.9;
+            if (keys['KeyD'] || keys['ArrowRight']) trn += 0.9;
+          }
+          return {
+            l: Math.max(-1, Math.min(1, fwd + trn * 0.9)),
+            r: Math.max(-1, Math.min(1, fwd - trn * 0.9))
+          };
+        } else {
+          if (Math.abs(arcadeFwd) > 0.04 || Math.abs(arcadeTrn) > 0.04) {
+            return {
+              l: Math.max(-1, Math.min(1, arcadeFwd + arcadeTrn * 0.9)),
+              r: Math.max(-1, Math.min(1, arcadeFwd - arcadeTrn * 0.9))
+            };
+          }
+          let fwd = 0, trn = 0;
+          if (keys['KeyW'] || keys['ArrowUp'])    fwd += 1;
+          if (keys['KeyS'] || keys['ArrowDown'])  fwd -= 1;
+          if (keys['KeyA'] || keys['ArrowLeft'])  trn -= 0.85;
+          if (keys['KeyD'] || keys['ArrowRight']) trn += 0.85;
+          return {
+            l: Math.max(-1, Math.min(1, fwd + trn)),
+            r: Math.max(-1, Math.min(1, fwd - trn))
+          };
+        }
+      }
+
+      /* ================================================================
+       * 7. AUTOPILOT TACTICAL DEMO & OPPONENT AI
+       * ================================================================ */
+      function normalizeAngle(a) {
+        while (a > Math.PI) a -= Math.PI * 2;
+        while (a < -Math.PI) a += Math.PI * 2;
+        return a;
+      }
+
+      function steerToward(body, tx, tz, speedScale = 1.0) {
+        const desired = Math.atan2(tx - body.x, tz - body.z);
+        const err = normalizeAngle(desired - body.heading);
+        if (Math.abs(err) > 0.55) {
+          return err > 0 ? { l: -0.95, r: 0.95 } : { l: 0.95, r: -0.95 };
+        }
+        const turn = Math.max(-1, Math.min(1, -err * 2.2));
+        return {
+          l: Math.max(-1, Math.min(1, (1.0 + turn) * speedScale)),
+          r: Math.max(-1, Math.min(1, (1.0 - turn) * speedScale))
+        };
+      }
+
+      function getDemoPlayerCommands() {
+        const t = state.matchElapsed;
+        const tac = state.activeTactic;
+        const rMe = Math.hypot(me.x, me.z);
+        const setStep = (idx) => {
+          document.querySelectorAll('#strat-steps li').forEach((li, i) => li.classList.toggle('active-step', i === idx));
+        };
+
+        if (tac === 'fast-lr') {
+          if (t < 0.78) {
+            setStep(1);
+            return state.pose === 'right' ? { l: -1.0, r: 0.0 } : { l: 0.0, r: -1.0 };
+          }
+          setStep(2);
+          return steerToward(me, opp.x, opp.z, 1.0);
+        }
+        if (tac === 'fast-back') {
+          if (t < 0.34 && rMe < 25.0) {
+            setStep(0);
+            return { l: 1.0, r: 1.0 };
+          } else if (t < 1.18 && Math.abs(normalizeAngle(Math.PI - me.heading)) > 0.25) {
+            setStep(1);
+            return { l: -1.0, r: 1.0 };
+          }
+          setStep(2);
+          return steerToward(me, opp.x, opp.z, 1.0);
+        }
+        if (tac === 'slow-45') {
+          if (t < 0.95) {
+            setStep(1);
+            return state.pose === 'right' ? { l: 0.28, r: 1.0 } : { l: 1.0, r: 0.28 };
+          }
+          setStep(2);
+          return steerToward(me, opp.x, opp.z, 1.0);
+        }
+        if (tac === 'slow-feint') {
+          if (t < 0.85) { setStep(0); return { l: 1.0, r: 1.0 }; }
+          if (t < 1.30) { setStep(1); return { l: 1.0, r: -0.25 }; }
+          if (t < 1.85) { setStep(2); return { l: 1.0, r: 0.75 }; }
+          setStep(2);
+          return steerToward(me, opp.x, opp.z, 1.0);
+        }
+        if (tac === 'edge-save') {
+          if (t < 0.72) { setStep(1); return { l: 0.35, r: 1.0 }; }
+          setStep(2);
+          return steerToward(me, opp.x, opp.z, 1.0);
+        }
+        const aliveCup = cups.find(c => !c.out);
+        if (aliveCup) {
+          if (rMe > 38) return steerToward(me, 0, 0, 0.85);
+          return steerToward(me, aliveCup.x, aliveCup.z, 0.85);
+        }
+        return { l: 0, r: 0 };
+      }
+
+      function getOpponentCommands() {
+        if (state.pose === 'drill1') return { l: 0, r: 0 };
+        const arch = currentArch.id;
+        const rOpp = Math.hypot(opp.x, opp.z);
+
+        if (state.pose === 'edge' && state.matchElapsed < 1.45) return { l: 1.0, r: 1.0 };
+        if (state.mode === 'demo' && state.activeTactic === 'slow-feint' && state.matchElapsed >= 0.85 && state.matchElapsed < 1.60) {
+          return { l: 1.0, r: 1.0 };
+        }
+        if (rOpp > 42.5 && !(arch === 'fast' && Math.hypot(opp.vx, opp.vz) > 26)) {
+          return steerToward(opp, 0, 0, 0.9);
+        }
+
+        const desired = Math.atan2(me.x - opp.x, me.z - opp.z);
+        const err = normalizeAngle(desired - opp.heading);
+
+        if (arch === 'fast') {
+          if (Math.abs(err) > 0.28) return err > 0 ? { l: -1.0, r: 1.0 } : { l: 1.0, r: -1.0 };
+          return { l: 1.0, r: 1.0 };
+        }
+        if (arch === 'slow') {
+          if (Math.abs(err) > 0.25) return err > 0 ? { l: -0.9, r: 0.9 } : { l: 0.9, r: -0.9 };
+          return { l: 1.0, r: 1.0 };
+        }
+        const offsetAngle = desired + Math.sin(state.matchElapsed * 1.4) * 0.22;
+        const bErr = normalizeAngle(offsetAngle - opp.heading);
+        const trn = Math.max(-1, Math.min(1, -bErr * 2.0));
+        return { l: Math.max(-1, Math.min(1, 0.92 + trn)), r: Math.max(-1, Math.min(1, 0.92 - trn)) };
+      }
+
+      /* ================================================================
+       * 8. PHYSICS ENGINE (120 Hz)
+       * ================================================================ */
+      function stepBodyDrive(b, dt, speedMult = 1.0) {
+        if (b.out) {
+          b.vy -= 980 * dt;
+          b.y = Math.max(0, b.y + b.vy * dt);
+          b.x += b.vx * dt; b.z += b.vz * dt;
+          b.vx *= Math.max(0, 1 - 4.0 * dt);
+          b.vz *= Math.max(0, 1 - 4.0 * dt);
+          b.pitch += (b.targetPitch - b.pitch) * Math.min(1, dt * 8);
+          b.roll  += (b.targetRoll - b.roll) * Math.min(1, dt * 8);
+          return;
+        }
+        const spec = b.spec;
+        const grip = Math.max(0.22, 1.0 - (b.lifted || 0) * 0.78);
+        b.lifted = Math.max(0, (b.lifted || 0) - dt * 4.0);
+
+        const maxSpd = spec.maxSpeed * speedMult;
+        const maxTrn = spec.maxTurn * Math.sqrt(speedMult);
+        const fwdCmd = (b.leftCmd + b.rightCmd) * 0.5;
+        const trnCmd = (b.leftCmd - b.rightCmd) * 0.5;
+
+        const targetOmega = -trnCmd * maxTrn * grip;
+        b.omega += (targetOmega - b.omega) * Math.min(1, dt * 11.0);
+        b.heading = normalizeAngle(b.heading + b.omega * dt);
+
+        const fx = Math.sin(b.heading), fz = Math.cos(b.heading);
+        const rx = fz, rz = -fx;
+        let vFwd = b.vx * fx + b.vz * fz;
+        let vLat = b.vx * rx + b.vz * rz;
+
+        const targetVFwd = fwdCmd * maxSpd;
+        const accelRate = (Math.abs(targetVFwd) > Math.abs(vFwd) ? spec.accel * speedMult : spec.brakeDrag * 22.0) * grip;
+        const dv = targetVFwd - vFwd;
+        vFwd += Math.max(-accelRate * dt, Math.min(accelRate * dt, dv));
+
+        const latGrip = ((spec.id === 'fast') ? 4.8 : 9.0) * grip;
+        vLat *= Math.max(0, 1 - latGrip * dt);
+
+        b.vx = fx * vFwd + rx * vLat;
+        b.vz = fz * vFwd + rz * vLat;
+        b.x += b.vx * dt; b.z += b.vz * dt;
+
+        b.pitch += (b.targetPitch - b.pitch) * Math.min(1, dt * 10);
+        b.roll  += (b.targetRoll - b.roll) * Math.min(1, dt * 10);
+        b.targetPitch *= Math.max(0, 1 - 6 * dt);
+        b.targetRoll  *= Math.max(0, 1 - 6 * dt);
+      }
+
+      function resolveRobotCollision(dt) {
+        if (state.pose === 'drill1' || me.out || opp.out) return;
+        const dx = opp.x - me.x, dz = opp.z - me.z;
+        const dist = Math.hypot(dx, dz);
+        const minDist = (me.spec.length * 0.45) + (opp.spec.length * 0.45);
+
+        if (dist >= minDist || dist < 0.001) {
+          state.deadlockTime = Math.max(0, state.deadlockTime - dt * 2);
+          state.contactText = '未接觸'; state.advText = '—';
+          return;
+        }
+
+        const nx = dx / dist, nz = dz / dist, overlap = minDist - dist;
+        const tx = -nz, tz = nx;
+        const mFx = Math.sin(me.heading), mFz = Math.cos(me.heading);
+        const oFx = Math.sin(opp.heading), oFz = Math.cos(opp.heading);
+
+        const meAlign  = mFx * nx + mFz * nz;
+        const oppAlign = oFx * (-nx) + oFz * (-nz);
+        const meWedgeActive  = meAlign > 0.58;
+        const oppWedgeActive = oppAlign > 0.58;
+        const oppFlankExposed = oppAlign < 0.48;
+        const meFlankExposed  = meAlign < 0.48;
+
+        const meDrive  = Math.max(0.15, (me.leftCmd + me.rightCmd) * 0.5 + 0.35);
+        const oppDrive = Math.max(0.15, (opp.leftCmd + opp.rightCmd) * 0.5 + 0.35);
+
+        let mePower  = me.spec.pushForce * meDrive * (meWedgeActive ? 1.25 : 0.45);
+        let oppPower = opp.spec.pushForce * state.oppTorqueMult * oppDrive * (oppWedgeActive ? 1.25 : 0.45);
+
+        if (meWedgeActive && oppFlankExposed) {
+          mePower *= 2.1; oppPower *= 0.35; opp.lifted = 1.0;
+          opp.targetRoll = (Math.sin(opp.heading) * nz - Math.cos(opp.heading) * nx) > 0 ? 0.26 : -0.26;
+          opp.targetPitch = -0.15;
+          state.contactText = '🔥 側鏟命中！'; state.advText = '我方壓倒性優勢';
+        } else if (oppWedgeActive && meFlankExposed) {
+          oppPower *= 2.0; mePower *= 0.38; me.lifted = 1.0;
+          me.targetRoll = 0.24;
+          state.contactText = '⚠️ 側面受擊！'; state.advText = '危險！快轉鏟對敵';
+        } else {
+          const ratio = mePower / Math.max(1, oppPower);
+          if (ratio > 1.22) {
+            opp.lifted = 0.55; opp.targetPitch = -0.11;
+            state.contactText = '正面硬推'; state.advText = '我方推力領先';
+          } else if (ratio < 0.82) {
+            me.lifted = 0.55; me.targetPitch = -0.11;
+            state.contactText = '正面受壓'; state.advText = '對手推力領先';
+          } else {
+            state.contactText = '正面頂死僵局'; state.advText = '按 Space 滑步破局！';
+            state.deadlockTime += dt;
+            if (state.deadlockTime > 1.2 && state.mode !== 'demo') {
+              showToast('⚠️ 正面頂死僵局！按 Space 滑步破局騙對手前撲再切側面！');
+            }
+          }
+        }
+
+        const totalP = mePower + oppPower;
+        me.x  -= nx * overlap * (oppPower / totalP);
+        me.z  -= nz * overlap * (oppPower / totalP);
+        opp.x += nx * overlap * (mePower  / totalP);
+        opp.z += nz * overlap * (mePower  / totalP);
+
+        const pushNet = (mePower - oppPower);
+        const pushSpeed = Math.max(-28, Math.min(28, pushNet * 0.24));
+        if (Math.abs(pushNet) > 15) {
+          const blend = Math.min(1, dt * 18);
+          if (pushNet > 0) {
+            const oppVn = opp.vx * nx + opp.vz * nz;
+            const dvN = (pushSpeed - oppVn) * blend;
+            opp.vx += nx * dvN; opp.vz += nz * dvN;
+            me.x += nx * pushSpeed * dt * 0.45; me.z += nz * pushSpeed * dt * 0.45;
+          } else {
+            const meVn = me.vx * nx + me.vz * nz;
+            const dvN = (pushSpeed - meVn) * blend;
+            me.vx += nx * dvN; me.vz += nz * dvN;
+            opp.x += nx * pushSpeed * dt * 0.45; opp.z += nz * pushSpeed * dt * 0.45;
+          }
+        }
+        const meSlip = (mFx * tx + mFz * tz) * 14.0 * dt;
+        me.x += tx * meSlip; me.z += tz * meSlip;
+
+        if (Math.hypot(me.vx - opp.vx, me.vz - opp.vz) > 14 && state.bumpCooldown <= 0) {
+          playBump(0.6); state.bumpCooldown = 0.25;
+        }
+      }
+
+      function resolveCupCollisions(dt) {
+        if (state.pose !== 'drill1') return;
+        let allOut = true;
+        for (const c of cups) {
+          if (c.out) {
+            c.vy -= 980 * dt;
+            c.fallY = Math.max(-ARENA_H, c.fallY + c.vy * dt);
+            c.x += c.vx * dt; c.z += c.vz * dt;
+            c.mesh.position.set(c.x, ARENA_H + c.fallY, c.z);
+            c.mesh.rotation.x += dt * 3.5;
+            continue;
+          }
+          allOut = false;
+          const dx = c.x - me.x, dz = c.z - me.z, dist = Math.hypot(dx, dz), minD = 11.2 + c.r;
+          if (dist < minD && dist > 0.01) {
+            const nx = dx / dist, nz = dz / dist;
+            c.x += nx * (minD - dist); c.z += nz * (minD - dist);
+            c.vx = me.vx * 1.15 + nx * 12; c.vz = me.vz * 1.15 + nz * 12;
+          }
+          c.x += c.vx * dt; c.z += c.vz * dt;
+          c.vx *= Math.max(0, 1 - 6.0 * dt); c.vz *= Math.max(0, 1 - 6.0 * dt);
+          c.mesh.position.set(c.x, ARENA_H, c.z);
+          if (Math.hypot(c.x, c.z) > ARENA_R + 1.5) { c.out = true; playTone(620, 0.09, 'triangle', 0.12); }
+        }
+        if (allOut && state.phase === 'running') {
+          finishRound('me', '🎯 準確度訓練過關！所有紙杯已推出場地外！');
+        }
+      }
+
+      function checkRingOut() {
+        const checkBody = (b) => {
+          const r = Math.hypot(b.x, b.z);
+          if (r > 43.0 && !b.out) {
+            const outX = b.x / r, outZ = b.z / r;
+            const dot = Math.sin(b.heading) * outX + Math.cos(b.heading) * outZ;
+            b.targetPitch = dot * ((r - 43.0) / 5.0) * 0.25;
+          }
+          if (r > RING_OUT_EDGE && !b.out) {
+            b.out = true;
+            b.vx += (b.x / r) * 16; b.vz += (b.z / r) * 16;
+            b.targetPitch = 0.42;
+            return true;
+          }
+          return false;
+        };
+        const meFell = checkBody(me);
+        const oppFell = (state.pose !== 'drill1') ? checkBody(opp) : false;
+
+        if (state.phase === 'running') {
+          if (oppFell && !meFell) finishRound('me', `🏆 勝利！成功將【${currentArch.name}】推出擂台外！`);
+          else if (meFell && !oppFell) finishRound('opp', '❌ 我方接觸擂台外圍落敗！');
+          else if (meFell && oppFell) finishRound('draw', '⚖️ 雙方同時出界，本局和局！');
+        }
+      }
+
+      function finishRound(winner, msg) {
+        state.phase = 'round_over';
+        if (winner === 'me') { state.scoreMe++; playWin(true); showBanner('我方勝出！', msg, 2800); }
+        else if (winner === 'opp') { state.scoreOpp++; playWin(false); showBanner('對手勝出', msg, 2800); }
+        else { playTone(400, 0.2, 'sine', 0.12); showBanner('本局和局', msg, 2600); }
+        showToast(msg);
+        document.getElementById('btn-quick-replay').style.display = 'inline-flex';
+        updateScoreboardUI();
+      }
+
+      /* ================================================================
+       * 9. MESH SYNC & CAMERA ORBIT
+       * ================================================================ */
+      function syncMeshes() {
+        myVisual.root.position.set(me.x, me.y, me.z);
+        myVisual.root.rotation.order = 'YXZ';
+        myVisual.root.rotation.y = me.heading;
+        myVisual.root.rotation.x = me.pitch;
+        myVisual.root.rotation.z = me.roll;
+
+        oppVisual.root.position.set(opp.x, opp.y, opp.z);
+        oppVisual.root.rotation.order = 'YXZ';
+        oppVisual.root.rotation.y = opp.heading;
+        oppVisual.root.rotation.x = opp.pitch;
+        oppVisual.root.rotation.z = opp.roll;
+      }
+
+      let camMode = 'broadcast';
+      let orbitTheta = 0.0, orbitPhi = 0.68, orbitDist = 132;
+      let isDragging = false, lastMX = 0, lastMY = 0;
+
+      renderer.domElement.addEventListener('pointerdown', (e) => {
+        isDragging = true; lastMX = e.clientX; lastMY = e.clientY;
+      });
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        orbitTheta -= (e.clientX - lastMX) * 0.007;
+        orbitPhi = Math.max(0.15, Math.min(1.42, orbitPhi - (e.clientY - lastMY) * 0.006));
+        lastMX = e.clientX; lastMY = e.clientY;
+        camMode = 'broadcast';
+      });
+      window.addEventListener('pointerup', () => { isDragging = false; });
+      renderer.domElement.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        orbitDist = Math.max(55, Math.min(210, orbitDist + e.deltaY * 0.08));
+      }, { passive: false });
+
+      function updateCamera(dt) {
+        let tx = 0, ty = ARENA_H, tz = 0, px, py, pz;
+        if (camMode === 'top') {
+          px = 0; py = 148; pz = 0.01;
+        } else if (camMode === 'chase') {
+          const fx = Math.sin(me.heading), fz = Math.cos(me.heading);
+          px = me.x - fx * 42; py = 26; pz = me.z - fz * 42;
+          tx = me.x + fx * 15; ty = ARENA_H + 3; tz = me.z + fz * 15;
+        } else {
+          px = Math.sin(orbitTheta) * Math.sin(orbitPhi) * orbitDist;
+          py = Math.cos(orbitPhi) * orbitDist + ARENA_H;
+          pz = Math.cos(orbitTheta) * Math.sin(orbitPhi) * orbitDist;
+        }
+        camera.position.lerp(new THREE.Vector3(px, py, pz), Math.min(1, dt * 8));
+        camera.lookAt(tx, ty, tz);
+      }
+
+      /* ================================================================
+       * 10. UI, SUB-PAGE DRAWER & EDGE CONTROLLER MODE SWITCHING
+       * ================================================================ */
+      const elBanner = document.getElementById('center-banner');
+      const elBannerMain = document.getElementById('banner-main');
+      const elBannerSub = document.getElementById('banner-sub');
+      const elToast = document.getElementById('toast-text');
+      const drawer = document.getElementById('subpage-drawer');
+      const backdrop = document.getElementById('drawer-backdrop');
+      let bannerTimeout = null;
+
+      function openDrawer(tab = 'tactics') {
+        playClick();
+        drawer.classList.add('open');
+        backdrop.classList.add('open');
+        switchDrawerTab(tab);
+      }
+      function closeDrawer() {
+        drawer.classList.remove('open');
+        backdrop.classList.remove('open');
+      }
+      function switchDrawerTab(tab) {
+        document.getElementById('tab-btn-tactics').classList.toggle('active-mode', tab === 'tactics');
+        document.getElementById('tab-btn-setup').classList.toggle('active-mode', tab === 'setup');
+        document.getElementById('tab-pane-tactics').classList.toggle('active', tab === 'tactics');
+        document.getElementById('tab-pane-setup').classList.toggle('active', tab === 'setup');
+      }
+
+      document.getElementById('btn-open-drawer').addEventListener('click', () => openDrawer('tactics'));
+      document.getElementById('btn-close-drawer').addEventListener('click', () => { playClick(); closeDrawer(); });
+      backdrop.addEventListener('click', closeDrawer);
+      document.getElementById('tab-btn-tactics').addEventListener('click', () => { playClick(); switchDrawerTab('tactics'); });
+      document.getElementById('tab-btn-setup').addEventListener('click', () => { playClick(); switchDrawerTab('setup'); });
+
+      function showBanner(main, sub, autoHideMs = 0) {
+        elBannerMain.textContent = main;
+        elBannerSub.textContent = sub || '';
+        elBanner.classList.add('visible');
+        if (bannerTimeout) clearTimeout(bannerTimeout);
+        if (autoHideMs > 0) bannerTimeout = setTimeout(() => elBanner.classList.remove('visible'), autoHideMs);
+      }
+      const hideBanner = () => elBanner.classList.remove('visible');
+      const showToast = (txt) => { elToast.textContent = txt; };
+
+      const POSE_LABELS = { left: '面向左', right: '面向右', back: '面向後', front: '面向前', edge: '邊緣自救', drill1: '紙杯塔' };
+
+      function updateScoreboardUI() {
+        document.getElementById('score-me').textContent = state.scoreMe;
+        document.getElementById('score-opp').textContent = state.scoreOpp;
+        document.getElementById('score-opp-name').textContent = state.pose === 'drill1' ? '紙杯塔' : currentArch.name;
+        const elTimer = document.getElementById('timer-display');
+        elTimer.textContent = state.timer.toFixed(1);
+        elTimer.classList.toggle('warn', state.timer <= 15 && state.timer > 5);
+        elTimer.classList.toggle('danger', state.timer <= 5);
+        document.getElementById('round-display').textContent = `第${state.round}局 · ${POSE_LABELS[state.pose] || state.pose}`;
+      }
+
+      function setControlMode(mode) {
+        state.ctrlMode = mode;
+        const isTank   = (mode === 'tank');
+        const isArcade = (mode === 'arcade');
+        const isSplit  = (mode === 'split');
+
+        // Left Edge: Tank = vertical 1-key lever | Arcade = 360° circle | Split = vertical-locked circle
+        document.getElementById('edge-left-tank').classList.toggle('hidden', !isTank);
+        document.getElementById('edge-left-arcade').classList.toggle('hidden', !isArcade);
+        document.getElementById('edge-left-split').classList.toggle('hidden', !isSplit);
+        // Right Edge: Tank = vertical 2-key lever | Split = horizontal-locked circle | Arcade = EMPTY!
+        document.getElementById('edge-right-tank').classList.toggle('hidden', !isTank);
+        document.getElementById('edge-right-split').classList.toggle('hidden', !isSplit);
+
+        document.getElementById('ctrl-tank').classList.toggle('active-mode', isTank);
+        document.getElementById('ctrl-arcade').classList.toggle('active-mode', isArcade);
+        document.getElementById('ctrl-split').classList.toggle('active-mode', isSplit);
+
+        const topLabels = { tank: '雙鍵 1/2', arcade: '左側單搖桿', split: '雙搖桿(前/轉)' };
+        document.getElementById('btn-ctrl-toggle').textContent = topLabels[mode] || '雙鍵 1/2';
+      }
+
+      const CTRL_CYCLE = ['tank', 'arcade', 'split'];
+      document.getElementById('btn-ctrl-toggle').addEventListener('click', () => {
+        playClick();
+        const nextMode = CTRL_CYCLE[(CTRL_CYCLE.indexOf(state.ctrlMode) + 1) % CTRL_CYCLE.length];
+        setControlMode(nextMode);
+        const msgs = {
+          tank:   '已切換【左右雙邊 1/2 鍵手掣】（左馬達＋右馬達獨立推桿）',
+          arcade: '已切換【左側單搖桿】（右側畫面完全留空！）',
+          split:  '已切換【雙搖桿模式】（左邊只控前後 ⇅，右邊只控左右 ⇄）'
+        };
+        showToast(msgs[nextMode]);
+      });
+      document.getElementById('ctrl-tank').addEventListener('click', () => { playClick(); setControlMode('tank'); });
+      document.getElementById('ctrl-arcade').addEventListener('click', () => { playClick(); setControlMode('arcade'); });
+      document.getElementById('ctrl-split').addEventListener('click', () => { playClick(); setControlMode('split'); });
+      document.getElementById('btn-move-feint-split').addEventListener('click', () => {
+        if (state.phase === 'running') triggerFeintMove();
+        else showToast('請先按「▶ 3-2-1 開賽」開始比賽！');
+      });
+
+      function selectArchetype(archId) {
+        if (!ARCHETYPES[archId]) return;
+        currentArch = ARCHETYPES[archId];
+        scene.remove(oppVisual.root);
+        oppVisual = buildOpponentMesh(currentArch);
+        scene.add(oppVisual.root);
+        opp.spec = currentArch;
+        document.querySelectorAll('.arch-card').forEach(c => c.classList.toggle('selected', c.dataset.arch === archId));
+        applyStartPose(state.pose === 'drill1' ? 'left' : state.pose);
+      }
+
+      function loadTactic(tacticId, autoRunDemo = false) {
+        const tac = TACTICS[tacticId];
+        if (!tac) return;
+        state.activeTactic = tacticId;
+
+        if (tac.arch !== 'cups') {
+          currentArch = ARCHETYPES[tac.arch];
+          scene.remove(oppVisual.root);
+          oppVisual = buildOpponentMesh(currentArch);
+          scene.add(oppVisual.root);
+          opp.spec = currentArch;
+          document.querySelectorAll('.arch-card').forEach(c => c.classList.toggle('selected', c.dataset.arch === tac.arch));
+        }
+
+        document.querySelectorAll('.tac-btn').forEach(b => b.classList.toggle('selected', b.id === `tac-${tacticId}`));
+        document.querySelectorAll('[data-pose]').forEach(b => b.classList.toggle('active-mode', b.dataset.pose === tac.pose));
+
+        applyStartPose(tac.pose);
+        rebuildTacticalArrows(tacticId);
+
+        document.getElementById('strat-name').textContent = tac.title;
+        document.getElementById('strat-status').textContent = autoRunDemo ? 'AUTO DEMO' : 'READY';
+        document.getElementById('strat-steps').innerHTML = tac.steps.map((s, i) => `<li class="${i === 0 ? 'active-step' : ''}">${s}</li>`).join('');
+        showToast(tac.toast);
+
+        if (autoRunDemo) {
+          closeDrawer(); // Close sub-page automatically so 3D arena is 100% unobstructed!
+          startMatch('demo');
+        }
+      }
+
+      function startMatch(runMode = 'duel') {
+        playClick();
+        closeDrawer();
+        state.mode = runMode;
+        document.getElementById('btn-quick-replay').style.display = 'none';
+        applyStartPose(state.pose);
+        if (runMode === 'demo') {
+          state.phase = 'running';
+          hideBanner();
+          playCountdown(true);
+          document.getElementById('strat-status').textContent = 'RUNNING';
+          showToast(`▶ 自動示範：${TACTICS[state.activeTactic].title}`);
+        } else {
+          state.phase = 'countdown';
+          state.countdownVal = 3;
+          state.countdownAcc = 0;
+          showBanner('3', '雙方貼齊黑線後方，聽到 GO 立即啟動！');
+          playCountdown(false);
+        }
+      }
+
+      // Wire Buttons
+      document.getElementById('btn-start').addEventListener('click', () => startMatch('duel'));
+      document.getElementById('btn-quick-replay').addEventListener('click', () => startMatch(state.mode));
+      document.getElementById('btn-reset-round').addEventListener('click', () => {
+        playClick(); state.phase = 'idle'; hideBanner();
+        document.getElementById('btn-quick-replay').style.display = 'none';
+        applyStartPose(state.pose);
+        showToast('本局已重置，雙方貼齊中心黑線後方。');
+      });
+      document.getElementById('btn-reset-match').addEventListener('click', () => {
+        playClick(); state.phase = 'idle'; state.round = 1; state.scoreMe = 0; state.scoreOpp = 0;
+        hideBanner(); applyStartPose('left'); closeDrawer();
+        showToast('已開啟新場次（3 局 2 勝制）。');
+      });
+      document.getElementById('btn-mute').addEventListener('click', (e) => {
+        isMuted = !isMuted; e.currentTarget.textContent = isMuted ? '🔇' : '🔊';
+      });
+
+      document.querySelectorAll('.arch-card').forEach(card => {
+        card.addEventListener('click', () => {
+          playClick(); state.phase = 'idle'; hideBanner(); selectArchetype(card.dataset.arch);
+        });
+      });
+
+      document.getElementById('sl-opp-spd').addEventListener('input', (e) => {
+        state.oppSpeedMult = Number(e.target.value) / 100;
+        document.getElementById('val-opp-spd').textContent = `${e.target.value}%`;
+      });
+      document.getElementById('sl-opp-trq').addEventListener('input', (e) => {
+        state.oppTorqueMult = Number(e.target.value) / 100;
+        document.getElementById('val-opp-trq').textContent = `${e.target.value}%`;
+      });
+
+      document.querySelectorAll('[data-pose]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          playClick(); state.phase = 'idle'; hideBanner();
+          document.querySelectorAll('[data-pose]').forEach(b => b.classList.remove('active-mode'));
+          btn.classList.add('active-mode');
+          applyStartPose(btn.dataset.pose);
+          if (currentArch.id === 'fast' && (btn.dataset.pose === 'left' || btn.dataset.pose === 'right')) rebuildTacticalArrows('fast-lr');
+          else if (currentArch.id === 'fast' && btn.dataset.pose === 'back') rebuildTacticalArrows('fast-back');
+          else if (currentArch.id === 'slow' && btn.dataset.pose === 'front') rebuildTacticalArrows('slow-feint');
+          else rebuildTacticalArrows('');
+        });
+      });
+
+      document.getElementById('btn-rand-pose').addEventListener('click', () => {
+        playClick();
+        const poses = ['left', 'right', 'back'];
+        const pick = poses[Math.floor(Math.random() * poses.length)];
+        document.getElementById(`pose-${pick}`).click();
+        showToast(`🎲 大會隨機抽籤開局方向：【${POSE_LABELS[pick]}】`);
+      });
+
+      ['fast-lr', 'fast-back', 'slow-45', 'slow-feint', 'edge-save', 'cup-drill'].forEach(id => {
+        document.getElementById(`tac-${id}`).addEventListener('click', () => { playClick(); loadTactic(id, false); });
+      });
+
+      document.getElementById('btn-auto-demo').addEventListener('click', () => loadTactic(state.activeTactic, true));
+      document.getElementById('btn-manual-drill').addEventListener('click', () => { loadTactic(state.activeTactic, false); startMatch('duel'); });
+
+      // Camera pills
+      const setCamActive = (id) => ['cam-broadcast', 'cam-top', 'cam-chase'].forEach(k => document.getElementById(k).classList.toggle('active', k === id));
+      document.getElementById('cam-broadcast').addEventListener('click', () => { playClick(); camMode = 'broadcast'; orbitTheta = 0; orbitPhi = 0.68; orbitDist = 132; setCamActive('cam-broadcast'); });
+      document.getElementById('cam-top').addEventListener('click', () => { playClick(); camMode = 'top'; setCamActive('cam-top'); });
+      document.getElementById('cam-chase').addEventListener('click', () => { playClick(); camMode = 'chase'; setCamActive('cam-chase'); });
+      document.getElementById('btn-toggle-vectors').addEventListener('click', (e) => {
+        playClick(); showVectors = !showVectors;
+        e.currentTarget.textContent = showVectors ? '箭頭 ON' : '箭頭 OFF';
+        e.currentTarget.classList.toggle('active', showVectors);
+        safeRingGroup.visible = showVectors;
+        rebuildTacticalArrows(state.activeTactic);
+      });
+
+      [['spd-05', 0.5], ['spd-10', 1.0], ['spd-15', 1.5]].forEach(([id, val]) => {
+        document.getElementById(id).addEventListener('click', () => {
+          playClick(); state.simSpeed = val;
+          ['spd-05', 'spd-10', 'spd-15'].forEach(k => document.getElementById(k).classList.toggle('active', k === id));
+        });
+      });
+
+      const bindHold = (id, setter) => {
+        const el = document.getElementById(id);
+        el.addEventListener('pointerdown', (e) => { e.stopPropagation(); setter(true); });
+        el.addEventListener('pointerup', () => setter(false));
+        el.addEventListener('pointerleave', () => setter(false));
+        el.addEventListener('pointercancel', () => setter(false));
+      };
+      bindHold('btn-move-back-l', v => { holdBtnLeftBack = v; });
+      bindHold('btn-move-back-l-split', v => { holdBtnLeftBack = v; });
+      bindHold('btn-move-back-r', v => { holdBtnRightBack = v; });
+      document.getElementById('btn-move-feint').addEventListener('click', () => { closeDrawer(); if (state.phase === 'running') triggerFeintMove(); else showToast('請先按「▶ 3-2-1 開賽」開始比賽！'); });
+      document.getElementById('btn-move-feint-arcade').addEventListener('click', () => { if (state.phase === 'running') triggerFeintMove(); else showToast('請先按「▶ 3-2-1 開賽」開始比賽！'); });
+
+      /* ================================================================
+       * 11. MAIN ANIMATION LOOP
+       * ================================================================ */
+      let lastTime = performance.now();
+      const FIXED_DT = 1 / 120;
+      let acc = 0;
+
+      function animate(now) {
+        requestAnimationFrame(animate);
+        const rawDt = Math.min(0.05, (now - lastTime) / 1000);
+        lastTime = now;
+
+        if (state.phase === 'countdown') {
+          state.countdownAcc += rawDt;
+          if (state.countdownAcc >= 0.78) {
+            state.countdownAcc = 0;
+            state.countdownVal--;
+            if (state.countdownVal > 0) {
+              showBanner(String(state.countdownVal), '準備啟動！');
+              playCountdown(false);
+            } else {
+              state.phase = 'running';
+              showBanner('GO!', '全速執行策略！', 650);
+              playCountdown(true);
+            }
+          }
+        }
+
+        acc += rawDt * state.simSpeed;
+        while (acc >= FIXED_DT) {
+          acc -= FIXED_DT;
+          if (state.bumpCooldown > 0) state.bumpCooldown -= FIXED_DT;
+          if (state.feintTimer > 0) state.feintTimer -= FIXED_DT;
+
+          if (state.phase === 'running') {
+            state.matchElapsed += FIXED_DT;
+            state.timer = Math.max(0, state.timer - FIXED_DT);
+
+            const myCmd = state.mode === 'demo' ? getDemoPlayerCommands() : getManualCommands();
+            const oppCmd = getOpponentCommands();
+            me.leftCmd = myCmd.l; me.rightCmd = myCmd.r;
+            opp.leftCmd = oppCmd.l; opp.rightCmd = oppCmd.r;
+
+            stepBodyDrive(me, FIXED_DT, 1.0);
+            stepBodyDrive(opp, FIXED_DT, state.oppSpeedMult);
+            resolveRobotCollision(FIXED_DT);
+            resolveCupCollisions(FIXED_DT);
+            checkRingOut();
+
+            if (state.timer <= 0 && state.phase === 'running') {
+              finishRound('draw', '⏱ 60 秒時間到！本局和局。');
+            }
+          } else if (state.phase === 'round_over') {
+            me.leftCmd = 0; me.rightCmd = 0; opp.leftCmd = 0; opp.rightCmd = 0;
+            stepBodyDrive(me, FIXED_DT, 1.0);
+            stepBodyDrive(opp, FIXED_DT, 1.0);
+          }
+        }
+
+        // Visual wheel & gear spin
+        if (state.phase === 'running') {
+          const dtV = rawDt * state.simSpeed;
+          myVisual.wheelL.rotation.x += (me.leftCmd * me.spec.maxSpeed / 2.8) * dtV;
+          myVisual.wheelR.rotation.x += (me.rightCmd * me.spec.maxSpeed / 2.8) * dtV;
+          myVisual.gearL.rotation.x  += (me.leftCmd * me.spec.maxSpeed / 2.8) * 1.67 * dtV;
+          myVisual.gearR.rotation.x  += (me.rightCmd * me.spec.maxSpeed / 2.8) * 1.67 * dtV;
+          oppVisual.wheelL.rotation.x += (opp.leftCmd * opp.spec.maxSpeed / 2.8) * dtV;
+          oppVisual.wheelR.rotation.x += (opp.rightCmd * opp.spec.maxSpeed / 2.8) * dtV;
+        }
+
+        syncMeshes();
+        updateCamera(rawDt);
+        updateScoreboardUI();
+
+        // Sync visual edge knobs (Tank 1/2 & Split Left=Fwd/Back + Right=Left/Right)
+        const trackH = document.getElementById('stick-left-track').clientHeight || 158;
+        const centerTop = (trackH - 50) / 2;
+        const travel = centerTop - 6;
+        if (state.ctrlMode === 'split') {
+          const fwdVis = Math.max(-1, Math.min(1, (me.leftCmd + me.rightCmd) * 0.5));
+          const trnVis = Math.max(-1, Math.min(1, (me.leftCmd - me.rightCmd) * 0.55));
+          document.getElementById('split-fwd-knob').style.top = `${36 - fwdVis * 38}px`;
+          document.getElementById('split-fwd-knob').style.left = '36px';
+          document.getElementById('split-steer-knob').style.left = `${36 + trnVis * 38}px`;
+          document.getElementById('split-steer-knob').style.top = '36px';
+        } else {
+          document.getElementById('stick-left-knob').style.top  = `${centerTop - me.leftCmd * travel}px`;
+          document.getElementById('stick-right-knob').style.top = `${centerTop - me.rightCmd * travel}px`;
+        }
+
+        // Update Telemetry inside Drawer
+        document.getElementById('tele-my-spd').textContent  = `${Math.hypot(me.vx, me.vz).toFixed(1)} cm/s`;
+        document.getElementById('tele-opp-spd').textContent = `${Math.hypot(opp.vx, opp.vz).toFixed(1)} cm/s`;
+        document.getElementById('tele-contact').textContent = state.contactText;
+        document.getElementById('tele-adv').textContent     = state.advText;
+
+        // Zone HUD pill
+        const rMe = Math.hypot(me.x, me.z);
+        const zoneLed = document.getElementById('led-zone');
+        const zoneTxt = document.getElementById('hud-zone-text');
+        if (rMe <= SAFE_ZONE_R) {
+          zoneLed.className = 'led-dot green';
+          zoneTxt.textContent = `安全區 · R=${rMe.toFixed(0)}cm`;
+        } else if (rMe <= DANGER_ZONE_R) {
+          zoneLed.className = 'led-dot';
+          zoneTxt.textContent = `⚠️ 紅圈危險 · R=${rMe.toFixed(0)}cm`;
+        } else {
+          zoneLed.className = 'led-dot';
+          zoneTxt.textContent = `🚨 黑邊快甩尾 · R=${rMe.toFixed(0)}cm`;
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener('resize', () => {
+        const w = host.clientWidth, h = Math.max(host.clientHeight, 1);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      });
+
+      // Boot: behind-black-line Left pose, Tank 1/2 iPad edge controls ready!
+      setControlMode('tank');
+      loadTactic('fast-lr', false);
+      requestAnimationFrame(animate);
+    })();
+  </script>
+</body>
+</html>
